@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Http\Controllers\Chat;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\GroupResource;
+use App\Models\Group;
+use App\Repositories\GroupRepository;
+use Illuminate\Http\Request;
+
+class GroupController extends Controller
+{
+    public  function __construct(protected GroupRepository $groupRepository)
+    {
+
+    }   //
+    public function getUserChatGroup(Request $request)
+    {
+        return $this->groupRepository->fetchUserChatGroups($request);
+    }
+}
