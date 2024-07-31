@@ -30,17 +30,3 @@ Route::group(['middleware' => ['auth:sanctum','extract.user.id']], function() {
 });
 
 Route::post('login',[AuthController::class,'login']);
-
-
-Route::post('/chat', function (Request $request) {
-    $token = $request->header('Authorization');
-    return $token;
-    $user = User::find($token);
-
-    if (!$user) {
-      return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    // Return the chat endpoint
-    return response()->json(['endpoint' => 'chat']);
-  });
