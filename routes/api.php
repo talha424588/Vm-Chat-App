@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\Chat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
@@ -30,3 +31,15 @@ Route::group(['middleware' => ['auth:sanctum','extract.user.id']], function() {
 });
 
 Route::post('login',[AuthController::class,'login']);
+
+Route::post('/send-message', function (Request $request) {
+    $user = new User();
+    $user->id = $request->input('user.id');
+    $user->name = $request->input('user.name');
+
+    $message = $request->input('message');
+
+    broadcast(new Chat($user, $message));
+
+    return response()->json(['message' => 'Message sent successfully']);
+});

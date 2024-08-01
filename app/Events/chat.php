@@ -2,6 +2,8 @@
 
 namespace App\Events;
 
+use App\Models\GroupMessage;
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,19 +13,21 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class chat implements ShouldBroadcast
+class Chat implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $user;
     public $message;
-    public $username;
+
     /**
      * Create a new event instance.
      */
-    public function __construct($username, $message)
+    public function __construct(User $user, $message)
     {
-        $this->username = $username;
+        $this->user = $user;
         $this->message = $message;
+        Log::info('Chat message received', ['username' => $this->user->name, 'message' => $this->message]);
     }
 
     /**
@@ -33,6 +37,24 @@ class chat implements ShouldBroadcast
      */
     public function broadcastOn()
     {
+
+        Log::info('Chat message received', ['username' => $this->user->name, 'message' => $this->message]);
         return new Channel('vm-chat');
+    }
+
+    public function broadcastWith()
+    {
+        return [
+            'type' => 'message',
+            'user' => [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+            ],
+            'message' => $this->message,
+        ];
+    }
+
+    public function broadcastAs () {
+        return 'vm-chat-monitor';
     }
 }
