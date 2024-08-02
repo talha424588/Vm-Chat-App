@@ -28,18 +28,9 @@ Route::group(['middleware' => ['auth:sanctum','extract.user.id']], function() {
     //Chats Routes
     Route::get('search-groups-chat-messages',[ChatController::class,'searchGroupMessages']);
     Route::get('get-groups-messages-by-group-id',[ChatController::class,'getUserAllGroupsMessages']);
+
+    Route::get('/messages', [ChatController::class, 'index']);
+    Route::post('/messages', [ChatController::class, 'store']);
 });
 
 Route::post('login',[AuthController::class,'login']);
-
-Route::post('/send-message', function (Request $request) {
-    $user = new User();
-    $user->id = $request->input('user.id');
-    $user->name = $request->input('user.name');
-
-    $message = $request->input('message');
-
-    broadcast(new Chat($user, $message));
-
-    return response()->json(['message' => 'Message sent successfully']);
-});

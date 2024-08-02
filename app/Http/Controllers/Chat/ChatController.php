@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Http\Controllers\Controller;
+use App\Models\GroupMessage;
 use App\Repositories\ChatRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -62,5 +63,28 @@ class ChatController extends Controller
         }
 
         return null;
+    }
+
+
+    public function index(Request $request)
+    {
+        return GroupMessage::where('group_id',$request->group_id)->with('user')->get();
+    }
+
+    public function store(Request $request)
+    {
+        $user = $request->input('user');
+
+    // Get the unique_id from the user object
+        $uniqueId = $user['unique_id'];
+
+        $message = new GroupMessage;
+        $message->msg = $request->msg;
+        $message->sender = $uniqueId;
+        $message->reply_id = $request->replyId;
+        $message->group_id = "i2R5WNL55XaFYOX";
+        $message->time = time();
+        $message->save();
+        return response()->json($message, 201);
     }
 }

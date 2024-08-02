@@ -10,9 +10,15 @@ class GroupMessage extends Model
     use HasFactory;
 
     protected $table = "group_messages";
+    public $timestamps = false;
 
     public function group()
     {
         return $this->belongsTo(Group::class, 'group_id','group_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class,'sender',"unique_id");
     }
 }
