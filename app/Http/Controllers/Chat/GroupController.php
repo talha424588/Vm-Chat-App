@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\GroupResource;
-use App\Models\Group;
 use App\Repositories\GroupRepository;
 use Illuminate\Http\Request;
 

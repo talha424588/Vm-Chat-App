@@ -38,10 +38,10 @@ const authenticateSocket = async (socket, next) => {
 
 io.on('connection', (socket) => {
     console.log('connection');
-
+    console.log( socket.client.conn.server.clientsCount + " users connected" );
     socket.on('sendChatToServer', async (message) => {
         console.log(message);
-        socket.broadcast.emit('sendChatToClient', message);
+        socket.connected ?? socket.broadcast.emit('sendChatToClient', message);
     });
 
     socket.on('disconnect', () => {

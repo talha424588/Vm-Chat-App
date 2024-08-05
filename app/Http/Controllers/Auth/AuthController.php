@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequestBody;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {

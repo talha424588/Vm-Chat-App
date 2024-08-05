@@ -7,7 +7,6 @@ use App\Models\GroupMessage;
 use App\Repositories\ChatRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 
 class ChatController extends Controller
 {
