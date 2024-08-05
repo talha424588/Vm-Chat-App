@@ -34,7 +34,7 @@ class ChatService implements ChatRepository
     {
         $perPage = 20;
         $page = $request->get('page',1);
-        $paginator = GroupMessage::where('group_id', $request->groupId)
+        $paginator = GroupMessage::where('group_id', $request->groupId)->with('user')->orderBy('id', 'desc')
         ->paginate($perPage, ['*'], 'page', $page);
         if ($paginator != null) {
             $response = [

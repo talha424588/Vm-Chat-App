@@ -67,7 +67,7 @@ class ChatController extends Controller
 
     public function index(Request $request)
     {
-        return GroupMessage::where('group_id',$request->group_id)->with('user')->get();
+        return $this->chatRepository->fetchUserAllGroupsMessages($request);
     }
 
     public function store(Request $request)

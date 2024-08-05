@@ -23,7 +23,6 @@ const authenticateSocket = async (socket, next) => {
             Authorization: `Bearer ${token}`
           }
         });
-
         if (response.status === 200) {
           next();
         } else {
@@ -37,11 +36,17 @@ const authenticateSocket = async (socket, next) => {
   io.use(authenticateSocket);
 
 io.on('connection', (socket) => {
-    console.log('connection');
-    console.log( socket.client.conn.server.clientsCount + " users connected" );
+    //console.log( socket.client.conn.server.clientsCount + " users connected" );
     socket.on('sendChatToServer', async (message) => {
-        console.log(message);
-        socket.connected ?? socket.broadcast.emit('sendChatToClient', message);
+        if(socket.connected)
+        {
+            socket.broadcast.emit('sendChatToClient', message);
+            console.log(message);
+        }
+        else
+        {
+            console.log("message send failed");
+        }
     });
 
     socket.on('disconnect', () => {
