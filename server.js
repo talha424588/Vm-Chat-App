@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import axios from 'axios';
 
 const app = express();
 
@@ -9,6 +10,31 @@ const server = createServer(app);
 const io = new Server(server, {
     cors: { origin: "*" }
 });
+
+const authenticateSocket = async (socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) {
+      return next(new Error('Unauthorized'));
+    }
+
+    try {
+        const response = await axios.get('http://localhost:8000/api/auth/token/verify', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 200) {
+          next();
+        } else {
+          next(new Error('Unauthorized'));
+        }
+      } catch (error) {
+        next(new Error('Unauthorized'));
+      }
+    };
+
+  io.use(authenticateSocket);
 
 io.on('connection', (socket) => {
     console.log('connection');

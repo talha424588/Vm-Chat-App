@@ -6,15 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequestBody;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
     public function __construct(protected UserRepository $userRepository)
-{
-}
+    {
+    }
 
     public function login(LoginRequestBody $request)
     {
         return $this->userRepository->authenticateUser($request);
+    }
+
+    public function verifyToken(Request $request)
+    {
+        return $this->userRepository->varifyUserForSocketConnection($request);
     }
 }

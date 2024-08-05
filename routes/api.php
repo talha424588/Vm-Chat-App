@@ -31,6 +31,8 @@ Route::group(['middleware' => ['auth:sanctum','extract.user.id']], function() {
 
     Route::get('/messages', [ChatController::class, 'index']);
     Route::post('/messages', [ChatController::class, 'store']);
+    Route::get('auth/token/verify', [AuthController::class, 'verifyToken']);
+
 });
 
 Route::post('login',[AuthController::class,'login']);

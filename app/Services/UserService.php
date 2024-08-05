@@ -27,6 +27,20 @@ class UserService implements UserRepository
             return response()->json(['status'=>false,'message'=>'not found', 'data' => null]);
     }
 
+    public function varifyUserForSocketConnection($request)
+    {
+        $token = $this->getTokenFromHeaders($request);
+        $user = auth('sanctum')->authenticate($token);
+        return response()->json(["status" => true, "user" => $user]);
+    }
+
+    private function getTokenFromHeaders(Request $request)
+    {
+        $token = $request->header('Authorization');
+        $token = str_replace('Bearer ', '', $token);
+        return $token;
+    }
+
     // private function revokeTokenIfExist()
     // {
     //     $user = auth('sanctum')->user();
