@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Http\Requests\LoginRequestBody;
-use App\Http\Resources\userResource;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
