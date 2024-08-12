@@ -35,4 +35,4 @@ Route::group(['middleware' => ['auth:sanctum','extract.user.id']], function() {
 
 });
 
-Route::post('login',[AuthController::class,'login']);
+//Route::post('login',[AuthController::class,'login']);

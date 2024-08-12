@@ -39,7 +39,13 @@ class Chat implements ShouldBroadcast
     {
 
         Log::info('Chat message received', ['username' => $this->user->name, 'message' => $this->message]);
-        return new Channel('vm-chat');
+        return new Channel('vmChat');
+    }
+
+
+    public function broadcastAs()
+    {
+        return 'Chat';
     }
 
     public function broadcastWith()
@@ -52,9 +58,5 @@ class Chat implements ShouldBroadcast
             ],
             'message' => $this->message,
         ];
-    }
-
-    public function broadcastAs () {
-        return 'vm-chat-monitor';
     }
 }

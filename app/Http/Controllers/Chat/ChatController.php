@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Chat;
 
+use App\Events\Chat;
 use App\Http\Controllers\Controller;
 use App\Models\GroupMessage;
+use App\Models\User;
 use App\Repositories\ChatRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -85,5 +87,13 @@ class ChatController extends Controller
         $message->time = time();
         $message->save();
         return response()->json($message, 201);
+    }
+
+
+    public function broadcastChat()
+    {
+        $user = User::find(33);
+        event(new Chat($user,"message"));
+        return response()->json(['msg'=>"event fired !!"]);
     }
 }
