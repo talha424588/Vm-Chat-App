@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Chat\ChatController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,14 +16,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LoginController::class,'restrictMultipleLogin']);
 
 
 Route::post('/broadcast',[ChatController::class,'broadcastChat'])->name('broadcast.chat');
-Route::post('/chat',[ChatController::class,'store'])->name('store.chat');
+Route::get('/chat',[ChatController::class,'store'])->name('store.chat');
 
 Auth::routes();
-
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

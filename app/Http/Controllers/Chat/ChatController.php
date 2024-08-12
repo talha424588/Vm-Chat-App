@@ -74,26 +74,28 @@ class ChatController extends Controller
 
     public function store(Request $request)
     {
-        $user = $request->input('user');
+        // $user = $request->input('user');
 
     // Get the unique_id from the user object
-        $uniqueId = $user['unique_id'];
+        // $uniqueId = $user['unique_id'];
+        $uniqueId = $request->user()->unique_id;
 
         $message = new GroupMessage;
         $message->msg = $request->msg;
         $message->sender = $uniqueId;
         $message->reply_id = $request->replyId;
-        $message->group_id = "i2R5WNL55XaFYOX";
+        $message->group_id = $request->group_id;
         $message->time = time();
         $message->save();
         return response()->json($message, 201);
     }
 
 
-    public function broadcastChat()
+    public function broadcastChat(Request $request)
     {
-        $user = User::find(33);
-        event(new Chat($user,"message"));
+        $user = $request->user();
+        event(new Chat($user,$request->msg));
+        $this->store($request);
         return response()->json(['msg'=>"event fired !!"]);
     }
 }
