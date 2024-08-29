@@ -71,7 +71,7 @@ let populateChatList = () => {
 	.sort((a, b) => mDate(a.time).subtract(b.time))
 	.forEach((msg) => {
 		let chat = {};
-		
+
 		chat.isGroup = msg.recvIsGroup;
 		chat.msg = msg;
 
@@ -102,22 +102,22 @@ let viewChatList = () => {
 	.forEach((elem, index) => {
 		let statusClass = elem.msg.status < 2 ? "far" : "fas";
 		let unreadClass = elem.unread ? "unread" : "";
-/*if needs to display the tick icon with the message 
+/*if needs to display the tick icon with the message
 <div class="small last-message">${elem.isGroup ? contactList.find(contact => contact.id === elem.msg.sender).name + ": " : ""}${elem.msg.sender === user.id ? "<i class=\"" + statusClass + " fa-check-circle mr-1\"></i>" : ""} ${elem.msg.body}</div>
 */
 
 			DOM.chatList.innerHTML += `
 		<div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" onclick="generateMessageArea(this, ${index})">
 			<img src="${elem.isGroup ? elem.group.pic : elem.contact.pic}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
-		
-		
+
+
 			<div class="w-50">
 				<div class="name list-user-name">${elem.name}</div>
-				<div class="small last-message">${elem.isGroup ? contactList.find(contact => contact.id === elem.msg.sender).name + ": " : ""}${elem.msg.sender === user.id ? 
+				<div class="small last-message">${elem.isGroup ? contactList.find(contact => contact.id === elem.msg.sender).name + ": " : ""}${elem.msg.sender === user.id ?
 					"" : ""} ${elem.msg.body}</div>
 
 			</div>
-			
+
 			<div class="flex-grow-1 text-right">
 				<div class="small time">${mDate(elem.msg.time).chatListFormat()}</div>
 				${elem.unread ? "<div class=\"badge badge-success badge-pill small\" id=\"unread-count\">" + elem.unread + "</div>" : ""}
@@ -144,7 +144,7 @@ let addDateToMessageArea = (date) => {
 };
 let addunreadToMessageArea = {
     addUnread: function() {
-	
+
 		DOM.messages.innerHTML += `
  <div class="notification-wrapper">
   <div class="unread-messages">
@@ -188,9 +188,9 @@ let addMessageToMessageArea = (msg) => {
         addDateToMessageArea(msgDate);
         lastDate = msgDate;
     }
-    
+
     var alert_message = msg.read_status;
-    
+
     if (alert_message == 1) {
         addunreadToMessageArea.addUnread();
     }
@@ -212,7 +212,7 @@ let addMessageToMessageArea = (msg) => {
 	<div class="ml-3">
 	  ${msg.sender === user.id ? '' : profileImage}
 	  <div class="">
-		<div class="align-self-${msg.sender === user.id ? 'end self' : 'start'} d-flex flex-row align-items-center 
+		<div class="align-self-${msg.sender === user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
 		  p-1 my-1 mx-3 rounded message-item ${msg.sender === user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${msg.id}">
 		  <div style="margin-top:-4px">
 			<div class="shadow-sm" style="background:${msg.sender === user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
@@ -226,7 +226,7 @@ let addMessageToMessageArea = (msg) => {
 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal">Seen</a>
 				</span> |
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: 
+				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
 				  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${msg.id}">Reply</a>
 				</span> |
 				<span>
@@ -239,7 +239,7 @@ let addMessageToMessageArea = (msg) => {
 	  </div>
 	</div>
 	`;
-	
+
 
     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
 };
@@ -272,7 +272,7 @@ let generateMessageArea = (elem, chatIndex) => {
 
 	DOM.messageAreaName.innerHTML = chat.name;
 	DOM.messageAreaPic.src = chat.isGroup ? chat.group.pic : chat.contact.pic;
-	
+
 	// Message Area details ("last seen ..." for contacts / "..names.." for groups)
 	if (chat.isGroup) {
 		let groupMembers = groupList.find(group => group.id === chat.group.id).members;
@@ -280,7 +280,7 @@ let generateMessageArea = (elem, chatIndex) => {
 				.filter(contact => groupMembers.indexOf(contact.id) !== -1)
 				.map(contact => contact.id === user.id ? "You" : contact.name)
 				.join(", ");
-		
+
 		DOM.messageAreaDetails.innerHTML = `${memberNames}`;
 	} else {
 		DOM.messageAreaDetails.innerHTML = `last seen ${mDate(chat.contact.lastSeen).lastSeenFormat()}`;
@@ -324,6 +324,7 @@ let sendMessage = () => {
 };
 
 let showProfileSettings = () => {
+    console.log("hit");
 	DOM.profileSettings.style.left = 0;
 	DOM.profilePic.src = user.pic;
 	DOM.inputName.value = user.name;
@@ -358,7 +359,7 @@ init();
 
 
 
-//Code to send the message 
+//Code to send the message
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');
 const chatInputContainer = document.querySelector('.chat-input-container');
@@ -378,7 +379,7 @@ const startRecording = () => {
 			mediaRecorder.start();
 			chatInputContainer.classList.add('recording-active');
 			voiceIcon.classList.add('recording');
-			
+
 			// Change SVG to pause icon
 			voiceSvg.innerHTML = `
 				<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
@@ -423,7 +424,7 @@ const startRecording = () => {
 			console.error('Error accessing media devices.', error);
 			chatInputContainer.classList.remove('recording-active');
 			voiceIcon.classList.remove('recording');
-			
+
 			// Change SVG back to voice icon
 			voiceSvg.innerHTML = `
 				<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
@@ -468,7 +469,7 @@ fileInput.addEventListener('change', (event) => {
 
 
 
-// on enter send the message 
+// on enter send the message
 document.getElementById('input').addEventListener('keydown', function(event) {
 	if (event.key === 'Enter') {
 		event.preventDefault(); // Prevent form submission or other default actions

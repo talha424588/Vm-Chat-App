@@ -1,10 +1,53 @@
+document.addEventListener('DOMContentLoaded', function (e) {
+    const id = document.getElementById("login_user_id").value;
+    const name = document.getElementById("login_user_name").value;
+    const unique_id = document.getElementById("login_user_unique_id").value;
 
+    fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
+        method: 'GET',
+        headers: {
+            'content-type': 'application/json'
+        }
+    }).then(response => response.json())
+        .then(result => {
+            console.log(result);
+            groupList = result;
+
+        }).catch(error => {
+            console.log(error);
+        });
+
+});
+
+let groupList = [
+	{
+		id: 1,
+		name: "Programmers",
+		members: [0, 1, 3],
+		pic: "images/0923102932_aPRkoW.jpg"
+	},
+	{
+		id: 2,
+		name: "Web Developers",
+		members: [0, 2],
+		pic: "images/1921231232_Ag1asE.png"
+	},
+	{
+		id: 3,
+		name: "notes",
+		members: [0],
+		pic: "images/8230192232_asdEWq2.png"
+	}
+];
+
+// message status - 0:sent, 1:delivered, 2:read
 let user = {
-	id: 0,
-	name: "Awais Ahmad",
-	number: "+91 91231 40293",
-	pic: "images/asdsd12f34ASd231.png"
+    id: 0,
+    name: "Awais Ahmad",
+    number: "+91 91231 40293",
+    pic: "assets/images/asdsd12f34ASd231.png"
 };
+
 
 let contactList = [
 	{
@@ -43,30 +86,6 @@ let contactList = [
 		lastSeen: "Apr 27 2018 17:28:10"
 	}
 ];
-
-let groupList = [
-	{
-		id: 1,
-		name: "Programmers",
-		members: [0, 1, 3],
-		pic: "images/0923102932_aPRkoW.jpg"
-	},
-	{
-		id: 2,
-		name: "Web Developers",
-		members: [0, 2],
-		pic: "images/1921231232_Ag1asE.png"
-	},
-	{
-		id: 3,
-		name: "notes",
-		members: [0],
-		pic: "images/8230192232_asdEWq2.png"
-	}
-];
-
-// message status - 0:sent, 1:delivered, 2:read
-
 let messages = [
 	{
 		id: 0,
@@ -120,7 +139,7 @@ let messages = [
 		time: "April 27, 2018 18:20:11",
 		status: 0,
 		recvId: 1,
-		
+
 		recvIsGroup: true
 	},
 	{

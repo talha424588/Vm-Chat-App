@@ -20,7 +20,7 @@ use App\Models\User;
 */
 
 
-Route::group(['middleware' => ['auth:sanctum','extract.user.id']], function() {
+Route::group(['middleware' => ['auth:web']], function() {
 
     //Groups Routes
     Route::get('get-user-chat-groups',[GroupController::class,'getUserChatGroup']);
