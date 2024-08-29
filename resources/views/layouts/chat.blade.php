@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="Kodinger">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>VMChatter-Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/my-login.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+
+<body class="my-login-page">
+
+
+    <div class="">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-bottom justify-content-between">
+            <a class="navbar-brand logo_brand" href="#">VM Chatter</a>
+
+
+
+            <button class="btn btn-contactus my-2 my-sm-0" type="submit"><svg width="16" height="16"
+                    viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M14.4323 10.9109L12.17 10.6526C11.904 10.6214 11.6343 10.6508 11.3813 10.7388C11.1283 10.8267 10.8986 10.9708 10.7093 11.1603L9.07041 12.7992C6.54212 11.513 4.48702 9.45785 3.20082 6.92954L4.84858 5.28177C5.23157 4.89878 5.41862 4.36437 5.35627 3.82105L5.09797 1.57652C5.04766 1.14194 4.8392 0.741074 4.51231 0.450327C4.18543 0.159581 3.76299 -0.000712612 3.32551 2.38166e-06H1.78464C0.778165 2.38166e-06 -0.0590758 0.837247 0.0032719 1.84372C0.475333 9.45018 6.55869 15.5247 14.1562 15.9967C15.1627 16.0591 15.9999 15.2218 15.9999 14.2154V12.6745C16.0088 11.7749 15.3319 11.0178 14.4323 10.9109Z"
+                        fill="white" />
+                </svg>&nbsp;&nbsp;Contact Us</button>
+
+        </nav>
+    </div>
+
+
+    <main class="py-4">
+        @yield('content')
+    </main>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+    <script src="{{ asset('assets/js/my-login.js') }}"></script>
+</body>
+
+</html>

@@ -242,42 +242,9 @@
     }, 1000);
 
 
-    // function broadcast() {
-    //     console.log("user", user);
-    //     $.ajax({
-    //         headers: {
-    //             'X-CSRF-TOKEN': '{{ csrf_token() }}'
-    //         },
-    //         url: '{{ route('broadcast.chat') }}',
-    //         type: 'POST',
-    //         data: {
-    //             user: user,
-    //             msg: $("#chat-input").val(),
-    //             reply_id: null,
-    //             group_id: "i2R5WNL55XaFYOX"
-    //         },
-    //         success: function(data) {
-    //             console.log(data.msg);
-    //             document.getElementById('chat-input').value = "";
-    //         }
-    //     });
-    // }
-
     function broadcast() {
-        var message = document.getElementById('chat-input').value;
-        if (message.trim() !== '') {
-            console.log("Broadcasting message:", message);
-            // Add your broadcast logic here
-            // Example: send the message to your server or WebSocket
-        }
-        document.getElementById('chat-input').value = ''; // Clear the input field
-    }
-
-    // Listen for the Enter key press on the input field
-    document.getElementById('chat-input').addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent the default form submission behavior
-            $.ajax({
+        console.log("user", user);
+        $.ajax({
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
@@ -294,8 +261,41 @@
                 document.getElementById('chat-input').value = "";
             }
         });
-        }
-    });
+    }
+
+    // function broadcast() {
+    //     var message = document.getElementById('chat-input').value;
+    //     if (message.trim() !== '') {
+    //         console.log("Broadcasting message:", message);
+    //         // Add your broadcast logic here
+    //         // Example: send the message to your server or WebSocket
+    //     }
+    //     document.getElementById('chat-input').value = ''; // Clear the input field
+    // }
+
+    // // Listen for the Enter key press on the input field
+    // document.getElementById('chat-input').addEventListener('keydown', function(event) {
+    //     if (event.key === 'Enter') {
+    //         event.preventDefault(); // Prevent the default form submission behavior
+    //         $.ajax({
+    //         headers: {
+    //             'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    //         },
+    //         url: '{{ route('broadcast.chat') }}',
+    //         type: 'POST',
+    //         data: {
+    //             user: user,
+    //             msg: $("#chat-input").val(),
+    //             reply_id: null,
+    //             group_id: "i2R5WNL55XaFYOX"
+    //         },
+    //         success: function(data) {
+    //             console.log(data.msg);
+    //             document.getElementById('chat-input').value = "";
+    //         }
+    //     });
+    //     }
+    // });
 </script>
 
 </html>

@@ -16,11 +16,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [LoginController::class,'restrictMultipleLogin']);
+Route::get('/login', [LoginController::class,'restrictMultipleLogin'])->name('login');
 
 
-Route::post('/broadcast',[ChatController::class,'broadcastChat'])->name('broadcast.chat');
-Route::get('/chat',[ChatController::class,'store'])->name('store.chat');
+// Route::post('/broadcast',[ChatController::class,'broadcastChat'])->name('broadcast.chat');
+// Route::get('/chat',[ChatController::class,'store'])->name('store.chat');
 
-Auth::routes();
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Auth::routes();
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

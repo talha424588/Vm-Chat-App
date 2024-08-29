@@ -43,6 +43,6 @@ class LoginController extends Controller
 
     public function restrictMultipleLogin()
     {
-        return Auth::user() != null ? redirect('/'):redirect('login');
+        return Auth::user() != null ? view('chat'):view('auth.login');
     }
 }
