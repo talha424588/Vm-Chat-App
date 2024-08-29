@@ -22,4 +22,10 @@ class AuthController extends Controller
     {
         return $this->userRepository->varifyUserForSocketConnection($request);
     }
+
+    public function resetPassword($token)
+    {
+        return $token;
+    }
+
 }

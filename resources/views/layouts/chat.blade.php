@@ -31,11 +31,33 @@
         </nav>
     </div>
 
+    @yield('content')
 
-    <main class="py-4">
-        @yield('content')
-    </main>
 
+
+
+    <footer class="text-center  bg-white fixed-bottom" style="box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);">
+
+        <!-- Copyright -->
+        <div class="text-center p-3 ">
+            <div class="d-flex justify-content-between">
+                <div class="Copyright-claim">
+                    © 2024 VMChatter All Right Reserved
+                </div>
+                <div class="Copyright-claim-right">
+                    <a class="text-body" style="padding-right: 50px;" href="https://mdbootstrap.com/">Privacy Policy</a>
+
+                    <a class="text-body" href="https://mdbootstrap.com/">Use of Terms</a>
+
+                </div>
+            </div>
+
+
+
+        </div>
+        <!-- Copyright -->
+    </footer>
+    </section>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">

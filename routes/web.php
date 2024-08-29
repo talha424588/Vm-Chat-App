@@ -16,7 +16,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/login', [LoginController::class,'restrictMultipleLogin'])->name('login');
+Route::get('/login', [LoginController::class, 'restrictMultipleLogin'])->name('login');
+Route::get('/forgot-password', function () {
+    return view('forgotPassword');
+})->middleware('guest')->name('password.request');
+
+Route::get('/reset-password/', [AuthController::class, 'resetPassword'])->middleware('guest')->name('password.reset');
 
 
 // Route::post('/broadcast',[ChatController::class,'broadcastChat'])->name('broadcast.chat');
