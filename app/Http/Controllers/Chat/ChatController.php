@@ -15,6 +15,12 @@ class ChatController extends Controller
     public function __construct(protected ChatRepository $chatRepository)
     {
     }
+
+
+    public function index()
+    {
+        return view('chat');
+    }
     //
     public function searchGroupMessages(Request $request)
     {
@@ -67,10 +73,10 @@ class ChatController extends Controller
     }
 
 
-    public function index(Request $request)
-    {
-        return $this->chatRepository->fetchUserAllGroupsMessages($request);
-    }
+    // public function index(Request $request)
+    // {
+    //     return $this->chatRepository->fetchUserAllGroupsMessages($request);
+    // }
 
     public function store(Request $request)
     {

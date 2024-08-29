@@ -16,15 +16,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/login', [LoginController::class, 'restrictMultipleLogin'])->name('login');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
+Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 Route::get('/forgot-password', function () {
     return view('forgotPassword');
 })->middleware('guest')->name('password.request');
 
 Route::get('/reset-password/', [AuthController::class, 'resetPassword'])->middleware('guest')->name('password.reset');
 
+Route::get('/', [ChatController::class, 'index'])->name('chat')->middleware('auth');
 
-// Route::post('/broadcast',[ChatController::class,'broadcastChat'])->name('broadcast.chat');
+Route::post('/broadcast',[ChatController::class,'broadcastChat'])->name('broadcast.chat');
 // Route::get('/chat',[ChatController::class,'store'])->name('store.chat');
 
 // Auth::routes();

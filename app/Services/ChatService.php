@@ -65,9 +65,5 @@ class ChatService implements ChatRepository
             ], 404);
         }
 
-        // if (count($userGroupsMessages) > 0)
-        //     return new MessageResource($userGroupsMessages);
-        // else
-        //     return response()->json(["status" => false, "message" => "not found", "messages" => null], 404);
     }
 }

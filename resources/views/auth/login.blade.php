@@ -7,8 +7,8 @@
             <div class="row justify-content-md-center h-100">
                 <div class="card-wrapper">
                     <!-- <div class="brand">
-                                <img src="img/logo.jpg" alt="logo">
-                            </div> -->
+                                            <img src="img/logo.jpg" alt="logo">
+                                        </div> -->
                     <div class="card fat">
                         <div class="card-body">
                             <h4 class="card-title text-center">Hi, Welcome </h4>
@@ -22,9 +22,7 @@
                                         value="{{ old('email') }}" required autocomplete="email" autofocus>
 
                                     @error('email')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
+                                        <div class="alert alert-danger my-2">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -33,16 +31,15 @@
                                     <input id="password" type="password" class="form-control" name="password" required
                                         data-eye>
                                     @error('password')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
+                                        <div class="alert alert-danger my-2">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 <div class="form-group ">
                                     <div class="custom-checkbox custom-control text-center mt-4">
                                         @if (Route::has('password.request'))
-                                        <a href="{{ route('password.request') }}" class="forgot-password ">Forgot your password?</a>
+                                            <a href="{{ route('password.request') }}" class="forgot-password ">Forgot your
+                                                password?</a>
                                         @endif
                                     </div>
                                 </div>

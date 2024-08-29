@@ -10,33 +10,33 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
 class UserService implements UserRepository
 {
-    public function authenticateUser(LoginRequestBody $request)
-    {
-        $user = User::where('email' , $request->email)->first();
+    // public function authenticateUser(LoginRequestBody $request)
+    // {
+    //     $user = User::where('email' , $request->email)->first();
 
-        if($user && Hash::check($request->password,$user->password))
-        {
-            $token = $user->createToken('bearer')->plainTextToken;
-            $user->token = $token;
-            return new UserResource($user->setAttribute('token', $token));
-        }
-        else
-            return response()->json(['status'=>false,'message'=>'not found', 'data' => null]);
-    }
+    //     if($user && Hash::check($request->password,$user->password))
+    //     {
+    //         $token = $user->createToken('bearer')->plainTextToken;
+    //         $user->token = $token;
+    //         return new UserResource($user->setAttribute('token', $token));
+    //     }
+    //     else
+    //         return response()->json(['status'=>false,'message'=>'not found', 'data' => null]);
+    // }
 
-    public function varifyUserForSocketConnection($request)
-    {
-        $token = $this->getTokenFromHeaders($request);
-        $user = auth('sanctum')->authenticate($token);
-        return response()->json(["status" => true, "user" => $user]);
-    }
+    // public function varifyUserForSocketConnection($request)
+    // {
+    //     $token = $this->getTokenFromHeaders($request);
+    //     $user = auth('sanctum')->authenticate($token);
+    //     return response()->json(["status" => true, "user" => $user]);
+    // }
 
-    private function getTokenFromHeaders(Request $request)
-    {
-        $token = $request->header('Authorization');
-        $token = str_replace('Bearer ', '', $token);
-        return $token;
-    }
+    // private function getTokenFromHeaders(Request $request)
+    // {
+    //     $token = $request->header('Authorization');
+    //     $token = str_replace('Bearer ', '', $token);
+    //     return $token;
+    // }
 
     // private function revokeTokenIfExist()
     // {
