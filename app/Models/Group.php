@@ -15,4 +15,9 @@ class Group extends Model
     {
         return $this->hasMany(GroupMessage::class, 'group_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'access');
+    }
 }

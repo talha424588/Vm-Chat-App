@@ -275,9 +275,9 @@
             </div>
         </div>
     </div>
-    <input type="text" value="{{Auth::user()->id}}" id="login_user_id">
-    <input type="text" value="{{Auth::user()->name}}" id="login_user_name">
-    <input type="text" value="{{Auth::user()->unique_id}}" id="login_user_unique_id">
+    <input type="hidden" value="{{Auth::user()->id}}" id="login_user_id">
+    <input type="hidden" value="{{Auth::user()->name}}" id="login_user_name">
+    <input type="hidden" value="{{Auth::user()->unique_id}}" id="login_user_unique_id">
     <script type="module">
         import {
             Picker

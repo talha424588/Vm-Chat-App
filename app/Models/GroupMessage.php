@@ -14,11 +14,11 @@ class GroupMessage extends Model
 
     public function group()
     {
-        return $this->belongsTo(Group::class, 'group_id','group_id');
+        return $this->belongsTo(Group::class, 'group_id');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class,'sender',"unique_id");
+        return $this->belongsTo(User::class,"sender","unique_id");
     }
 }

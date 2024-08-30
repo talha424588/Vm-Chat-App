@@ -47,8 +47,13 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function groupMessage()
+    public function groupMessages()
     {
-        return $this->hasMany(GroupMessage::class,"sender");
+        return $this->hasMany(GroupMessage::class,"sender","unique_id");
+    }
+
+    public function groups()
+    {
+        return $this->hasMany(Group::class, 'access');
     }
 }

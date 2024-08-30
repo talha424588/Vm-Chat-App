@@ -10,8 +10,15 @@ document.addEventListener('DOMContentLoaded', function (e) {
         }
     }).then(response => response.json())
         .then(result => {
+            groupList = result.map(group => {
+                return {
+                    id: group.id,
+                    name: group.name,
+                    members: group.members,
+                    pic: group.pic
+                };
+            });
             console.log(result);
-            groupList = result;
 
         }).catch(error => {
             console.log(error);
@@ -19,27 +26,30 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
 });
 
-let groupList = [
-	{
-		id: 1,
-		name: "Programmers",
-		members: [0, 1, 3],
-		pic: "images/0923102932_aPRkoW.jpg"
-	},
-	{
-		id: 2,
-		name: "Web Developers",
-		members: [0, 2],
-		pic: "images/1921231232_Ag1asE.png"
-	},
-	{
-		id: 3,
-		name: "notes",
-		members: [0],
-		pic: "images/8230192232_asdEWq2.png"
-	}
-];
+console.log("group list",groupList)
 
+// let groupList = [
+// 	{
+// 		id: 1,
+// 		name: "Programmers",
+// 		members: [0, 1, 3],
+// 		pic: "assets/images/0923102932_aPRkoW.jpg"
+// 	},
+// 	{
+// 		id: 2,
+// 		name: "Web Developers",
+// 		members: [0, 2],
+// 		pic: "assets/images/1921231232_Ag1asE.png"
+// 	},
+// 	{
+// 		id: 3,
+// 		name: "notes",
+// 		members: [0],
+// 		pic: "assets/images/8230192232_asdEWq2.png"
+// 	}
+// ];
+
+console.log("group ==========",groupList);
 // message status - 0:sent, 1:delivered, 2:read
 let user = {
     id: 0,
@@ -54,35 +64,35 @@ let contactList = [
 		id: 0,
 		name: "Awais Ahmad",
 		number: "+91 91231 40293",
-		pic: "images/asdsd12f34ASd231.png",
+		pic: "assets/images/asdsd12f34ASd231.png",
 		lastSeen: "Apr 29 2018 17:58:02"
 	},
 	{
 		id: 1,
 		name: "Nitin",
 		number: "+91 98232 37261",
-		pic: "images/Ass09123asdj9dk0qw.jpg",
+		pic: "assets/images/Ass09123asdj9dk0qw.jpg",
 		lastSeen: "Apr 28 2018 22:18:21"
 	},
 	{
 		id: 2,
 		name: "Sanjay",
 		number: "+91 72631 2937",
-		pic: "images/asd1232ASdas123a.png",
+		pic: "assets/images/asd1232ASdas123a.png",
 		lastSeen: "Apr 28 2018 19:23:16"
 	},
 	{
 		id: 3,
 		name: "Suvro Mobile",
 		number: "+91 98232 63547",
-		pic: "images/Alsdk120asdj913jk.jpg",
+		pic: "assets/images/Alsdk120asdj913jk.jpg",
 		lastSeen: "Apr 29 2018 11:16:42"
 	},
 	{
 		id: 4,
 		name: "Dee",
 		number: "+91 72781 38213",
-		pic: "images/dsaad212312aGEA12ew.png",
+		pic: "assets/images/dsaad212312aGEA12ew.png",
 		lastSeen: "Apr 27 2018 17:28:10"
 	}
 ];
