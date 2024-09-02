@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 return {
                     id: group.id,
                     name: group.name,
-                    members: group.members,
+                    members: [group.access],
                     pic: group.pic
                 };
             });
@@ -26,30 +26,27 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
 });
 
-console.log("group list",groupList)
+let groupList = [
+	{
+		id: 1,
+		name: "Programmers",
+		members: [0, 1, 3],
+		pic: "assets/images/0923102932_aPRkoW.jpg"
+	},
+	{
+		id: 2,
+		name: "Web Developers",
+		members: [0, 2],
+		pic: "assets/images/1921231232_Ag1asE.png"
+	},
+	{
+		id: 3,
+		name: "notes",
+		members: [0],
+		pic: "assets/images/8230192232_asdEWq2.png"
+	}
+];
 
-// let groupList = [
-// 	{
-// 		id: 1,
-// 		name: "Programmers",
-// 		members: [0, 1, 3],
-// 		pic: "assets/images/0923102932_aPRkoW.jpg"
-// 	},
-// 	{
-// 		id: 2,
-// 		name: "Web Developers",
-// 		members: [0, 2],
-// 		pic: "assets/images/1921231232_Ag1asE.png"
-// 	},
-// 	{
-// 		id: 3,
-// 		name: "notes",
-// 		members: [0],
-// 		pic: "assets/images/8230192232_asdEWq2.png"
-// 	}
-// ];
-
-console.log("group ==========",groupList);
 // message status - 0:sent, 1:delivered, 2:read
 let user = {
     id: 0,
