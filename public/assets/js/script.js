@@ -23,6 +23,33 @@ const DOM = {
     displayPic: getById("display-pic"),
 };
 
+
+document.addEventListener('DOMContentLoaded', function (e) {
+    const id = document.getElementById("login_user_id").value;
+    const name = document.getElementById("login_user_name").value;
+    const unique_id = document.getElementById("login_user_unique_id").value;
+    fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
+        method: 'GET',
+        headers: {
+            'content-type': 'application/json'
+        }
+    }).then(response => response.json())
+        .then(result => {
+            userGroupList = result.map(group => {
+                return {
+                    id: group.id,
+                    name: group.name,
+                    members: [group.access],
+                    pic: group.pic ?? "assets/images/0923102932_aPRkoW.jpg"
+                };
+            });
+
+        }).catch(error => {
+            console.log(error);
+        });
+
+});
+
 let mClassList = (element) => {
     return {
         add: (className) => {
@@ -71,7 +98,6 @@ let populateChatList = () => {
         .sort((a, b) => mDate(a.time).subtract(b.time))
         .forEach((msg) => {
             let chat = {};
-            console.log("message",msg,"count");
             chat.isGroup = msg.recvIsGroup;
             chat.msg = msg;
 
@@ -107,6 +133,7 @@ let viewChatList = () => {
             /*if needs to display the tick icon with the message
             <div class="small last-message">${elem.isGroup ? contactList.find(contact => contact.id === elem.msg.sender).name + ": " : ""}${elem.msg.sender === user.id ? "<i class=\"" + statusClass + " fa-check-circle mr-1\"></i>" : ""} ${elem.msg.body}</div>
             */
+            // <div class="small last-message">${elem.isGroup ? contactList.find(contact => contact.id === elem.msg.sender).name + ": " : ""}${elem.msg.sender === user.id ?"" : ""} ${elem.msg.body}</div>
 
             if (elem.isGroup) {
                 DOM.chatList.innerHTML += `
@@ -116,8 +143,8 @@ let viewChatList = () => {
 
             <div class="w-50">
                 <div class="name list-user-name">${elem.name}</div>
-                <div class="small last-message">${elem.isGroup ? contactList.find(contact => contact.id === elem.msg.sender).name + ": " : ""}${elem.msg.sender === user.id ?
-                        "" : ""} ${elem.msg.body}</div>
+                <div class="small last-message">${elem.isGroup ? elem.msg.sender.name + ": " : ""}${elem.msg.body}</div>
+
 
             </div>
 
@@ -186,6 +213,8 @@ function makeformatDate(dateString) {
 }
 
 let addMessageToMessageArea = (msg) => {
+
+
     let msgDate = mDate(msg.time).getDate();
     if (lastDate != msgDate) {
         addDateToMessageArea(msgDate);
@@ -200,25 +229,23 @@ let addMessageToMessageArea = (msg) => {
 
     let sendStatus = `<i class="${msg.status < 2 ? "far" : "fas"} fa-check-circle"></i>`;
 
-    let profileImage = `<img src="${chat.isGroup ? chat.group.pic : chat.contact.pic}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+    let profileImage = `<img src="${chat.isGroup ?? chat.group.pic}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
 
     // Find sender name
     let senderName = '';
-    if (msg.sender === user.id) {
+
+    if (msg.sender.id == user.id) {
         senderName = user.name;
-    } else {
-        const contact = contactList.find(c => c.id === msg.sender);
-        senderName = contact ? contact.name : 'Unknown Sender';
     }
 
     DOM.messages.innerHTML += `
 	<div class="ml-3">
-	  ${msg.sender === user.id ? '' : profileImage}
+	  ${msg.sender.id == user.id ? '' : profileImage}
 	  <div class="">
-		<div class="align-self-${msg.sender === user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
-		  p-1 my-1 mx-3 rounded message-item ${msg.sender === user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${msg.id}">
+		<div class="align-self-${msg.sender.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
+		  p-1 my-1 mx-3 rounded message-item ${msg.sender.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${msg.id}">
 		  <div style="margin-top:-4px">
-			<div class="shadow-sm" style="background:${msg.sender === user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+			<div class="shadow-sm" style="background:${msg.sender.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
 			  ${msg.body}
 			</div>
 			<div>
@@ -307,18 +334,35 @@ let showChatList = () => {
 };
 
 let sendMessage = () => {
+    var loginUser = {
+        id: document.getElementById("login_user_id").value,
+        name: document.getElementById("login_user_name").value,
+        unique_id: document.getElementById("login_user_unique_id").value,
+        email: document.getElementById("login_user_email").value
+    }
     let value = DOM.messageInput.value;
-    DOM.messageInput.value = "";
     if (value === "") return;
 
     let msg = {
-        sender: user.id,
+        sender: loginUser,
         body: value,
+        reply_id: null,
+        group_id: "i2R5WNL55XaFYOX",
+        type: "message",
         time: mDate().toString(),
-        status: 1,
-        recvId: chat.isGroup ? chat.group.id : chat.contact.id,
-        recvIsGroup: chat.isGroup
     };
+
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': csrfToken
+        },
+        url: broadcastChatRoute,
+        type: 'POST',
+        data: msg,
+        success: function (data) {
+            DOM.messageInput.value = "";
+        }
+    });
 
     addMessageToMessageArea(msg);
     MessageUtils.addMessage(msg);
@@ -326,7 +370,6 @@ let sendMessage = () => {
 };
 
 let showProfileSettings = () => {
-    console.log("hit");
     DOM.profileSettings.style.left = 0;
     DOM.profilePic.src = user.pic;
     DOM.inputName.value = user.name;

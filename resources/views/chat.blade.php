@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css"
         integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
-    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 
 </head>
@@ -275,9 +275,22 @@
             </div>
         </div>
     </div>
-    <input type="hidden" value="{{Auth::user()->id}}" id="login_user_id">
-    <input type="hidden" value="{{Auth::user()->name}}" id="login_user_name">
-    <input type="hidden" value="{{Auth::user()->unique_id}}" id="login_user_unique_id">
+    <input type="hidden" value="{{ Auth::user()->id }}" id="login_user_id">
+    <input type="hidden" value="{{ Auth::user()->name }}" id="login_user_name">
+    <input type="hidden" value="{{ Auth::user()->unique_id }}" id="login_user_unique_id">
+    <input type="hidden" value="{{ Auth::user()->email }}" id="login_user_email">
+    <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script>
+    @vite(['resources/js/app.js'])
+    <script>
+        setTimeout(() => {
+            window.Echo.channel('vmChat').listen('.Chat', (e) => {
+                    console.log(e);
+                })
+                .error((error) => {
+                    console.error("Error:", error);
+                })
+        }, 1000);
+    </script>
     <script type="module">
         import {
             Picker
@@ -381,7 +394,12 @@
     <script src="{{ asset('assets/js/datastore.js') }}"></script>
     <script src="{{ asset('assets/js/date-utils.js') }}"></script>
     <script src="{{ asset('assets/js/script.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <script>
+        var csrfToken = '{{ csrf_token() }}';
+        var broadcastChatRoute = '{{ route('broadcast.chat') }}';
+    </script>
 </body>
 
 </html>

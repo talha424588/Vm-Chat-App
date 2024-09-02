@@ -18,16 +18,18 @@ class Chat implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $user;
-    public $msg;
+    public $body;
+    public $time;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, $msg)
+    public function __construct(User $user, $body,$time)
     {
         $this->user = $user;
-        $this->msg = $msg;
-        Log::info('Chat message received', ['username' => $this->user->name, 'message' => $this->msg]);
+        $this->body = $body;
+        $this->time = $time;
+        Log::info('Chat message received', ['username' => $this->user->name, 'message' => $this->body,'time' => $this->time]);
     }
 
     /**
@@ -38,7 +40,6 @@ class Chat implements ShouldBroadcast
     public function broadcastOn()
     {
 
-        Log::info('Chat message received', ['username' => $this->user->name, 'message' => $this->msg]);
         return new Channel('vmChat');
     }
 
@@ -56,7 +57,8 @@ class Chat implements ShouldBroadcast
                 'id' => $this->user->id,
                 'name' => $this->user->name,
             ],
-            'message' => $this->msg,
+            'message' => $this->body,
+            'time' => $this->time,
         ];
     }
 }

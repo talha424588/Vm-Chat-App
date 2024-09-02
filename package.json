@@ -11,7 +11,7 @@
         "bootstrap": "^5.2.3",
         "laravel-echo": "^1.16.1",
         "laravel-mix": "^6.0.6",
-        "laravel-vite-plugin": "^1.0.0",
+        "laravel-vite-plugin": "^1.0.5",
         "lodash": "^4.17.19",
         "postcss": "^8.1.14",
         "pusher-js": "^8.4.0-rc2",

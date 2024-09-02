@@ -85,8 +85,9 @@ class ChatController extends Controller
         // $uniqueId = $user['unique_id'];
         $uniqueId = $request->user()->unique_id;
 
+
         $message = new GroupMessage;
-        $message->msg = $request->msg;
+        $message->msg = $request->body;
         $message->sender = $uniqueId;
         $message->reply_id = $request->replyId;
         $message->group_id = $request->group_id;
@@ -99,7 +100,7 @@ class ChatController extends Controller
     public function broadcastChat(Request $request)
     {
         $user = $request->user();
-        event(new Chat($user,$request->msg));
+        event(new Chat($user,$request->body,$request->time));
         $this->store($request);
         return response()->json(['msg'=>"event fired !!"]);
     }
