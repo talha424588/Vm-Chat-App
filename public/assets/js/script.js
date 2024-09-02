@@ -24,31 +24,31 @@ const DOM = {
 };
 
 
-document.addEventListener('DOMContentLoaded', function (e) {
-    const id = document.getElementById("login_user_id").value;
-    const name = document.getElementById("login_user_name").value;
-    const unique_id = document.getElementById("login_user_unique_id").value;
-    fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
-        method: 'GET',
-        headers: {
-            'content-type': 'application/json'
-        }
-    }).then(response => response.json())
-        .then(result => {
-            userGroupList = result.map(group => {
-                return {
-                    id: group.id,
-                    name: group.name,
-                    members: [group.access],
-                    pic: group.pic ?? "assets/images/0923102932_aPRkoW.jpg"
-                };
-            });
+// document.addEventListener('DOMContentLoaded', function (e) {
+//     const id = document.getElementById("login_user_id").value;
+//     const name = document.getElementById("login_user_name").value;
+//     const unique_id = document.getElementById("login_user_unique_id").value;
+//     fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
+//         method: 'GET',
+//         headers: {
+//             'content-type': 'application/json'
+//         }
+//     }).then(response => response.json())
+//         .then(result => {
+//             userGroupList = result.map(group => {
+//                 return {
+//                     id: group.id,
+//                     name: group.name,
+//                     members: [group.access],
+//                     pic: group.pic ?? "assets/images/0923102932_aPRkoW.jpg"
+//                 };
+//             });
 
-        }).catch(error => {
-            console.log(error);
-        });
+//         }).catch(error => {
+//             console.log(error);
+//         });
 
-});
+// });
 
 let mClassList = (element) => {
     return {
@@ -93,6 +93,7 @@ let populateChatList = () => {
     // that are already included in chatList
     // in short, 'present' is a Map DS
     let present = {};
+    console.log(MessageUtils);
 
     MessageUtils.getMessages()
         .sort((a, b) => mDate(a.time).subtract(b.time))
@@ -128,6 +129,7 @@ let viewChatList = () => {
         .sort((a, b) => mDate(b.msg.time).subtract(a.msg.time))
 
         .forEach((elem, index) => {
+            console.log("index", index);
             let statusClass = elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             /*if needs to display the tick icon with the message
@@ -237,6 +239,9 @@ let addMessageToMessageArea = (msg) => {
     if (msg.sender.id == user.id) {
         senderName = user.name;
     }
+    else {
+        senderName = "unknown"
+    }
 
     DOM.messages.innerHTML += `
 	<div class="ml-3">
@@ -277,6 +282,7 @@ let addMessageToMessageArea = (msg) => {
 
 let generateMessageArea = (elem, chatIndex) => {
     chat = chatList[chatIndex];
+    console.log("elem", elem, "inddex", chatIndex, "chat", chat);
 
     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
     mClassList(DOM.messageAreaOverlay).add("d-none");

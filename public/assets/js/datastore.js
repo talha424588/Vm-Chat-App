@@ -16,7 +16,6 @@ let user = {
     id: parseInt(document.getElementById("login_user_id").value),
     name: document.getElementById("login_user_name").value,
     unique_id: document.getElementById("login_user_unique_id").value,
-    // number: "+91 91231 40293",
     email: document.getElementById("login_user_email").value,
     pic: "assets/images/asdsd12f34ASd231.png"
 };
@@ -73,7 +72,6 @@ let messages = [
         time: "April 27, 2018 18:20:11",
         status: 0,
         recvId: 1,
-
         recvIsGroup: true
     },
     {
@@ -95,6 +93,7 @@ let messages = [
 
 let MessageUtils = {
     getByGroupId: (groupId) => {
+        console.log("on licck group",groupId);
         return messages.filter(msg => msg.recvIsGroup && msg.recvId === groupId);
     },
     getByContactId: (contactId) => {
