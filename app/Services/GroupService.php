@@ -21,12 +21,17 @@ class GroupService implements GroupRepository
         //     ->where('groups.access', '=', $request->id)
         //     ->get();
 
-        $userGroups = User::with(['groups', 'groupMessages'])
-        ->where('id', $request->id)
-        ->get();
+        // $userGroups = User::with(['groups', 'groupMessages'])
+        // ->where('id', $request->id)
+        // ->get();
 
-        if (count($userGroups) > 0)
-            return new GroupResource($userGroups);
+        $groups = Group::whereRaw("FIND_IN_SET($request->id, access) > 0")
+            ->where('access', (int)($request->id))
+             ->with('groupMessages')
+            ->get();
+
+        if (count($groups) > 0)
+            return new GroupResource($groups);
         else
             return response()->json(["status" => false, "groups" => "not found", "messages" => null], 404);
     }

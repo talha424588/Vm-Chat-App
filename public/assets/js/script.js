@@ -23,32 +23,34 @@ const DOM = {
     displayPic: getById("display-pic"),
 };
 
+document.addEventListener('DOMContentLoaded', async function (e) {
+    const id = document.getElementById("login_user_id").value;
+    const name = document.getElementById("login_user_name").value;
+    const unique_id = document.getElementById("login_user_unique_id").value;
+    let userGroupList = [];
 
-// document.addEventListener('DOMContentLoaded', function (e) {
-//     const id = document.getElementById("login_user_id").value;
-//     const name = document.getElementById("login_user_name").value;
-//     const unique_id = document.getElementById("login_user_unique_id").value;
-//     fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
-//         method: 'GET',
-//         headers: {
-//             'content-type': 'application/json'
-//         }
-//     }).then(response => response.json())
-//         .then(result => {
-//             userGroupList = result.map(group => {
-//                 return {
-//                     id: group.id,
-//                     name: group.name,
-//                     members: [group.access],
-//                     pic: group.pic ?? "assets/images/0923102932_aPRkoW.jpg"
-//                 };
-//             });
+    await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
+        method: 'GET',
+        headers: {
+            'content-type': 'application/json'
+        }
+    }).then(response => response.json())
+        .then(result => {
+            userGroupList = result.map(group => {
+                console.log(group);
+                return {
+                    id: group.id,
+                    name: group.name,
+                    members: [group.id],
+                    pic: group.pic ?? "assets/images/0923102932_aPRkoW.jpg"
+                };
+            });
 
-//         }).catch(error => {
-//             console.log(error);
-//         });
-
-// });
+        }).catch(error => {
+            console.log(error);
+        });
+    console.log(userGroupList);
+});
 
 let mClassList = (element) => {
     return {
@@ -93,7 +95,7 @@ let populateChatList = () => {
     // that are already included in chatList
     // in short, 'present' is a Map DS
     let present = {};
-    console.log(MessageUtils);
+    console.log("getMessages", MessageUtils.getMessages());
 
     MessageUtils.getMessages()
         .sort((a, b) => mDate(a.time).subtract(b.time))
@@ -139,22 +141,20 @@ let viewChatList = () => {
 
             if (elem.isGroup) {
                 DOM.chatList.innerHTML += `
-            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" onclick="generateMessageArea(this, ${index})">
-                <img src="${elem.isGroup ?? elem.group.pic}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" onclick="generateMessageArea(this, ${index})">
+                        <img src="${elem.isGroup ?? elem.group.pic}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
 
+                        <div class="w-50">
+                            <div class="name list-user-name">${elem.name}</div>
+                            <div class="small last-message">${elem.isGroup ? elem.msg.sender.name + ": " : ""}${elem.msg.body}</div>
 
-            <div class="w-50">
-                <div class="name list-user-name">${elem.name}</div>
-                <div class="small last-message">${elem.isGroup ? elem.msg.sender.name + ": " : ""}${elem.msg.body}</div>
+                        </div>
 
-
-            </div>
-
-            <div class="flex-grow-1 text-right">
-                <div class="small time">${mDate(elem.msg.time).chatListFormat()}</div>
-                ${elem.unread ? "<div class=\"badge badge-success badge-pill small\" id=\"unread-count\">" + elem.unread + "</div>" : ""}
-            </div>
-        </div>`;
+                        <div class="flex-grow-1 text-right">
+                            <div class="small time">${mDate(elem.msg.time).chatListFormat()}</div>
+                            ${elem.unread ? "<div class=\"badge badge-success badge-pill small\" id=\"unread-count\">" + elem.unread + "</div>" : ""}
+                        </div>
+                    </div>`;
             }
         });
 };
