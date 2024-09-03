@@ -100,8 +100,9 @@ class ChatController extends Controller
     public function broadcastChat(Request $request)
     {
         $user = $request->user();
-        event(new Chat($user,$request->body,$request->time));
-        $this->store($request);
+        $message = $this->store($request);
+        $messageResposne = json_decode($message->getContent(),true);
+        event(new Chat($user,$request->body,$request->time, (int)($messageResposne['id'])));
         return response()->json(['msg'=>"event fired !!"]);
     }
 }

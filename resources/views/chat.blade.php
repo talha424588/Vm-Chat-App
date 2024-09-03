@@ -282,14 +282,7 @@
     <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script>
     @vite(['resources/js/app.js'])
     <script>
-        setTimeout(() => {
-            window.Echo.channel('vmChat').listen('.Chat', (e) => {
-                    console.log(e);
-                })
-                .error((error) => {
-                    console.error("Error:", error);
-                })
-        }, 1000);
+
     </script>
     <script type="module">
         import {

@@ -22,12 +22,14 @@ const DOM = {
     username: getById("username"),
     displayPic: getById("display-pic"),
 };
+let userGroupList = [];
 
-document.addEventListener('DOMContentLoaded', async function (e) {
+// document.addEventListener('DOMContentLoaded', async function (e) {
+async function loadUserGroups()
+{
     const id = document.getElementById("login_user_id").value;
     const name = document.getElementById("login_user_name").value;
     const unique_id = document.getElementById("login_user_unique_id").value;
-    let userGroupList = [];
 
     await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
         method: 'GET',
@@ -37,7 +39,6 @@ document.addEventListener('DOMContentLoaded', async function (e) {
     }).then(response => response.json())
         .then(result => {
             userGroupList = result.map(group => {
-                console.log(group);
                 return {
                     id: group.id,
                     name: group.name,
@@ -49,8 +50,13 @@ document.addEventListener('DOMContentLoaded', async function (e) {
         }).catch(error => {
             console.log(error);
         });
-    console.log(userGroupList);
-});
+}
+loadUserGroups();
+console.log("dynamics",userGroupList);
+
+
+
+// });
 
 let mClassList = (element) => {
     return {
@@ -88,14 +94,13 @@ let lastDate = "";
 
 // 'populateChatList' will generate the chat list
 // based on the 'messages' in the datastore
-let populateChatList = () => {
+let populateChatList = async () => {
     chatList = [];
 
     // 'present' will keep track of the chats
     // that are already included in chatList
     // in short, 'present' is a Map DS
     let present = {};
-    console.log("getMessages", MessageUtils.getMessages());
 
     MessageUtils.getMessages()
         .sort((a, b) => mDate(a.time).subtract(b.time))
@@ -131,7 +136,6 @@ let viewChatList = () => {
         .sort((a, b) => mDate(b.msg.time).subtract(a.msg.time))
 
         .forEach((elem, index) => {
-            console.log("index", index);
             let statusClass = elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             /*if needs to display the tick icon with the message
@@ -163,8 +167,6 @@ let generateChatList = () => {
     populateChatList();
     viewChatList();
 };
-
-
 
 
 let addDateToMessageArea = (date) => {
@@ -214,55 +216,57 @@ function makeformatDate(dateString) {
     }
 }
 
-let addMessageToMessageArea = (msg) => {
+// let addMessageToMessageArea = (msg) => {
 
+setTimeout(() => {
+    window.Echo.channel('vmChat').listen('.Chat', (message) => {
+        console.log(message);
+        let msgDate = mDate(message.time).getDate();
+        if (lastDate != msgDate) {
+            addDateToMessageArea(msgDate);
+            lastDate = msgDate;
+        }
 
-    let msgDate = mDate(msg.time).getDate();
-    if (lastDate != msgDate) {
-        addDateToMessageArea(msgDate);
-        lastDate = msgDate;
-    }
+        // var alert_message = msg.read_status;
 
-    var alert_message = msg.read_status;
+        // if (alert_message == 1) {
+        //     addunreadToMessageArea.addUnread();
+        // }
 
-    if (alert_message == 1) {
-        addunreadToMessageArea.addUnread();
-    }
+        // let sendStatus = `<i class="${msg.status < 2 ? "far" : "fas"} fa-check-circle"></i>`;
 
-    let sendStatus = `<i class="${msg.status < 2 ? "far" : "fas"} fa-check-circle"></i>`;
+        let profileImage = `<img src="${message.user.hasOwnProperty('pic') ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
 
-    let profileImage = `<img src="${chat.isGroup ?? chat.group.pic}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+        // Find sender name
+        let senderName = message.user.name;
 
-    // Find sender name
-    let senderName = '';
+        // if (message.user.id == user.id) {
+        //     senderName = user.name;
+        // }
+        // else {
+        //     senderName = "unknown"
+        // }
 
-    if (msg.sender.id == user.id) {
-        senderName = user.name;
-    }
-    else {
-        senderName = "unknown"
-    }
-
-    DOM.messages.innerHTML += `
+        DOM.messages.innerHTML += `
 	<div class="ml-3">
-	  ${msg.sender.id == user.id ? '' : profileImage}
+	  ${message.user.id == user.id ? '' : profileImage}
 	  <div class="">
-		<div class="align-self-${msg.sender.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
-		  p-1 my-1 mx-3 rounded message-item ${msg.sender.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${msg.id}">
+		<div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
+		  p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
 		  <div style="margin-top:-4px">
-			<div class="shadow-sm" style="background:${msg.sender.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
-			  ${msg.body}
+			<div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+			  ${message.message}
 			</div>
 			<div>
 			  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(msg.time)})</span> |
+				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(message.time)})</span> |
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal">Seen</a>
 				</span> |
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
-				  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${msg.id}">Reply</a>
+				  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
 				</span> |
 				<span>
 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal">Delete</a>
@@ -276,8 +280,15 @@ let addMessageToMessageArea = (msg) => {
 	`;
 
 
-    DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
-};
+        DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
+    })
+        .error((error) => {
+            console.error("Error:", error);
+        })
+}, 1000);
+
+
+// };
 
 
 let generateMessageArea = (elem, chatIndex) => {
@@ -370,9 +381,9 @@ let sendMessage = () => {
         }
     });
 
-    addMessageToMessageArea(msg);
-    MessageUtils.addMessage(msg);
-    generateChatList();
+    // addMessageToMessageArea(msg);
+    // MessageUtils.addMessage(msg);
+    // generateChatList();
 };
 
 let showProfileSettings = () => {

@@ -20,16 +20,18 @@ class Chat implements ShouldBroadcast
     public $user;
     public $body;
     public $time;
+    public $id;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, $body,$time)
+    public function __construct(User $user, $body,$time,$id)
     {
         $this->user = $user;
         $this->body = $body;
+        $this->id = $id;
         $this->time = $time;
-        Log::info('Chat message received', ['username' => $this->user->name, 'message' => $this->body,'time' => $this->time]);
+        Log::info('Chat message received', ['username' => $this->user->name, 'message' => $this->body,'time' => $this->time,'id' => $this->id]);
     }
 
     /**
@@ -57,6 +59,7 @@ class Chat implements ShouldBroadcast
                 'id' => $this->user->id,
                 'name' => $this->user->name,
             ],
+            'id' => $this->id,
             'message' => $this->body,
             'time' => $this->time,
         ];
