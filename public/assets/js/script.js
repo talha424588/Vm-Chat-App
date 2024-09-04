@@ -64,116 +64,81 @@ let chatList = [];
 // in the message area
 let lastDate = "";
 
-// 'populateChatList' will generate the chat list
-// based on the 'messages' in the datastore
-// let populateChatList = async () => {
-//     chatList = [];
-
-//     // 'present' will keep track of the chats
-//     // that are already included in chatList
-//     // in short, 'present' is a Map DS
-//     let present = {};
-
-//     MessageUtils.getMessages()
-//         .sort((a, b) => mDate(a.time).subtract(b.time))
-//         .forEach((msg) => {
-//             let chat = {};
-//             chat.isGroup = msg.recvIsGroup;
-//             chat.msg = msg;
-
-//             if (msg.recvIsGroup) {
-//                 chat.group = groupList.find((group) => (group.id === msg.recvId));
-//                 chat.name = chat.group.name;
-//             }
-//             // else {
-//             // 	chat.contact = contactList.find((contact) => (msg.sender !== user.id) ? (contact.id === msg.sender) : (contact.id === msg.recvId));
-//             // 	chat.name = chat.contact.name;
-//             // }
-
-//             chat.unread = (msg.sender !== user.id && msg.read_status < 2) ? 1 : 0;
-
-//             if (present[chat.name] !== undefined) {
-//                 chatList[present[chat.name]].msg = msg;
-//                 chatList[present[chat.name]].unread += chat.unread;
-//             } else {
-//                 present[chat.name] = chatList.length;
-//                 chatList.push(chat);
-//             }
-//         });
-// };
-
-
 let populateChatList = async () => {
     chatList = [];
     let present = {};
 
     try {
-        const id = document.getElementById("login_user_id").value;
+      const id = document.getElementById("login_user_id").value;
 
-        // Fetch groups with their messages
-        const response = await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
-            method: 'GET',
-            headers: {
-                'content-type': 'application/json'
-            }
-        });
-        const result = await response.json();
+      // Fetch groups with their messages
+      const response = await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
+        method: 'GET',
+        headers: {
+          'content-type': 'application/json'
+        }
+      });
+      const result = await response.json();
+      console.log("result", result);
 
-        result.forEach(group => {
-            group.group_messages.forEach(msg => {
+      result.forEach(group => {
+        let chat = {};
+        chat.isGroup = true;
+        chat.group = group;
+        chat.name = group.name;
+        chat.unread = 0; // initialize unread count to 0
 
-                let chat = {};
-                chat.isGroup = true;
-                chat.msg = msg;
-                chat.time = new Date(msg.time * 1000);
-                chat.group = group;
-                chat.name = group.name;
+        if (group.group_messages && group.group_messages.length > 0) {
+          // if the group has messages, process them
+          group.group_messages.forEach(msg => {
+            chat.msg = msg;
+            chat.time = new Date(msg.time * 1000);
 
-                // Ensure unread is calculated correctly
-                const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
-                chat.unread = (msg.sender !== id && !seenBy.includes(id)) ? 1 : 0;
+            // Ensure unread is calculated correctly
+            const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
+            chat.unread += (msg.sender !== id && !seenBy.includes(id)) ? 1 : 0;
+          });
+        }
 
-                if (present[chat.name] !== undefined) {
-                    chatList[present[chat.name]].msg = msg;
-                    chatList[present[chat.name]].unread += chat.unread;
-                } else {
-                    present[chat.name] = chatList.length;
-                    chatList.push(chat);
-                }
-            });
-        });
+        if (present[chat.name] !== undefined) {
+          // if the group is already in the chatList, update its unread count
+          chatList[present[chat.name]].unread += chat.unread;
+        } else {
+          present[chat.name] = chatList.length;
+          chatList.push(chat);
+        }
+      });
     } catch (error) {
-        console.log("Error fetching chat groups:", error);
+      console.log("Error fetching chat groups:", error);
     }
-    console.log("message chat List", chatList);
-};
+    console.log("result", chatList);
+  };
+
 
 // let viewChatList = () => {
+//     if (chatList.length === 0) {
+//         console.log("No chats to display.");
+//         return;
+//     }
+
 //     DOM.chatList.innerHTML = "";
 //     chatList
 //         .sort((a, b) => mDate(b.msg.time).subtract(a.msg.time))
-
 //         .forEach((elem, index) => {
 //             let statusClass = elem.msg.status < 2 ? "far" : "fas";
 //             let unreadClass = elem.unread ? "unread" : "";
-//             /*if needs to display the tick icon with the message
-//             <div class="small last-message">${elem.isGroup ? contactList.find(contact => contact.id === elem.msg.sender).name + ": " : ""}${elem.msg.sender === user.id ? "<i class=\"" + statusClass + " fa-check-circle mr-1\"></i>" : ""} ${elem.msg.body}</div>
-//             */
-//             // <div class="small last-message">${elem.isGroup ? contactList.find(contact => contact.id === elem.msg.sender).name + ": " : ""}${elem.msg.sender === user.id ?"" : ""} ${elem.msg.body}</div>
-
 //             if (elem.isGroup) {
+//                 const lastetMessage = elem.group.group_messages[elem.group.group_messages.length - 1];
 //                 DOM.chatList.innerHTML += `
 //                     <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" onclick="generateMessageArea(this, ${index})">
-//                         <img src="${elem.isGroup ?? elem.group.pic}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
-
+//                     <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
 //                         <div class="w-50">
-//                             <div class="name list-user-name">${elem.name}</div>
-//                             <div class="small last-message">${elem.isGroup ? elem.msg.sender.name + ": " : ""}${elem.msg.body}</div>
-
+//                             <div class="name list-user-name">${elem.group.name}</div>
+//                             <div class="small last-message">${elem.isGroup ? lastetMessage.user.name + ": " : ""}${lastetMessage.msg}</div>
 //                         </div>
 
 //                         <div class="flex-grow-1 text-right">
-//                             <div class="small time">${mDate(elem.msg.time).chatListFormat()}</div>
+//                             <div class="small time">${mDate(elem.time).chatListFormat()}</div>
 //                             ${elem.unread ? "<div class=\"badge badge-success badge-pill small\" id=\"unread-count\">" + elem.unread + "</div>" : ""}
 //                         </div>
 //                     </div>`;
@@ -184,42 +149,47 @@ let populateChatList = async () => {
 
 let viewChatList = () => {
     if (chatList.length === 0) {
-        console.log("No chats to display.");
-        return;
+      console.log("No chats to display.");
+      return;
     }
-
-    console.log("message chat List n2", chatList);
 
     DOM.chatList.innerHTML = "";
     chatList
-        .sort((a, b) => mDate(b.msg.time).subtract(a.msg.time))
-        .forEach((elem, index) => {
-            let statusClass = elem.msg.status < 2 ? "far" : "fas";
-            let unreadClass = elem.unread ? "unread" : "";
-            // console.log(elem);
-            if (elem.isGroup) {
-//
-                console.log("-1============",elem.group.group_messages.pop());
+      .sort((a, b) => {
+        if (a.time && b.time) {
+          return mDate(b.time).subtract(a.time);
+        } else if (a.time) {
+          return -1; // a has time, b doesn't
+        } else if (b.time) {
+          return 1; // b has time, a doesn't
+        } else {
+          return 0; // neither has time
+        }
+      })
+      .forEach((elem, index) => {
+        let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
+        let unreadClass = elem.unread ? "unread" : "";
+        if (elem.isGroup) {
+          const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
+          const messageText = latestMessage ? latestMessage.msg : "No messages";
+          const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
+          const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
+          DOM.chatList.innerHTML += `
+            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" onclick="generateMessageArea(this, ${index})">
+              <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+              <div class="w-50">
+                <div class="name list-user-name">${elem.group.name}</div>
+                <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${messageText}</div>
+              </div>
 
-
-
-                DOM.chatList.innerHTML += `
-                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" onclick="generateMessageArea(this, ${index})">
-                    <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
-                        <div class="w-50">
-                            <div class="name list-user-name">${elem.name}</div>
-                            <div class="small last-message">${elem.isGroup ? elem.msg.sender.name + ": " : ""}${elem.group.group_messages.pop().msg}</div>
-
-                        </div>
-
-                        <div class="flex-grow-1 text-right">
-                            <div class="small time">${mDate(elem.time).chatListFormat()}</div>
-                            ${elem.unread ? "<div class=\"badge badge-success badge-pill small\" id=\"unread-count\">" + elem.unread + "</div>" : ""}
-                        </div>
-                    </div>`;
-            }
-        });
-};
+              <div class="flex-grow-1 text-right">
+                <div class="small time">${timeText}</div>
+                ${elem.unread ? "<div class=\"badge badge-success badge-pill small\" id=\"unread-count\">" + elem.unread + "</div>" : ""}
+              </div>
+            </div>`;
+        }
+      });
+  };
 
 let generateChatList = async () => {
     await populateChatList();
@@ -297,13 +267,6 @@ setTimeout(() => {
 
         // Find sender name
         let senderName = message.user.name;
-
-        // if (message.user.id == user.id) {
-        //     senderName = user.name;
-        // }
-        // else {
-        //     senderName = "unknown"
-        // }
 
         DOM.messages.innerHTML += `
 	<div class="ml-3">
