@@ -99,7 +99,7 @@
                         <i class="fas fa-arrow-left p-2 mr-2 text-dark" style="font-size: 1.5rem; cursor: pointer;"
                             onclick="showChatList()"></i>
                     </div>
-                    <a href="#"><img src="https://via.placeholder.com/400x400" alt="Profile Photo"
+                    <a href="#"><img src="https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg" alt="Profile Photo"
                             class="img-fluid rounded-circle mr-2" style="height:50px;" id="pic"></a>
                     <div class="d-flex flex-column">
                         <div class="text-dark font-weight-bold" id="name"></div>

@@ -26,4 +26,10 @@ class Group extends Model
         $userIds = explode(',', $this->access);
         return User::whereIn('id', $userIds)->get();
     }
+
+    public function users_with_access()
+{
+    return $this->belongsToMany(User::class, 'user', 'id','id')
+        ->whereRaw("FIND_IN_SET(user.id, access) > 0");
+}
 }

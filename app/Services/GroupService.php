@@ -25,12 +25,25 @@ class GroupService implements GroupRepository
         // ->where('id', $request->id)
         // ->get();
 
+        // $groups = Group::whereRaw("FIND_IN_SET($request->id, access) > 0")
+        // ->where('access', (int)($request->id))
+        // ->with(['groupMessages' => function ($query) {
+        //     $query->with('user');
+        // }])
+        // ->get();
+
         $groups = Group::whereRaw("FIND_IN_SET($request->id, access) > 0")
-        ->where('access', (int)($request->id))
-        ->with(['groupMessages' => function ($query) {
-            $query->with('user');
-        }])
-        ->get();
+            ->with(['groupMessages' => function ($query) {
+                $query->with('user');
+            }])
+            ->get();
+
+        foreach ($groups as $group) {
+            $userIds = explode(',', $group->access);
+            $group->users_with_access = User::whereIn('id', $userIds)->get();
+        }
+
+
 
         if (count($groups) > 0)
             return new GroupResource($groups);

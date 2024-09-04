@@ -1,13 +1,13 @@
 
 
-let groupList = [
-    {
-        id: 1,
-        name: "Programmers",
-        members: [0, 1, 3],
-        pic: "assets/images/0923102932_aPRkoW.jpg"
-    }
-];
+// let groupList = [
+//     {
+//         id: 15,
+//         name: "Programmers",
+//         members: [0, 1, 3],
+//         pic: "assets/images/0923102932_aPRkoW.jpg"
+//     }
+// ];
 
 // message status - 0:sent, 1:delivered, 2:read
 
