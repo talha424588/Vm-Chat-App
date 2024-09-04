@@ -69,81 +69,81 @@ let populateChatList = async () => {
     let present = {};
 
     try {
-      const id = document.getElementById("login_user_id").value;
+        const id = document.getElementById("login_user_id").value;
 
-      // Fetch groups with their messages
-      const response = await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
-        method: 'GET',
-        headers: {
-          'content-type': 'application/json'
-        }
-      });
-      const result = await response.json();
+        // Fetch groups with their messages
+        const response = await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json'
+            }
+        });
+        const result = await response.json();
 
-      result.forEach(group => {
-        let chat = {};
-        chat.isGroup = true;
-        chat.group = group;
-        chat.group.access = [group.access];
-        // chat.members = [group.access];
-        chat.name = group.name;
-        chat.unread = 0; // initialize unread count to 0
+        result.forEach(group => {
+            let chat = {};
+            chat.isGroup = true;
+            chat.group = group;
+            chat.group.access = [group.access];
+            // chat.members = [group.access];
+            chat.name = group.name;
+            chat.unread = 0; // initialize unread count to 0
 
-        if (group.group_messages && group.group_messages.length > 0) {
-          // if the group has messages, process them
-          group.group_messages.forEach(msg => {
-            chat.msg = msg;
-            chat.time = new Date(msg.time * 1000);
+            if (group.group_messages && group.group_messages.length > 0) {
+                // if the group has messages, process them
+                group.group_messages.forEach(msg => {
+                    chat.msg = msg;
+                    chat.time = new Date(msg.time * 1000);
 
-            // Ensure unread is calculated correctly
-            const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
-            chat.unread += (msg.sender !== id && !seenBy.includes(id)) ? 1 : 0;
-          });
-        }
+                    // Ensure unread is calculated correctly
+                    const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
+                    chat.unread += (msg.sender !== id && !seenBy.includes(id)) ? 1 : 0;
+                });
+            }
 
-        if (present[chat.name] !== undefined) {
-          // if the group is already in the chatList, update its unread count
-          chatList[present[chat.name]].unread += chat.unread;
-        } else {
-          present[chat.name] = chatList.length;
-          chatList.push(chat);
-        }
-      });
+            if (present[chat.name] !== undefined) {
+                // if the group is already in the chatList, update its unread count
+                chatList[present[chat.name]].unread += chat.unread;
+            } else {
+                present[chat.name] = chatList.length;
+                chatList.push(chat);
+            }
+        });
     } catch (error) {
-      console.log("Error fetching chat groups:", error);
+        console.log("Error fetching chat groups:", error);
     }
-  };
+};
 
 let viewChatList = () => {
     if (chatList.length === 0) {
-      console.log("No chats to display.");
-      return;
+        console.log("No chats to display.");
+        return;
     }
 
     cn
 
     DOM.chatList.innerHTML = "";
     chatList
-      .sort((a, b) => {
-        if (a.time && b.time) {
-          return mDate(b.time).subtract(a.time);
-        } else if (a.time) {
-          return -1;
-        } else if (b.time) {
-          return 1;
-        } else {
-          return 0;
-        }
-      })
-      .forEach((elem, index) => {
-        let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
-        let unreadClass = elem.unread ? "unread" : "";
-        if (elem.isGroup) {
-          const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
-          const messageText = latestMessage ? latestMessage.msg : "No messages";
-          const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
-          const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
-          DOM.chatList.innerHTML += `
+        .sort((a, b) => {
+            if (a.time && b.time) {
+                return mDate(b.time).subtract(a.time);
+            } else if (a.time) {
+                return -1;
+            } else if (b.time) {
+                return 1;
+            } else {
+                return 0;
+            }
+        })
+        .forEach((elem, index) => {
+            let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
+            let unreadClass = elem.unread ? "unread" : "";
+            if (elem.isGroup) {
+                const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
+                const messageText = latestMessage ? latestMessage.msg : "No messages";
+                const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
+                const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
+                DOM.chatList.innerHTML += `
             <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" onclick="generateMessageArea(this, ${index})">
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
@@ -156,9 +156,9 @@ let viewChatList = () => {
                 ${elem.unread ? "<div class=\"badge badge-success badge-pill small\" id=\"unread-count\">" + elem.unread + "</div>" : ""}
               </div>
             </div>`;
-        }
-      });
-  };
+            }
+        });
+};
 
 let generateChatList = async () => {
     await populateChatList();
@@ -213,31 +213,93 @@ function makeformatDate(dateString) {
     }
 }
 
-// let addMessageToMessageArea = (msg) => {
-// console.log("mesage",msg);
 setTimeout(() => {
     window.Echo.channel('vmChat').listen('.Chat', (message) => {
         console.log(message);
-        let msgDate = mDate(message.time).getDate();
-        if (lastDate != msgDate) {
-            addDateToMessageArea(msgDate);
-            lastDate = msgDate;
-        }
+        addMessageToMessageArea(message);
+        //     let msgDate = mDate(message.time).getDate();
+        //     if (lastDate != msgDate) {
+        //         addDateToMessageArea(msgDate);
+        //         lastDate = msgDate;
+        //     }
 
-        // var alert_message = msg.read_status;
+        //     // var alert_message = msg.read_status;
 
-        // if (alert_message == 1) {
-        //     addunreadToMessageArea.addUnread();
-        // }
+        //     // if (alert_message == 1) {
+        //     //     addunreadToMessageArea.addUnread();
+        //     // }
 
-        // let sendStatus = `<i class="${msg.status < 2 ? "far" : "fas"} fa-check-circle"></i>`;
+        //     // let sendStatus = `<i class="${msg.status < 2 ? "far" : "fas"} fa-check-circle"></i>`;
 
-        let profileImage = `<img src="${message.user.hasOwnProperty('pic') ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+        //     let profileImage = `<img src="${message.user.hasOwnProperty('pic') ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
 
-        // Find sender name
-        let senderName = message.user.name;
+        //     // Find sender name
+        //     let senderName = message.user.name;
 
-        DOM.messages.innerHTML += `
+        //     DOM.messages.innerHTML += `
+        // <div class="ml-3">
+        //   ${message.user.id == user.id ? '' : profileImage}
+        //   <div class="">
+        // 	<div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
+        // 	  p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
+        // 	  <div style="margin-top:-4px">
+        // 		<div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+        // 		  ${message.message}
+        // 		</div>
+        // 		<div>
+        // 		  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+        // 			<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
+        // 			<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(message.time)})</span> |
+        // 			<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
+        // 			  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal">Seen</a>
+        // 			</span> |
+        // 			<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
+        // 			  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
+        // 			  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
+        // 			</span> |
+        // 			<span>
+        // 			  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal">Delete</a>
+        // 			</span>
+        // 		  </div>
+        // 		</div>
+        // 	  </div>
+        // 	</div>
+        //   </div>
+        // </div>
+        // `;
+
+
+        //     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
+    })
+        .error((error) => {
+            console.error("Error:", error);
+        })
+}, 1000);
+
+
+let addMessageToMessageArea = (message) => {
+
+    console.log(message);
+    let msgDate = mDate(message.time).getDate();
+    if (lastDate != msgDate) {
+        addDateToMessageArea(msgDate);
+        lastDate = msgDate;
+    }
+
+    // var alert_message = msg.read_status;
+
+    // if (alert_message == 1) {
+    //     addunreadToMessageArea.addUnread();
+    // }
+
+    // let sendStatus = `<i class="${msg.status < 2 ? "far" : "fas"} fa-check-circle"></i>`;
+
+    let profileImage = `<img src="${message.user.hasOwnProperty('pic') ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+
+    // Find sender name
+    let senderName = message.user.name;
+
+    DOM.messages.innerHTML += `
 	<div class="ml-3">
 	  ${message.user.id == user.id ? '' : profileImage}
 	  <div class="">
@@ -245,12 +307,12 @@ setTimeout(() => {
 		  p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
 		  <div style="margin-top:-4px">
 			<div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
-			  ${message.message}
+			  ${message.msg ?? message.message}
 			</div>
 			<div>
 			  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(message.time)})</span> |
+				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time : message.time * 1000))})</span> |
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal">Seen</a>
 				</span> |
@@ -270,15 +332,10 @@ setTimeout(() => {
 	`;
 
 
-        DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
-    })
-        .error((error) => {
-            console.error("Error:", error);
-        })
-}, 1000);
+    DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
 
 
-// };
+};
 
 
 let generateMessageArea = (elem, chatIndex) => {
@@ -318,6 +375,7 @@ let generateMessageArea = (elem, chatIndex) => {
     // else {
     //     DOM.messageAreaDetails.innerHTML = `last seen ${mDate(chat.contact.lastSeen).lastSeenFormat()}`;
     // }
+    console.log("check fot length", chat.group.group_messages);
 
     let msgs = chat.isGroup ? chat.group.group_messages : [];
 
@@ -350,7 +408,7 @@ let sendMessage = () => {
     let msg = {
         sender: loginUser,
         body: value,
-        reply_id: null,
+        reply_id: '`',
         group_id: "i2R5WNL55XaFYOX",
         type: "message",
         time: mDate().toString(),
@@ -369,8 +427,7 @@ let sendMessage = () => {
     });
 
     // addMessageToMessageArea(msg);
-    // MessageUtils.addMessage(msg);
-    // generateChatList();
+    generateChatList();
 };
 
 let showProfileSettings = () => {
