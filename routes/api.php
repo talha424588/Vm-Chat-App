@@ -34,5 +34,6 @@ Route::group(['middleware' => ['auth:web']], function() {
 
 });
 Route::post('/messages', [ChatController::class, 'store']);
+Route::delete('/message/delete/{id}', [ChatController::class, 'delete']);
 
 //Route::post('login',[AuthController::class,'login']);

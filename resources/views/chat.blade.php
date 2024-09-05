@@ -231,13 +231,13 @@
                     <p class="not-recover">This action cannot be undone.</p>
 
                     <button type="button" class="btn btn-delete">Delete</button> &nbsp;&nbsp;&nbsp;
-                    <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-cancel" id="btn-close" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
     <!--Seen Modal -->
-    <div class="modal fade" id="seenModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    <div class="modal fade" id="seenModal" tabindex="-1" role="dialog" aria-labelledby="seenModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -258,7 +258,7 @@
     </div>
 
     <!-- File Size Modal -->
-    <div class="modal fade" id="filesizealeart" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    <div class="modal fade" id="filesizealeart" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">

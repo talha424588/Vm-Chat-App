@@ -174,7 +174,7 @@ let viewChatList = () => {
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
                 DOM.chatList.innerHTML += `
-<input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
+            <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
             <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" onclick="generateMessageArea(this, ${index})">
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
@@ -257,7 +257,6 @@ socket.on('sendChatToClient', (message) => {
 
 
 let addMessageToMessageArea = (message) => {
-    console.log("asdasdas", message);
     let msgDate = mDate(message.time).getDate();
     if (lastDate != msgDate) {
         addDateToMessageArea(msgDate);
@@ -298,7 +297,7 @@ let addMessageToMessageArea = (message) => {
 				  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
 				</span> |
 				<span>
-				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal">Delete</a>
+				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
 				</span>
 			  </div>
 			</div>
@@ -558,5 +557,31 @@ document.getElementById('input').addEventListener('keydown', function (event) {
     }
 });
 
+// delete model
+$('#deleteModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var messageId = button.data('message-id');
+
+    console.log("button", button, "message id", messageId);
+
+    $(this).find('.btn-delete').data('message-id', messageId);
+});
+
+$('#deleteModal .btn-delete').on('click', function () {
+    var messageId = $(this).data('message-id');
+    var messageElement = $('[data-message-id="' + messageId + '"]'); // Select the element that contains the message
 
 
+    axios.delete('api/message/delete/' + messageId)
+        .then(function (response) {
+            console.log(response);
+            $("#deleteModal").on('hide.bs.modal', function () { });
+            $('#deleteModal').removeClass('show');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+            messageElement.remove();
+        })
+        .catch(function (error) {
+            console.error(error);
+        });
+});

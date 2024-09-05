@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\GroupMessage;
 use App\Models\User;
 use App\Repositories\ChatRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -89,7 +90,7 @@ class ChatController extends Controller
 
 
         $message = new GroupMessage;
-        $message->msg = $request->body;
+        $message->msg = $request->message;
         $message->sender = $uniqueId;
         $message->reply_id = $request->replyId;
         $message->group_id = $request->group_id;
@@ -99,12 +100,42 @@ class ChatController extends Controller
     }
 
 
-    public function broadcastChat(Request $request)
-    {
-        $user = $request->user();
-        $message = $this->store($request);
-        $messageResposne = json_decode($message->getContent(),true);
-        event(new Chat($user,$request->body,$request->time, (int)($messageResposne['id'])));
-        return response()->json(['msg'=>"event fired !!"]);
+    // public function broadcastChat(Request $request)
+    // {
+    //     $user = $request->user();
+    //     $message = $this->store($request);
+    //     $messageResposne = json_decode($message->getContent(),true);
+    //     event(new Chat($user,$request->body,$request->time, (int)($messageResposne['id'])));
+    //     return response()->json(['msg'=>"event fired !!"]);
+    // }
+
+    public function delete($id)
+{
+    try {
+        $message = GroupMessage::findOrFail($id);
+        if ($message->delete()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Message deleted successfully'
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Message deletion failed'
+            ], 400);
+        }
+    } catch (ModelNotFoundException $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Message not found'
+        ], 404);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'An error occurred while deleting the message'
+        ], 500);
     }
+}
+
+
 }

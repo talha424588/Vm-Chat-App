@@ -78,13 +78,13 @@ io.on('connection', (socket) => {
         console.log("message details",msg);
         socket.emit('sendChatToClient', msg);
         socket.broadcast.emit('sendChatToClient', msg);
-        // const response = await axios.post('http://localhost:8000/api/messages', msg);
-        // console.log("resposer",response);
-        // if (response.status === 201) {
-        //     console.log('Message stored successfully!');
-        // } else {
-        //     console.error('Error storing message:', response.status);
-        // }
+        const response = await axios.post('http://localhost:8000/api/messages', msg);
+        console.log("resposer",response);
+        if (response.status === 201) {
+            console.log('Message stored successfully!');
+        } else {
+            console.error('Error storing message:', response.status);
+        }
     });
 
     socket.on('disconnect', () => {
