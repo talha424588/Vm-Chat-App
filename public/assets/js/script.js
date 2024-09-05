@@ -174,6 +174,7 @@ let viewChatList = () => {
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
                 DOM.chatList.innerHTML += `
+<input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
             <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" onclick="generateMessageArea(this, ${index})">
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
@@ -378,18 +379,16 @@ let sendMessage = () => {
     }
     let value = DOM.messageInput.value;
     if (value === "") return;
-
     let msg = {
         user: loginUser,
         message: value,
         reply_id: '',
-        group_id: "i2R5WNL55XaFYOX",
+        group_id: document.getElementById('group-id').value,
         type: "message",
         time: mDate().toString(),
     };
-    socket.emit('sendChatToServer', msg, () => {
-        DOM.messageInput.value = "";
-    });
+    socket.emit('sendChatToServer', msg)
+    DOM.messageInput.value = "";
     // $.ajax({
     //     headers: {
     //         'X-CSRF-TOKEN': csrfToken

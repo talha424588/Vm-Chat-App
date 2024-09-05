@@ -30,9 +30,9 @@ Route::group(['middleware' => ['auth:web']], function() {
     Route::get('get-groups-messages-by-group-id',[ChatController::class,'getUserAllGroupsMessages']);
 
     Route::get('/messages', [ChatController::class, 'index']);
-    Route::post('/messages', [ChatController::class, 'store']);
     Route::get('auth/token/verify', [AuthController::class, 'verifyToken']);
 
 });
+Route::post('/messages', [ChatController::class, 'store']);
 
 //Route::post('login',[AuthController::class,'login']);

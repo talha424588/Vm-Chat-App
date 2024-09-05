@@ -1,7 +1,7 @@
 // import express from 'express';
 // import { createServer } from 'http';
 // import { Server } from 'socket.io';
-// import axios from 'axios';
+import axios from 'axios';
 
 // const app = express();
 
@@ -75,10 +75,17 @@ io.on('connection', (socket) => {
     console.log('connection');
 
     socket.on('sendChatToServer', async (msg) => {
-        console.log(msg);
+        console.log("message details",msg);
         socket.emit('sendChatToClient', msg);
         socket.broadcast.emit('sendChatToClient', msg);
-      });
+        // const response = await axios.post('http://localhost:8000/api/messages', msg);
+        // console.log("resposer",response);
+        // if (response.status === 201) {
+        //     console.log('Message stored successfully!');
+        // } else {
+        //     console.error('Error storing message:', response.status);
+        // }
+    });
 
     socket.on('disconnect', () => {
         console.log('Disconnect');

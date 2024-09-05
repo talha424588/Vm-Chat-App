@@ -8,6 +8,7 @@ use App\Models\GroupMessage;
 use App\Models\User;
 use App\Repositories\ChatRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ChatController extends Controller
@@ -83,7 +84,8 @@ class ChatController extends Controller
 
     // Get the unique_id from the user object
         // $uniqueId = $user['unique_id'];
-        $uniqueId = $request->user()->unique_id;
+        $user = $request->input('user');
+        $uniqueId = $user['unique_id'];
 
 
         $message = new GroupMessage;
@@ -92,8 +94,8 @@ class ChatController extends Controller
         $message->reply_id = $request->replyId;
         $message->group_id = $request->group_id;
         $message->time = time();
-        $message->save();
-        return response()->json($message, 201);
+        if($message->save())
+            return response()->json($message, 201);
     }
 
 
