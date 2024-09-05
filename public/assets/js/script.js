@@ -2,6 +2,9 @@
 let getById = (id, parent) => parent ? parent.getElementById(id) : getById(id, document);
 let getByClass = (className, parent) => parent ? parent.getElementsByClassName(className) : getByClass(className, document);
 
+const socket = io('http://localhost:3000');
+// Connect to the server
+
 const DOM = {
     chatListArea: getById("chat-list-area"),
     messageArea: getById("message-area"),
@@ -21,11 +24,38 @@ const DOM = {
     inputName: getById("input-name"),
     username: getById("username"),
     displayPic: getById("display-pic"),
+    groupId: getById("group-id"),
 };
 let userGroupList = [];
 
 // document.addEventListener('DOMContentLoaded', async function (e) {
 
+// const message = DOM.messageInput.value;
+// var loginUser = {
+//     id: document.getElementById("login_user_id").value,
+//     name: document.getElementById("login_user_name").value,
+//     unique_id: document.getElementById("login_user_unique_id").value,
+//     email: document.getElementById("login_user_email").value
+// }
+// const sendButton = document.getElementById('input');
+// const chatLog = document.getElementById('chat-log');
+
+// sendButton.addEventListener('dblclick', () => {
+//   const message = DOM.messageInput.value;
+//   if (message) {
+//     // Send the loginUser object along with the message
+//     socket.emit('sendChatToServer', { message, loginUser });
+//     chatInput.value = '';
+//   }
+// });
+
+socket.on('sendChatToClient', (message) => {
+    // console.log("message", message);
+    //     console.log("loginUser", data.loginUser);
+    //     const messageElement = document.createElement('div');
+    //     messageElement.textContent = `${data.loginUser.name}: ${data.message}`;
+    //     chatLog.appendChild(messageElement);
+});
 
 
 // });
@@ -213,73 +243,20 @@ function makeformatDate(dateString) {
     }
 }
 
-setTimeout(() => {
-    window.Echo.channel('vmChat').listen('.Chat', (message) => {
-        console.log(message);
-        addMessageToMessageArea(message);
-        //     let msgDate = mDate(message.time).getDate();
-        //     if (lastDate != msgDate) {
-        //         addDateToMessageArea(msgDate);
-        //         lastDate = msgDate;
-        //     }
-
-        //     // var alert_message = msg.read_status;
-
-        //     // if (alert_message == 1) {
-        //     //     addunreadToMessageArea.addUnread();
-        //     // }
-
-        //     // let sendStatus = `<i class="${msg.status < 2 ? "far" : "fas"} fa-check-circle"></i>`;
-
-        //     let profileImage = `<img src="${message.user.hasOwnProperty('pic') ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
-
-        //     // Find sender name
-        //     let senderName = message.user.name;
-
-        //     DOM.messages.innerHTML += `
-        // <div class="ml-3">
-        //   ${message.user.id == user.id ? '' : profileImage}
-        //   <div class="">
-        // 	<div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
-        // 	  p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
-        // 	  <div style="margin-top:-4px">
-        // 		<div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
-        // 		  ${message.message}
-        // 		</div>
-        // 		<div>
-        // 		  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
-        // 			<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-        // 			<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(message.time)})</span> |
-        // 			<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-        // 			  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal">Seen</a>
-        // 			</span> |
-        // 			<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-        // 			  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
-        // 			  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
-        // 			</span> |
-        // 			<span>
-        // 			  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal">Delete</a>
-        // 			</span>
-        // 		  </div>
-        // 		</div>
-        // 	  </div>
-        // 	</div>
-        //   </div>
-        // </div>
-        // `;
-
-
-        //     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
-    })
-        .error((error) => {
-            console.error("Error:", error);
-        })
-}, 1000);
+// setTimeout(() => {
+//     window.Echo.channel('vmChat').listen('.Chat', (message) => {
+socket.on('sendChatToClient', (message) => {
+    addMessageToMessageArea(message);
+});
+//     })
+//         .error((error) => {
+//             console.error("Error:", error);
+//         })
+// }, 1000);
 
 
 let addMessageToMessageArea = (message) => {
-
-    console.log(message);
+    console.log("asdasdas", message);
     let msgDate = mDate(message.time).getDate();
     if (lastDate != msgDate) {
         addDateToMessageArea(msgDate);
@@ -294,8 +271,7 @@ let addMessageToMessageArea = (message) => {
 
     // let sendStatus = `<i class="${msg.status < 2 ? "far" : "fas"} fa-check-circle"></i>`;
 
-    let profileImage = `<img src="${message.user.hasOwnProperty('pic') ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
-
+    let profileImage = `<img src="${message.user?.pic ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     // Find sender name
     let senderName = message.user.name;
 
@@ -341,7 +317,6 @@ let addMessageToMessageArea = (message) => {
 let generateMessageArea = (elem, chatIndex) => {
     chat = chatList[chatIndex];
 
-    console.log("chat group", chat);
 
     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
     mClassList(DOM.messageAreaOverlay).add("d-none");
@@ -375,7 +350,6 @@ let generateMessageArea = (elem, chatIndex) => {
     // else {
     //     DOM.messageAreaDetails.innerHTML = `last seen ${mDate(chat.contact.lastSeen).lastSeenFormat()}`;
     // }
-    console.log("check fot length", chat.group.group_messages);
 
     let msgs = chat.isGroup ? chat.group.group_messages : [];
 
@@ -406,25 +380,27 @@ let sendMessage = () => {
     if (value === "") return;
 
     let msg = {
-        sender: loginUser,
-        body: value,
-        reply_id: '`',
+        user: loginUser,
+        message: value,
+        reply_id: '',
         group_id: "i2R5WNL55XaFYOX",
         type: "message",
         time: mDate().toString(),
     };
-
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': csrfToken
-        },
-        url: broadcastChatRoute,
-        type: 'POST',
-        data: msg,
-        success: function (data) {
-            DOM.messageInput.value = "";
-        }
+    socket.emit('sendChatToServer', msg, () => {
+        DOM.messageInput.value = "";
     });
+    // $.ajax({
+    //     headers: {
+    //         'X-CSRF-TOKEN': csrfToken
+    //     },
+    //     url: broadcastChatRoute,
+    //     type: 'POST',
+    //     data: msg,
+    //     success: function (data) {
+    //         DOM.messageInput.value = "";
+    //     }
+    // });
 
     // addMessageToMessageArea(msg);
     generateChatList();
