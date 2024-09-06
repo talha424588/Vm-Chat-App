@@ -3,22 +3,26 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class MessageResource extends ResourceCollection
+class MessageResource extends JsonResource
 {
+    public static $wrap = null;
     /**
-     * Transform the resource collection into an array.
+     * Transform the resource into an array.
      *
-     * @return array<int|string, mixed>
+     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
-    }
-
-    public function withResponse($request, $response)
-    {
-        $response->setData($this->toArray($request));
+        return [
+            'id' => $this->id,
+            'sender' => $this->sender,
+            'group_id' => $this->group_id,
+            'msg' => $this->msg,
+            'reply_id' => $this->reply_id,
+            'seen_by' => $this->seen_by,
+            'time' => $this->time,
+        ];
     }
 }

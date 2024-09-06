@@ -290,7 +290,7 @@ let addMessageToMessageArea = (message) => {
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time : message.time * 1000))})</span> |
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal">Seen</a>
+				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id = "${message.id}">Seen</a>
 				</span> |
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
@@ -310,7 +310,6 @@ let addMessageToMessageArea = (message) => {
 
     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
 
-
 };
 
 
@@ -323,14 +322,16 @@ let generateMessageArea = (elem, chatIndex) => {
 
     [...DOM.chatListItem].forEach((elem) => mClassList(elem).remove("active"));
 
-    mClassList(elem).contains("unread", () => {
-        MessageUtils.changeStatusById({
-            isGroup: chat.isGroup,
-            id: chat.isGroup ? chat.group.id : chat.contact.id
-        });
-        mClassList(elem).remove("unread");
-        mClassList(elem.querySelector("#unread-count")).add("d-none");
-    });
+
+    // update read status of each using message utils from
+    // mClassList(elem).contains("unread", () => {
+    //     MessageUtils.changeStatusById({
+    //         isGroup: chat.isGroup,
+    //         id: chat.isGroup ? chat.group.id : chat.contact.id
+    //     });
+    //     mClassList(elem).remove("unread");
+    //     mClassList(elem.querySelector("#unread-count")).add("d-none");
+    // });
 
     if (window.innerWidth <= 575) {
         mClassList(DOM.chatListArea).remove("d-flex").add("d-none");
@@ -559,6 +560,7 @@ document.getElementById('input').addEventListener('keydown', function (event) {
 
 // delete model
 $('#deleteModal').on('show.bs.modal', function (event) {
+    console.log(event);
     var button = $(event.relatedTarget);
     var messageId = button.data('message-id');
 
@@ -585,3 +587,37 @@ $('#deleteModal .btn-delete').on('click', function () {
             console.error(error);
         });
 });
+
+// udpate message seen by status
+
+// function updateMessageStatus(messageId, userId) {
+//     fetch(`/messages/${messageId}/seen`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify({ userId: userId })
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//       console.log(data);
+//     })
+//     .catch(error => {
+//       console.error(error);
+//     });
+//   }
+
+// Seen Model
+$("#seenModal").on("show.bs.modal", async function (event) {
+
+    let deleteBtn = $(event.relatedTarget);
+    let messageId = deleteBtn.data("message-id");
+    try {
+        const response = await axios.get("api/message/read/status/" + messageId);
+        const message = await response.data;
+        console.log(message);
+    }
+    catch {
+        console.log("Something went wrong");
+    }
+})

@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\LoginRequestBody;
 use App\Http\Resources\GroupResource;
-use App\Http\Resources\MessageResource;
+use App\Http\Resources\MessageResourceCollection;
 use App\Http\Resources\userResource;
 use App\Models\Group;
 use App\Models\GroupMessage;

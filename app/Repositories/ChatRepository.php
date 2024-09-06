@@ -8,5 +8,5 @@ interface ChatRepository
 {
     public function searchChatMessages($request);
     public function fetchUserAllGroupsMessages($request);
-
+    public function getMessageStatus($id);
 }

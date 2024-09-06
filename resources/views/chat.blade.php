@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css"
         integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
 
@@ -100,8 +100,10 @@
                         <i class="fas fa-arrow-left p-2 mr-2 text-dark" style="font-size: 1.5rem; cursor: pointer;"
                             onclick="showChatList()"></i>
                     </div>
-                    <a href="#"><img src="https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg" alt="Profile Photo"
-                            class="img-fluid rounded-circle mr-2" style="height:50px;" id="pic"></a>
+                    <a href="#"><img
+                            src="https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg"
+                            alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;"
+                            id="pic"></a>
                     <div class="d-flex flex-column">
                         <div class="text-dark font-weight-bold" id="name"></div>
                         <div class=" small" id="details"></div>
@@ -231,7 +233,8 @@
                     <p class="not-recover">This action cannot be undone.</p>
 
                     <button type="button" class="btn btn-delete">Delete</button> &nbsp;&nbsp;&nbsp;
-                    <button type="button" class="btn btn-cancel" id="btn-close" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-cancel" id="btn-close"
+                        data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -244,15 +247,10 @@
 
                 <div class="modal-body">
                     <img src="{{ asset('assets/svg/message-seen.gif') }}" alt="" height="78.32px">
-
                     <h5>Users who have seen this message:</h5>
                     <p class="not-recover">awais-designer, VM-UST-SA, Talha Dev</p>
-
-
                     <button type="button" class="btn btn-cancel" data-dismiss="modal">Ok</button>
-
                 </div>
-
             </div>
         </div>
     </div>
@@ -282,9 +280,7 @@
     <input type="hidden" value="{{ Auth::user()->email }}" id="login_user_email">
     <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script>
     @vite(['resources/js/app.js'])
-    <script>
-
-    </script>
+    <script></script>
     <script type="module">
         import {
             Picker
@@ -389,7 +385,7 @@
     <script src="{{ asset('assets/js/date-utils.js') }}"></script>
     <script src="{{ asset('assets/js/script.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
 
     <script>

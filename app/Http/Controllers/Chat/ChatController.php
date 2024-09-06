@@ -14,9 +14,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ChatController extends Controller
 {
-    public function __construct(protected ChatRepository $chatRepository)
-    {
-    }
+    public function __construct(protected ChatRepository $chatRepository) {}
 
     public function index()
     {
@@ -83,7 +81,7 @@ class ChatController extends Controller
     {
         // $user = $request->input('user');
 
-    // Get the unique_id from the user object
+        // Get the unique_id from the user object
         // $uniqueId = $user['unique_id'];
         $user = $request->input('user');
         $uniqueId = $user['unique_id'];
@@ -95,7 +93,7 @@ class ChatController extends Controller
         $message->reply_id = $request->replyId;
         $message->group_id = $request->group_id;
         $message->time = time();
-        if($message->save())
+        if ($message->save())
             return response()->json($message, 201);
     }
 
@@ -110,32 +108,35 @@ class ChatController extends Controller
     // }
 
     public function delete($id)
-{
-    try {
-        $message = GroupMessage::findOrFail($id);
-        if ($message->delete()) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Message deleted successfully'
-            ], 200);
-        } else {
+    {
+        try {
+            $message = GroupMessage::findOrFail($id);
+            if ($message->delete()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Message deleted successfully'
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Message deletion failed'
+                ], 400);
+            }
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Message deletion failed'
-            ], 400);
+                'message' => 'Message not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while deleting the message'
+            ], 500);
         }
-    } catch (ModelNotFoundException $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Message not found'
-        ], 404);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'An error occurred while deleting the message'
-        ], 500);
     }
-}
 
-
+    public function getMessageReadStatus($messageId)
+    {
+        return $this->chatRepository->getMessageStatus($messageId);
+    }
 }
