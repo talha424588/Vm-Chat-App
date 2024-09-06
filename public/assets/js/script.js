@@ -28,38 +28,6 @@ const DOM = {
 };
 let userGroupList = [];
 
-// document.addEventListener('DOMContentLoaded', async function (e) {
-
-// const message = DOM.messageInput.value;
-// var loginUser = {
-//     id: document.getElementById("login_user_id").value,
-//     name: document.getElementById("login_user_name").value,
-//     unique_id: document.getElementById("login_user_unique_id").value,
-//     email: document.getElementById("login_user_email").value
-// }
-// const sendButton = document.getElementById('input');
-// const chatLog = document.getElementById('chat-log');
-
-// sendButton.addEventListener('dblclick', () => {
-//   const message = DOM.messageInput.value;
-//   if (message) {
-//     // Send the loginUser object along with the message
-//     socket.emit('sendChatToServer', { message, loginUser });
-//     chatInput.value = '';
-//   }
-// });
-
-socket.on('sendChatToClient', (message) => {
-    // console.log("message", message);
-    //     console.log("loginUser", data.loginUser);
-    //     const messageElement = document.createElement('div');
-    //     messageElement.textContent = `${data.loginUser.name}: ${data.message}`;
-    //     chatLog.appendChild(messageElement);
-});
-
-
-// });
-
 let mClassList = (element) => {
     return {
         add: (className) => {
@@ -166,6 +134,7 @@ let viewChatList = () => {
             }
         })
         .forEach((elem, index) => {
+            console.log(elem);
             let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
@@ -389,19 +358,6 @@ let sendMessage = () => {
     };
     socket.emit('sendChatToServer', msg)
     DOM.messageInput.value = "";
-    // $.ajax({
-    //     headers: {
-    //         'X-CSRF-TOKEN': csrfToken
-    //     },
-    //     url: broadcastChatRoute,
-    //     type: 'POST',
-    //     data: msg,
-    //     success: function (data) {
-    //         DOM.messageInput.value = "";
-    //     }
-    // });
-
-    // addMessageToMessageArea(msg);
     generateChatList();
 };
 
