@@ -79,10 +79,6 @@ class ChatController extends Controller
 
     public function store(Request $request)
     {
-        // $user = $request->input('user');
-
-        // Get the unique_id from the user object
-        // $uniqueId = $user['unique_id'];
         $user = $request->input('user');
         $uniqueId = $user['unique_id'];
 
@@ -90,6 +86,7 @@ class ChatController extends Controller
         $message = new GroupMessage;
         $message->msg = $request->message;
         $message->sender = $uniqueId;
+        $message->seen_by = $uniqueId .", ";
         $message->reply_id = $request->replyId;
         $message->group_id = $request->group_id;
         $message->time = time();

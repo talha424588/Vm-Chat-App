@@ -68,6 +68,7 @@ let populateChatList = async () => {
 
     try {
         const id = document.getElementById("login_user_id").value;
+        const unique_id = document.getElementById("login_user_unique_id").value;
 
         // Fetch groups with their messages
         const response = await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
@@ -95,7 +96,7 @@ let populateChatList = async () => {
 
                     // Ensure unread is calculated correctly
                     const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
-                    chat.unread += (msg.sender !== id && !seenBy.includes(id)) ? 1 : 0;
+                    chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
                 });
             }
 
@@ -231,14 +232,6 @@ let addMessageToMessageArea = (message) => {
         addDateToMessageArea(msgDate);
         lastDate = msgDate;
     }
-
-    // var alert_message = msg.read_status;
-
-    // if (alert_message == 1) {
-    //     addunreadToMessageArea.addUnread();
-    // }
-
-    // let sendStatus = `<i class="${msg.status < 2 ? "far" : "fas"} fa-check-circle"></i>`;
 
     let profileImage = `<img src="${message.user?.pic ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     // Find sender name
@@ -569,7 +562,7 @@ $("#seenModal").on("show.bs.modal", async function (event) {
     let deleteBtn = $(event.relatedTarget);
     let messageId = deleteBtn.data("message-id");
     try {
-        const response = await axios.get("api/message/read/status/" + messageId);
+        const response = await axios.get("api/message/seen-by/" + messageId);
         const message = await response.data;
         console.log(message);
     }
