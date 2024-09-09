@@ -82,7 +82,6 @@ class ChatController extends Controller
         $user = $request->input('user');
         $uniqueId = $user['unique_id'];
 
-
         $message = new GroupMessage;
         $message->msg = $request->message;
         $message->sender = $uniqueId;

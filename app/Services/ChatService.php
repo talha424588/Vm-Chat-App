@@ -33,10 +33,11 @@ class ChatService implements ChatRepository
 
     public function fetchUserAllGroupsMessages($request)
     {
-        $perPage = 20;
+        $perPage = 40;
         $page = $request->get('page', 1);
         $paginator = GroupMessage::where('group_id', $request->groupId)->with('user')->orderBy('id', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
+
         if ($paginator != null) {
             $response = [
                 'status' => true,

@@ -57,14 +57,15 @@ let chat = null;
 // this will contain all the chats that is to be viewed
 // in the chatListArea
 let chatList = [];
+let pagnicateChatList = [];
 
 // this will be used to store the date of the last message
 // in the message area
 let lastDate = "";
 let offset = 0;
+let isLoadingMore = false;
 
-let populateChatList = async () => {
-    // let offset = 0;
+let populateGroupList = async () => {
     chatList = [];
     let present = {};
 
@@ -72,14 +73,7 @@ let populateChatList = async () => {
         const id = document.getElementById("login_user_id").value;
         const unique_id = document.getElementById("login_user_unique_id").value;
 
-        // Fetch groups with their messages
-        // const response = await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}`, {
-        //     method: 'GET',
-        //     headers: {
-        //         'content-type': 'application/json'
-        //     }
-        // });
-        const response = await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}&offset=${offset}`, {
+        const response = await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}&page=1`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json'
@@ -113,11 +107,6 @@ let populateChatList = async () => {
                 chatList.push(chat);
             }
         });
-        if (result.length < 40) {
-            offset = result.length;
-        } else {
-            offset += 40;
-        }
     } catch (error) {
         console.log("Error fetching chat groups:", error);
     }
@@ -143,13 +132,10 @@ let viewChatList = () => {
             }
         })
         .forEach((elem, index) => {
-            console.log(elem);
             let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
-                console.log("group", elem.group.group_messages);;
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
-                console.log("lastest message",latestMessage);
                 const messageText = latestMessage ? latestMessage.msg : "No messages";
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
@@ -173,7 +159,7 @@ let viewChatList = () => {
 };
 
 let generateChatList = async () => {
-    await populateChatList();
+    await populateGroupList();
     viewChatList();
 };
 
@@ -238,6 +224,7 @@ socket.on('sendChatToClient', (message) => {
 
 
 let addMessageToMessageArea = (message) => {
+    console.log("new message", message);
     let msgDate = mDate(message.time).getDate();
     if (lastDate != msgDate) {
         addDateToMessageArea(msgDate);
@@ -285,8 +272,8 @@ let addMessageToMessageArea = (message) => {
 
 };
 
-
-let generateMessageArea = (elem, chatIndex) => {
+let generateMessageArea = async (elem, chatIndex) => {
+    pagnicateChatList = [];
     chat = chatList[chatIndex];
 
 
@@ -321,23 +308,107 @@ let generateMessageArea = (elem, chatIndex) => {
         let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
+
+    const response = await fetch(`api/get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=1`, {
+        method: 'GET',
+        headers: {
+            'content-type': 'application/json'
+        }
+    });
+    pagnicateChatList = await response.json();
+    console.log("message result", pagnicateChatList);
+
+
     // else {
     //     DOM.messageAreaDetails.innerHTML = `last seen ${mDate(chat.contact.lastSeen).lastSeenFormat()}`;
     // }
 
-    let msgs = chat.isGroup ? chat.group.group_messages : [];
+    // let msgs = chat.isGroup ? chat.group.group_messages : [];
 
-    DOM.messages.innerHTML = "";
+    // DOM.messages.innerHTML = "";
 
     lastDate = "";
-    msgs
-        .sort((a, b) => mDate(a.time).subtract(b.time))
+    pagnicateChatList.data.reverse()
+        // .sort((a, b) => mDate(a.time).subtract(b.time))
         .forEach((msg) => addMessageToMessageArea(msg));
 
 
-
+    // DOM.messages.addEventListener('scroll', async () => {
+    //     console.log("isLoadingMore",isLoadingMore);
+    //     // Check if the user scrolled to the top of the message area
+    //     if (DOM.messages.scrollTop === 0 && !isLoadingMore) {
+    //         isLoadingMore = true;
+    //         await loadMoreMessages(chatIndex);
+    //         isLoadingMore = false;
+    //     }
+    // });
 
 };
+// let loadMoreMessages = async (chatIndex) => {
+//     let chat = chatList[chatIndex]; // Track which chat is active
+//     if (!chat.isGroup) return; // Ensure we are fetching group messages
+
+//     console.log("offset",offset);
+//         const groupId = chat.group.group_id;
+//         const response = await fetch(`api/get-group-messages?group_id=${groupId}&offset=${offset}`, {
+
+//             method: 'GET',
+//             headers: {
+//                 'content-type': 'application/json'
+//             }
+//         });
+// }
+
+// const loadMoreMessages = async (chatIndex) => {
+//     let present = {};
+//     const id = document.getElementById("login_user_id").value;
+//     const unique_id = document.getElementById("login_user_unique_id").value;
+//     pagnicateChatList = [];
+//     const chat = chatList[chatIndex];
+//     const newOffset = chat.group.group_messages.length;
+
+//     try {
+//         const response = await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(user.id)}&offset=${newOffset}`);
+//         const result = await response.json();
+
+//         // Append new messages to the existing message list
+//         result.forEach(group => {
+//             let chat = {};
+//             chat.isGroup = true;
+//             chat.group = group;
+//             chat.group.access = [group.access];
+//             // chat.members = [group.access];
+//             chat.name = group.name;
+//             chat.unread = 0;
+
+//             if (group.group_messages && group.group_messages.length > 0) {
+//                 group.group_messages.reverse().forEach(msg => {
+//                     chat.msg = msg;
+//                     chat.time = new Date(msg.time * 1000);
+
+//                     const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
+//                     chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
+//                 });
+//             }
+
+//             if (present[chat.name] !== undefined) {
+//                 pagnicateChatList[present[chat.name]].unread += chat.unread;
+//             } else {
+//                 present[chat.name] = pagnicateChatList.length;
+//                 pagnicateChatList.push(chat);
+//             }
+//         });
+//         console.log("pagnicateChatList",pagnicateChatList);
+//         pagnicateChatList.msg.forEach(newMsg => {
+//             chat.group.group_messages.unshift(newMsg);  // Add to the top of the message list
+//             addMessageToMessageArea(newMsg);  // Render new messages
+//         });
+//         console.log("new message array",chat.group.group_messages.length);
+//         console.log("new message array",chat.group.group_messages);
+//     } catch (error) {
+//         console.error("Error loading more messages:", error);
+//     }
+// };
 
 let showChatList = () => {
     if (areaSwapped) {
@@ -354,7 +425,7 @@ let sendMessage = () => {
         unique_id: document.getElementById("login_user_unique_id").value,
         email: document.getElementById("login_user_email").value
     }
-    console.log("loginUser",loginUser);
+    console.log("loginUser", loginUser);
     let value = DOM.messageInput.value;
     if (value === "") return;
     let msg = {
