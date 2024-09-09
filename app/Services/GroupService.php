@@ -21,29 +21,28 @@ class GroupService implements GroupRepository
         //     ->where('groups.access', '=', $request->id)
         //     ->get();
 
-        // $userGroups = User::with(['groups', 'groupMessages'])
-        // ->where('id', $request->id)
-        // ->get();
+        // $specificId = 38;
+        // $user = Group::whereRaw('FIND_IN_SET(38,access)')->get();
+        // return DB::table('groups')->whereRaw("find_in_set('7',access)")->get();
 
-        // $groups = Group::whereRaw("FIND_IN_SET($request->id, access) > 0")
-        // ->where('access', (int)($request->id))
-        // ->with(['groupMessages' => function ($query) {
-        //     $query->with('user');
-        // }])
-        // ->get();
+        // return $user;
+        // exit;
 
-        $groups = Group::whereRaw("FIND_IN_SET($request->id, access) > 0")
-            ->with(['groupMessages' => function ($query) {
-                $query->with('user');
-            }])
-            ->get();
+        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
+        ->with(['groupMessages' => function ($query) use ($request) {
+            // $query->orderByRaw("FROM_UNIXTIME(time) desc")
+            $query->orderBy("id", "desc")
+                ->limit(40)
+                ->offset($request->input('offset', 0));
+        }, 'groupMessages.user'])
+        ->get();
 
+
+        // $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])->get();
         foreach ($groups as $group) {
             $userIds = explode(',', $group->access);
             $group->users_with_access = User::whereIn('id', $userIds)->get();
         }
-
-
 
         if (count($groups) > 0)
             return new GroupResource($groups);
