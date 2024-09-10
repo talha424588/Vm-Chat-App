@@ -75,12 +75,16 @@ io.on('connection', (socket) => {
     console.log('connection');
 
     socket.on('sendChatToServer', async (msg) => {
-        console.log("message details",msg);
-        socket.emit('sendChatToClient', msg);
-        socket.broadcast.emit('sendChatToClient', msg);
+        console.log("message details", msg);
         const response = await axios.post('http://localhost:8000/api/messages', msg);
-        console.log("resposer",response);
-        if (response.status === 201) {
+        console.log("resposer", response);
+        if (response.status == 201) {
+            const savedMessage = response.data; // The saved message with the generated ID
+
+            // Emit the saved message (including the ID) back to the sender and broadcast to others
+            socket.emit('sendChatToClient', savedMessage);
+            socket.broadcast.emit('sendChatToClient', savedMessage);
+
             console.log('Message stored successfully!');
         } else {
             console.error('Error storing message:', response.status);

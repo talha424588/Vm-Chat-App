@@ -91,6 +91,7 @@ class ChatController extends Controller
         $message->group_id = $request->group_id;
         $message->time = $request->time;
         if ($message->save())
+            $message->user = User::where("unique_id",$uniqueId)->first();
             return response()->json($message, 201);
     }
 

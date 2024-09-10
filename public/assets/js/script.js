@@ -212,11 +212,13 @@ socket.on('sendChatToClient', (message) => {
             id: message.id,
             sender: message.user.unique_id,
             group_id: message.group_id,
-            msg: message.message,
+            msg: message.message??message.msg,
             time: message.time,
             seen_by: message.seen_by || '',
             user: message.user,
         };
+
+        console.log("lastMessage",lastMessage);
         groupToUpdate.group.group_messages.push(lastMessage);
         groupToUpdate.msg = lastMessage;
         groupToUpdate.time = new Date(message.time * 1000);
@@ -247,6 +249,7 @@ socket.on('sendChatToClient', (message) => {
 
 
 let addMessageToMessageArea = (message) => {
+    console.log("message details",message);
     let msgDate = mDate(message.time).getDate();
     if (lastDate != msgDate) {
         addDateToMessageArea(msgDate);
@@ -413,7 +416,7 @@ let sendMessage = () => {
         type: "message",
         time: Math.floor(Date.now() / 1000),
     };
-    socket.emit('sendChatToServer', msg)
+    socket.emit('sendChatToServer', msg);
     DOM.messageInput.value = "";
 };
 
