@@ -207,7 +207,6 @@ socket.on('sendChatToClient', (message) => {
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
 
     if (groupToUpdate) {
-        // Update the last message and time for the relevant group
         const lastMessage = {
             id: message.id,
             sender: message.user.unique_id,
@@ -584,32 +583,6 @@ $('#deleteModal .btn-delete').on('click', function () {
             console.error(error);
         });
 });
-
-// udpate message seen by status
-
-// function updateMessageStatus(messageId, userId) {
-//     fetch(`/messages/${messageId}/seen`, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify({ userId: userId })
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         if (data.status) {
-//             // Get the names from the response data and join them into a string
-//             const names = data.data.join(', ');
-//             // Update the content of the <p> element dynamically
-//             document.getElementById('is_read').innerHTML = names;
-//           } else {
-//             console.error('Error updating message status:', data.message);
-//           }
-//     })
-//     .catch(error => {
-//       console.error(error);
-//     });
-//   }
 
 // Seen Model
 $("#seenModal").on("show.bs.modal", async function (event) {
