@@ -88,7 +88,7 @@ class ChatController extends Controller
         $message->seen_by = $uniqueId .", ";
         $message->reply_id = $request->replyId;
         $message->group_id = $request->group_id;
-        $message->time = time();
+        $message->time = $request->time;
         if ($message->save())
             return response()->json($message, 201);
     }

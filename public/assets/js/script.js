@@ -23,7 +23,7 @@ const DOM = {
     inputName: getById("input-name"),
     username: getById("username"),
     displayPic: getById("display-pic"),
-    groupId: getById("group-id"),
+    groupId: null,
 };
 let userGroupList = [];
 
@@ -55,6 +55,8 @@ let pagnicateChatList = [];
 let lastDate = "";
 let offset = 0;
 let isLoadingMore = false;
+let currentPage = 1;
+let loading = false;
 
 let populateGroupList = async () => {
     chatList = [];
@@ -202,11 +204,49 @@ function makeformatDate(dateString) {
 //     window.Echo.channel('vmChat').listen('.Chat', (message) => {
 socket.on('sendChatToClient', (message) => {
     addMessageToMessageArea(message);
+    let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
+
+    if (groupToUpdate) {
+        // Update the last message and time for the relevant group
+        const lastMessage = {
+            id: message.id,
+            sender: message.user.unique_id,
+            group_id: message.group_id,
+            msg: message.message,
+            time: message.time,
+            seen_by: message.seen_by || '',
+            user: message.user,
+        };
+        groupToUpdate.group.group_messages.push(lastMessage);
+        groupToUpdate.msg = lastMessage;
+        groupToUpdate.time = new Date(message.time * 1000);
+
+        const seenBy = lastMessage.seen_by ? lastMessage.seen_by.split(",").map(s => s.trim()) : [];
+        const unique_id = document.getElementById("login_user_unique_id").value;
+        if (lastMessage.sender !== unique_id && !seenBy.includes(unique_id)) {
+            groupToUpdate.unread += 1;
+        }
+
+        chatList.sort((a, b) => {
+            if (a.time && b.time) {
+                return new Date(b.time) - new Date(a.time);
+            } else if (a.time) {
+                return -1;
+            } else if (b.time) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
+        viewChatList();
+    } else {
+        console.log('Group not found in chat list');
+    }
 });
 
 
 let addMessageToMessageArea = (message) => {
-    console.log("new message", message);
     let msgDate = mDate(message.time).getDate();
     if (lastDate != msgDate) {
         addDateToMessageArea(msgDate);
@@ -229,7 +269,7 @@ let addMessageToMessageArea = (message) => {
 			<div>
 			  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time : message.time * 1000))})</span> |
+				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time * 1000 : message.time * 1000))})</span> |
 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id = "${message.id}">Seen</a>
 				</span> |
@@ -250,13 +290,58 @@ let addMessageToMessageArea = (message) => {
 
 
     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
-
 };
 
+// DOM.messages.addEventListener('scroll', () => {
+//     if (DOM.messages.scrollTop === 0) {
+//         fetchNextPageMessages();
+//     }
+// });
+// const fetchNextPageMessages = async () => {
+//     currentPage++;
+
+//     // Get the current scroll height before loading new messages
+//     const currentScrollHeight = DOM.messages.scrollHeight;
+
+//     const response = await fetch(`api/get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}`, {
+//       method: 'GET',
+//       headers: {
+//         'content-type': 'application/json'
+//       }
+//     });
+
+//     const nextPageMessages = await response.json();
+
+//     pagnicateChatList.data = [...nextPageMessages.data, ...pagnicateChatList.data];
+
+//     // Clear the current message area
+//     DOM.messages.innerHTML = '';
+
+//     // Reverse the order to display messages in correct order (oldest first at the top)
+//     pagnicateChatList.data.reverse().forEach((msg) => {
+//         // Add each message to the DOM (message area)
+//         addMessageToMessageArea(msg);
+//     });
+
+//     // After prepending, adjust the scroll position to keep the view at the same place
+//     DOM.messages.scrollTop = DOM.messages.scrollHeight - currentScrollHeight;
+
+//     // Reverse the messages to prepend in the correct order
+//     // nextPageMessages.data.reverse().forEach((msg) => {
+//     //     // Prepend messages to the top
+//     //     let messageElement = document.createElement('div');
+//     //     messageElement.innerHTML = createMessageHTML(msg);
+//     //     DOM.messages.insertBefore(messageElement.firstChild, DOM.messages.firstChild);
+//     // });
+// };
+
+
 let generateMessageArea = async (elem, chatIndex) => {
+
     pagnicateChatList = [];
     chat = chatList[chatIndex];
 
+    DOM.groupId = chat.group.group_id;
 
     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
     mClassList(DOM.messageAreaOverlay).add("d-none");
@@ -290,7 +375,7 @@ let generateMessageArea = async (elem, chatIndex) => {
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-    const response = await fetch(`api/get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=1`, {
+    const response = await fetch(`api/get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
         method: 'GET',
         headers: {
             'content-type': 'application/json'
@@ -303,18 +388,6 @@ let generateMessageArea = async (elem, chatIndex) => {
     pagnicateChatList.data.reverse()
         // .sort((a, b) => mDate(a.time).subtract(b.time))
         .forEach((msg) => addMessageToMessageArea(msg));
-
-
-    // DOM.messages.addEventListener('scroll', async () => {
-    //     console.log("isLoadingMore",isLoadingMore);
-    //     // Check if the user scrolled to the top of the message area
-    //     if (DOM.messages.scrollTop === 0 && !isLoadingMore) {
-    //         isLoadingMore = true;
-    //         await loadMoreMessages(chatIndex);
-    //         isLoadingMore = false;
-    //     }
-    // });
-
 };
 
 
@@ -333,20 +406,18 @@ let sendMessage = () => {
         unique_id: document.getElementById("login_user_unique_id").value,
         email: document.getElementById("login_user_email").value
     }
-    console.log("loginUser", loginUser);
     let value = DOM.messageInput.value;
     if (value === "") return;
     let msg = {
         user: loginUser,
         message: value,
         reply_id: '',
-        group_id: document.getElementById('group-id').value,
+        group_id: DOM.groupId,
         type: "message",
-        time: mDate().toString(),
+        time: Math.floor(Date.now() / 1000),
     };
     socket.emit('sendChatToServer', msg)
     DOM.messageInput.value = "";
-    generateChatList();
 };
 
 let showProfileSettings = () => {
