@@ -341,6 +341,8 @@ let generateMessageArea = async (elem, chatIndex) => {
     pagnicateChatList = [];
     chat = chatList[chatIndex];
 
+    DOM.messages.innerHTML = '';
+
     DOM.groupId = chat.group.group_id;
 
     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
@@ -375,6 +377,8 @@ let generateMessageArea = async (elem, chatIndex) => {
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
+
+    ///read as statuc for user messages
     const response = await fetch(`api/get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
         method: 'GET',
         headers: {
@@ -382,7 +386,24 @@ let generateMessageArea = async (elem, chatIndex) => {
         }
     });
     pagnicateChatList = await response.json();
-    console.log("message result", pagnicateChatList);
+
+    const ids = pagnicateChatList.data.map(item => item.id);
+
+    // axios.post("api/message/seen-by/update",{ids})
+    // .then(response=>{
+    //     console.log("response",response);
+    // })
+    // .catch(error => {
+    //     console.log(error);
+    // });
+    try {
+        const readMessageResponse = await axios.post("api/message/seen-by/update", { ids });
+        console.log(readMessageResponse);
+    }
+    catch (error) {
+        console.log(error);
+    }
+
 
     lastDate = "";
     pagnicateChatList.data.reverse()

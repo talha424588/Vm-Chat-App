@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Ui\Presets\React;
 
 class ChatController extends Controller
 {
@@ -134,5 +135,10 @@ class ChatController extends Controller
     public function getMessageReadStatus($messageId)
     {
         return $this->chatRepository->getMessageStatus($messageId);
+    }
+
+    public function updateMessageReadStatus(Request $request)
+    {
+        return $this->chatRepository->updateMessageIsReadStatus($request);
     }
 }

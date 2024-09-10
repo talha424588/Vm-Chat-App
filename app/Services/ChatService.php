@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
@@ -73,5 +74,24 @@ class ChatService implements ChatRepository
             return response()->json(["status" => true, "message" => "success"] + (new MessageResource($messages))->resolve());
         else
             return response()->json(["status" => false, "message" => "not found", "messages" => null], 404);
+    }
+
+
+    public function updateMessageIsReadStatus($request)
+    {
+        // return $request;
+        $messagesArray = GroupMessage::WhereIn("id",$request->ids)->get();
+
+        foreach ($messagesArray as $message) {
+            $seenBy = explode(", ", $message->seen_by);
+            if(!in_array(Auth::user()->unique_id , $seenBy))
+            {
+               $seenBy[]= Auth::user()->unique_id;
+               $message->seen_by = implode(', ', $seenBy);
+               $message->save();
+            }
+        }
+
+        return response()->json(["status"=>200,"message"=>"is read updated"]);
     }
 }

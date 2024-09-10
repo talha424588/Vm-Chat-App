@@ -35,7 +35,7 @@ Route::group(['middleware' => ['auth:web']], function() {
 });
 Route::post('/messages', [ChatController::class, 'store']);
 Route::delete('/message/delete/{id}', [ChatController::class, 'delete']);
-// Route::post('/message/seen-by/update', [ChatController::class, 'getMessageReadStatus']);
+Route::post('/message/seen-by/update', [ChatController::class, 'updateMessageReadStatus']);
 Route::get('/message/seen-by/{id}', [ChatController::class, 'getMessageReadStatus']);
 
 //Route::post('login',[AuthController::class,'login']);
