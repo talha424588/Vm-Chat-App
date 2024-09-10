@@ -317,22 +317,13 @@ let addMessageToMessageArea = (message) => {
 //     // Clear the current message area
 //     DOM.messages.innerHTML = '';
 
-//     // Reverse the order to display messages in correct order (oldest first at the top)
 //     pagnicateChatList.data.reverse().forEach((msg) => {
 //         // Add each message to the DOM (message area)
 //         addMessageToMessageArea(msg);
 //     });
 
-//     // After prepending, adjust the scroll position to keep the view at the same place
 //     DOM.messages.scrollTop = DOM.messages.scrollHeight - currentScrollHeight;
 
-//     // Reverse the messages to prepend in the correct order
-//     // nextPageMessages.data.reverse().forEach((msg) => {
-//     //     // Prepend messages to the top
-//     //     let messageElement = document.createElement('div');
-//     //     messageElement.innerHTML = createMessageHTML(msg);
-//     //     DOM.messages.insertBefore(messageElement.firstChild, DOM.messages.firstChild);
-//     // });
 // };
 
 
@@ -388,14 +379,6 @@ let generateMessageArea = async (elem, chatIndex) => {
     pagnicateChatList = await response.json();
 
     const ids = pagnicateChatList.data.map(item => item.id);
-
-    // axios.post("api/message/seen-by/update",{ids})
-    // .then(response=>{
-    //     console.log("response",response);
-    // })
-    // .catch(error => {
-    //     console.log(error);
-    // });
     try {
         const readMessageResponse = await axios.post("api/message/seen-by/update", { ids });
         console.log(readMessageResponse);
@@ -407,7 +390,6 @@ let generateMessageArea = async (elem, chatIndex) => {
 
     lastDate = "";
     pagnicateChatList.data.reverse()
-        // .sort((a, b) => mDate(a.time).subtract(b.time))
         .forEach((msg) => addMessageToMessageArea(msg));
 };
 
@@ -470,13 +452,6 @@ let init = () => {
 
 init();
 
-
-
-
-
-
-
-//Code to send the message
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');
 const chatInputContainer = document.querySelector('.chat-input-container');
@@ -568,7 +543,6 @@ voiceIcon.addEventListener('touchend', () => {
 });
 
 
-
 fileIcon.addEventListener('click', () => {
     fileInput.click();
 });
@@ -577,8 +551,6 @@ fileInput.addEventListener('change', (event) => {
     const files = event.target.files;
     console.log('Selected files:', files);
 });
-
-
 
 document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
@@ -601,7 +573,6 @@ $('#deleteModal').on('show.bs.modal', function (event) {
 $('#deleteModal .btn-delete').on('click', function () {
     var messageId = $(this).data('message-id');
     var messageElement = $('[data-message-id="' + messageId + '"]');
-
 
     axios.delete('api/message/delete/' + messageId)
         .then(function (response) {
