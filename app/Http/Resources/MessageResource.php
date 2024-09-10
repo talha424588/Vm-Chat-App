@@ -23,6 +23,20 @@ class MessageResource extends JsonResource
             'reply_id' => $this->reply_id,
             'seen_by' => $this->seen_by,
             'time' => $this->time,
+            'user' => [
+                    'id' => $this->user->id,
+                    'unique_id' => $this->user->unique_id,
+                    'name' => $this->user->name,
+                    'email' => $this->user->email,
+                    'role' => $this->user->role,
+                    'user_status' => $this->user->user_status,
+                    'email_status' => $this->user->email_status,
+                    'access' => $this->user->access,
+                    'chat_status' => $this->user->chat_status,
+                    'seen_privacy' => $this->user->seen_privacy,
+                    'code' => $this->user->code,
+                    'status' => $this->user->status,
+                ],
         ];
     }
 }

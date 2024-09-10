@@ -288,7 +288,6 @@ let addMessageToMessageArea = (message) => {
 	</div>
 	`;
 
-
     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
 };
 
@@ -341,7 +340,6 @@ let generateMessageArea = async (elem, chatIndex) => {
 
     [...DOM.chatListItem].forEach((elem) => mClassList(elem).remove("active"));
 
-
     // update read status of each using message utils from
     // mClassList(elem).contains("unread", () => {
     //     MessageUtils.changeStatusById({
@@ -368,8 +366,6 @@ let generateMessageArea = async (elem, chatIndex) => {
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-
-    ///read as statuc for user messages
     const response = await fetch(`api/get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
         method: 'GET',
         headers: {
@@ -387,12 +383,10 @@ let generateMessageArea = async (elem, chatIndex) => {
         console.log(error);
     }
 
-
     lastDate = "";
     pagnicateChatList.data.reverse()
         .forEach((msg) => addMessageToMessageArea(msg));
 };
-
 
 let showChatList = () => {
     if (areaSwapped) {
@@ -572,7 +566,7 @@ $('#deleteModal').on('show.bs.modal', function (event) {
 
 $('#deleteModal .btn-delete').on('click', function () {
     var messageId = $(this).data('message-id');
-    var messageElement = $('[data-message-id="' + messageId + '"]');
+    var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
 
     axios.delete('api/message/delete/' + messageId)
         .then(function (response) {
@@ -600,7 +594,14 @@ $('#deleteModal .btn-delete').on('click', function () {
 //     })
 //     .then(response => response.json())
 //     .then(data => {
-//       console.log(data);
+//         if (data.status) {
+//             // Get the names from the response data and join them into a string
+//             const names = data.data.join(', ');
+//             // Update the content of the <p> element dynamically
+//             document.getElementById('is_read').innerHTML = names;
+//           } else {
+//             console.error('Error updating message status:', data.message);
+//           }
 //     })
 //     .catch(error => {
 //       console.error(error);
@@ -614,8 +615,12 @@ $("#seenModal").on("show.bs.modal", async function (event) {
     let messageId = deleteBtn.data("message-id");
     try {
         const response = await axios.get("api/message/seen-by/" + messageId);
-        const message = await response.data;
-        console.log(message);
+        const messageStatus = await response.data;
+
+        const names = messageStatus.data.join(', ');
+        document.getElementById('is_read').innerHTML = names;
+
+        console.log("message", message);
     }
     catch {
         console.log("Something went wrong");

@@ -69,9 +69,11 @@ class ChatService implements ChatRepository
 
     public function getMessageStatus($id)
     {
-        $messages = GroupMessage::findOrFail($id);
-        if ($messages)
-            return response()->json(["status" => true, "message" => "success"] + (new MessageResource($messages))->resolve());
+        $message = GroupMessage::with('user')->where("id", $id)->first();
+        $seenBy = explode(', ', $message->seen_by);
+        $seenByUserNames = User::whereIn('unique_id', $seenBy)->get()->pluck('name')->all();
+        if ($message)
+        return response()->json(["status" => true, "message" => "success","data" => $seenByUserNames] );
         else
             return response()->json(["status" => false, "message" => "not found", "messages" => null], 404);
     }
