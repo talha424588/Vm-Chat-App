@@ -221,6 +221,8 @@ socket.on('sendChatToClient', (message) => {
         groupToUpdate.group.group_messages.push(lastMessage);
         groupToUpdate.msg = lastMessage;
         groupToUpdate.time = new Date(message.time * 1000);
+        groupToUpdate.unread = groupToUpdate.group.group_messages.filter(msg => msg.seen_by && !msg.seen_by.includes(unique_id)).length;
+
 
         const seenBy = lastMessage.seen_by ? lastMessage.seen_by.split(",").map(s => s.trim()) : [];
         const unique_id = document.getElementById("login_user_unique_id").value;
@@ -248,7 +250,6 @@ socket.on('sendChatToClient', (message) => {
 
 
 let addMessageToMessageArea = (message) => {
-    console.log("message details",message);
     let msgDate = mDate(message.time).getDate();
     if (lastDate != msgDate) {
         addDateToMessageArea(msgDate);
@@ -407,6 +408,8 @@ let sendMessage = () => {
     }
     let value = DOM.messageInput.value;
     if (value === "") return;
+    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    console.log("csrf" ,csrfToken);
     let msg = {
         user: loginUser,
         message: value,
@@ -414,6 +417,7 @@ let sendMessage = () => {
         group_id: DOM.groupId,
         type: "message",
         time: Math.floor(Date.now() / 1000),
+        csrf_token:csrfToken
     };
     socket.emit('sendChatToServer', msg);
     DOM.messageInput.value = "";

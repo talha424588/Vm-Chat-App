@@ -12,9 +12,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body>
