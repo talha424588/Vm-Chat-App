@@ -66,7 +66,7 @@ let populateGroupList = async () => {
         const id = document.getElementById("login_user_id").value;
         const unique_id = document.getElementById("login_user_unique_id").value;
 
-        const response = await fetch(`api/get-user-chat-groups?id=${encodeURIComponent(id)}&page=1`, {
+        const response = await fetch(`get-user-chat-groups?id=${encodeURIComponent(id)}&page=1`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json'
@@ -304,7 +304,7 @@ let addMessageToMessageArea = (message) => {
 //     // Get the current scroll height before loading new messages
 //     const currentScrollHeight = DOM.messages.scrollHeight;
 
-//     const response = await fetch(`api/get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}`, {
+//     const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}`, {
 //       method: 'GET',
 //       headers: {
 //         'content-type': 'application/json'
@@ -368,7 +368,7 @@ let generateMessageArea = async (elem, chatIndex) => {
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-    const response = await fetch(`api/get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
+    const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
         method: 'GET',
         headers: {
             'content-type': 'application/json'
@@ -378,7 +378,7 @@ let generateMessageArea = async (elem, chatIndex) => {
 
     const ids = pagnicateChatList.data.map(item => item.id);
     try {
-        const readMessageResponse = await axios.post("api/message/seen-by/update", { ids });
+        const readMessageResponse = await axios.post("message/seen-by/update", { ids });
         console.log(readMessageResponse);
     }
     catch (error) {
@@ -570,7 +570,7 @@ $('#deleteModal .btn-delete').on('click', function () {
     var messageId = $(this).data('message-id');
     var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
 
-    axios.delete('api/message/delete/' + messageId)
+    axios.delete('message/delete/' + messageId)
         .then(function (response) {
             console.log(response);
             $("#deleteModal").on('hide.bs.modal', function () { });
@@ -590,7 +590,7 @@ $("#seenModal").on("show.bs.modal", async function (event) {
     let deleteBtn = $(event.relatedTarget);
     let messageId = deleteBtn.data("message-id");
     try {
-        const response = await axios.get("api/message/seen-by/" + messageId);
+        const response = await axios.get("message/seen-by/" + messageId);
         const messageStatus = await response.data;
 
         const names = messageStatus.data.join(', ');

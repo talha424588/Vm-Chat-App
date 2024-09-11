@@ -18,7 +18,7 @@ import axios from 'axios';
 //     }
 
 //     try {
-//         const response = await axios.get('http://localhost:8000/api/auth/token/verify', {
+//         const response = await axios.get('http://localhost:8000/auth/token/verify', {
 //           headers: {
 //             Authorization: `Bearer ${token}`
 //           }
@@ -76,7 +76,7 @@ io.on('connection', (socket) => {
 
     socket.on('sendChatToServer', async (msg) => {
         console.log("message details", msg);
-        const response = await axios.post('http://localhost:8000/api/messages', msg);
+        const response = await axios.post('http://localhost:8000/messages', msg);
         console.log("resposer", response);
         if (response.status == 201) {
             const savedMessage = response.data; // The saved message with the generated ID

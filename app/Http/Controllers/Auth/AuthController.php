@@ -15,7 +15,7 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
-    public function __construct(protected AuthRepository $userRepository) {}
+    public function __construct(protected AuthRepository $authRepository) {}
 
     public function login(Request $request)
     {
@@ -23,7 +23,7 @@ class AuthController extends Controller
         if ($validateData->fails()) {
             return back()->withErrors($validateData)->withInput();
         }
-        return $this->userRepository->authenticateUser($request);
+        return $this->authRepository->authenticateUser($request);
     }
 
     // public function verifyToken(Request $request)
