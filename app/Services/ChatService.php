@@ -81,7 +81,6 @@ class ChatService implements ChatRepository
 
     public function updateMessageIsReadStatus($request)
     {
-        // return $request;
         $messagesArray = GroupMessage::WhereIn("id",$request->ids)->get();
 
         foreach ($messagesArray as $message) {

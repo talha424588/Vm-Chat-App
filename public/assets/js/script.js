@@ -205,6 +205,7 @@ function makeformatDate(dateString) {
 socket.on('sendChatToClient', (message) => {
     addMessageToMessageArea(message);
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
+    const unique_id = document.getElementById("login_user_unique_id").value;
 
     if (groupToUpdate) {
         const lastMessage = {
@@ -217,15 +218,13 @@ socket.on('sendChatToClient', (message) => {
             user: message.user,
         };
 
-        console.log("lastMessage",lastMessage);
         groupToUpdate.group.group_messages.push(lastMessage);
         groupToUpdate.msg = lastMessage;
         groupToUpdate.time = new Date(message.time * 1000);
-        groupToUpdate.unread = groupToUpdate.group.group_messages.filter(msg => msg.seen_by && !msg.seen_by.includes(unique_id)).length;
+        // groupToUpdate.unread = groupToUpdate.group.group_messages.filter(msg => msg.seen_by && !msg.seen_by.includes(unique_id)).length;
 
 
         const seenBy = lastMessage.seen_by ? lastMessage.seen_by.split(",").map(s => s.trim()) : [];
-        const unique_id = document.getElementById("login_user_unique_id").value;
         if (lastMessage.sender !== unique_id && !seenBy.includes(unique_id)) {
             groupToUpdate.unread += 1;
         }
