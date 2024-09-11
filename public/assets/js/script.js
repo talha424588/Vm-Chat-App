@@ -24,6 +24,7 @@ const DOM = {
     username: getById("username"),
     displayPic: getById("display-pic"),
     groupId: null,
+    activeChatIndex:null,
 };
 let userGroupList = [];
 
@@ -203,6 +204,7 @@ function makeformatDate(dateString) {
 
 //     window.Echo.channel('vmChat').listen('.Chat', (message) => {
 socket.on('sendChatToClient', (message) => {
+
     addMessageToMessageArea(message);
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     const unique_id = document.getElementById("login_user_unique_id").value;
@@ -248,50 +250,50 @@ socket.on('sendChatToClient', (message) => {
 });
 
 
-let addMessageToMessageArea = (message) => {
-    let msgDate = mDate(message.time).getDate();
-    if (lastDate != msgDate) {
-        addDateToMessageArea(msgDate);
-        lastDate = msgDate;
-    }
+// let addMessageToMessageArea = (message) => {
+//     let msgDate = mDate(message.time).getDate();
+//     if (lastDate != msgDate) {
+//         addDateToMessageArea(msgDate);
+//         lastDate = msgDate;
+//     }
 
-    let profileImage = `<img src="${message.user?.pic ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
-    let senderName = message.user.name;
+//     let profileImage = `<img src="${message.user?.pic ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+//     let senderName = message.user.name;
 
-    DOM.messages.innerHTML += `
-	<div class="ml-3">
-	  ${message.user.id == user.id ? '' : profileImage}
-	  <div class="">
-		<div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
-		  p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
-		  <div style="margin-top:-4px">
-			<div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
-			  ${message.msg ?? message.message}
-			</div>
-			<div>
-			  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time * 1000 : message.time * 1000))})</span> |
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id = "${message.id}">Seen</a>
-				</span> |
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
-				  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
-				</span> |
-				<span>
-				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-				</span>
-			  </div>
-			</div>
-		  </div>
-		</div>
-	  </div>
-	</div>
-	`;
+//     DOM.messages.innerHTML += `
+// 	<div class="ml-3">
+// 	  ${message.user.id == user.id ? '' : profileImage}
+// 	  <div class="">
+// 		<div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
+// 		  p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
+// 		  <div style="margin-top:-4px">
+// 			<div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+// 			  ${message.msg ?? message.message}
+// 			</div>
+// 			<div>
+// 			  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+// 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
+// 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time * 1000 : message.time * 1000))})</span> |
+// 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
+// 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id = "${message.id}">Seen</a>
+// 				</span> |
+// 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
+// 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
+// 				  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
+// 				</span> |
+// 				<span>
+// 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+// 				</span>
+// 			  </div>
+// 			</div>
+// 		  </div>
+// 		</div>
+// 	  </div>
+// 	</div>
+// 	`;
 
-    DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
-};
+//     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
+// };
 
 // DOM.messages.addEventListener('scroll', () => {
 //     if (DOM.messages.scrollTop === 0) {
@@ -328,10 +330,63 @@ let addMessageToMessageArea = (message) => {
 // };
 
 
+let addMessageToMessageArea = (message) => {
+    const currentGroupIndex = DOM.activeChatIndex;
+    const currentGroup = chatList[currentGroupIndex];
+    console.log(currentGroup);
+    if (currentGroup.group.group_id === message.group_id) {
+      // Add the message to the current group
+      let msgDate = mDate(message.time).getDate();
+      if (lastDate != msgDate) {
+        addDateToMessageArea(msgDate);
+        lastDate = msgDate;
+      }
+
+      let profileImage = `<img src="${message.user?.pic ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+      let senderName = message.user.name;
+
+      DOM.messages.innerHTML += `
+        <div class="ml-3">
+          ${message.user.id == user.id ? '' : profileImage}
+          <div class="">
+            <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
+              p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
+              <div style="margin-top:-4px">
+                <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+                  ${message.msg ?? message.message}
+                </div>
+                <div>
+                  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
+                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time * 1000 : message.time * 1000))})</span> |
+                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
+                      <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id = "${message.id}">Seen</a>
+                    </span> |
+                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
+                      <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
+                      underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
+                    </span> |
+                    <span>
+                      <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
+    }
+  };
+
 let generateMessageArea = async (elem, chatIndex) => {
 
     pagnicateChatList = [];
     chat = chatList[chatIndex];
+
+    DOM.activeChatIndex = chatIndex;
 
     DOM.messages.innerHTML = '';
 
