@@ -25,6 +25,7 @@ class MessageResourceCollection extends ResourceCollection
                 'reply_id' => $message->reply_id,
                 'seen_by' => $message->seen_by,
                 'time' => $message->time,
+                'type' => $message->type,
                 'user' => [
                     'id' => $message->user->id,
                     'unique_id' => $message->user->unique_id,
