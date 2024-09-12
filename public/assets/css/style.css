@@ -33,23 +33,23 @@ border-bottom-left-radius: 10px; /* Rounded corner on bottom */
 z-index: 1; /* Ensure it is above other content */
 }
 
-		
+
 		.quoted-content {
 			flex-grow: 1;
 			padding-left: 1.5%;
 		}
-		
+
 		.sender-name {
 			color: #2e7d32;
 			font-weight: bold;
 			display: block;
 		}
-		
+
 		.quoted-text {
 			margin: 5px 0 0 0;
 			color: #555;
 		}
-		
+
 		.close-quoted {
 			color: #777;
 			cursor: pointer;
@@ -59,8 +59,8 @@ z-index: 1; /* Ensure it is above other content */
 			right: 10px;
 			top: 10px;
 		}
-		
-		
+
+
 		/*Model Popup */
 .modal-body {
 	border-bottom: none;
@@ -202,7 +202,7 @@ background-color: white;
 border-radius: 20px;
 font-size: 13px;
 font-weight: bold;
-color: #463C3C; 
+color: #463C3C;
 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 text-align: center;
 font-family: 'Open Sans', sans-serif;
@@ -323,7 +323,7 @@ border-radius: 10px;
 font-size: 16px;
 background-color: #F0F2F5;
 background-image: url('../img/search-back-icon.png');
-background-position: 10px 50%; 
+background-position: 10px 50%;
 background-repeat: no-repeat;
 
 
@@ -362,7 +362,7 @@ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the values as needed */
 	border-radius: 10px;
 	max-width: 500px; /* Optional: Set a max width */
   }
-  
+
   .search-bar i {
 	position: absolute; /* Position the icon inside the input */
 	left: 10px; /* Space from the left edge of the input */
@@ -370,7 +370,7 @@ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the values as needed */
 	font-size: 18px; /* Adjust size if necessary */
 	margin-top: 5px;
  			   }
-  
+
   .search-bar input {
 	background-color: #f0f0f0; /* Background color of the input field */
 	border: none;
@@ -381,13 +381,13 @@ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the values as needed */
 	width: 100%; /* Ensure input takes full width of the container */
 	box-sizing: border-box; /* Ensure padding is included in the width calculation */
   }
-  
-  
 
-  .buttons {	
+
+
+  .buttons {
 	margin-top: 20px;
 	margin-bottom: 10px;
-	
+
   }
   .button {
 	background-color: #F0F2F5;
@@ -433,12 +433,12 @@ color: #666; /* adjust the color to your liking */
 		  display: flex;
 		  align-items: center;
 		  background-color: #F0F2F5;
-	   
+
 		  padding: 10px 10px 5px;
 		  width: 100%;
 		  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 	  }
-	  
+
 	  .chat-input {
 		  flex-grow: 1;
 		  border: none;
@@ -449,29 +449,29 @@ color: #666; /* adjust the color to your liking */
 			background-color: #ffffff;
 			border-radius:10px;
 	  }
-	  
+
 	  .chat-input:focus {
 		  outline: none;
 	  }
-	  
+
 	  .chat-icon {
 		  margin-right: 10px;
-		  
+
 		  color: #666;
 		  font-size: 24px;
 	  }
-	  
+
 	  .chat-action-icons i {
-		 
+
 		  color: #666;
 		  font-size: 24px;
 		  cursor: pointer;
 	  }
-	  
+
 	  .chat-action-icons i:hover {
 		  color: #333;
 	  }
-	  
+
 	  .chat-action-icons .send-icon {
 		  background-color: #00BFA5;
 		  color: white;
@@ -483,7 +483,7 @@ color: #666; /* adjust the color to your liking */
 		  color: #FF0000;
 	  }
 
-	 
+
 	  .sticker-menu {
 		  display: none;
 		  position: absolute;
@@ -520,24 +520,24 @@ color: #666; /* adjust the color to your liking */
 .right-nidle {
 	position: relative;
 
-	
+
 	padding: 10px 15px;
 	border-radius: 6px;
-	
+
 	float: right;
 	right: 20px;
   }
-  
+
   .right-nidle::before {
 	content: '';
 	position: absolute;
 	visibility: visible;
 	top: -1px;
 	right: -10px;
-	
+
 	border-top: 10px solid #ccc;
   }
-  
+
   .right-nidle::after {
 	content: '';
 	position: absolute;
@@ -547,13 +547,13 @@ color: #666; /* adjust the color to your liking */
 	border: 10px solid transparent;
 	border-top: 10px solid #dcf8c6;
 	clear: both;
-	
+
   }
-  
+
   div{
 	clear: right;
   }
-  
+
   .right-nidle img {
 	  display: block;
 	  height: auto;
@@ -566,22 +566,22 @@ color: #666; /* adjust the color to your liking */
 	text-align: left;
 	padding: 10px 15px;
 	border-radius: 6px;
-	
+
 	float: left;
 	left: 44px;
 	top:-50px;
   }
-  
+
   .left-nidle::before {
 	content: '';
 	position: absolute;
 	visibility: visible;
 	top: -1px;
 	left: -10px;
-	
+
 	border-top: 10px solid #ccc;
   }
-  
+
   .left-nidle::after {
 	content: '';
 	position: absolute;
@@ -591,13 +591,13 @@ color: #666; /* adjust the color to your liking */
 	border: 10px solid transparent;
 	border-top: 10px solid #ffffff;
 	clear: both;
-	
+
   }
-  
+
   div{
 	clear: left;
   }
-  
+
   .left-nidle img {
 	  display: block;
 	  height: auto;
@@ -757,4 +757,82 @@ body{
 	top: 0;
 	left: 0;
 	z-index: 99;
+}
+
+
+
+/* capture image css */
+
+#camera-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+#camera-stream {
+    width: 100%;
+    height: 100%;
+    background: #000;
+}
+#capture-btn, #close-btn {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+}
+#close-btn {
+    bottom: 20px; /* Position close button at the bottom */
+}
+#switch-camera-btn {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+}
+#photo {
+    display: none;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+}
+#photo-options {
+    display: none;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+#captureid {
+    cursor: pointer;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: white;
+    border: none;
+    margin: 5px;
+    cursor: pointer;
+}
+
+#hidden-file-input
+{
+    display: none;
 }

@@ -24,7 +24,8 @@ const DOM = {
     username: getById("username"),
     displayPic: getById("display-pic"),
     groupId: null,
-    activeChatIndex:null,
+    activeChatIndex: null,
+    unique_id: document.getElementById("login_user_unique_id").value,
 };
 let userGroupList = [];
 
@@ -135,7 +136,7 @@ let viewChatList = () => {
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
                 DOM.chatList.innerHTML += `
             <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
-            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" onclick="generateMessageArea(this, ${index})">
+            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index})">
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
                 <div class="name list-user-name">${elem.group.name}</div>
@@ -203,68 +204,27 @@ function makeformatDate(dateString) {
 }
 
 //     window.Echo.channel('vmChat').listen('.Chat', (message) => {
-// socket.on('sendChatToClient', (message) => {
 
-//     addMessageToMessageArea(message);
-//     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
-//     const unique_id = document.getElementById("login_user_unique_id").value;
-
-//     if (groupToUpdate) {
-//         const lastMessage = {
-//             id: message.id,
-//             sender: message.user.unique_id,
-//             group_id: message.group_id,
-//             msg: message.message??message.msg,
-//             time: message.time,
-//             seen_by: message.seen_by || '',
-//             user: message.user,
-//         };
-
-//         groupToUpdate.group.group_messages.push(lastMessage);
-//         groupToUpdate.msg = lastMessage;
-//         groupToUpdate.time = new Date(message.time * 1000);
-//         // groupToUpdate.unread = groupToUpdate.group.group_messages.filter(msg => msg.seen_by && !msg.seen_by.includes(unique_id)).length;
-
-
-//         const seenBy = lastMessage.seen_by ? lastMessage.seen_by.split(",").map(s => s.trim()) : [];
-//         if (lastMessage.sender !== unique_id && !seenBy.includes(unique_id)) {
-//             groupToUpdate.unread += 1;
-//         }
-
-//         chatList.sort((a, b) => {
-//             if (a.time && b.time) {
-//                 return new Date(b.time) - new Date(a.time);
-//             } else if (a.time) {
-//                 return -1;
-//             } else if (b.time) {
-//                 return 1;
-//             } else {
-//                 return 0;
-//             }
-//         });
-
-//         viewChatList();
-//     } else {
-//         console.log('Group not found in chat list');
-//     }
-// });
 socket.on('sendChatToClient', (message) => {
 
     let unique_id = document.getElementById("login_user_unique_id").value;
 
     const groupId = message.group_id;
-    const groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
-    if (groupToUpdate) {
-        // Add the new message to the correct group chat object
+    // const groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
+    let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
+
+
+    console.log("group to update",groupToUpdate, "group send id",DOM.groupId)
+    console.log("condition check",groupToUpdate.group.group_id === DOM.groupId);
+
+    if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
         groupToUpdate.group.group_messages.push(message);
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
-        // Update the unread count
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
         if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
             groupToUpdate.unread += 1;
         }
-        // Sort the chat list and refresh the UI
         chatList.sort((a, b) => {
             if (a.time && b.time) {
                 return new Date(b.time) - new Date(a.time);
@@ -277,55 +237,74 @@ socket.on('sendChatToClient', (message) => {
             }
         });
         viewChatList();
+        addMessageToMessageArea(message);
     } else {
-        console.log('Group not found in chat list');
+        groupToUpdate.group.group_messages.push(message);
+        groupToUpdate.msg = message;
+        groupToUpdate.time = new Date(message.time * 1000);
+        const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
+        if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
+            groupToUpdate.unread += 1;
+        }
+        chatList.sort((a, b) => {
+            if (a.time && b.time) {
+                return new Date(b.time) - new Date(a.time);
+            } else if (a.time) {
+                return -1;
+            } else if (b.time) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        viewChatList();
     }
 });
 
-// let addMessageToMessageArea = (message) => {
-//     let msgDate = mDate(message.time).getDate();
-//     if (lastDate != msgDate) {
-//         addDateToMessageArea(msgDate);
-//         lastDate = msgDate;
-//     }
+let addMessageToMessageArea = (message) => {
+    let msgDate = mDate(message.time).getDate();
+    if (lastDate != msgDate) {
+        addDateToMessageArea(msgDate);
+        lastDate = msgDate;
+    }
 
-//     let profileImage = `<img src="${message.user?.pic ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
-//     let senderName = message.user.name;
+    let profileImage = `<img src="${message.user?.pic ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+    let senderName = message.user.name;
 
-//     DOM.messages.innerHTML += `
-// 	<div class="ml-3">
-// 	  ${message.user.id == user.id ? '' : profileImage}
-// 	  <div class="">
-// 		<div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
-// 		  p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
-// 		  <div style="margin-top:-4px">
-// 			<div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
-// 			  ${message.msg ?? message.message}
-// 			</div>
-// 			<div>
-// 			  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
-// 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-// 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time * 1000 : message.time * 1000))})</span> |
-// 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-// 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id = "${message.id}">Seen</a>
-// 				</span> |
-// 				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-// 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
-// 				  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
-// 				</span> |
-// 				<span>
-// 				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-// 				</span>
-// 			  </div>
-// 			</div>
-// 		  </div>
-// 		</div>
-// 	  </div>
-// 	</div>
-// 	`;
+    DOM.messages.innerHTML += `
+	<div class="ml-3">
+	  ${message.user.id == user.id ? '' : profileImage}
+	  <div class="">
+		<div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
+		  p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
+		  <div style="margin-top:-4px">
+			<div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+			  ${message.msg ?? message.message}
+			</div>
+			<div>
+			  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
+				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time * 1000 : message.time * 1000))})</span> |
+				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
+				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id = "${message.id}">Seen</a>
+				</span> |
+				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
+				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
+				  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
+				</span> |
+				<span>
+				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+				</span>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	`;
 
-//     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
-// };
+    DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
+};
 
 // DOM.messages.addEventListener('scroll', () => {
 //     if (DOM.messages.scrollTop === 0) {
@@ -361,58 +340,6 @@ socket.on('sendChatToClient', (message) => {
 
 // };
 
-
-let addMessageToMessageArea = (message) => {
-    const currentGroupIndex = DOM.activeChatIndex;
-    const currentGroup = chatList[currentGroupIndex];
-    console.log(currentGroup);
-    if (currentGroup.group.group_id === message.group_id) {
-      // Add the message to the current group
-      let msgDate = mDate(message.time).getDate();
-      if (lastDate != msgDate) {
-        addDateToMessageArea(msgDate);
-        lastDate = msgDate;
-      }
-
-      let profileImage = `<img src="${message.user?.pic ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
-      let senderName = message.user.name;
-
-      DOM.messages.innerHTML += `
-        <div class="ml-3">
-          ${message.user.id == user.id ? '' : profileImage}
-          <div class="">
-            <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
-              p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
-              <div style="margin-top:-4px">
-                <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
-                  ${message.msg ?? message.message}
-                </div>
-                <div>
-                  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
-                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time * 1000 : message.time * 1000))})</span> |
-                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-                      <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id = "${message.id}">Seen</a>
-                    </span> |
-                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-                      <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
-                      underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
-                    </span> |
-                    <span>
-                      <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
-    }
-  };
-
 let generateMessageArea = async (elem, chatIndex) => {
 
     pagnicateChatList = [];
@@ -422,7 +349,9 @@ let generateMessageArea = async (elem, chatIndex) => {
 
     DOM.messages.innerHTML = '';
 
-    DOM.groupId = chat.group.group_id;
+    // DOM.groupId = chat.group.group_id;
+    DOM.groupId = elem.dataset.groupId;
+    console.log("sdfsdfsdfsdfsdfsdf",elem.dataset.groupId);
 
     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
     mClassList(DOM.messageAreaOverlay).add("d-none");
@@ -495,7 +424,7 @@ let sendMessage = () => {
     let value = DOM.messageInput.value;
     if (value === "") return;
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    console.log("csrf" ,csrfToken);
+    console.log("csrf", csrfToken);
     let msg = {
         user: loginUser,
         message: value,
@@ -503,7 +432,7 @@ let sendMessage = () => {
         group_id: DOM.groupId,
         type: "message",
         time: Math.floor(Date.now() / 1000),
-        csrf_token:csrfToken
+        csrf_token: csrfToken
     };
     socket.emit('sendChatToServer', msg);
     DOM.messageInput.value = "";
@@ -692,3 +621,159 @@ $("#seenModal").on("show.bs.modal", async function (event) {
         console.log("Something went wrong");
     }
 })
+
+
+//image upload
+
+// function uploadMedia() {
+
+//     var mediaName = DOM.unique_id + Date.now();
+
+//     return false;
+//     var storageRef = firebase.storage().ref('/images/' + mediaName);
+
+//     // put file to firebase
+//     var uploadTask = storageRef.put(selectedFile);
+
+//     // all working for progress bar that in html
+//     // to indicate image uploading... report
+//     uploadTask.on('state_changed', function (snapshot) {
+//         var progress =
+//             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+//         var uploader = document.getElementById('uploader');
+//         uploader.value = progress;
+//         switch (snapshot.state) {
+//             case firebase.storage.TaskState.PAUSED:
+//                 console.log('Upload is paused');
+//                 break;
+//             case firebase.storage.TaskState.RUNNING:
+//                 console.log('Upload is running');
+//                 break;
+//         }
+//     }, function (error) {
+//         console.log(error);
+//     }, function () {
+
+//         // get the uploaded image url back
+//         uploadTask.snapshot.ref.getDownloadURL().then(
+//             function (downloadURL) {
+
+//                 // You get your url from here
+//                 console.log('File available at', downloadURL);
+
+//                 // print the image url
+//                 console.log(downloadURL);
+//                 document.getElementById('submit_link').removeAttribute('disabled');
+//             });
+//     });
+// };
+
+
+
+// capture image:
+const captureId = document.getElementById('captureid');
+const cameraContainer = document.getElementById('camera-container');
+const video = document.getElementById('camera-stream');
+const canvas = document.getElementById('snapshot');
+const photo = document.getElementById('photo');
+const captureBtn = document.getElementById('capture-btn');
+const switchCameraBtn = document.getElementById('switch-camera-btn');
+const closeBtn = document.getElementById('close-btn'); // Get the close button
+const photoOptions = document.getElementById('photo-options');
+const sendBtn = document.getElementById('send-btn');
+const retakeBtn = document.getElementById('retake-btn');
+const hiddenFileInput = document.getElementById('hidden-file-input');
+const context = canvas.getContext('2d');
+let currentStream = null;
+let currentFacingMode = 'user'; // Default to front camera
+
+// Function to generate a random file name
+function generateRandomFileName() {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 10000);
+    return `image_${timestamp}_${random}.png`;
+}
+
+async function startCamera(facingMode) {
+    // Stop any existing stream
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+    }
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode }
+        });
+        video.srcObject = stream;
+        currentStream = stream;
+    } catch (err) {
+        console.error("Error accessing camera: ", err);
+    }
+}
+
+captureId.addEventListener('click', () => {
+    cameraContainer.style.display = 'flex';
+    startCamera(currentFacingMode);
+});
+
+captureBtn.addEventListener('click', async () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/png');
+
+    // Convert data URL to Blob
+    const blob = await (await fetch(dataUrl)).blob();
+    const fileName = generateRandomFileName();
+    const file = new File([blob], fileName, { type: 'image/png' });
+
+    // Create a DataTransfer object to set the file
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    hiddenFileInput.files = dataTransfer.files;
+
+    // Display the captured photo and options
+    photo.src = dataUrl;
+    photo.style.display = 'block';
+    photoOptions.style.display = 'block';
+
+    // Hide the camera container and stop the stream
+    video.style.display = 'none';
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+    }
+});
+
+sendBtn.addEventListener('click', () => {
+    // Implement sending logic here
+    console.log("Image ready to be sent");
+    // Example: form submission or AJAX request to send the image
+});
+
+retakeBtn.addEventListener('click', () => {
+    photo.style.display = 'none';
+    photoOptions.style.display = 'none';
+    video.style.display = 'block';
+    startCamera(currentFacingMode);
+});
+
+switchCameraBtn.addEventListener('click', () => {
+    currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
+    startCamera(currentFacingMode);
+});
+
+closeBtn.addEventListener('click', () => {
+    cameraContainer.style.display = 'none';
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+    }
+});
+
+cameraContainer.addEventListener('click', (e) => {
+    if (e.target === cameraContainer) {
+        cameraContainer.style.display = 'none';
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
+    }
+});
