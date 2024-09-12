@@ -214,8 +214,8 @@ socket.on('sendChatToClient', (message) => {
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
 
 
-    console.log("group to update",groupToUpdate, "group send id",DOM.groupId)
-    console.log("condition check",groupToUpdate.group.group_id === DOM.groupId);
+    console.log("group to update", groupToUpdate, "group send id", DOM.groupId)
+    console.log("condition check", groupToUpdate.group.group_id === DOM.groupId);
 
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
         groupToUpdate.group.group_messages.push(message);
@@ -351,7 +351,6 @@ let generateMessageArea = async (elem, chatIndex) => {
 
     // DOM.groupId = chat.group.group_id;
     DOM.groupId = elem.dataset.groupId;
-    console.log("sdfsdfsdfsdfsdfsdf",elem.dataset.groupId);
 
     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
     mClassList(DOM.messageAreaOverlay).add("d-none");
@@ -395,7 +394,6 @@ let generateMessageArea = async (elem, chatIndex) => {
     const ids = pagnicateChatList.data.map(item => item.id);
     try {
         const readMessageResponse = await axios.post("message/seen-by/update", { ids });
-        console.log(readMessageResponse);
     }
     catch (error) {
         console.log(error);
@@ -563,8 +561,56 @@ fileIcon.addEventListener('click', () => {
 });
 
 fileInput.addEventListener('change', (event) => {
-    const files = event.target.files;
-    console.log('Selected files:', files);
+    const firebaseConfig = {
+        apiKey: "AIzaSyA8spaZnrsTPHRM-c-Cvybu6fJD-o8CMAQ",
+        authDomain: "vm-chat-5c18d.firebaseapp.com",
+        projectId: "vm-chat-5c18d",
+        storageBucket: "vm-chat-5c18d.appspot.com",
+        messagingSenderId: "644255696505",
+        appId: "1:644255696505:web:72499c9aa2772cdc2836a8"
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+
+    const file = event.target.files;
+    console.log('Selected files:', file);
+    var storage = firbase.storage();
+    let mediaName = file.name + DOM.unique_id + Date.now();
+    let storageRef = storage().ref('/files/' + mediaName);
+
+    var uploadTask = storageRef.put(file);
+
+    uploadTask.on('state_changed', function (snapshot) {
+        var progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        var uploader = document.getElementById('uploader');
+        uploader.value = progress;
+        switch (snapshot.state) {
+            case firebase.storage.TaskState.PAUSED:
+                console.log('Upload is paused');
+                break;
+            case firebase.storage.TaskState.RUNNING:
+                console.log('Upload is running');
+                break;
+        }
+    }, function (error) {
+        console.log(error);
+    }, function () {
+
+        // get the uploaded image url back
+        uploadTask.snapshot.ref.getDownloadURL().then(
+            function (downloadURL) {
+
+                // You get your url from here
+                console.log('File available at', downloadURL);
+
+                // print the image url
+                console.log(downloadURL);
+                document.getElementById('submit_link').removeAttribute('disabled');
+            });
+    });
+
 });
 
 document.getElementById('input').addEventListener('keydown', function (event) {
@@ -576,12 +622,8 @@ document.getElementById('input').addEventListener('keydown', function (event) {
 
 // delete model
 $('#deleteModal').on('show.bs.modal', function (event) {
-    console.log(event);
     var button = $(event.relatedTarget);
     var messageId = button.data('message-id');
-
-    console.log("button", button, "message id", messageId);
-
     $(this).find('.btn-delete').data('message-id', messageId);
 });
 
@@ -591,7 +633,6 @@ $('#deleteModal .btn-delete').on('click', function () {
 
     axios.delete('message/delete/' + messageId)
         .then(function (response) {
-            console.log(response);
             $("#deleteModal").on('hide.bs.modal', function () { });
             $('#deleteModal').removeClass('show');
             $('body').removeClass('modal-open');
@@ -615,60 +656,11 @@ $("#seenModal").on("show.bs.modal", async function (event) {
         const names = messageStatus.data.join(', ');
         document.getElementById('is_read').innerHTML = names;
 
-        console.log("message", message);
     }
     catch {
         console.log("Something went wrong");
     }
 })
-
-
-//image upload
-
-// function uploadMedia() {
-
-//     var mediaName = DOM.unique_id + Date.now();
-
-//     return false;
-//     var storageRef = firebase.storage().ref('/images/' + mediaName);
-
-//     // put file to firebase
-//     var uploadTask = storageRef.put(selectedFile);
-
-//     // all working for progress bar that in html
-//     // to indicate image uploading... report
-//     uploadTask.on('state_changed', function (snapshot) {
-//         var progress =
-//             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-//         var uploader = document.getElementById('uploader');
-//         uploader.value = progress;
-//         switch (snapshot.state) {
-//             case firebase.storage.TaskState.PAUSED:
-//                 console.log('Upload is paused');
-//                 break;
-//             case firebase.storage.TaskState.RUNNING:
-//                 console.log('Upload is running');
-//                 break;
-//         }
-//     }, function (error) {
-//         console.log(error);
-//     }, function () {
-
-//         // get the uploaded image url back
-//         uploadTask.snapshot.ref.getDownloadURL().then(
-//             function (downloadURL) {
-
-//                 // You get your url from here
-//                 console.log('File available at', downloadURL);
-
-//                 // print the image url
-//                 console.log(downloadURL);
-//                 document.getElementById('submit_link').removeAttribute('disabled');
-//             });
-//     });
-// };
-
-
 
 // capture image:
 const captureId = document.getElementById('captureid');
