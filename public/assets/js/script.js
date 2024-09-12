@@ -459,6 +459,18 @@ let init = () => {
     DOM.profilePicInput.addEventListener("change", () => console.log(DOM.profilePicInput.files[0]));
     DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
     generateChatList();
+    const firebaseConfig = {
+        apiKey: "AIzaSyA8spaZnrsTPHRM-c-Cvybu6fJD-o8CMAQ",
+        authDomain: "vm-chat-5c18d.firebaseapp.com",
+        projectId: "vm-chat-5c18d",
+        storageBucket: "vm-chat-5c18d.appspot.com",
+        messagingSenderId: "644255696505",
+        appId: "1:644255696505:web:72499c9aa2772cdc2836a8"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig); // Initialize Firebase app
+    }
 
     console.log("Click the Image at top-left to open settings.");
 };
@@ -561,57 +573,25 @@ fileIcon.addEventListener('click', () => {
 });
 
 fileInput.addEventListener('change', (event) => {
-    const firebaseConfig = {
-        apiKey: "AIzaSyA8spaZnrsTPHRM-c-Cvybu6fJD-o8CMAQ",
-        authDomain: "vm-chat-5c18d.firebaseapp.com",
-        projectId: "vm-chat-5c18d",
-        storageBucket: "vm-chat-5c18d.appspot.com",
-        messagingSenderId: "644255696505",
-        appId: "1:644255696505:web:72499c9aa2772cdc2836a8"
-      };
 
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
+    const file = event.target.files[0];
 
-    const file = event.target.files;
-    console.log('Selected files:', file);
-    var storage = firbase.storage();
-    let mediaName = file.name + DOM.unique_id + Date.now();
-    let storageRef = storage().ref('/files/' + mediaName);
-
-    var uploadTask = storageRef.put(file);
-
-    uploadTask.on('state_changed', function (snapshot) {
-        var progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        var uploader = document.getElementById('uploader');
-        uploader.value = progress;
-        switch (snapshot.state) {
-            case firebase.storage.TaskState.PAUSED:
-                console.log('Upload is paused');
-                break;
-            case firebase.storage.TaskState.RUNNING:
-                console.log('Upload is running');
-                break;
-        }
-    }, function (error) {
-        console.log(error);
-    }, function () {
-
-        // get the uploaded image url back
-        uploadTask.snapshot.ref.getDownloadURL().then(
-            function (downloadURL) {
-
-                // You get your url from here
-                console.log('File available at', downloadURL);
-
-                // print the image url
-                console.log(downloadURL);
-                document.getElementById('submit_link').removeAttribute('disabled');
-            });
-    });
-
+    const ref = firebase.storage().ref("files/" + DOM.unique_id);
+    const mediaName = file.name + DOM.unique_id + Date.now();
+    const metadata = {
+        contentType: file.type
+    };
+    const task = ref.child(mediaName).put(file, metadata);
+    task
+        .then(snapshot => snapshot.ref.getDownloadURL())
+        .then(url => {
+            console.log(url);
+            DOM.messageInput.value = url;
+            sendMessage();
+        })
+        .catch(error => console.error(error));
 });
+
 
 document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
