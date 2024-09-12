@@ -412,7 +412,7 @@ let showChatList = () => {
     }
 };
 
-let sendMessage = () => {
+let sendMessage = (type = 'Message') => {
     var loginUser = {
         id: document.getElementById("login_user_id").value,
         name: document.getElementById("login_user_name").value,
@@ -428,13 +428,14 @@ let sendMessage = () => {
         message: value,
         reply_id: '',
         group_id: DOM.groupId,
-        type: "message",
+        type: type,
         time: Math.floor(Date.now() / 1000),
         csrf_token: csrfToken
     };
     socket.emit('sendChatToServer', msg);
     DOM.messageInput.value = "";
 };
+
 
 let showProfileSettings = () => {
     DOM.profileSettings.style.left = 0;
@@ -587,7 +588,7 @@ fileInput.addEventListener('change', (event) => {
         .then(url => {
             console.log(url);
             DOM.messageInput.value = url;
-            sendMessage();
+            sendMessage("File");
         })
         .catch(error => console.error(error));
 });
@@ -642,7 +643,6 @@ $("#seenModal").on("show.bs.modal", async function (event) {
     }
 })
 
-// capture image:
 const captureId = document.getElementById('captureid');
 const cameraContainer = document.getElementById('camera-container');
 const video = document.getElementById('camera-stream');
@@ -650,16 +650,15 @@ const canvas = document.getElementById('snapshot');
 const photo = document.getElementById('photo');
 const captureBtn = document.getElementById('capture-btn');
 const switchCameraBtn = document.getElementById('switch-camera-btn');
-const closeBtn = document.getElementById('close-btn'); // Get the close button
+const closeBtn = document.getElementById('close-btn');
 const photoOptions = document.getElementById('photo-options');
 const sendBtn = document.getElementById('send-btn');
 const retakeBtn = document.getElementById('retake-btn');
 const hiddenFileInput = document.getElementById('hidden-file-input');
 const context = canvas.getContext('2d');
 let currentStream = null;
-let currentFacingMode = 'user'; // Default to front camera
+let currentFacingMode = 'user';
 
-// Function to generate a random file name
 function generateRandomFileName() {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 10000);
@@ -667,7 +666,6 @@ function generateRandomFileName() {
 }
 
 async function startCamera(facingMode) {
-    // Stop any existing stream
     if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
     }
@@ -694,22 +692,18 @@ captureBtn.addEventListener('click', async () => {
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL('image/png');
 
-    // Convert data URL to Blob
     const blob = await (await fetch(dataUrl)).blob();
     const fileName = generateRandomFileName();
     const file = new File([blob], fileName, { type: 'image/png' });
 
-    // Create a DataTransfer object to set the file
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(file);
     hiddenFileInput.files = dataTransfer.files;
 
-    // Display the captured photo and options
     photo.src = dataUrl;
     photo.style.display = 'block';
     photoOptions.style.display = 'block';
 
-    // Hide the camera container and stop the stream
     video.style.display = 'none';
     if (currentStream) {
         currentStream.getTracks().forEach(track => track.stop());
@@ -717,9 +711,7 @@ captureBtn.addEventListener('click', async () => {
 });
 
 sendBtn.addEventListener('click', () => {
-    // Implement sending logic here
     console.log("Image ready to be sent");
-    // Example: form submission or AJAX request to send the image
 });
 
 retakeBtn.addEventListener('click', () => {

@@ -89,6 +89,7 @@ class ChatController extends Controller
         $message->seen_by = $uniqueId .", ";
         $message->reply_id = $request->replyId;
         $message->group_id = $request->group_id;
+        $message->type = $request->type;
         $message->time = $request->time;
         if ($message->save())
             $message->user = User::where("unique_id",$uniqueId)->first();
