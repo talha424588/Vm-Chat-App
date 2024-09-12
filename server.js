@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 import express from 'express';
 import { createServer } from 'http';
@@ -20,9 +19,8 @@ io.on('connection', (socket) => {
         const response = await axios.post('http://localhost:8000/messages', msg);
         console.log("resposer", response);
         if (response.status == 201) {
-            const savedMessage = response.data; // The saved message with the generated ID
+            const savedMessage = response.data;
 
-            // Emit the saved message (including the ID) back to the sender and broadcast to others
             socket.emit('sendChatToClient', savedMessage);
             socket.broadcast.emit('sendChatToClient', savedMessage);
 

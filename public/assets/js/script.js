@@ -203,34 +203,68 @@ function makeformatDate(dateString) {
 }
 
 //     window.Echo.channel('vmChat').listen('.Chat', (message) => {
+// socket.on('sendChatToClient', (message) => {
+
+//     addMessageToMessageArea(message);
+//     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
+//     const unique_id = document.getElementById("login_user_unique_id").value;
+
+//     if (groupToUpdate) {
+//         const lastMessage = {
+//             id: message.id,
+//             sender: message.user.unique_id,
+//             group_id: message.group_id,
+//             msg: message.message??message.msg,
+//             time: message.time,
+//             seen_by: message.seen_by || '',
+//             user: message.user,
+//         };
+
+//         groupToUpdate.group.group_messages.push(lastMessage);
+//         groupToUpdate.msg = lastMessage;
+//         groupToUpdate.time = new Date(message.time * 1000);
+//         // groupToUpdate.unread = groupToUpdate.group.group_messages.filter(msg => msg.seen_by && !msg.seen_by.includes(unique_id)).length;
+
+
+//         const seenBy = lastMessage.seen_by ? lastMessage.seen_by.split(",").map(s => s.trim()) : [];
+//         if (lastMessage.sender !== unique_id && !seenBy.includes(unique_id)) {
+//             groupToUpdate.unread += 1;
+//         }
+
+//         chatList.sort((a, b) => {
+//             if (a.time && b.time) {
+//                 return new Date(b.time) - new Date(a.time);
+//             } else if (a.time) {
+//                 return -1;
+//             } else if (b.time) {
+//                 return 1;
+//             } else {
+//                 return 0;
+//             }
+//         });
+
+//         viewChatList();
+//     } else {
+//         console.log('Group not found in chat list');
+//     }
+// });
 socket.on('sendChatToClient', (message) => {
 
-    addMessageToMessageArea(message);
-    let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
-    const unique_id = document.getElementById("login_user_unique_id").value;
+    let unique_id = document.getElementById("login_user_unique_id").value;
 
+    const groupId = message.group_id;
+    const groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
     if (groupToUpdate) {
-        const lastMessage = {
-            id: message.id,
-            sender: message.user.unique_id,
-            group_id: message.group_id,
-            msg: message.message??message.msg,
-            time: message.time,
-            seen_by: message.seen_by || '',
-            user: message.user,
-        };
-
-        groupToUpdate.group.group_messages.push(lastMessage);
-        groupToUpdate.msg = lastMessage;
+        // Add the new message to the correct group chat object
+        groupToUpdate.group.group_messages.push(message);
+        groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
-        // groupToUpdate.unread = groupToUpdate.group.group_messages.filter(msg => msg.seen_by && !msg.seen_by.includes(unique_id)).length;
-
-
-        const seenBy = lastMessage.seen_by ? lastMessage.seen_by.split(",").map(s => s.trim()) : [];
-        if (lastMessage.sender !== unique_id && !seenBy.includes(unique_id)) {
+        // Update the unread count
+        const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
+        if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
             groupToUpdate.unread += 1;
         }
-
+        // Sort the chat list and refresh the UI
         chatList.sort((a, b) => {
             if (a.time && b.time) {
                 return new Date(b.time) - new Date(a.time);
@@ -242,13 +276,11 @@ socket.on('sendChatToClient', (message) => {
                 return 0;
             }
         });
-
         viewChatList();
     } else {
         console.log('Group not found in chat list');
     }
 });
-
 
 // let addMessageToMessageArea = (message) => {
 //     let msgDate = mDate(message.time).getDate();
