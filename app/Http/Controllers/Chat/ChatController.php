@@ -90,6 +90,7 @@ class ChatController extends Controller
         $message->reply_id = $request->replyId;
         $message->group_id = $request->group_id;
         $message->type = $request->type;
+        $message->media_name = $request->mediaName;
         $message->time = $request->time;
         if ($message->save())
             $message->user = User::where("unique_id",$uniqueId)->first();

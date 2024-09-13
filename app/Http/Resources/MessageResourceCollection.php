@@ -26,6 +26,7 @@ class MessageResourceCollection extends ResourceCollection
                 'seen_by' => $message->seen_by,
                 'time' => $message->time,
                 'type' => $message->type,
+                'media_name' => $message->media_name,
                 'user' => [
                     'id' => $message->user->id,
                     'unique_id' => $message->user->unique_id,

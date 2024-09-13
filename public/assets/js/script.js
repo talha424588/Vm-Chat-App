@@ -131,7 +131,8 @@ let viewChatList = () => {
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
-                const messageText = latestMessage ? latestMessage.msg : "No messages";
+                const messageText = latestMessage ? latestMessage : "No messages";
+                const lastSendMesssage = messageText.type === "Message" ? messageText.msg : messageText.media_name;
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
                 DOM.chatList.innerHTML += `
@@ -140,7 +141,7 @@ let viewChatList = () => {
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
                 <div class="name list-user-name">${elem.group.name}</div>
-                <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${messageText}</div>
+                <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${lastSendMesssage}</div>
               </div>
 
               <div class="flex-grow-1 text-right">
@@ -212,11 +213,6 @@ socket.on('sendChatToClient', (message) => {
     const groupId = message.group_id;
     // const groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
-
-
-    console.log("group to update", groupToUpdate, "group send id", DOM.groupId)
-    console.log("condition check", groupToUpdate.group.group_id === DOM.groupId);
-
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
         groupToUpdate.group.group_messages.push(message);
         groupToUpdate.msg = message;
@@ -262,49 +258,81 @@ socket.on('sendChatToClient', (message) => {
 });
 
 let addMessageToMessageArea = (message) => {
+    console.log(message);
     let msgDate = mDate(message.time).getDate();
-    if (lastDate != msgDate) {
+
+    if (lastDate !== msgDate) {
         addDateToMessageArea(msgDate);
         lastDate = msgDate;
     }
 
-    let profileImage = `<img src="${message.user?.pic ?? "assets/images/Alsdk120asdj913jk.jpg"}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+    let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
 
+    // Determine the message content based on the message type
+    let messageContent;
+    if (message.type === 'File') {
+        messageContent = `
+            <div class="file-message">
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">${message.media_name}</p>
+
+                </div>
+                <a href="${message.message ?? message.msg}" download="${message.media_name}" class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>
+        `;
+    } else if (message.type === 'Image') {
+        messageContent = `
+            <img src="${message.imageUrl}" style="height:222px; width:54;">
+        `;
+    } else if (message.type === 'Message' || message.type === null) {
+        messageContent = message.message ?? message.msg;
+    }
+
+    // Append the message content to the message area
     DOM.messages.innerHTML += `
-	<div class="ml-3">
-	  ${message.user.id == user.id ? '' : profileImage}
-	  <div class="">
-		<div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center
-		  p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
-		  <div style="margin-top:-4px">
-			<div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
-			  ${message.msg ?? message.message}
-			</div>
-			<div>
-			  <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.message ? message.time * 1000 : message.time * 1000))})</span> |
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id = "${message.id}">Seen</a>
-				</span> |
-				<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">
-				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration:
-				  underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
-				</span> |
-				<span>
-				  <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-				</span>
-			  </div>
-			</div>
-		  </div>
-		</div>
-	  </div>
-	</div>
-	`;
+        <div class="ml-3">
+            ${message.user.id == user.id ? '' : profileImage}
+            <div class="">
+                <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
+                    <div style="margin-top:-4px">
+                        <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+                            ${messageContent}
+                        </div>
+                        <div>
+                            <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
+                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span> |
+                                <span>
+                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
+                                </span> |
+                                <span>
+                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
+                                </span> |
+                                <span>
+                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
 
     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
 };
+
 
 // DOM.messages.addEventListener('scroll', () => {
 //     if (DOM.messages.scrollTop === 0) {
@@ -412,7 +440,7 @@ let showChatList = () => {
     }
 };
 
-let sendMessage = (type = 'Message') => {
+let sendMessage = (type = 'Message',mediaName = null) => {
     var loginUser = {
         id: document.getElementById("login_user_id").value,
         name: document.getElementById("login_user_name").value,
@@ -429,6 +457,7 @@ let sendMessage = (type = 'Message') => {
         reply_id: '',
         group_id: DOM.groupId,
         type: type,
+        mediaName: mediaName,
         time: Math.floor(Date.now() / 1000),
         csrf_token: csrfToken
     };
@@ -578,7 +607,7 @@ fileInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
 
     const ref = firebase.storage().ref("files/" + DOM.unique_id);
-    const mediaName = file.name + DOM.unique_id + Date.now();
+    const mediaName = file.name;
     const metadata = {
         contentType: file.type
     };
@@ -588,7 +617,7 @@ fileInput.addEventListener('change', (event) => {
         .then(url => {
             console.log(url);
             DOM.messageInput.value = url;
-            sendMessage("File");
+            sendMessage("File",mediaName);
         })
         .catch(error => console.error(error));
 });
@@ -711,6 +740,24 @@ captureBtn.addEventListener('click', async () => {
 });
 
 sendBtn.addEventListener('click', () => {
+
+    const file = event.target.files[0];
+
+    const ref = firebase.storage().ref("files/" + DOM.unique_id);
+    const mediaName = file.name + DOM.unique_id + Date.now();
+    const metadata = {
+        contentType: file.type
+    };
+    const task = ref.child(mediaName).put(file, metadata);
+    task
+        .then(snapshot => snapshot.ref.getDownloadURL())
+        .then(url => {
+            console.log(url);
+            DOM.messageInput.value = url;
+            sendMessage("File");
+        })
+        .catch(error => console.error(error));
+
     console.log("Image ready to be sent");
 });
 
