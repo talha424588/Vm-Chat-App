@@ -131,8 +131,21 @@ let viewChatList = () => {
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
-                const messageText = latestMessage ? latestMessage : "No messages";
-                const lastSendMesssage = messageText.type === "Message" ? messageText.msg : messageText.media_name;
+                let messageText = null;
+                if (latestMessage != undefined && 'type' in latestMessage && (latestMessage.type == "File" || latestMessage.type == "Image")) {
+                    if (latestMessage.type === "File" || latestMessage.type === "Image") {
+                        console.log("latestMessage", latestMessage);
+                        messageText = latestMessage.media_name;
+                    }
+                    else {
+
+                        messageText = latestMessage.msg;
+                    }
+                }
+                else {
+                    messageText = "No messages";
+                }
+
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
                 DOM.chatList.innerHTML += `
@@ -141,7 +154,7 @@ let viewChatList = () => {
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
                 <div class="name list-user-name">${elem.group.name}</div>
-                <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${lastSendMesssage}</div>
+                <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${messageText}</div>
               </div>
 
               <div class="flex-grow-1 text-right">
@@ -293,7 +306,7 @@ let addMessageToMessageArea = (message) => {
         `;
     } else if (message.type === 'Image') {
         messageContent = `
-            <img src="${message.imageUrl}" style="height:222px; width:54;">
+            <img src="${message.message ?? message.msg}" style="height:222px; width:54;">
         `;
     } else if (message.type === 'Message' || message.type === null) {
         messageContent = message.message ?? message.msg;
@@ -440,7 +453,7 @@ let showChatList = () => {
     }
 };
 
-let sendMessage = (type = 'Message',mediaName = null) => {
+let sendMessage = (type = 'Message', mediaName = null) => {
     var loginUser = {
         id: document.getElementById("login_user_id").value,
         name: document.getElementById("login_user_name").value,
@@ -617,7 +630,7 @@ fileInput.addEventListener('change', (event) => {
         .then(url => {
             console.log(url);
             DOM.messageInput.value = url;
-            sendMessage("File",mediaName);
+            sendMessage("File", mediaName);
         })
         .catch(error => console.error(error));
 });
@@ -740,25 +753,36 @@ captureBtn.addEventListener('click', async () => {
 });
 
 sendBtn.addEventListener('click', () => {
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+    }
+    cameraContainer.style.display = 'none';
+    const imageInput = document.getElementById('hidden-file-input');
 
-    const file = event.target.files[0];
+    if (imageInput.files.length > 0) {
+        const image = imageInput.files[0];
+        const ref = firebase.storage().ref("images/" + DOM.unique_id);
+        const mediaName = image.name;
+        const metadata = {
+            contentType: image.type
+        };
+        const task = ref.child(mediaName).put(image, metadata);
+        task
+            .then(snapshot => snapshot.ref.getDownloadURL())
+            .then(url => {
+                console.log(url);
 
-    const ref = firebase.storage().ref("files/" + DOM.unique_id);
-    const mediaName = file.name + DOM.unique_id + Date.now();
-    const metadata = {
-        contentType: file.type
-    };
-    const task = ref.child(mediaName).put(file, metadata);
-    task
-        .then(snapshot => snapshot.ref.getDownloadURL())
-        .then(url => {
-            console.log(url);
-            DOM.messageInput.value = url;
-            sendMessage("File");
-        })
-        .catch(error => console.error(error));
+                DOM.messageInput.value = url;
+                sendMessage("Image", mediaName);
 
-    console.log("Image ready to be sent");
+            })
+            .catch(error => console.error(error));
+
+    } else {
+        console.log("No image selected");
+    }
+
+
 });
 
 retakeBtn.addEventListener('click', () => {
