@@ -27,6 +27,14 @@ const DOM = {
     activeChatIndex: null,
     unique_id: document.getElementById("login_user_unique_id").value,
 };
+let user = {
+
+    id: parseInt(document.getElementById("login_user_id").value),
+    name: document.getElementById("login_user_name").value,
+    unique_id: document.getElementById("login_user_unique_id").value,
+    email: document.getElementById("login_user_email").value,
+    pic: "assets/images/profile-picture.webp"
+};
 let userGroupList = [];
 
 let mClassList = (element) => {
@@ -132,13 +140,12 @@ let viewChatList = () => {
             if (elem.isGroup) {
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
                 let messageText = null;
-                if (latestMessage != undefined && 'type' in latestMessage && (latestMessage.type == "File" || latestMessage.type == "Image")) {
+                if (latestMessage != undefined && 'type' in latestMessage ) {
                     if (latestMessage.type === "File" || latestMessage.type === "Image") {
                         console.log("latestMessage", latestMessage);
                         messageText = latestMessage.media_name;
                     }
                     else {
-
                         messageText = latestMessage.msg;
                     }
                 }
