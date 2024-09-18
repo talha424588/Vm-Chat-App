@@ -440,10 +440,19 @@ let generateMessageArea = async (elem, chatIndex) => {
     pagnicateChatList = await response.json();
 
     const ids = pagnicateChatList.data.map(item => item.id);
+
     try {
-        const readMessageResponse = await axios.post("message/seen-by/update", { ids });
-    }
-    catch (error) {
+        const response = await fetch("message/seen-by/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": csrfToken,
+            },
+            body: JSON.stringify({ ids }),
+        });
+
+        const readMessageResponse = await response.json();
+    } catch (error) {
         console.log(error);
     }
 

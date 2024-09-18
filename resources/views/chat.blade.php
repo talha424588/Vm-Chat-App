@@ -295,8 +295,8 @@
     <input type="hidden" value="{{ Auth::user()->name }}" id="login_user_name">
     <input type="hidden" value="{{ Auth::user()->unique_id }}" id="login_user_unique_id">
     <input type="hidden" value="{{ Auth::user()->email }}" id="login_user_email">
-    <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script>
-    @vite(['resources/js/app.js'])
+    {{-- <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script> --}}
+    {{-- @vite(['resources/js/app.js']) --}}
     <script></script>
     <script type="module">
         import {
@@ -398,7 +398,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
         integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous">
     </script>
-    <script src="{{ asset('assets/js/datastore.js') }}"></script>
     <script src="{{ asset('assets/js/date-utils.js') }}"></script>
     <script src="{{ asset('assets/js/script.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
