@@ -669,18 +669,43 @@ $('#deleteModal').on('show.bs.modal', function (event) {
 $('#deleteModal .btn-delete').on('click', function () {
     var messageId = $(this).data('message-id');
     var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
+    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-    axios.delete('message/delete/' + messageId)
-        .then(function (response) {
-            $("#deleteModal").on('hide.bs.modal', function () { });
-            $('#deleteModal').removeClass('show');
-            $('body').removeClass('modal-open');
-            $('.modal-backdrop').remove();
-            messageElement.remove();
-        })
-        .catch(function (error) {
-            console.error(error);
-        });
+    // axios.delete('message/delete/' + messageId)
+    //     .then(function (response) {
+    //         $("#deleteModal").on('hide.bs.modal', function () { });
+    //         $('#deleteModal').removeClass('show');
+    //         $('body').removeClass('modal-open');
+    //         $('.modal-backdrop').remove();
+    //         messageElement.remove();
+    //     })
+    //     .catch(function (error) {
+    //         console.error(error);
+    //     });
+    fetch('message/delete/' + messageId, {
+        method: 'DELETE',
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken,
+        },
+      })
+      .then(function(response) {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Error deleting message');
+        }
+      })
+      .then(function() {
+        $("#deleteModal").on('hide.bs.modal', function () { });
+        $('#deleteModal').removeClass('show');
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+        messageElement.remove();
+      })
+      .catch(function(error) {
+        console.error(error);
+      });
 });
 
 // Seen Model
