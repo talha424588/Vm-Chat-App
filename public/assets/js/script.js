@@ -226,6 +226,17 @@ function makeformatDate(dateString) {
 
 //     window.Echo.channel('vmChat').listen('.Chat', (message) => {
 
+// Client-side code
+socket.on('deleteMessage', (messageId) => {
+    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+
+    if (messageElement) {
+        messageElement.remove();
+        viewChatList();
+    }
+});
+
+
 socket.on('sendChatToClient', (message) => {
 
     let unique_id = document.getElementById("login_user_unique_id").value;
@@ -671,17 +682,6 @@ $('#deleteModal .btn-delete').on('click', function () {
     var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-    // axios.delete('message/delete/' + messageId)
-    //     .then(function (response) {
-    //         $("#deleteModal").on('hide.bs.modal', function () { });
-    //         $('#deleteModal').removeClass('show');
-    //         $('body').removeClass('modal-open');
-    //         $('.modal-backdrop').remove();
-    //         messageElement.remove();
-    //     })
-    //     .catch(function (error) {
-    //         console.error(error);
-    //     });
     fetch('message/delete/' + messageId, {
         method: 'DELETE',
         headers: {
@@ -702,6 +702,7 @@ $('#deleteModal .btn-delete').on('click', function () {
         $('body').removeClass('modal-open');
         $('.modal-backdrop').remove();
         messageElement.remove();
+        socket.emit('deleteMessage', messageId);
       })
       .catch(function(error) {
         console.error(error);
@@ -714,16 +715,14 @@ $("#seenModal").on("show.bs.modal", async function (event) {
     let deleteBtn = $(event.relatedTarget);
     let messageId = deleteBtn.data("message-id");
     try {
-        const response = await axios.get("message/seen-by/" + messageId);
-        const messageStatus = await response.data;
+        const response = await fetch("message/seen-by/" + messageId);
+        const messageStatus = await response.json();
 
         const names = messageStatus.data.join(', ');
         document.getElementById('is_read').innerHTML = names;
-
-    }
-    catch {
+      } catch {
         console.log("Something went wrong");
-    }
+      }
 })
 
 const captureId = document.getElementById('captureid');

@@ -30,10 +30,17 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Server-side code
+    socket.on('deleteMessage', (messageId) => {
+        console.log("delete message event",messageId);
+        io.emit('deleteMessage', messageId);
+    });
+
     socket.on('disconnect', () => {
         console.log('Disconnect');
     });
 });
+
 
 server.listen(3000, () => {
     console.log('Server is running');

@@ -265,6 +265,7 @@
                 <div class="modal-body">
                     <img src="{{ asset('assets/svg/message-seen.gif') }}" alt="" height="78.32px">
                     <h5>Users who have seen this message:</h5>
+                    {{-- <p class="not-recover" id="is_read">awais-designer, VM-UST-SA, Talha Dev</p> --}}
                     <p class="not-recover" id="is_read"></p>
                     <button type="button" class="btn btn-cancel" data-dismiss="modal">Ok</button>
                 </div>
