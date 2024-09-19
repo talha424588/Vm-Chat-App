@@ -43,28 +43,32 @@ class GroupService implements GroupRepository
     public function fetchUnreadMessageGroups()
     {
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
-        ->with(['groupMessages' => function ($query) {
-            $query->latest('time');
-        }, 'groupMessages.user'])
-        ->get()
-        ->filter(function ($group) {
-            if ($group->groupMessages->isEmpty()) {
-                return false;
-            }
-            foreach ($group->groupMessages as $message) {
-                $seenByArray = explode(',', $message->seen_by);
-                if (in_array(Auth::user()->unique_id, $seenByArray)) {
+            ->with(['groupMessages' => function ($query) {
+                $query->latest('time');
+            }, 'groupMessages.user'])
+            ->get()
+            ->filter(function ($group) {
+                if ($group->groupMessages->isEmpty()) {
                     return false;
                 }
-            }
-            return true;
-        });
-        return $groups;
+                foreach ($group->groupMessages as $message) {
+                    $seenByArray = explode(',', $message->seen_by);
+                    if (in_array(Auth::user()->unique_id, $seenByArray)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        if (count($groups) > 0) {
+            return response()->json(["status" => true, "message" => "Sucess", "groups" => $groups], 200);
+        } else
+            return response()->json(["status" => false, "message" => "Not Found", "groups" => null], 404);
     }
 
+    // working
     public function getGroupByName($name)
     {
-        $groups = Group::where('name', 'LIKE', "%$name%")
+        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])->where('name', 'LIKE', "%$name%")
             ->with(['groupMessages' => function ($query) {
                 $query->latest('time');
             }, 'groupMessages.user'])
