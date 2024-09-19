@@ -144,4 +144,10 @@ class ChatController extends Controller
     {
         return $this->chatRepository->updateMessageIsReadStatus($request);
     }
+
+
+    public function searchMessage($query,$groupId)
+    {
+        return $this->chatRepository->searchGroupMessages($query,$groupId);
+    }
 }

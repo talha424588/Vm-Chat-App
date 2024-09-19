@@ -40,26 +40,25 @@ class GroupService implements GroupRepository
             return response()->json(["status" => false, "groups" => "not found", "messages" => null], 404);
     }
 
-
     public function fetchUnreadMessageGroups()
     {
-        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
-            ->with(['groupMessages' => function ($query) {
-                $query->latest('time');
-            }, 'groupMessages.user'])
-            ->get()
-            ->filter(function ($group) {
-                if ($group->groupMessages->isEmpty()) {
+        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
+        ->with(['groupMessages' => function ($query) {
+            $query->latest('time');
+        }, 'groupMessages.user'])
+        ->get()
+        ->filter(function ($group) {
+            if ($group->groupMessages->isEmpty()) {
+                return false;
+            }
+            foreach ($group->groupMessages as $message) {
+                $seenByArray = explode(',', $message->seen_by);
+                if (in_array(Auth::user()->unique_id, $seenByArray)) {
                     return false;
                 }
-                foreach ($group->groupMessages as $message) {
-                    if (str_contains($message->seen_by, Auth::user()->unique_id)) {
-                        return false;
-                    }
-                }
-                return true;
-            });
-
+            }
+            return true;
+        });
         return $groups;
     }
 

@@ -918,18 +918,55 @@ cameraContainer.addEventListener('click', (e) => {
 let groupSearchField = document.getElementById("search_group");
 let debounceTimeout = null;
 
-groupSearchField.addEventListener("input", function(event) {
-  clearTimeout(debounceTimeout);
-  debounceTimeout = setTimeout(async function() {
-    const url = `search-group-by-name/${event.target.value}`;
-    try {
-      const groupResponse = await fetch(url);
-      const response = await groupResponse.json();
-      if (response) {
-        console.log(response);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, 500); // adjust the delay time as needed
+groupSearchField.addEventListener("input", function (event) {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(async function () {
+        const url = `search-group-by-name/${event.target.value}`;
+        try {
+            const groupResponse = await fetch(url);
+            const response = await groupResponse.json();
+            if (response) {
+                console.log(response);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }, 500);
 });
+
+
+// get unread message groups
+let unreadGroup = document.getElementById("unread");
+unreadGroup.addEventListener("click", async function (e) {
+    try {
+        const url = `get-unread-chat-groups`;
+        const unreadConversationGroupResponse = await fetch(url);
+        const response = await unreadConversationGroupResponse.json();
+        console.log("response", response);
+    }
+    catch (error) {
+        console.log(error);
+    }
+})
+
+let searchMessageInputFeild = document.getElementById("messsage_search_query");
+
+searchMessageInputFeild.addEventListener("input", function (e) {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(async function () {
+        const url = `message/search/${e.target.value}/${DOM.groupId}`;
+        try {
+            fetch(url)
+                .then(response => response.json())
+                .then(messageResponse => {
+                    console.log(messageResponse);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }, 500)
+})

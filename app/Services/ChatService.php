@@ -73,28 +73,36 @@ class ChatService implements ChatRepository
         $seenBy = explode(', ', $message->seen_by);
         $seenByUserNames = User::whereIn('unique_id', $seenBy)->get()->pluck('name')->all();
         if ($message)
-        return response()->json(["status" => true, "message" => "success","data" => $seenByUserNames] );
+            return response()->json(["status" => true, "message" => "success", "data" => $seenByUserNames]);
         else
             return response()->json(["status" => false, "message" => "not found", "messages" => null], 404);
     }
 
-
     public function updateMessageIsReadStatus($request)
     {
-        $messagesArray = GroupMessage::WhereIn("id",$request->ids)->get();
+        $messagesArray = GroupMessage::WhereIn("id", $request->ids)->get();
 
         foreach ($messagesArray as $message) {
             $seenBy = explode(", ", $message->seen_by);
-            if(!in_array(Auth::user()->unique_id , $seenBy))
-            {
-               $seenBy[]= Auth::user()->unique_id;
-               $message->seen_by = implode(', ', $seenBy);
-            //    $message->seen_by = implode(', ', array_map(function ($unique_id) {
-            //     return " $unique_id";
-            // }, $seenBy));
-               $message->save();
+            if (!in_array(Auth::user()->unique_id, $seenBy)) {
+                $seenBy[] = Auth::user()->unique_id;
+                $message->seen_by = implode(', ', $seenBy);
+                //    $message->seen_by = implode(', ', array_map(function ($unique_id) {
+                //     return " $unique_id";
+                // }, $seenBy));
+                $message->save();
             }
         }
-        return response()->json(["status"=>200,"message"=>"is read updated"]);
+        return response()->json(["status" => 200, "message" => "is read updated"]);
+    }
+
+    public function searchGroupMessages($query, $groupId)
+    {
+        $messages = GroupMessage::where("msg", "LIKE", "%$query%")->where("group_id", $groupId)->with("user")->get();
+        if (count($messages) > 0) {
+            return response()->json(["status" => true, "message" => "success", "messages" => $messages]);
+        } else {
+            return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+        }
     }
 }
