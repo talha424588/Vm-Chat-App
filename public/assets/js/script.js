@@ -225,10 +225,8 @@ function makeformatDate(dateString) {
 }
 
 //     window.Echo.channel('vmChat').listen('.Chat', (message) => {
-
 // Client-side code
 socket.on('deleteMessage', (messageId) => {
-    // const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
     var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
     if (messageElement) {
         messageElement.remove();
@@ -243,14 +241,11 @@ socket.on('updateGroupMessages', (messageId) => {
     if (DOM.groupId != null || DOM.groupId != undefined) {
         const group = chatList.find(group => group.group.group_id === groupId);
         if (group) {
-            console.log("group", group,);
-            console.log("mmesage id", messageId);
             const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
-            console.log("message Index", messageIndex);
             if (messageIndex !== -1) {
                 group.group.group_messages.splice(messageIndex, 1);
+                group.unread -= 1
             }
-            console.log("after update", group);
             viewChatList();
         }
     }
@@ -259,20 +254,14 @@ socket.on('updateGroupMessages', (messageId) => {
             return group.group.group_messages.find(message => message.id === messageId);
         });
         if (group) {
-            console.log("group", group);
-            console.log("message id", messageId);
             const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
-            console.log("message Index", messageIndex);
             if (messageIndex !== -1) {
                 group.group.group_messages.splice(messageIndex, 1);
+                group.unread -= 1
             }
-            console.log("after update", group);
-            viewChatList(); // Update the chat list to reflect the changes
+            viewChatList();
         }
     }
-
-    console.log(groupId);
-
 });
 
 socket.on('sendChatToClient', (message) => {
