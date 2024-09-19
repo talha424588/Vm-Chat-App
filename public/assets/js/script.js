@@ -140,7 +140,7 @@ let viewChatList = () => {
             if (elem.isGroup) {
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
                 let messageText = null;
-                if (latestMessage != undefined && 'type' in latestMessage ) {
+                if (latestMessage != undefined && 'type' in latestMessage) {
                     if (latestMessage.type === "File" || latestMessage.type === "Image") {
                         console.log("latestMessage", latestMessage);
                         messageText = latestMessage.media_name;
@@ -228,14 +228,52 @@ function makeformatDate(dateString) {
 
 // Client-side code
 socket.on('deleteMessage', (messageId) => {
-    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-
+    // const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+    var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
     if (messageElement) {
         messageElement.remove();
         viewChatList();
     }
+    else {
+        viewChatList();
+    }
 });
+socket.on('updateGroupMessages', (messageId) => {
+    const groupId = DOM.groupId;
+    if (DOM.groupId != null || DOM.groupId != undefined) {
+        const group = chatList.find(group => group.group.group_id === groupId);
+        if (group) {
+            console.log("group", group,);
+            console.log("mmesage id", messageId);
+            const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
+            console.log("message Index", messageIndex);
+            if (messageIndex !== -1) {
+                group.group.group_messages.splice(messageIndex, 1);
+            }
+            console.log("after update", group);
+            viewChatList();
+        }
+    }
+    else {
+        const group = chatList.find(group => {
+            return group.group.group_messages.find(message => message.id === messageId);
+        });
+        if (group) {
+            console.log("group", group);
+            console.log("message id", messageId);
+            const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
+            console.log("message Index", messageIndex);
+            if (messageIndex !== -1) {
+                group.group.group_messages.splice(messageIndex, 1);
+            }
+            console.log("after update", group);
+            viewChatList(); // Update the chat list to reflect the changes
+        }
+    }
 
+    console.log(groupId);
+
+});
 
 socket.on('sendChatToClient', (message) => {
 
@@ -289,7 +327,6 @@ socket.on('sendChatToClient', (message) => {
 });
 
 let addMessageToMessageArea = (message) => {
-    console.log(message);
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -490,7 +527,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
     let value = DOM.messageInput.value;
     if (value === "") return;
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    console.log("csrf", csrfToken);
     let msg = {
         user: loginUser,
         message: value,
@@ -688,25 +724,35 @@ $('#deleteModal .btn-delete').on('click', function () {
             "Content-Type": "application/json",
             "X-CSRF-Token": csrfToken,
         },
-      })
-      .then(function(response) {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Error deleting message');
-        }
-      })
-      .then(function() {
-        $("#deleteModal").on('hide.bs.modal', function () { });
-        $('#deleteModal').removeClass('show');
-        $('body').removeClass('modal-open');
-        $('.modal-backdrop').remove();
-        messageElement.remove();
-        socket.emit('deleteMessage', messageId);
-      })
-      .catch(function(error) {
-        console.error(error);
-      });
+    })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Error deleting message');
+            }
+        })
+        .then(function () {
+
+            const groupId = DOM.groupId;
+            const group = chatList.find(group => group.group.group_id === groupId);
+            if (group) {
+                const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
+                if (messageIndex !== -1) {
+                    group.group.group_messages.splice(messageIndex, 1);
+                }
+            }
+
+            $("#deleteModal").on('hide.bs.modal', function () { });
+            $('#deleteModal').removeClass('show');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+            messageElement.remove();
+            socket.emit('deleteMessage', messageId);
+        })
+        .catch(function (error) {
+            console.error(error);
+        });
 });
 
 // Seen Model
@@ -720,9 +766,9 @@ $("#seenModal").on("show.bs.modal", async function (event) {
 
         const names = messageStatus.data.join(', ');
         document.getElementById('is_read').innerHTML = names;
-      } catch {
+    } catch {
         console.log("Something went wrong");
-      }
+    }
 })
 
 const captureId = document.getElementById('captureid');

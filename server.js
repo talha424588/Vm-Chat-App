@@ -34,6 +34,7 @@ io.on('connection', (socket) => {
     socket.on('deleteMessage', (messageId) => {
         console.log("delete message event",messageId);
         io.emit('deleteMessage', messageId);
+        io.emit('updateGroupMessages', messageId);
     });
 
     socket.on('disconnect', () => {
