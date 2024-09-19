@@ -141,7 +141,7 @@ let viewChatList = () => {
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
                 let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
-                    if (latestMessage.type === "File" || latestMessage.type === "Image") {
+                    if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
                         console.log("latestMessage", latestMessage);
                         messageText = latestMessage.media_name;
                     }
@@ -316,6 +316,7 @@ socket.on('sendChatToClient', (message) => {
 });
 
 let addMessageToMessageArea = (message) => {
+    console.log("message",message);
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -354,6 +355,12 @@ let addMessageToMessageArea = (message) => {
         `;
     } else if (message.type === 'Message' || message.type === null) {
         messageContent = message.message ?? message.msg;
+    }
+    else if (message.type === 'Audio') {
+        messageContent = `
+        <p>${message.media_name}</p>
+            <p>${message.message ?? message.msg}</p>
+        `;
     }
 
     // Append the message content to the message area
@@ -609,12 +616,29 @@ const startRecording = () => {
                 audio.play();
 
                 // Create a download link for the recorded audio
-                const downloadLink = document.createElement('a');
-                downloadLink.href = audioUrl;
-                downloadLink.download = 'recording.wav';
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
+
+                const ref = firebase.storage().ref("audio/" + DOM.unique_id);
+                const mediaName = "recording.wav";
+                const metadata = {
+                  contentType: 'audio/wav'
+                };
+                const task = ref.child(mediaName).put(blob, metadata);
+                task
+                  .then(snapshot => snapshot.ref.getDownloadURL())
+                  .then(url => {
+                    console.log(url);
+                    DOM.messageInput.value = url;
+                    sendMessage("Audio", mediaName);
+                  })
+                  .catch(error => console.error(error));
+
+
+                // const downloadLink = document.createElement('a');
+                // downloadLink.href = audioUrl;
+                // downloadLink.download = 'recording.wav';
+                // document.body.appendChild(downloadLink);
+                // downloadLink.click();
+                // document.body.removeChild(downloadLink);
 
                 chunks = [];
                 chatInputContainer.classList.remove('recording-active');
