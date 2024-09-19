@@ -34,11 +34,13 @@
 
                     <div class="nav-item dropdown ml-auto">
 
-                        <button type="submit" class="btn loginbutton btn-block"
-                            style="background-color:#1DAB61; color:white; border-radius: 10px; padding-right:15px;padding-left: 15px;">
+                        <button type="button" class="btn loginbutton btn-block" id="logout" style="background-color:#1DAB61; color:white; border-radius: 10px; padding-right:15px;padding-left: 15px;" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             Logout
                         </button>
 
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
                     </div>
                 </div>
                 <div>

@@ -44,4 +44,11 @@ class AuthController extends Controller
         ]);
         return $validator;
     }
+
+    public function logout(Request $request)
+    {
+        auth()->logout();
+        return redirect()->route('login');
+    }
+
 }

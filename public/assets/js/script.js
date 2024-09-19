@@ -342,7 +342,7 @@ let addMessageToMessageArea = (message) => {
                     <p class="file-name">${message.media_name}</p>
 
                 </div>
-                <a href="${message.message ?? message.msg}" download="${message.media_name}" class="download-icon">
+                <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
                     </svg>

@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\Chat\GroupController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Auth::routes();
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
@@ -48,11 +51,9 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::post('/message/seen-by/update', [ChatController::class, 'updateMessageReadStatus']);
     Route::get('/message/seen-by/{id}', [ChatController::class, 'getMessageReadStatus']);
     Route::get('message/search/{query}/{groupId}', [ChatController::class, 'searchMessage']);
-
-
-
-
+    Route::POST('/logout', [AuthController::class, 'logout'])->name("logout");
 });
+
 Route::post('/messages', [ChatController::class, 'store']);
 // Route::get('/chat',[ChatController::class,'store'])->name('store.chat');
 
