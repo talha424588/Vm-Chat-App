@@ -8,6 +8,7 @@ use App\Models\GroupMessage;
 use App\Models\User;
 use App\Repositories\GroupRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class GroupService implements GroupRepository
@@ -37,5 +38,50 @@ class GroupService implements GroupRepository
             return new GroupResource($groups);
         else
             return response()->json(["status" => false, "groups" => "not found", "messages" => null], 404);
+    }
+
+
+    public function fetchUnreadMessageGroups()
+    {
+        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
+            ->with(['groupMessages' => function ($query) {
+                $query->latest('time');
+            }, 'groupMessages.user'])
+            ->get()
+            ->filter(function ($group) {
+                if ($group->groupMessages->isEmpty()) {
+                    return false;
+                }
+                foreach ($group->groupMessages as $message) {
+                    if (str_contains($message->seen_by, Auth::user()->unique_id)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+        return $groups;
+    }
+
+    public function getGroupByName($name)
+    {
+        $groups = Group::where('name', 'LIKE', "%$name%")
+            ->with(['groupMessages' => function ($query) {
+                $query->latest('time');
+            }, 'groupMessages.user'])
+            ->get();
+        if (count($groups) > 0) {
+            return response()->json([
+                "status" => true,
+                "message" => "success",
+                "groups" => $groups
+            ]);
+        } else {
+            return response()->json([
+                "status" => false,
+                "message" => "Not Found",
+                "groups" => null
+            ]);
+        }
     }
 }

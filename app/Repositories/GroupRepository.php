@@ -8,4 +8,6 @@ use Illuminate\Http\Request;
 interface GroupRepository
 {
     public function fetchUserChatGroups(Request $request);
+    public function fetchUnreadMessageGroups();
+    public function getGroupByName($name);
 }

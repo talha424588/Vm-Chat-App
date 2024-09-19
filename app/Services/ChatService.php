@@ -89,10 +89,12 @@ class ChatService implements ChatRepository
             {
                $seenBy[]= Auth::user()->unique_id;
                $message->seen_by = implode(', ', $seenBy);
+            //    $message->seen_by = implode(', ', array_map(function ($unique_id) {
+            //     return " $unique_id";
+            // }, $seenBy));
                $message->save();
             }
         }
-
         return response()->json(["status"=>200,"message"=>"is read updated"]);
     }
 }

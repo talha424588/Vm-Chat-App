@@ -16,4 +16,14 @@ class GroupController extends Controller
     {
         return $this->groupRepository->fetchUserChatGroups($request);
     }
+
+    public function getUnreadMessageGroups()
+    {
+        return $this->groupRepository->fetchUnreadMessageGroups();
+    }
+
+    public function getChatGroupsByName($name)
+    {
+        return $this->groupRepository->getGroupByName($name);
+    }
 }

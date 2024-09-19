@@ -34,6 +34,7 @@ Route::group(['middleware' => ['auth:web']], function () {
 
     //Groups Routes
     Route::get('get-user-chat-groups', [GroupController::class, 'getUserChatGroup']);
+    Route::get('search-group-by-name/{query}', [GroupController::class, 'getChatGroupsByName']);
 
     //Chats Routes
     Route::get('search-groups-chat-messages', [ChatController::class, 'searchGroupMessages']);
@@ -45,6 +46,10 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::delete('/message/delete/{id}', [ChatController::class, 'delete']);
     Route::post('/message/seen-by/update', [ChatController::class, 'updateMessageReadStatus']);
     Route::get('/message/seen-by/{id}', [ChatController::class, 'getMessageReadStatus']);
+
+
+
+
 });
 Route::post('/messages', [ChatController::class, 'store']);
 // Route::get('/chat',[ChatController::class,'store'])->name('store.chat');

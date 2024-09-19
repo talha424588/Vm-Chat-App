@@ -46,13 +46,13 @@
 
                         <div class="search-bar">
                             <i class="fa fa-search"></i>
-                            <input type="text" placeholder="Search">
+                            <input type="text" placeholder="Search" id="search_group">
                         </div>
 
                         <div class="buttons">
                             <button class="button active">All</button>
                             <button class="button">Unread</button>
-                            <button class="button">Groups</button>
+                            {{-- <button class="button">Groups</button> --}}
                         </div>
 
                     </div>

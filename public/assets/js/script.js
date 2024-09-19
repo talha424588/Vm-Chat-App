@@ -316,7 +316,7 @@ socket.on('sendChatToClient', (message) => {
 });
 
 let addMessageToMessageArea = (message) => {
-    console.log("message",message);
+    console.log("message", message);
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -620,17 +620,17 @@ const startRecording = () => {
                 const ref = firebase.storage().ref("audio/" + DOM.unique_id);
                 const mediaName = "recording.wav";
                 const metadata = {
-                  contentType: 'audio/wav'
+                    contentType: 'audio/wav'
                 };
                 const task = ref.child(mediaName).put(blob, metadata);
                 task
-                  .then(snapshot => snapshot.ref.getDownloadURL())
-                  .then(url => {
-                    console.log(url);
-                    DOM.messageInput.value = url;
-                    sendMessage("Audio", mediaName);
-                  })
-                  .catch(error => console.error(error));
+                    .then(snapshot => snapshot.ref.getDownloadURL())
+                    .then(url => {
+                        console.log(url);
+                        DOM.messageInput.value = url;
+                        sendMessage("Audio", mediaName);
+                    })
+                    .catch(error => console.error(error));
 
 
                 // const downloadLink = document.createElement('a');
@@ -910,4 +910,26 @@ cameraContainer.addEventListener('click', (e) => {
             currentStream.getTracks().forEach(track => track.stop());
         }
     }
+});
+
+
+//search groups
+
+let groupSearchField = document.getElementById("search_group");
+let debounceTimeout = null;
+
+groupSearchField.addEventListener("input", function(event) {
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(async function() {
+    const url = `search-group-by-name/${event.target.value}`;
+    try {
+      const groupResponse = await fetch(url);
+      const response = await groupResponse.json();
+      if (response) {
+        console.log(response);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, 500); // adjust the delay time as needed
 });
