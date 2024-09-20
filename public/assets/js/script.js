@@ -166,7 +166,7 @@ let viewChatList = () => {
 
               <div class="flex-grow-1 text-right">
                 <div class="small time">${timeText}</div>
-                ${elem.unread ? "<div class=\"badge badge-success badge-pill small\" id=\"unread-count\">" + elem.unread + "</div>" : ""}
+                ${elem.unread > 0 ? "<div class=\"badge badge-success badge-pill small\" id=\"unread-count\">" + elem.unread + "</div>" : ""}
               </div>
             </div>`;
             }
