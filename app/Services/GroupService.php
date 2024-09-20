@@ -46,19 +46,23 @@ class GroupService implements GroupRepository
             ->with(['groupMessages' => function ($query) {
                 $query->latest('time');
             }, 'groupMessages.user'])
-            ->get()
-            ->filter(function ($group) {
-                if ($group->groupMessages->isEmpty()) {
-                    return false;
+            ->get();
+
+        $unreadGroups = [];
+        foreach ($groups as $eachGroup) {
+            $groupMessages = $eachGroup->groupMessages;
+
+            foreach ($groupMessages as $message) {
+                $array = explode(',', $message['seen_by']);
+                $string = implode(',', $array);
+                $user_unique_id = explode(',', $string);
+                if(!in_array(Auth::user()->unique_id,$user_unique_id))
+                {
+                    $unreadGroups[] = $eachGroup;
                 }
-                foreach ($group->groupMessages as $message) {
-                    $seenByArray = explode(',', $message->seen_by);
-                    if (in_array(Auth::user()->unique_id, $seenByArray)) {
-                        return false;
-                    }
-                }
-                return true;
-            });
+            }
+        }
+        return $unreadGroups;
         if (count($groups) > 0) {
             return response()->json(["status" => true, "message" => "Sucess", "groups" => $groups], 200);
         } else
