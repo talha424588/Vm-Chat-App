@@ -919,7 +919,7 @@ let groupSearchField = document.getElementById("search_group");
 let debounceTimeout = null;
 
 groupSearchField.addEventListener("input", function (event) {
-    if (event.target.value.length > 2) {
+    if (event.target.value.length > 0) {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(async function () {
             const url = `search-group-by-name/${event.target.value}`
@@ -954,7 +954,7 @@ unreadGroup.addEventListener("click", async function (e) {
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
 
 searchMessageInputFeild.addEventListener("input", function (e) {
-    if (e.target.value.length > 2) {
+    if (e.target.value.length >0) {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(async function () {
             const url = `message/search/${e.target.value}/${DOM.groupId}`;
