@@ -269,7 +269,6 @@ socket.on('sendChatToClient', (message) => {
     let unique_id = document.getElementById("login_user_unique_id").value;
 
     const groupId = message.group_id;
-    // const groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
         groupToUpdate.group.group_messages.push(message);
@@ -746,7 +745,7 @@ $('#deleteModal .btn-delete').on('click', function () {
             }
         })
         .then(function () {
-
+            $('#btn-close').trigger('click');
             const groupId = DOM.groupId;
             const group = chatList.find(group => group.group.group_id === groupId);
             if (group) {
