@@ -150,4 +150,9 @@ class ChatController extends Controller
     {
         return $this->chatRepository->searchGroupMessages($query,$groupId);
     }
+
+    public function getMessageDetails($id)
+    {
+        return $this->chatRepository->getMessageById($id);
+    }
 }

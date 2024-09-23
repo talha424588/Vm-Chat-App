@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 
+use function PHPUnit\Framework\returnSelf;
+
 class ChatService implements ChatRepository
 {
     public function searchChatMessages($request)
@@ -104,5 +106,14 @@ class ChatService implements ChatRepository
         } else {
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
         }
+    }
+
+    public function getMessageById($id)
+    {
+        $message = GroupMessage::where('id',$id)->first();
+        if($message)
+            return response()->json(["status"=>true,"msessage" =>"success", "message"=> new MessageResource($message)]);
+        else
+            return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
     }
 }
