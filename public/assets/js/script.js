@@ -166,8 +166,8 @@ let viewChatList = () => {
 
               <div class="flex-grow-1 text-right">
                 <div class="small time">${timeText}</div>
-                ${elem.unread > 0 ? "<div class=\"badge badge-success badge-pill small\" id=\"unread-count\">" + elem.unread + "</div>" : ""}
-              </div>
+               ${elem.unread > 0 ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>` : ""}
+    </div>
             </div>`;
             }
         });
@@ -386,6 +386,19 @@ let addMessageToMessageArea = (message) => {
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                 </span>
                             </div>
+                                      <!-- Dropdown menu for actions -->
+      ${message.sender === user.unique_id ? `
+        <div class="dropdown" style="position: absolute; top: 5px; right: 5px;">
+          <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-angle-down text-muted px-2"></i>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#" onclick="editMessage(${message.id})">Edit</a>
+            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal">Delete</a>
+            <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+          </div>
+        </div>
+      ` : ''}
                         </div>
                     </div>
                 </div>
@@ -396,6 +409,76 @@ let addMessageToMessageArea = (message) => {
     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
 };
 
+function moveMessage(messageId) {
+    // Select the message div using its data attribute
+    const messageElement = document.querySelector(`[data-message-id='${messageId}']`);
+
+    // Check if the message element exists
+    if (messageElement) {
+        // Find the closest parent with the class "ml-6"
+        const parentDiv = messageElement.closest('.ml-3');
+
+        // Toggle the 'selected-message' class to highlight/unhighlight the parent div
+        if (parentDiv) {
+            parentDiv.classList.toggle('selected-message');
+        } else {
+            console.error(`Parent .ml-6 div not found for message ID: ${messageId}.`);
+        }
+
+        // Hide the input area
+        $('#input-area').hide();
+
+        // Show the action bar (assuming you have it hidden initially)
+        $('#action-bar').show();
+
+        // Count the number of selected messages
+        const selectedMessages = document.querySelectorAll('.selected-message').length;
+
+        // Update the count in the selected-count div
+        document.getElementById('selected-count').textContent = `${selectedMessages} message${selectedMessages > 1 ? 's' : ''} selected`;
+
+        console.log(`Message with ID: ${messageId} has been highlighted/unhighlighted.`);
+    } else {
+        console.error(`Message with ID: ${messageId} not found.`);
+    }
+}
+
+document.getElementById('cancel-icon').addEventListener('click', function() {
+    // Remove the 'selected-message' class from all selected messages
+    document.querySelectorAll('.selected-message').forEach(function(element) {
+        element.classList.remove('selected-message');
+    });
+
+    // Hide the action bar
+    document.getElementById('action-bar').style.display = 'none';
+
+    // Show the input area
+    document.getElementById('input-area').style.display = 'block';
+
+    // Update the selected count display
+    document.getElementById('selected-count').textContent = 'Selected Messages: 0';
+
+    console.log('Selected messages have been cleared and input area is displayed.');
+});
+
+document.getElementById("openModalTrigger").addEventListener("click", function() {
+	var myModal = new bootstrap.Modal(document.getElementById('chatModal'));
+	myModal.show();
+});
+
+
+  function selectUsertosend(username) {
+    // Update the username in the bottom section
+    document.getElementById('selected-username').textContent = username;
+
+    // Show the bottom section when a user is selected with display: flex !important
+    document.getElementById('selected-usertosend').style.setProperty('display', 'flex', 'important');
+}
+
+  function editMessage(messageId) {
+	// Your logic to edit the message
+	console.log(`Edit message with ID: ${messageId}`);
+  }
 
 // DOM.messages.addEventListener('scroll', () => {
 //     if (DOM.messages.scrollTop === 0) {
@@ -498,6 +581,14 @@ let generateMessageArea = async (elem, chatIndex) => {
     } catch (error) {
         console.log(error);
     }
+
+    // var setcount = 0;
+    // document.getElementById("unread-count").value = setcount;
+
+    // const badgeSuccessElem = elem.querySelector('#unread-count');
+    // if (badgeSuccessElem) {
+    //   badgeSuccessElem.style.display = 'none'; // or use hide() if you have a jQuery reference
+    // }
 
     lastDate = "";
     pagnicateChatList.data.reverse()
@@ -937,8 +1028,10 @@ groupSearchField.addEventListener("input", function (event) {
 
 
 // get unread message groups
-let unreadGroup = document.getElementById("unread");
-unreadGroup.addEventListener("click", async function (e) {
+// let unreadGroup = document.getElementById("unread");
+// unreadGroup.addEventListener("click", async function (e) {
+async function unreadGrouChat()
+{
     try {
         const url = `get-unread-chat-groups`;
         const unreadConversationGroupResponse = await fetch(url);
@@ -948,7 +1041,8 @@ unreadGroup.addEventListener("click", async function (e) {
     catch (error) {
         console.log(error);
     }
-})
+}
+// })
 
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
 

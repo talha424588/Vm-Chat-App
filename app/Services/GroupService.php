@@ -62,7 +62,6 @@ class GroupService implements GroupRepository
                 }
             }
         }
-        return $unreadGroups;
         if (count($groups) > 0) {
             return response()->json(["status" => true, "message" => "Sucess", "groups" => $groups], 200);
         } else

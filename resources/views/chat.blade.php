@@ -15,6 +15,94 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
+    <style>
+        .selected-message {
+        background-color: #E8E9EA; / Change background color /
+       padding:2px;
+        transition: background-color 0.3s ease; / Smooth transition effect /
+    }
+    #action-bar {
+        display: flex;
+        justify-content: space-between; / Distributes space between items /
+        align-items: center; / Vertically centers items /
+        height: 62px;
+    }
+
+    #selected-count {
+        margin-right: auto; / Pushes the SVG to the right /
+        font-size: 16px;
+    }
+
+
+    .selected-message {
+background-color: #E8E9EA; / Change background color /
+padding:2px;
+transition: background-color 0.3s ease; / Smooth transition effect /
+}
+#action-bar {
+display: flex;
+justify-content: space-between; / Distributes space between items /
+align-items: center; / Vertically centers items /
+height: 62px;
+}
+
+#selected-count {
+margin-right: auto; / Pushes the SVG to the right /
+font-size: 16px;
+}
+
+.selected-user {
+background-color: #f8f9fa;
+border-top: 1px solid #ddd;
+padding: 10px;
+display: none !important; / Initially hidden /
+}
+
+
+.selected-username {
+font-weight: bold;
+font-size: 16px;
+}
+
+.btn-success {
+border-radius: 50%;
+width: 40px;
+height: 40px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+/ General styling for chat list item /
+.chat-list-item {
+cursor: pointer;
+display: flex;
+align-items: center; / This will vertically center the radio button /
+transition: background-color 0.3s ease;
+}
+
+.chat-list-item:hover {
+background-color: #f0f0f0;
+}
+
+/ Centering the radio button vertically /
+.chat-radio {
+margin-right: 10px; / Space between radio button and profile image /
+width: 18px; / Adjust size of radio button /
+height: 18px;
+}
+
+.name {
+font-weight: bold;
+font-size: 16px;
+}
+
+.last-message {
+color: #888;
+font-size: 14px;
+}
+</style>
+
 </head>
 
 <body>
@@ -52,15 +140,20 @@
                         </div>
 
                         <div class="buttons">
-                            <button class="button active">All</button>
+                            <button class="button active" onclick="display_chat('all')">All</button>
+                            <button class="button" onclick="display_chat('unread')">Unread</button>
+
+                           <!--- <button class="button active">All</button>
                             <button class="button" id="unread">Unread</button>
-                            {{-- <button class="button">Groups</button> --}}
+                            {{-- <button class="button">Groups</button> --}}--->
                         </div>
 
                     </div>
                 </div>
                 <!-- Chat List -->
                 <div class="row" id="chat-list" style="overflow:auto;"></div>
+                <div class="row" id="chat-list-unread" style="overflow:auto; display:none;">Unread List </div>
+
 
                 <!-- Profile Settings -->
                 <div class="d-flex flex-column w-100 h-100" id="profile-settings">
@@ -94,6 +187,7 @@
 
             <!-- Message Area -->
             <div class="d-none d-sm-flex flex-column col-12 col-sm-7 col-md-8 p-0 h-100" id="message-area">
+
                 <div class="w-100 h-100 overlay"></div>
 
                 <!-- Navbar -->
@@ -118,6 +212,69 @@
                 </div>
 
                 <div class="d-flex flex-column" id="messages"></div>
+
+
+<!-- New Code To Move Message -->
+<div class="chat-input-container" id="action-bar" style="display:none;">
+    &nbsp;&nbsp;&nbsp;
+    <svg width="14" height="14" id="cancel-icon"  viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 12.9966L13 1M1 1L13 12.9966" stroke="#687780" stroke-width="2" stroke-linecap="round"/>
+        </svg>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="selected-count">Selected Messages: 0</div>
+    <svg width="31" height="31" id="openModalTrigger" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+        <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white"/>
+    </svg>
+</div>
+<div class="modal fade" id="chatModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="width:100%; height:752px">
+            <div class="modal-header" style="background-color: #1DAB61; font-size: 18px; font-weight: 400;">
+                <h5 class="modal-title" style="color:white;">Move message to</h5>
+                <button type="button" style="color:white;" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 0px !important;">
+                <div class="search-header" style="padding: 10px 9px 12px 0px; border-bottom: 0px;">
+                    <input type="search" placeholder="Search messages" class="search-input" style="width: 100%;">
+                </div>
+                <div class="recent-chat" style="padding: 0px 0px 0px 10px; text-align: left;">
+                    <span style="font-weight: bold; display: block; margin-bottom: 5px;">Recent Chat</span>
+
+                    <!-- Chat list items -->
+                    <div class="d-flex flex-row w-100 p-2 border-bottom unread align-items-center">
+                        <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('Programmers')">
+                        <img src="images/0923102932_aPRkoW.jpg" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                        <div class="w-50">
+                            <div class="name list-user-name">Programmers</div>
+                            <div class="small last-message">message or status is here </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-row w-100 p-2 border-bottom unread align-items-center">
+                        <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('Developers')">
+                        <img src="images/0923102932_aPRkoW.jpg" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                        <div class="w-50">
+                            <div class="name list-user-name">Developers</div>
+                            <div class="small last-message">message or status is here </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom section for selected user display -->
+            <div id="selected-usertosend" class="selected-user d-flex align-items-center justify-content-between" style="padding: 10px; background-color: #F0F2F5; border-top: 1px solid #ddd; display: none;">
+                <span id="selected-username" class="selected-username"></span>
+                <svg width="31" height="31" id="openModalTrigger" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"></circle>
+                    <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!---new code is above that line --->
 
                 <div id="emoji-picker-wrapper"></div>
                 <!-- Input -->
@@ -300,7 +457,29 @@
     <input type="hidden" value="{{ Auth::user()->email }}" id="login_user_email">
     {{-- <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script> --}}
     {{-- @vite(['resources/js/app.js']) --}}
-    <script></script>
+    <script>
+        function display_chat(data) {
+            var buttons = document.querySelectorAll('.button');
+            var allChats = document.getElementById('chat-list');
+            var unreadChats = document.getElementById('chat-list-unread');
+
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            allChats.style.display = 'none';
+            unreadChats.style.display = 'none';
+
+            if (data === 'all') {
+                allChats.style.display = 'block';
+            } else if (data === 'unread') {
+                unreadChats.style.display = 'block';
+                unreadGrouChat();
+            }
+            document.querySelector(`.button[onclick="display_chat('${data}')"]`).classList.add('active');
+        }
+    </script>
+
     <script type="module">
         import {
             Picker
