@@ -598,10 +598,9 @@ let addNewMessageToArea = (message) => {
 
 
 
-const fetchNextPageMessages = async (message_id=null,current_display=null) => {
+const fetchNextPageMessages = async (message_id=null) => {
     console.log('Fetching next page of messages...'); // Log fetching messages
 alert('this is the messageid'+message_id);
-alert('Current Limit Display'+current_display);
 
     currentPage++;
 
@@ -1380,8 +1379,8 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
                                 }else{
-
-                                    fetchNextPageMessages(messageId,currentPage);
+                                    
+                                    fetchNextPageMessages(messageId);
 
                                  }
                             });
