@@ -157,7 +157,7 @@ let viewChatList = () => {
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
                 DOM.chatList.innerHTML += `
             <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
-            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom ${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index})">
+            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index})">
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
                 <div class="name list-user-name">${elem.group.name}</div>
@@ -480,39 +480,180 @@ document.getElementById("openModalTrigger").addEventListener("click", function()
 	console.log(`Edit message with ID: ${messageId}`);
   }
 
-// DOM.messages.addEventListener('scroll', () => {
-//     if (DOM.messages.scrollTop === 0) {
-//         fetchNextPageMessages();
-//     }
-// });
-// const fetchNextPageMessages = async () => {
-//     currentPage++;
 
-//     // Get the current scroll height before loading new messages
-//     const currentScrollHeight = DOM.messages.scrollHeight;
 
-//     const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}`, {
-//       method: 'GET',
-//       headers: {
-//         'content-type': 'application/json'
-//       }
-//     });
 
-//     const nextPageMessages = await response.json();
 
-//     pagnicateChatList.data = [...nextPageMessages.data, ...pagnicateChatList.data];
 
-//     // Clear the current message area
-//     DOM.messages.innerHTML = '';
 
-//     pagnicateChatList.data.reverse().forEach((msg) => {
-//         // Add each message to the DOM (message area)
-//         addMessageToMessageArea(msg);
-//     });
+  
+  let isLoadingMessages = false;
+  let hasMoreMessages = true; // Assume we have more messages initially
+  
+  // Listen for the scroll event
+  DOM.messages.addEventListener('scroll', async () => {
+      //alert('Scroll event triggered'); // Alert when the scroll event is triggered
+  
+      // Check if the user has scrolled to the top of the message area
+      if (DOM.messages.scrollTop === 0 && !isLoadingMessages && hasMoreMessages) {
+         // alert('User reached the top of the message area, starting to load more messages'); // Alert when the user reaches the top
+          
+          isLoadingMessages = true;
+          await fetchNextPageMessages();
+          isLoadingMessages = false;
+      } else if (DOM.messages.scrollTop !== 0) {
+         // alert('User is not at the top yet'); // Alert if the user hasn't reached the top
+      }
+  });
+  
+  // Modify the addNewMessageToArea function to return a DOM element
+let addNewMessageToArea = (message) => {
+    let msgDate = mDate(message.time).getDate();
 
-//     DOM.messages.scrollTop = DOM.messages.scrollHeight - currentScrollHeight;
+    if (lastDate !== msgDate) {
+        addDateToMessageArea(msgDate);
+        lastDate = msgDate;
+    }
 
-// };
+    let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+    let senderName = message.user.name;
+
+    // Determine the message content based on the message type
+    let messageContent;
+    if (message.type === 'File') {
+        messageContent = `
+            <div class="file-message">
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">${message.media_name}</p>
+                </div>
+                <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>
+        `;
+    } else if (message.type === 'Image') {
+        messageContent = `<img src="${message.message ?? message.msg}" style="height:222px; width:54px;">`;
+    } else if (message.type === 'Message' || message.type === null) {
+        messageContent = message.message ?? message.msg;
+    } else if (message.type === 'Audio') {
+        messageContent = `
+            <p>${message.media_name}</p>
+            <p>${message.message ?? message.msg}</p>
+        `;
+    }
+
+    // Create the message element as a DOM element
+    let messageElement = document.createElement('div');
+    messageElement.className = 'ml-3';
+
+    messageElement.innerHTML = `
+        ${message.user.id == user.id ? '' : profileImage}
+        <div class="">
+            <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
+                <div style="margin-top:-4px">
+                    <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+                        ${messageContent}
+                    </div>
+                    <div>
+                        <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+                            <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
+                            <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span> |
+                            <span>
+                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
+                            </span> |
+                            <span>
+                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
+                            </span> |
+                            <span>
+                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                            </span>
+                        </div>
+                        ${message.sender === user.unique_id ? `
+                        <div class="dropdown" style="position: absolute; top: 5px; right: 5px;">
+                            <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-angle-down text-muted px-2"></i>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="#" onclick="editMessage(${message.id})">Edit</a>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal">Delete</a>
+                                <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+                            </div>
+                        </div>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    return messageElement; // Return the DOM element
+};
+
+const fetchNextPageMessages = async () => {
+   // alert('Fetching next page of messages...'); // Alert when fetching messages starts
+
+    currentPage++;
+
+    // Get the current scroll height before loading new messages
+    const currentScrollHeight = DOM.messages.scrollHeight;
+   // alert(`Current scroll height: ${currentScrollHeight}`); // Alert the current scroll height
+
+    try {
+        const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json'
+            }
+        });
+
+        const nextPageMessages = await response.json();
+       // alert(`Messages fetched: ${nextPageMessages.data.length}`); // Alert how many messages were fetched
+
+        // If there are no more messages, stop fetching
+        if (nextPageMessages.data.length === 0) {
+            hasMoreMessages = false;
+           // alert('No more messages to load'); // Alert if there are no more messages
+            return;
+        }
+
+        // Append new messages to the end of the message list
+        nextPageMessages.data.forEach((msg) => {
+            const newMessage = addNewMessageToArea(msg);
+            // Append the new message at the end of the message list
+            DOM.messages.appendChild(newMessage);
+        });
+
+       // alert('New messages added to the bottom'); // Alert when new messages are added
+
+        // Adjust scroll position to maintain the user's view
+        const newScrollHeight = DOM.messages.scrollHeight;
+      //  alert(`New scroll height: ${newScrollHeight}`); // Alert the new scroll height after adding messages
+        DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
+
+    } catch (error) {
+        alert('Error fetching messages'); // Alert if there is an error fetching messages
+        console.error('Error fetching messages:', error);
+    }
+};
+
+
+
+  
+
+  
+
+
+
+
+
+
 
 let generateMessageArea = async (elem, chatIndex) => {
 
@@ -581,7 +722,29 @@ let generateMessageArea = async (elem, chatIndex) => {
     } catch (error) {
         console.log(error);
     }
+    var g_id = DOM.groupId; // Assume this contains the class name, e.g., "IMPZvumLHDgHjS10"
 
+    // Prefix g_id with a dot to create a valid class selector
+    const element = document.querySelector(`.${g_id}`); 
+    
+    if (element) {
+        const unreadCount = parseInt(element.innerText, 10);
+        
+        if (unreadCount > 0 && unreadCount <= 20) {
+            document.getElementById("unread-count").innerText = 0; // Reset the text to 0
+            element.style.display = 'none'; // Hides the element
+            alert(unreadCount);
+            console.log(unreadCount); // This will log the number
+        } else if (unreadCount > 20) { // No need to check unreadCount > 0 again
+            var valuetoset = unreadCount - 20;
+            document.getElementById("unread-count").innerText = valuetoset; // Set the new value
+        }
+    } else {
+        console.log("Element not found");
+    }
+    
+    
+    
     // var setcount = 0;
     // document.getElementById("unread-count").value = setcount;
 
