@@ -448,28 +448,80 @@ font-size: 14px;
     <input type="hidden" value="{{ Auth::user()->email }}" id="login_user_email">
     {{-- <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script> --}}
     {{-- @vite(['resources/js/app.js']) --}}
-    <script>
-        function display_chat(data) {
-            var buttons = document.querySelectorAll('.button');
-            var allChats = document.getElementById('chat-list');
-            var unreadChats = document.getElementById('chat-list-unread');
+  <style>.hidden {
+    display: none !important; /* Use !important to override any inline styles */
+}
 
-            buttons.forEach(button => {
-                button.classList.remove('active');
-            });
+div#chat-list-unread {
+    text-align: center;
+    margin-top: 60px;
+}
+</style>
 
-            allChats.style.display = 'none';
-            unreadChats.style.display = 'none';
+</style>
 
-            if (data === 'all') {
-                allChats.style.display = 'block';
-            } else if (data === 'unread') {
-                unreadChats.style.display = 'block';
-                unreadGrouChat();
-            }
-            document.querySelector(`.button[onclick="display_chat('${data}')"]`).classList.add('active');
+<script>
+function display_chat(type) {
+    const chatList = document.getElementById('chat-list');
+    const chatItems = chatList.getElementsByClassName('chat-list-item');
+
+    // Get the alert div
+    const alertDiv = document.getElementById('chat-list-unread');
+    // Get all buttons
+    const buttons = document.querySelectorAll('.buttons .button');
+
+    // Remove 'active' class from all buttons
+    buttons.forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // Set 'active' class on the clicked button
+    if (type === 'unread') {
+        buttons[1].classList.add('active'); // Assuming the unread button is the second one
+    } else {
+        buttons[0].classList.add('active'); // Assuming the all button is the first one
+    }
+
+    let allUnreadCountsGreaterThanZero = true; // Flag to check unread counts
+
+    for (let i = 0; i < chatItems.length; i++) {
+        const unreadCountElement = chatItems[i].getElementsByClassName('badge-success')[0];
+        let unreadCount = 0; // Default to 0 if no badge found
+        
+        // Check if the unreadCountElement exists and parse its value
+        if (unreadCountElement) {
+            unreadCount = parseInt(unreadCountElement.innerText);
         }
-    </script>
+        console.log(unreadCount);
+        
+        // If any unread count is 0, set the flag to false
+        if (unreadCount === 0) {
+            allUnreadCountsGreaterThanZero = false;
+        }
+
+        // Check if the chat item has the class 'tohide'
+        if (chatItems[i].classList.contains('tohide') && type === 'unread') {
+            chatItems[i].style.setProperty('display', 'none', 'important'); // Set display to none !important
+        } else {
+            chatItems[i].style.setProperty('display', 'block'); // Set display to block
+        }
+    }
+
+    // If type is unread and all unread counts are greater than 0
+    if (type === 'unread' && allUnreadCountsGreaterThanZero) {
+        chatList.style.display = 'none'; // Hide the chat list
+        alertDiv.style.display = 'block'; // Set the alert div to display block
+        alertDiv.innerHTML = 'No unread messages are available.'; // Display the message inside the alert div
+    } else {
+        alertDiv.style.display = 'none'; // Hide the alert if not applicable
+        chatList.style.display = 'block'; // Show the chat list if there are unread messages
+    }
+}
+</script>
+
+
+
+
 
     <script type="module">
         import {
