@@ -610,8 +610,10 @@ let addNewMessageToArea = (message) => {
 
 
 
-const fetchNextPageMessages = async () => {
+const fetchNextPageMessages = async (message_id=null,current_display=null) => {
     console.log('Fetching next page of messages...'); // Log fetching messages
+alert('this is the messageid'+message_id);
+alert('Current Limit Display'+current_display);
 
     currentPage++;
 
@@ -766,10 +768,10 @@ let generateMessageArea = async (elem, chatIndex) => {
         if (unreadCount > 0 && unreadCount <= responce_count) {
             document.getElementById("unread-count").innerText = 0; // Reset the text to 0
             element.style.display = 'none'; // Hides the element
-            alert(unreadCount);
+            //alert(unreadCount);
             console.log(unreadCount); // This will log the number
-        } else if (unreadCount > 20) { // No need to check unreadCount > 0 again
-            var valuetoset = unreadCount - 20;
+        } else if (unreadCount > responce_count) { // No need to check unreadCount > 0 again
+            var valuetoset = unreadCount - responce_count;
             document.getElementById("unread-count").innerText = valuetoset; // Set the new value
         }
     } else {
@@ -1403,7 +1405,11 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                         messageTextElement.innerHTML = highlightedText;
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
-                                }
+                                }else{
+                                   
+                                    fetchNextPageMessages(messageId,currentPage);
+                                    
+                                 }
                             });
                         });
                     })
