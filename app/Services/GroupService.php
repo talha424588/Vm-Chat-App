@@ -74,8 +74,9 @@ class GroupService implements GroupRepository
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])->where('name', 'LIKE', "%$name%")
             ->with(['groupMessages' => function ($query) {
                 $query->latest('time');
-            }, 'groupMessages.user'])
+            }, 'groupMessages.user', 'users_with_access'])
             ->get();
+
         if (count($groups) > 0) {
             return response()->json([
                 "status" => true,

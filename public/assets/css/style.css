@@ -876,3 +876,7 @@ body{
     color: #54656f;
     margin: 0;
   }
+
+  .highlight {
+    background-color: yellow;
+}
