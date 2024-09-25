@@ -379,16 +379,7 @@ font-size: 14px;
                 <div class="search-results">
                     <!-- Sample results -->
                     <div class="result-item">
-                        <div class="result-date">7/26/2024</div>
-                        <div class="result-text">Hello, this is testing text</div>
-                    </div>
-                    <div class="result-item">
-                        <div class="result-date">7/28/2024</div>
-                        <div class="result-text">Lorem Ipsum is simply dummy text</div>
-                    </div>
-                    <div class="result-item">
-                        <div class="result-date">8/06/2024</div>
-                        <div class="result-text">simply dummy text</div>
+
                     </div>
                 </div>
             </div>

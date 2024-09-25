@@ -27,9 +27,14 @@ class Group extends Model
         return User::whereIn('id', $userIds)->get();
     }
 
+    // public function users_with_access()
+    // {
+    //     return $this->belongsToMany(User::class, 'user', 'id', 'id')
+    //         ->whereRaw("FIND_IN_SET(user.id, access) > 0");
+    // }
     public function users_with_access()
-{
-    return $this->belongsToMany(User::class, 'user', 'id','id')
-        ->whereRaw("FIND_IN_SET(user.id, access) > 0");
-}
+    {
+        return $this->belongsToMany(User::class, 'groups', 'id', 'access')
+            ->whereRaw("FIND_IN_SET(user.id, groups.access) > 0");
+    }
 }

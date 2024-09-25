@@ -171,7 +171,6 @@ let viewChatList = () => {
             </div>`;
             }
         });
-
 };
 
 let generateChatList = async () => {
@@ -315,7 +314,6 @@ socket.on('sendChatToClient', (message) => {
 });
 
 let addMessageToMessageArea = (message) => {
-    console.log("message", message);
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -443,9 +441,9 @@ function moveMessage(messageId) {
     }
 }
 
-document.getElementById('cancel-icon').addEventListener('click', function() {
+document.getElementById('cancel-icon').addEventListener('click', function () {
     // Remove the 'selected-message' class from all selected messages
-    document.querySelectorAll('.selected-message').forEach(function(element) {
+    document.querySelectorAll('.selected-message').forEach(function (element) {
         element.classList.remove('selected-message');
     });
 
@@ -461,13 +459,13 @@ document.getElementById('cancel-icon').addEventListener('click', function() {
     console.log('Selected messages have been cleared and input area is displayed.');
 });
 
-document.getElementById("openModalTrigger").addEventListener("click", function() {
-	var myModal = new bootstrap.Modal(document.getElementById('chatModal'));
-	myModal.show();
+document.getElementById("openModalTrigger").addEventListener("click", function () {
+    var myModal = new bootstrap.Modal(document.getElementById('chatModal'));
+    myModal.show();
 });
 
 
-  function selectUsertosend(username) {
+function selectUsertosend(username) {
     // Update the username in the bottom section
     document.getElementById('selected-username').textContent = username;
 
@@ -475,10 +473,10 @@ document.getElementById("openModalTrigger").addEventListener("click", function()
     document.getElementById('selected-usertosend').style.setProperty('display', 'flex', 'important');
 }
 
-  function editMessage(messageId) {
-	// Your logic to edit the message
-	console.log(`Edit message with ID: ${messageId}`);
-  }
+function editMessage(messageId) {
+    // Your logic to edit the message
+    console.log(`Edit message with ID: ${messageId}`);
+}
 
 
 
@@ -1206,21 +1204,74 @@ cameraContainer.addEventListener('click', (e) => {
 let groupSearchField = document.getElementById("search_group");
 let debounceTimeout = null;
 
+// groupSearchField.addEventListener("input", function (event) {
+//     if (event.target.value.length > 0) {
+//         clearTimeout(debounceTimeout);
+//         debounceTimeout = setTimeout(async function () {
+//             const url = `search-group-by-name/${event.target.value}`
+//             try {
+//                 const groupResponse = await fetch(url);
+//                 const response = await groupResponse.json();
+//                 if (response) {
+//                     console.log(response);
+//                 }
+//             } catch (error) {
+//                 console.log(error);
+//             }
+//         }, 500);
+//     }
+// });
+
+
+let searchGroups = async (searchQuery) => {
+    if (searchQuery.length > 0) {
+        const url = `search-group-by-name/${searchQuery}`;
+        const unique_id = document.getElementById("login_user_unique_id").value;
+        try {
+            const groupResponse = await fetch(url);
+            const response = await groupResponse.json();
+            if (response) {
+                const groups = response.groups;
+                chatList = [];
+                groups.forEach((group) => {
+                    let chat = {};
+                    chat.isGroup = true;
+                    chat.group = group;
+                    chat.group.access = [group.access];
+                    chat.name = group.name;
+                    chat.unread = 0;
+
+                    if (group.group_messages && group.group_messages.length > 0) {
+                        group.group_messages.reverse().forEach((msg) => {
+                            chat.msg = msg;
+                            chat.time = new Date(msg.time * 1000);
+
+                            const seenBy = msg.seen_by ? msg.seen_by.split(",").map((s) => s.trim()) : [];
+                            chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
+                        });
+                    }
+
+                    chatList.push(chat);
+                });
+                viewChatList();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+};
+
+
+
 groupSearchField.addEventListener("input", function (event) {
     if (event.target.value.length > 0) {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(async function () {
-            const url = `search-group-by-name/${event.target.value}`
-            try {
-                const groupResponse = await fetch(url);
-                const response = await groupResponse.json();
-                if (response) {
-                    console.log(response);
-                }
-            } catch (error) {
-                console.log(error);
-            }
+            await searchGroups(event.target.value);
         }, 500);
+    }
+    else {
+        generateChatList();
     }
 });
 
@@ -1228,8 +1279,7 @@ groupSearchField.addEventListener("input", function (event) {
 // get unread message groups
 // let unreadGroup = document.getElementById("unread");
 // unreadGroup.addEventListener("click", async function (e) {
-async function unreadGrouChat()
-{
+async function unreadGrouChat() {
     try {
         const url = `get-unread-chat-groups`;
         const unreadConversationGroupResponse = await fetch(url);
@@ -1244,8 +1294,78 @@ async function unreadGrouChat()
 
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
 
+// searchMessageInputFeild.addEventListener("input", function (e) {
+//     if (e.target.value.length >0) {
+//         clearTimeout(debounceTimeout);
+//         debounceTimeout = setTimeout(async function () {
+//             const url = `message/search/${e.target.value}/${DOM.groupId}`;
+//             try {
+//                 fetch(url)
+//                     .then(response => response.json())
+//                     .then(messageResponse => {
+//                         console.log("search message response",messageResponse);
+//                     })
+//                     .catch(error => {
+//                         console.error('Error:', error);
+//                     });
+//             }
+//             catch (error) {
+//                 console.log(error);
+//             }
+//         }, 500)
+//     }
+// })
+
+
+// searchMessageInputFeild.addEventListener("input", function (e) {
+//     if (e.target.value.length > 0) {
+//         clearTimeout(debounceTimeout);
+//         debounceTimeout = setTimeout(async function () {
+//             const url = `message/search/${e.target.value}/${DOM.groupId}`;
+//             try {
+//                 fetch(url)
+//                     .then(response => response.json())
+//                     .then(messageResponse => {
+//                         console.log("search message response", messageResponse);
+//                         const searchResultsDiv = document.querySelector(".search-results");
+//                         searchResultsDiv.innerHTML = "";
+//                         messageResponse.messages.forEach((message) => {
+//                             const resultItemDiv = document.createElement("div");
+//                             resultItemDiv.className = "result-item";
+//                             const resultDateDiv = document.createElement("div");
+//                             resultDateDiv.className = "result-date";
+//                             resultDateDiv.textContent = new Date(message.time * 1000).toLocaleDateString();
+//                             const resultTextDiv = document.createElement("div");
+//                             resultTextDiv.className = "result-text";
+//                             resultTextDiv.textContent = message.msg;
+//                             resultItemDiv.appendChild(resultDateDiv);
+//                             resultItemDiv.appendChild(resultTextDiv);
+//                             searchResultsDiv.appendChild(resultItemDiv);
+//                             resultItemDiv.addEventListener("click", function () {
+//                                 const messageId = message.id;
+//                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+//                                 if (messageElement) {
+//                                     messageElement.scrollIntoView({ behavior: "smooth" });
+//                                 }
+//                             });
+//                         });
+//                     })
+//                     .catch(error => {
+//                         console.error('Error:', error);
+//                     });
+//             } catch (error) {
+//                 console.log(error);
+//             }
+//         }, 500)
+//     }
+//     else {
+//         const searchResultsDiv = document.querySelector(".search-results");
+//         searchResultsDiv.innerHTML = "";
+//     }
+// })
+
 searchMessageInputFeild.addEventListener("input", function (e) {
-    if (e.target.value.length >0) {
+    if (e.target.value.length > 0) {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(async function () {
             const url = `message/search/${e.target.value}/${DOM.groupId}`;
@@ -1253,14 +1373,65 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                 fetch(url)
                     .then(response => response.json())
                     .then(messageResponse => {
+                        console.log("search message response", messageResponse);
+                        const searchResultsDiv = document.querySelector(".search-results");
+                        searchResultsDiv.innerHTML = "";
+                        const searchQuery = e.target.value.toLowerCase();
+                        messageResponse.messages.forEach((message) => {
+                            const resultItemDiv = document.createElement("div");
+                            resultItemDiv.className = "result-item";
+                            const resultDateDiv = document.createElement("div");
+                            resultDateDiv.className = "result-date";
+                            resultDateDiv.textContent = new Date(message.time * 1000).toLocaleDateString();
+                            const resultTextDiv = document.createElement("div");
+                            resultTextDiv.className = "result-text";
+                            resultTextDiv.textContent = message.msg;
+                            resultItemDiv.appendChild(resultDateDiv);
+                            resultItemDiv.appendChild(resultTextDiv);
+                            searchResultsDiv.appendChild(resultItemDiv);
+
+                            // Add event listener to each result item
+                            resultItemDiv.addEventListener("click", function () {
+                                const messageId = message.id;
+                                const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+                                if (messageElement) {
+                                    const messageTextElement = messageElement.querySelector(".shadow-sm");
+                                    const messageText = messageTextElement.textContent.toLowerCase();
+                                    const index = messageText.indexOf(searchQuery);
+                                    if (index !== -1) {
+                                        const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                                        messageTextElement.innerHTML = highlightedText;
+                                    }
+                                    messageElement.scrollIntoView({ behavior: "smooth" });
+                                }
+                            });
+                        });
                     })
                     .catch(error => {
                         console.error('Error:', error);
                     });
-            }
-            catch (error) {
+            } catch (error) {
                 console.log(error);
             }
         }, 500)
     }
+    else {
+        const searchResultsDiv = document.querySelector(".search-results");
+        searchResultsDiv.innerHTML = "";
+        removeHighlight();
+    }
 })
+
+document.querySelector(".close-button").addEventListener("click", function () {
+    document.getElementById("messsage_search_query").value = "";
+    const searchResultsDiv = document.querySelector(".search-results");
+    searchResultsDiv.innerHTML = "";
+    removeHighlight();
+});
+
+function removeHighlight() {
+    const messageElements = DOM.messages.querySelectorAll(".shadow-sm");
+    messageElements.forEach((element) => {
+        element.innerHTML = element.textContent;
+    });
+}
