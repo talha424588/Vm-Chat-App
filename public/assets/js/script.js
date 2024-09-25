@@ -478,19 +478,7 @@ function editMessage(messageId) {
     console.log(`Edit message with ID: ${messageId}`);
 }
 
-
-
-
-
-
-
-  
- 
-  
-
-
-
-  let isLoadingMessages = false;
+let isLoadingMessages = false;
 let hasMoreMessages = true; // Assume we have more messages initially
 
 
@@ -502,7 +490,7 @@ DOM.messages.addEventListener('scroll', async () => {
     // Check if the user has scrolled to the top of the message area
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         console.log('User reached the top of the message area, starting to load more messages'); // Log when reaching the top
-        
+
         isLoadingMessages = true;
         await fetchNextPageMessages();
         isLoadingMessages = false;
@@ -673,20 +661,6 @@ alert('Current Limit Display'+current_display);
     }
 };
 
-
-
-
-
-  
-
-  
-
-
-
-
-
-
-
 let generateMessageArea = async (elem, chatIndex) => {
 
     pagnicateChatList = [];
@@ -760,11 +734,11 @@ let generateMessageArea = async (elem, chatIndex) => {
     var g_id = DOM.groupId; // Assume this contains the class name, e.g., "IMPZvumLHDgHjS10"
 
 
-    const element = document.querySelector(`.${g_id}`); 
-    
+    const element = document.querySelector(`.${g_id}`);
+
     if (element) {
         const unreadCount = parseInt(element.innerText, 10);
-        
+
         if (unreadCount > 0 && unreadCount <= responce_count) {
             document.getElementById("unread-count").innerText = 0; // Reset the text to 0
             element.style.display = 'none'; // Hides the element
@@ -777,9 +751,9 @@ let generateMessageArea = async (elem, chatIndex) => {
     } else {
         console.log("Element not found");
     }
-    
-    
-    
+
+
+
     // var setcount = 0;
     // document.getElementById("unread-count").value = setcount;
 
@@ -1406,9 +1380,9 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
                                 }else{
-                                   
+
                                     fetchNextPageMessages(messageId,currentPage);
-                                    
+
                                  }
                             });
                         });
