@@ -508,7 +508,7 @@ let addNewMessageToArea = (message) => {
         lastDate = msgDate; // Update lastDate
     }
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
-   let senderName = message.user.name;
+    let senderName = message.user.name;
 
     // Determine the message content based on the message type
     let messageContent;
@@ -598,27 +598,30 @@ let addNewMessageToArea = (message) => {
 
 
 
-const fetchNextPageMessages = async (message_id=null,current_display=null) => {
-    console.log('Fetching next page of messages...'); // Log fetching messages
-alert('this is the messageid'+message_id);
-alert('Current Limit Display'+current_display);
+// const fetchNextPageMessages = async (message_id = null) => {
+    const fetchNextPageMessages = async (message_id=null,current_Page=null) => {
 
+    console.log('Fetching next page of messages...'); // Log fetching messages
+    // alert('this is the messageid' + message_id);
+    console.log('message id',message_id);
+    console.log("counter page",currentPage);
+    console.log("static page",currentPage);
     currentPage++;
 
-    // Get the current scroll height before loading new messages
     const currentScrollHeight = DOM.messages.scrollHeight;
-    console.log(`Current scroll height: ${currentScrollHeight}`); // Log the current scroll height
+    console.log(`Current scroll height: ${currentScrollHeight}`);
 
     try {
-        const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}`, {
+        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}` : ''}`;
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
+                'content-type': 'application/json'
             }
         });
-
         const nextPageMessages = await response.json();
-        console.log(`Messages fetched: ${nextPageMessages.data.length}`); // Log how many messages were fetched
+        console.log("nextPageMessages",nextPageMessages);
+        console.log(`Messages fetched: ${nextPageMessages.data.length}`);
 
         const ids = nextPageMessages.data.map(item => item.id);
 
@@ -640,7 +643,7 @@ alert('Current Limit Display'+current_display);
         // If there are no more messages, stop fetching
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
-            console.log('No more messages to load'); // Log if there are no more messages
+            console.log('No more messages to load');
             return;
         }
 
@@ -712,7 +715,7 @@ let generateMessageArea = async (elem, chatIndex) => {
     });
     pagnicateChatList = await response.json();
 
-    var responce_count=pagnicateChatList.data.length;
+    var responce_count = pagnicateChatList.data.length;
 
 
     const ids = pagnicateChatList.data.map(item => item.id);
@@ -1368,7 +1371,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
 
                             // Add event listener to each result item
                             resultItemDiv.addEventListener("click", function () {
-                                const messageId = message.id;
+                                let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 if (messageElement) {
                                     const messageTextElement = messageElement.querySelector(".shadow-sm");
@@ -1379,11 +1382,12 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                         messageTextElement.innerHTML = highlightedText;
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
-                                }else{
+                                } else {
 
+                                    // fetchNextPageMessages(messageId);
                                     fetchNextPageMessages(messageId,currentPage);
 
-                                 }
+                                }
                             });
                         });
                     })
@@ -1391,6 +1395,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                         console.error('Error:', error);
                     });
             } catch (error) {
+
                 console.log(error);
             }
         }, 500)
