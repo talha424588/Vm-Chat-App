@@ -9,6 +9,7 @@ const DOM = {
     messageArea: getById("message-area"),
     inputArea: getById("input-area"),
     chatList: getById("chat-list"),
+    chatList2: getById("chat-list2"),
     messages: getById("messages"),
     chatListItem: getByClass("chat-list-item"),
     messageAreaName: getById("name", this.messageArea),
@@ -58,8 +59,8 @@ let mClassList = (element) => {
 let areaSwapped = false;
 
 let chat = null;
-
 let chatList = [];
+let chatList2 = [];
 let pagnicateChatList = [];
 
 let lastDate = "";
@@ -70,6 +71,7 @@ let loading = false;
 
 let populateGroupList = async () => {
     chatList = [];
+    chatList2 = [];
     let present = {};
 
     try {
@@ -108,6 +110,7 @@ let populateGroupList = async () => {
             } else {
                 present[chat.name] = chatList.length;
                 chatList.push(chat);
+
             }
         });
     } catch (error) {
@@ -122,8 +125,7 @@ let viewChatList = () => {
     }
 
     DOM.chatList.innerHTML = "";
-    chatList
-        .sort((a, b) => {
+    chatList.sort((a, b) => {
             if (a.time && b.time) {
                 return mDate(b.time).subtract(a.time);
             } else if (a.time) {
@@ -169,6 +171,17 @@ let viewChatList = () => {
                ${elem.unread > 0 ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>` : ""}
     </div>
             </div>`;
+            DOM.chatList2.innerHTML += `
+            <div style="width:95%; margin-left:10px;" class="d-flex flex-row  p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
+                <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
+                <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                <div class="w-50">
+                    <div class="name list-user-name">${elem.group.name}</div>
+                   
+                </div>
+            </div>`;
+        
+          
             }
         });
 };
@@ -178,6 +191,7 @@ let generateChatList = async () => {
     viewChatList();
 };
 
+console.log('Chat List is here'+chatList);
 
 let addDateToMessageArea = (date) => {
     DOM.messages.innerHTML += `
@@ -406,21 +420,37 @@ let addMessageToMessageArea = (message) => {
 
     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
 };
+//Multiple Select Messages Start
+
+
+// Array to store selected message IDs
+let selectedMessageIds = [];
 
 function moveMessage(messageId) {
+    // Check if the message ID is already selected
+    const index = selectedMessageIds.indexOf(messageId);
+
+    if (index > -1) {
+        // If it's already selected, remove it (unselect it)
+        selectedMessageIds.splice(index, 1);
+    } else {
+        // If it's not selected, add it to the array
+        selectedMessageIds.push(messageId);
+    }
+
     // Select the message div using its data attribute
     const messageElement = document.querySelector(`[data-message-id='${messageId}']`);
 
     // Check if the message element exists
     if (messageElement) {
-        // Find the closest parent with the class "ml-6"
+        // Find the closest parent with the class "ml-3"
         const parentDiv = messageElement.closest('.ml-3');
 
         // Toggle the 'selected-message' class to highlight/unhighlight the parent div
         if (parentDiv) {
             parentDiv.classList.toggle('selected-message');
         } else {
-            console.error(`Parent .ml-6 div not found for message ID: ${messageId}.`);
+           // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
         }
 
         // Hide the input area
@@ -429,17 +459,25 @@ function moveMessage(messageId) {
         // Show the action bar (assuming you have it hidden initially)
         $('#action-bar').show();
 
-        // Count the number of selected messages
-        const selectedMessages = document.querySelectorAll('.selected-message').length;
-
         // Update the count in the selected-count div
-        document.getElementById('selected-count').textContent = `${selectedMessages} message${selectedMessages > 1 ? 's' : ''} selected`;
+        document.getElementById('selected-count').textContent = `${selectedMessageIds.length} message${selectedMessageIds.length > 1 ? 's' : ''} selected`;
 
-        console.log(`Message with ID: ${messageId} has been highlighted/unhighlighted.`);
+        // Update the value of the hidden input field with selected message IDs
+        document.getElementById('messages_ids').value = selectedMessageIds.join(',');
+
+       // console.log(`Message with ID: ${messageId} has been highlighted/unhighlighted.`);
+       // console.log(`Selected messages: ${selectedMessageIds.join(', ')}`);
     } else {
         console.error(`Message with ID: ${messageId} not found.`);
     }
 }
+
+
+
+//Multiple Select Messages End
+
+
+
 
 document.getElementById('cancel-icon').addEventListener('click', function () {
     // Remove the 'selected-message' class from all selected messages
@@ -465,13 +503,29 @@ document.getElementById("openModalTrigger").addEventListener("click", function (
 });
 
 
-function selectUsertosend(username) {
+function selectUsertosend(username,postgroup_id) {
+
     // Update the username in the bottom section
     document.getElementById('selected-username').textContent = username;
-
+    document.getElementById('group_to_move_message').value =postgroup_id;
     // Show the bottom section when a user is selected with display: flex !important
     document.getElementById('selected-usertosend').style.setProperty('display', 'flex', 'important');
 }
+
+$(document).ready(function() {
+    // Listen for click event on the SVG
+    $('#MoveMessagetoGroup').on('click', function() {
+        // Collect values from hidden inputs
+        var messagesIds = $('#messages_ids').val();
+        var groupToMove = $('#group_to_move_message').val();
+
+   alert(messagesIds);
+   
+   alert(groupToMove);
+    });
+});
+
+
 
 function editMessage(messageId) {
     // Your logic to edit the message
@@ -485,17 +539,17 @@ let hasMoreMessages = true; // Assume we have more messages initially
 
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
-    console.log('Scroll event triggered'); // Log when the scroll event is triggered
+    //console.log('Scroll event triggered'); // Log when the scroll event is triggered
 
     // Check if the user has scrolled to the top of the message area
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
-        console.log('User reached the top of the message area, starting to load more messages'); // Log when reaching the top
+        //console.log('User reached the top of the message area, starting to load more messages'); // Log when reaching the top
 
         isLoadingMessages = true;
         await fetchNextPageMessages();
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
-        console.log('User is not at the top yet'); // Log if not at the top
+        //console.log('User is not at the top yet'); // Log if not at the top
     }
 });
 
@@ -598,15 +652,16 @@ let addNewMessageToArea = (message) => {
 
 
 
-const fetchNextPageMessages = async (message_id=null) => {
-    console.log('Fetching next page of messages...'); // Log fetching messages
+const fetchNextPageMessages = async (message_id=null,current_display=null) => {
+    //console.log('Fetching next page of messages...'); // Log fetching messages
 alert('this is the messageid'+message_id);
+alert('Current Limit Display'+current_display);
 
     currentPage++;
 
     // Get the current scroll height before loading new messages
     const currentScrollHeight = DOM.messages.scrollHeight;
-    console.log(`Current scroll height: ${currentScrollHeight}`); // Log the current scroll height
+    //console.log(`Current scroll height: ${currentScrollHeight}`); // Log the current scroll height
 
     try {
         const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}`, {
@@ -617,7 +672,7 @@ alert('this is the messageid'+message_id);
         });
 
         const nextPageMessages = await response.json();
-        console.log(`Messages fetched: ${nextPageMessages.data.length}`); // Log how many messages were fetched
+        //console.log(`Messages fetched: ${nextPageMessages.data.length}`); // Log how many messages were fetched
 
         const ids = nextPageMessages.data.map(item => item.id);
 
@@ -639,7 +694,7 @@ alert('this is the messageid'+message_id);
         // If there are no more messages, stop fetching
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
-            console.log('No more messages to load'); // Log if there are no more messages
+            //console.log('No more messages to load'); // Log if there are no more messages
             return;
         }
 
@@ -648,12 +703,12 @@ alert('this is the messageid'+message_id);
             const newMessage = addNewMessageToArea(msg);
             // Prepend the new message at the top of the message list
             DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
-            console.log('Message added:', msg); // Log each message added
+           // console.log('Message added:', msg); // Log each message added
         });
 
         // Adjust scroll position to maintain the user's view
         const newScrollHeight = DOM.messages.scrollHeight;
-        console.log(`New scroll height: ${newScrollHeight}`); // Log the new scroll height
+        //console.log(`New scroll height: ${newScrollHeight}`); // Log the new scroll height
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight; // Adjust scroll position
     } catch (error) {
         console.error('Error fetching messages:', error); // Log any fetch errors
@@ -742,7 +797,7 @@ let generateMessageArea = async (elem, chatIndex) => {
             document.getElementById("unread-count").innerText = 0; // Reset the text to 0
             element.style.display = 'none'; // Hides the element
             //alert(unreadCount);
-            console.log(unreadCount); // This will log the number
+           // console.log(unreadCount); // This will log the number
         } else if (unreadCount > responce_count) { // No need to check unreadCount > 0 again
             var valuetoset = unreadCount - responce_count;
             document.getElementById("unread-count").innerText = valuetoset; // Set the new value
@@ -1379,8 +1434,8 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
                                 }else{
-                                    
-                                    fetchNextPageMessages(messageId);
+
+                                    fetchNextPageMessages(messageId,currentPage);
 
                                  }
                             });

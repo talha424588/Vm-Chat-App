@@ -242,7 +242,8 @@ font-size: 14px;
                     <span style="font-weight: bold; display: block; margin-bottom: 5px;">Recent Chat</span>
 
                     <!-- Chat list items -->
-                    <div class="d-flex flex-row w-100 p-2 border-bottom unread align-items-center">
+                    <div class="row" id="chat-list2" style="overflow:auto;"></div>
+                    <!-- <div class="d-flex flex-row w-100 p-2 border-bottom unread align-items-center">
                         <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('Programmers')">
                         <img src="images/0923102932_aPRkoW.jpg" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
@@ -258,21 +259,29 @@ font-size: 14px;
                             <div class="name list-user-name">Developers</div>
                             <div class="small last-message">message or status is here </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
             <!-- Bottom section for selected user display -->
             <div id="selected-usertosend" class="selected-user d-flex align-items-center justify-content-between" style="padding: 10px; background-color: #F0F2F5; border-top: 1px solid #ddd; display: none;">
                 <span id="selected-username" class="selected-username"></span>
-                <svg width="31" height="31" id="openModalTrigger" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"></circle>
-                    <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white"></path>
-                </svg>
+              <!-- Hidden inputs to store message IDs and group ID -->
+<input type="hidden" name="messages_ids" id="messages_ids">
+<input type="hidden" name="group_to_move_message" id="group_to_move_message">
+
+<!-- SVG element that triggers the post action -->
+<svg width="31" height="31" id="MoveMessagetoGroup" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"></circle>
+    <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white"></path>
+</svg>
             </div>
         </div>
     </div>
 </div>
+
+
+
 
 <!---new code is above that line --->
 
