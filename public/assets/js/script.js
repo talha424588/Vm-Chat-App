@@ -593,26 +593,20 @@ let addNewMessageToArea = (message) => {
         </div>
     `;
 
-    return messageElement; // Return the DOM element
+    return messageElement;
 };
 
 
-
-// const fetchNextPageMessages = async (message_id = null) => {
-    const fetchNextPageMessages = async (message_id=null,current_Page=null) => {
-
-    console.log('Fetching next page of messages...'); // Log fetching messages
-    // alert('this is the messageid' + message_id);
-    console.log('message id',message_id);
-    console.log("counter page",currentPage);
-    console.log("static page",currentPage);
-    currentPage++;
+const fetchNextPageMessages = async (message_id = null, current_Page = null) => {
+    if (!message_id) {
+        currentPage++;
+    }
 
     const currentScrollHeight = DOM.messages.scrollHeight;
     console.log(`Current scroll height: ${currentScrollHeight}`);
 
     try {
-        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}` : ''}`;
+        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}&currentPage=${encodeURIComponent(current_Page)}` : ''}`;
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -620,8 +614,6 @@ let addNewMessageToArea = (message) => {
             }
         });
         const nextPageMessages = await response.json();
-        console.log("nextPageMessages",nextPageMessages);
-        console.log(`Messages fetched: ${nextPageMessages.data.length}`);
 
         const ids = nextPageMessages.data.map(item => item.id);
 
@@ -640,27 +632,41 @@ let addNewMessageToArea = (message) => {
             console.error('Error updating seen messages:', error);
         }
 
-        // If there are no more messages, stop fetching
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
             console.log('No more messages to load');
             return;
         }
+        console.log("nextPageMessages", nextPageMessages);
 
-        // Prepend new messages to the top of the message list
         nextPageMessages.data.forEach((msg) => {
             const newMessage = addNewMessageToArea(msg);
-            // Prepend the new message at the top of the message list
             DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
-            console.log('Message added:', msg); // Log each message added
+
+            if (msg.id === message_id) {
+
+                const messageElement = DOM.messages.querySelector(`[data-message-id="${msg.id}"]`);
+                if (messageElement) {
+                    setTimeout(() => {
+                        messageElement.scrollIntoView({ behavior: "smooth" });
+                    }, 100);
+                    const searchQuery = searchMessageInputFeild.value.toLowerCase();
+                    const messageTextElement = messageElement.querySelector(".shadow-sm");
+                    const messageText = messageTextElement.textContent.toLowerCase();
+                    const index = messageText.indexOf(searchQuery);
+                    if (index !== -1) {
+                        const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                        messageTextElement.innerHTML = highlightedText;
+                    }
+                }
+            }
         });
 
-        // Adjust scroll position to maintain the user's view
         const newScrollHeight = DOM.messages.scrollHeight;
-        console.log(`New scroll height: ${newScrollHeight}`); // Log the new scroll height
-        DOM.messages.scrollTop = newScrollHeight - currentScrollHeight; // Adjust scroll position
+        console.log(`New scroll height: ${newScrollHeight}`);
+        DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
     } catch (error) {
-        console.error('Error fetching messages:', error); // Log any fetch errors
+        console.error('Error fetching messages:', error);
     }
 };
 
@@ -1385,7 +1391,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 } else {
 
                                     // fetchNextPageMessages(messageId);
-                                    fetchNextPageMessages(messageId,currentPage);
+                                    fetchNextPageMessages(messageId, currentPage);
 
                                 }
                             });
