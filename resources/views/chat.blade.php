@@ -461,7 +461,7 @@ div#chat-list-unread {
 </style>
 
 <script>
-function display_chat(type) {
+    function display_chat(type) {
     const chatList = document.getElementById('chat-list');
     const chatItems = chatList.getElementsByClassName('chat-list-item');
 
@@ -482,41 +482,44 @@ function display_chat(type) {
         buttons[0].classList.add('active'); // Assuming the all button is the first one
     }
 
-    let allUnreadCountsGreaterThanZero = true; // Flag to check unread counts
+    let hasUnreadMessages = false; // Flag to check if any unread messages are present
 
     for (let i = 0; i < chatItems.length; i++) {
         const unreadCountElement = chatItems[i].getElementsByClassName('badge-success')[0];
         let unreadCount = 0; // Default to 0 if no badge found
         
-        // Check if the unreadCountElement exists and parse its value
-        if (unreadCountElement) {
+        // Check if the unreadCountElement exists and parse its value if visible
+        if (unreadCountElement && unreadCountElement.style.display !== 'none') {
             unreadCount = parseInt(unreadCountElement.innerText);
         }
         console.log(unreadCount);
-        
-        // If any unread count is 0, set the flag to false
-        if (unreadCount === 0) {
-            allUnreadCountsGreaterThanZero = false;
-        }
 
-        // Check if the chat item has the class 'tohide'
-        if (chatItems[i].classList.contains('tohide') && type === 'unread') {
-            chatItems[i].style.setProperty('display', 'none', 'important'); // Set display to none !important
-        } else {
-            chatItems[i].style.setProperty('display', 'block'); // Set display to block
+        // If unreadCount is greater than 0, show the chat item and set the flag
+        if (unreadCount > 0) {
+            hasUnreadMessages = true;
+            chatItems[i].style.setProperty('display', 'block'); // Show the chat item
+        } 
+        // If type is 'unread', hide chat items with unreadCount 0
+        else if (type === 'unread') {
+            chatItems[i].style.setProperty('display', 'none', 'important'); // Hide chat item
+        } 
+        // If type is 'all', show all chat items
+        else {
+            chatItems[i].style.setProperty('display', 'block');
         }
     }
 
-    // If type is unread and all unread counts are greater than 0
-    if (type === 'unread' && allUnreadCountsGreaterThanZero) {
+    // If type is 'unread' and there are no unread messages
+    if (type === 'unread' && !hasUnreadMessages) {
         chatList.style.display = 'none'; // Hide the chat list
-        alertDiv.style.display = 'block'; // Set the alert div to display block
+        alertDiv.style.display = 'block'; // Show the alert div
         alertDiv.innerHTML = 'No unread messages are available.'; // Display the message inside the alert div
     } else {
         alertDiv.style.display = 'none'; // Hide the alert if not applicable
         chatList.style.display = 'block'; // Show the chat list if there are unread messages
     }
 }
+
 </script>
 
 

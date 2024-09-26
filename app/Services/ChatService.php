@@ -37,36 +37,59 @@ class ChatService implements ChatRepository
     public function fetchUserAllGroupsMessages($request)
     {
         $perPage = 20;
-        $page = $request->get('page', 1);
-        $paginator = GroupMessage::where('group_id', $request->groupId)->with('user')->orderBy('id', 'desc')
-            ->paginate($perPage, ['*'], 'page', $page);
+        if (!$request->messageId) {
+            $page = $request->get('page', 1);
+            $paginator = GroupMessage::where('group_id', $request->groupId)->with('user')->orderBy('id', 'desc')
+                ->paginate($perPage, ['*'], 'page', $page);
 
-        if ($paginator != null) {
-            $response = [
-                'status' => true,
-                'message' => 'Messages found',
-                'data' => new MessageResourceCollection($paginator->items()),
-                'pagination' => [
-                    'current_page' => $paginator->currentPage(),
-                    'total_pages' => $paginator->lastPage(),
-                    'total_count' => $paginator->total(),
-                    'per_page' => $paginator->perPage()
-                ]
-            ];
-            return response()->json($response);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Not found',
-                'data' => null,
-                'pagination' => [
-                    'current_page' => 1,
-                    'total_pages' => 0,
-                    'total_count' => 0,
-                    'per_page' => $perPage
-                ]
-            ], 404);
+            if ($paginator != null) {
+                $response = [
+                    'status' => true,
+                    'message' => 'Messages found',
+                    'data' => new MessageResourceCollection($paginator->items()),
+                    'pagination' => [
+                        'current_page' => $paginator->currentPage(),
+                        'total_pages' => $paginator->lastPage(),
+                        'total_count' => $paginator->total(),
+                        'per_page' => $paginator->perPage()
+                    ]
+                ];
+                return response()->json($response);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Not found',
+                    'data' => null,
+                    'pagination' => [
+                        'current_page' => 1,
+                        'total_pages' => 0,
+                        'total_count' => 0,
+                        'per_page' => $perPage
+                    ]
+                ], 404);
+            }
+        }else
+        {
+            return $this->fetchMessagesUpToSearched($request);
         }
+    }
+    private function fetchMessagesUpToSearched($request)
+    {
+        $pageNo = (int)($request->currentPage);
+        $messageId = $request->messageId;
+        $groupId = $request->groupId;
+
+        $messages = GroupMessage::where('group_id', $groupId)
+        ->where('id', '>=', $messageId)
+        ->orderBy('id', 'desc')
+        ->take(PHP_INT_MAX)
+        ->skip($pageNo * 20)
+        ->get();
+        return response()->json([
+            'status' => true,
+            'message' => 'Messages found',
+            'data' => new MessageResourceCollection($messages),
+        ]);
     }
 
     public function getMessageStatus($id)
@@ -110,9 +133,9 @@ class ChatService implements ChatRepository
 
     public function getMessageById($id)
     {
-        $message = GroupMessage::where('id',$id)->first();
-        if($message)
-            return response()->json(["status"=>true,"msessage" =>"success", "message"=> new MessageResource($message)]);
+        $message = GroupMessage::where('id', $id)->first();
+        if ($message)
+            return response()->json(["status" => true, "msessage" => "success", "message" => new MessageResource($message)]);
         else
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
     }

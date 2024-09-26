@@ -478,74 +478,76 @@ function editMessage(messageId) {
     console.log(`Edit message with ID: ${messageId}`);
 }
 
+let isLoadingMessages = false;
+let hasMoreMessages = true; // Assume we have more messages initially
 
 
 
+// Listen for the scroll event
+DOM.messages.addEventListener('scroll', async () => {
+    console.log('Scroll event triggered'); // Log when the scroll event is triggered
 
+    // Check if the user has scrolled to the top of the message area
+    if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
+        console.log('User reached the top of the message area, starting to load more messages'); // Log when reaching the top
 
+        isLoadingMessages = true;
+        await fetchNextPageMessages();
+        isLoadingMessages = false;
+    } else if (DOM.messages.scrollTop !== 0) {
+        console.log('User is not at the top yet'); // Log if not at the top
+    }
+});
 
-  
-  let isLoadingMessages = false;
-  let hasMoreMessages = true; // Assume we have more messages initially
-  
-  // Listen for the scroll event
-  DOM.messages.addEventListener('scroll', async () => {
-      //alert('Scroll event triggered'); // Alert when the scroll event is triggered
-  
-      // Check if the user has scrolled to the top of the message area
-      if (DOM.messages.scrollTop === 0 && !isLoadingMessages && hasMoreMessages) {
-         // alert('User reached the top of the message area, starting to load more messages'); // Alert when the user reaches the top
-          
-          isLoadingMessages = true;
-          await fetchNextPageMessages();
-          isLoadingMessages = false;
-      } else if (DOM.messages.scrollTop !== 0) {
-         // alert('User is not at the top yet'); // Alert if the user hasn't reached the top
-      }
-  });
-  
-  // Modify the addNewMessageToArea function to return a DOM element
+// Function to add a new message to the message area
 let addNewMessageToArea = (message) => {
-    let msgDate = mDate(message.time).getDate();
+    let msgDate = new Date(message.time * 1000).getDate(); // Convert timestamp to date
 
     if (lastDate !== msgDate) {
-        addDateToMessageArea(msgDate);
-        lastDate = msgDate;
+        addDateToMessageArea(msgDate); // Add date separator if needed
+        lastDate = msgDate; // Update lastDate
     }
-
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
 
     // Determine the message content based on the message type
     let messageContent;
-    if (message.type === 'File') {
-        messageContent = `
-            <div class="file-message">
-                <div class="file-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-                    </svg>
+    switch (message.type) {
+        case 'File':
+            messageContent = `
+                <div class="file-message">
+                    <div class="file-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <p class="file-name">${message.media_name}</p>
+                    </div>
+                    <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                        </svg>
+                    </a>
                 </div>
-                <div class="file-details">
-                    <p class="file-name">${message.media_name}</p>
-                </div>
-                <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-                    </svg>
-                </a>
-            </div>
-        `;
-    } else if (message.type === 'Image') {
-        messageContent = `<img src="${message.message ?? message.msg}" style="height:222px; width:54px;">`;
-    } else if (message.type === 'Message' || message.type === null) {
-        messageContent = message.message ?? message.msg;
-    } else if (message.type === 'Audio') {
-        messageContent = `
-            <p>${message.media_name}</p>
-            <p>${message.message ?? message.msg}</p>
-        `;
+            `;
+            break;
+        case 'Image':
+            messageContent = `<img src="${message.message ?? message.msg}" style="height:222px; width:54px;">`;
+            break;
+        case 'Message':
+        case null:
+            messageContent = message.message ?? message.msg;
+            break;
+        case 'Audio':
+            messageContent = `
+                <p>${message.media_name}</p>
+                <p>${message.message ?? message.msg}</p>
+            `;
+            break;
+        default:
+            messageContent = '';
     }
 
     // Create the message element as a DOM element
@@ -591,67 +593,82 @@ let addNewMessageToArea = (message) => {
         </div>
     `;
 
-    return messageElement; // Return the DOM element
+    return messageElement;
 };
 
-const fetchNextPageMessages = async () => {
-   // alert('Fetching next page of messages...'); // Alert when fetching messages starts
 
-    currentPage++;
+const fetchNextPageMessages = async (message_id = null, current_Page = null) => {
+    if (!message_id) {
+        currentPage++;
+    }
 
-    // Get the current scroll height before loading new messages
     const currentScrollHeight = DOM.messages.scrollHeight;
-   // alert(`Current scroll height: ${currentScrollHeight}`); // Alert the current scroll height
+    console.log(`Current scroll height: ${currentScrollHeight}`);
 
     try {
-        const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}`, {
+        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}&currentPage=${encodeURIComponent(current_Page)}` : ''}`;
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json'
             }
         });
-
         const nextPageMessages = await response.json();
-       // alert(`Messages fetched: ${nextPageMessages.data.length}`); // Alert how many messages were fetched
 
-        // If there are no more messages, stop fetching
-        if (nextPageMessages.data.length === 0) {
-            hasMoreMessages = false;
-           // alert('No more messages to load'); // Alert if there are no more messages
-            return;
+        const ids = nextPageMessages.data.map(item => item.id);
+
+        try {
+            const response = await fetch("message/seen-by/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken,
+                },
+                body: JSON.stringify({ ids }),
+            });
+
+            const readMessageResponse = await response.json();
+        } catch (error) {
+            console.error('Error updating seen messages:', error);
         }
 
-        // Append new messages to the end of the message list
+        if (nextPageMessages.data.length === 0) {
+            hasMoreMessages = false;
+            console.log('No more messages to load');
+            return;
+        }
+        console.log("nextPageMessages", nextPageMessages);
+
         nextPageMessages.data.forEach((msg) => {
             const newMessage = addNewMessageToArea(msg);
-            // Append the new message at the end of the message list
-            DOM.messages.appendChild(newMessage);
+            DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
+
+            if (msg.id === message_id) {
+
+                const messageElement = DOM.messages.querySelector(`[data-message-id="${msg.id}"]`);
+                if (messageElement) {
+                    setTimeout(() => {
+                        messageElement.scrollIntoView({ behavior: "smooth" });
+                    }, 100);
+                    const searchQuery = searchMessageInputFeild.value.toLowerCase();
+                    const messageTextElement = messageElement.querySelector(".shadow-sm");
+                    const messageText = messageTextElement.textContent.toLowerCase();
+                    const index = messageText.indexOf(searchQuery);
+                    if (index !== -1) {
+                        const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                        messageTextElement.innerHTML = highlightedText;
+                    }
+                }
+            }
         });
 
-       // alert('New messages added to the bottom'); // Alert when new messages are added
-
-        // Adjust scroll position to maintain the user's view
         const newScrollHeight = DOM.messages.scrollHeight;
-      //  alert(`New scroll height: ${newScrollHeight}`); // Alert the new scroll height after adding messages
+        console.log(`New scroll height: ${newScrollHeight}`);
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
-
     } catch (error) {
-        alert('Error fetching messages'); // Alert if there is an error fetching messages
         console.error('Error fetching messages:', error);
     }
 };
-
-
-
-  
-
-  
-
-
-
-
-
-
 
 let generateMessageArea = async (elem, chatIndex) => {
 
@@ -704,6 +721,9 @@ let generateMessageArea = async (elem, chatIndex) => {
     });
     pagnicateChatList = await response.json();
 
+    var responce_count = pagnicateChatList.data.length;
+
+
     const ids = pagnicateChatList.data.map(item => item.id);
 
     try {
@@ -722,27 +742,27 @@ let generateMessageArea = async (elem, chatIndex) => {
     }
     var g_id = DOM.groupId; // Assume this contains the class name, e.g., "IMPZvumLHDgHjS10"
 
-    // Prefix g_id with a dot to create a valid class selector
-    const element = document.querySelector(`.${g_id}`); 
-    
+
+    const element = document.querySelector(`.${g_id}`);
+
     if (element) {
         const unreadCount = parseInt(element.innerText, 10);
-        
-        if (unreadCount > 0 && unreadCount <= 20) {
+
+        if (unreadCount > 0 && unreadCount <= responce_count) {
             document.getElementById("unread-count").innerText = 0; // Reset the text to 0
             element.style.display = 'none'; // Hides the element
-            alert(unreadCount);
+            //alert(unreadCount);
             console.log(unreadCount); // This will log the number
-        } else if (unreadCount > 20) { // No need to check unreadCount > 0 again
-            var valuetoset = unreadCount - 20;
+        } else if (unreadCount > responce_count) { // No need to check unreadCount > 0 again
+            var valuetoset = unreadCount - responce_count;
             document.getElementById("unread-count").innerText = valuetoset; // Set the new value
         }
     } else {
         console.log("Element not found");
     }
-    
-    
-    
+
+
+
     // var setcount = 0;
     // document.getElementById("unread-count").value = setcount;
 
@@ -1357,7 +1377,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
 
                             // Add event listener to each result item
                             resultItemDiv.addEventListener("click", function () {
-                                const messageId = message.id;
+                                let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 if (messageElement) {
                                     const messageTextElement = messageElement.querySelector(".shadow-sm");
@@ -1368,6 +1388,11 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                         messageTextElement.innerHTML = highlightedText;
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
+                                } else {
+
+                                    // fetchNextPageMessages(messageId);
+                                    fetchNextPageMessages(messageId, currentPage);
+
                                 }
                             });
                         });
@@ -1376,6 +1401,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                         console.error('Error:', error);
                     });
             } catch (error) {
+
                 console.log(error);
             }
         }, 500)
