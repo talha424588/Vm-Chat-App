@@ -95,7 +95,8 @@ let populateGroupList = async () => {
             chat.name = group.name;
             chat.unread = 0;
 
-            if (group.group_messages && group.group_messages.length > 0) {
+            if (group.group_messages && group.group_messages.length > 0) 
+            {
                 group.group_messages.reverse().forEach(msg => {
                     chat.msg = msg;
                     chat.time = new Date(msg.time * 1000);
@@ -393,10 +394,12 @@ let addMessageToMessageArea = (message) => {
                                 </span> |
                                 <span>
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
-                                </span> |
-                                <span>
+                                </span>
+                                ${message.sender === user.unique_id ? `
+                                | <span>
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                 </span>
+                                 ` : ''}
                             </div>
                                       <!-- Dropdown menu for actions -->
       ${message.sender === user.unique_id ? `
