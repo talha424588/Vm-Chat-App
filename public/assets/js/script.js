@@ -27,6 +27,7 @@ const DOM = {
     groupId: null,
     activeChatIndex: null,
     unique_id: document.getElementById("login_user_unique_id").value,
+    replyId: null,
 };
 let user = {
 
@@ -95,8 +96,7 @@ let populateGroupList = async () => {
             chat.name = group.name;
             chat.unread = 0;
 
-            if (group.group_messages && group.group_messages.length > 0) 
-            {
+            if (group.group_messages && group.group_messages.length > 0) {
                 group.group_messages.reverse().forEach(msg => {
                     chat.msg = msg;
                     chat.time = new Date(msg.time * 1000);
@@ -127,16 +127,16 @@ let viewChatList = () => {
 
     DOM.chatList.innerHTML = "";
     chatList.sort((a, b) => {
-            if (a.time && b.time) {
-                return mDate(b.time).subtract(a.time);
-            } else if (a.time) {
-                return -1;
-            } else if (b.time) {
-                return 1;
-            } else {
-                return 0;
-            }
-        })
+        if (a.time && b.time) {
+            return mDate(b.time).subtract(a.time);
+        } else if (a.time) {
+            return -1;
+        } else if (b.time) {
+            return 1;
+        } else {
+            return 0;
+        }
+    })
         .forEach((elem, index) => {
             let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
@@ -172,17 +172,17 @@ let viewChatList = () => {
                ${elem.unread > 0 ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>` : ""}
     </div>
             </div>`;
-            DOM.chatList2.innerHTML += `
+                DOM.chatList2.innerHTML += `
             <div style="width:95%; margin-left:10px;" class="d-flex flex-row  p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
                 <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
                 <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                 <div class="w-50">
                     <div class="name list-user-name">${elem.group.name}</div>
-                   
+
                 </div>
             </div>`;
-        
-          
+
+
             }
         });
 };
@@ -192,7 +192,7 @@ let generateChatList = async () => {
     viewChatList();
 };
 
-console.log('Chat List is here'+chatList);
+console.log('Chat List is here' + chatList);
 
 let addDateToMessageArea = (date) => {
     DOM.messages.innerHTML += `
@@ -368,10 +368,10 @@ let addMessageToMessageArea = (message) => {
         messageContent = message.message ?? message.msg;
     }
     else if (message.type === 'Audio') {
-        const audioSrc = message.msg; 
-        
+        const audioSrc = message.msg;
+
         messageContent = `
-     
+
 <div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
             <div class="avatar">
                 <!-- Avatar image here -->
@@ -394,7 +394,7 @@ let addMessageToMessageArea = (message) => {
     `;
     }
 
-    
+
     // Append the message content to the message area
     DOM.messages.innerHTML += `
         <div class="ml-3">
@@ -415,11 +415,11 @@ let addMessageToMessageArea = (message) => {
                                 <span>
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
                                 </span>
-                              
+
                                <!--- | <span>
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                 </span> ---->
-                             
+
                             </div>
                                       <!-- Dropdown menu for actions -->
       ${message.sender === user.unique_id ? `
@@ -473,7 +473,7 @@ function moveMessage(messageId) {
         if (parentDiv) {
             parentDiv.classList.toggle('selected-message');
         } else {
-           // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
+            // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
         }
 
         // Hide the input area
@@ -488,8 +488,8 @@ function moveMessage(messageId) {
         // Update the value of the hidden input field with selected message IDs
         document.getElementById('messages_ids').value = selectedMessageIds.join(',');
 
-       // console.log(`Message with ID: ${messageId} has been highlighted/unhighlighted.`);
-       // console.log(`Selected messages: ${selectedMessageIds.join(', ')}`);
+        // console.log(`Message with ID: ${messageId} has been highlighted/unhighlighted.`);
+        // console.log(`Selected messages: ${selectedMessageIds.join(', ')}`);
     } else {
         console.error(`Message with ID: ${messageId} not found.`);
     }
@@ -526,25 +526,25 @@ document.getElementById("openModalTrigger").addEventListener("click", function (
 });
 
 
-function selectUsertosend(username,postgroup_id) {
+function selectUsertosend(username, postgroup_id) {
 
     // Update the username in the bottom section
     document.getElementById('selected-username').textContent = username;
-    document.getElementById('group_to_move_message').value =postgroup_id;
+    document.getElementById('group_to_move_message').value = postgroup_id;
     // Show the bottom section when a user is selected with display: flex !important
     document.getElementById('selected-usertosend').style.setProperty('display', 'flex', 'important');
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     // Listen for click event on the SVG
-    $('#MoveMessagetoGroup').on('click', function() {
+    $('#MoveMessagetoGroup').on('click', function () {
         // Collect values from hidden inputs
         var messagesIds = $('#messages_ids').val();
         var groupToMove = $('#group_to_move_message').val();
 
-   alert(messagesIds);
-   
-   alert(groupToMove);
+        alert(messagesIds);
+
+        alert(groupToMove);
     });
 });
 
@@ -829,7 +829,7 @@ let generateMessageArea = async (elem, chatIndex) => {
             document.getElementById("unread-count").innerText = 0; // Reset the text to 0
             element.style.display = 'none'; // Hides the element
             //alert(unreadCount);
-           // console.log(unreadCount); // This will log the number
+            // console.log(unreadCount); // This will log the number
         } else if (unreadCount > responce_count) { // No need to check unreadCount > 0 again
             var valuetoset = unreadCount - responce_count;
             document.getElementById("unread-count").innerText = valuetoset; // Set the new value
@@ -853,7 +853,7 @@ let generateMessageArea = async (elem, chatIndex) => {
         .forEach((msg) => addMessageToMessageArea(msg));
 
 
-        get_voice_list();
+    get_voice_list();
 };
 
 let showChatList = () => {
@@ -865,6 +865,7 @@ let showChatList = () => {
 };
 
 let sendMessage = (type = 'Message', mediaName = null) => {
+    console.log("DOM.replyId",DOM.replyId);
     var loginUser = {
         id: document.getElementById("login_user_id").value,
         name: document.getElementById("login_user_name").value,
@@ -874,14 +875,14 @@ let sendMessage = (type = 'Message', mediaName = null) => {
     const fileIcon = document.querySelector('#file-icon');
     const chaticon = document.querySelector('#captureid');
     fileIcon.style.visibility = 'visible';
-    chaticon.style.visibility = 'visible'; 
+    chaticon.style.visibility = 'visible';
     let value = DOM.messageInput.value;
     if (value === "") return;
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     let msg = {
         user: loginUser,
         message: value,
-        reply_id: '',
+        reply_id: DOM.replyId ?? "",
         group_id: DOM.groupId,
         type: type,
         mediaName: mediaName,
@@ -890,6 +891,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
     };
     socket.emit('sendChatToServer', msg);
     DOM.messageInput.value = "";
+    DOM.replyId = null;
 };
 
 
@@ -1474,8 +1476,8 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                         messageTextElement.innerHTML = highlightedText;
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
-                                }else{
-                                    fetchNextPageMessages(messageId,currentPage);
+                                } else {
+                                    fetchNextPageMessages(messageId, currentPage);
                                 }
                             });
                         });
@@ -1516,9 +1518,9 @@ let currentlyPlayingAudio = null; // Variable to hold the currently playing audi
 
 function get_voice_list() {
     const audioMessages = document.querySelectorAll('.chat_list_messages .audio-message');
-    
-   // console.log(audioMessages); // Debugging - Check if audio messages are selected
-    
+
+    // console.log(audioMessages); // Debugging - Check if audio messages are selected
+
     audioMessages.forEach((message) => {
         const playButton = message.querySelector('.play-button');
         const progressBarContainer = message.querySelector('.audio-progress');
@@ -1526,12 +1528,12 @@ function get_voice_list() {
         const audioDuration = message.querySelector('.audio-duration');
         const audioSrc = message.getAttribute('data-audio-src');
         const audioPlayer = new Audio(audioSrc);
-        
+
         // Debugging - Check if the audio source is valid
         //console.log('Audio Source:', audioSrc);
-        
+
         // Play/Pause functionality
-        playButton.addEventListener('click', function() {
+        playButton.addEventListener('click', function () {
             if (audioPlayer.paused) {
                 // If another audio is currently playing, pause it
                 if (currentlyPlayingAudio && currentlyPlayingAudio !== audioPlayer) {
@@ -1555,7 +1557,7 @@ function get_voice_list() {
         });
 
         // Update the progress bar as the audio plays
-        audioPlayer.addEventListener('timeupdate', function() {
+        audioPlayer.addEventListener('timeupdate', function () {
             if (audioPlayer.duration) {
                 const progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
                 progressFilled.style.width = `${progressPercent}%`;
@@ -1564,7 +1566,7 @@ function get_voice_list() {
         });
 
         // Reset to default state when the audio ends
-        audioPlayer.addEventListener('ended', function() {
+        audioPlayer.addEventListener('ended', function () {
             playButton.innerHTML = '<img src="/images/Play-icon.jpg" alt="Play" />'; // Reset to play icon
             progressFilled.style.width = '0%'; // Reset the progress bar
             audioDuration.textContent = '0:00'; // Reset the timer display
@@ -1579,22 +1581,51 @@ function get_voice_list() {
         }
 
         // Set audio time when clicking the progress bar
-progressBarContainer.addEventListener('click', (event) => {
-    const progressBarWidth = progressBarContainer.offsetWidth;
-    const clickX = event.offsetX;
+        progressBarContainer.addEventListener('click', (event) => {
+            const progressBarWidth = progressBarContainer.offsetWidth;
+            const clickX = event.offsetX;
 
-    // Ensure audioPlayer.duration is a finite number before calculating newTime
-    if (audioPlayer.duration && audioPlayer.duration > 0) {
-        const newTime = (clickX / progressBarWidth) * audioPlayer.duration;
-        audioPlayer.currentTime = Math.min(Math.max(newTime, 0), audioPlayer.duration); // Ensure newTime is within valid range
-    } else {
-        console.warn('Audio duration is not available or invalid:', audioPlayer.duration);
-    }
-});
+            // Ensure audioPlayer.duration is a finite number before calculating newTime
+            if (audioPlayer.duration && audioPlayer.duration > 0) {
+                const newTime = (clickX / progressBarWidth) * audioPlayer.duration;
+                audioPlayer.currentTime = Math.min(Math.max(newTime, 0), audioPlayer.duration); // Ensure newTime is within valid range
+            } else {
+                console.warn('Audio duration is not available or invalid:', audioPlayer.duration);
+            }
+        });
 
 
         // Debugging - Check audio player status
         audioPlayer.addEventListener('play', () => console.log('Playing audio:', audioSrc));
         audioPlayer.addEventListener('pause', () => console.log('Paused audio:', audioSrc));
     });
+}
+
+
+async function showReply() {
+    const element = document.getElementById('reply-link');
+    DOM.replyId = element.getAttribute('data-message-id');
+    console.log(DOM.replyId);
+    try {
+        console.log("show reply");
+        const result = await fetch(`message/detail/${DOM.replyId}`);
+        if (!result.ok) {
+            throw new Error(`HTTP error! status: ${result.status}`);
+        }
+        const data = await result.json();
+        const quotedMessageDiv = document.getElementById('quoted-message');
+        const senderNameSpan = quotedMessageDiv.querySelector('.sender-name');
+        const quotedTextP = quotedMessageDiv.querySelector('.quoted-text');
+
+        senderNameSpan.textContent = data.message.user.name;
+        quotedTextP.textContent = data.message.msg;
+
+        const replyDiv = document.getElementById('reply-div');
+        replyDiv.style.display = 'block';
+
+        const iconContainer = document.querySelector('.icon-container');
+        iconContainer.style.bottom = '145px';
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
