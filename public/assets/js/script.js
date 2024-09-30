@@ -223,8 +223,7 @@ function makeformatDate(dateString) {
     }
 }
 
-//     window.Echo.channel('vmChat').listen('.Chat', (message) => {
-// Client-side code
+
 socket.on('deleteMessage', (messageId) => {
     var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
     if (messageElement) {
@@ -637,7 +636,6 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
             console.log('No more messages to load');
             return;
         }
-        console.log("nextPageMessages", nextPageMessages);
 
         nextPageMessages.data.forEach((msg) => {
             const newMessage = addNewMessageToArea(msg);
