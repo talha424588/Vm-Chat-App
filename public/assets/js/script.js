@@ -369,12 +369,33 @@ let addMessageToMessageArea = (message) => {
         messageContent = message.message ?? message.msg;
     }
     else if (message.type === 'Audio') {
+        const audioSrc = message.msg; 
+        
         messageContent = `
-        <p>${message.media_name}</p>
-            <p>${message.message ?? message.msg}</p>
-        `;
+     
+<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+            <div class="avatar">
+                <!-- Avatar image here -->
+            </div>
+            <div class="audio-content">
+                <div class="audio-controls">
+                    <button class="play-button">
+                        <img src="{{url('/img/play-icon.svg')}}" alt="Play" />
+                    </button>
+                    <div class="audio-progress">
+                        <div class="progress-filled"></div>
+                    </div>
+                </div>
+                <div class="audio-time-container">
+                    <span class="audio-duration">0:00</span>
+                    <span class="audio-time">12:27 PM</span>
+                </div>
+            </div>
+        </div>
+    `;
     }
 
+    
     // Append the message content to the message area
     DOM.messages.innerHTML += `
         <div class="ml-3">
@@ -395,11 +416,11 @@ let addMessageToMessageArea = (message) => {
                                 <span>
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
                                 </span>
-                                ${message.sender === user.unique_id ? `
-                                | <span>
+                              
+                               <!--- | <span>
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                                </span>
-                                 ` : ''}
+                                </span> ---->
+                             
                             </div>
                                       <!-- Dropdown menu for actions -->
       ${message.sender === user.unique_id ? `
@@ -409,7 +430,7 @@ let addMessageToMessageArea = (message) => {
           </a>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <a class="dropdown-item" href="#" onclick="editMessage(${message.id})">Edit</a>
-            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal">Delete</a>
+            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
           </div>
         </div>
@@ -628,10 +649,10 @@ let addNewMessageToArea = (message) => {
                             </span> |
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
-                            </span> |
+                            </span> <!---|
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                            </span>
+                            </span>--->
                         </div>
                         ${message.sender === user.unique_id ? `
                         <div class="dropdown" style="position: absolute; top: 5px; right: 5px;">
@@ -640,7 +661,7 @@ let addNewMessageToArea = (message) => {
                             </a>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" href="#" onclick="editMessage(${message.id})">Edit</a>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal">Delete</a>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                 <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                             </div>
                         </div>` : ''}
@@ -657,8 +678,8 @@ let addNewMessageToArea = (message) => {
 
 const fetchNextPageMessages = async (message_id=null,current_display=null) => {
     //console.log('Fetching next page of messages...'); // Log fetching messages
-alert('this is the messageid'+message_id);
-alert('Current Limit Display'+current_display);
+// alert('this is the messageid'+message_id);
+// alert('Current Limit Display'+current_display);
 
     currentPage++;
 
@@ -822,6 +843,9 @@ let generateMessageArea = async (elem, chatIndex) => {
     lastDate = "";
     pagnicateChatList.data.reverse()
         .forEach((msg) => addMessageToMessageArea(msg));
+
+
+        get_voice_list();
 };
 
 let showChatList = () => {
@@ -839,6 +863,10 @@ let sendMessage = (type = 'Message', mediaName = null) => {
         unique_id: document.getElementById("login_user_unique_id").value,
         email: document.getElementById("login_user_email").value
     }
+    const fileIcon = document.querySelector('#file-icon');
+    const chaticon = document.querySelector('#captureid');
+    fileIcon.style.visibility = 'visible';
+    chaticon.style.visibility = 'visible'; 
     let value = DOM.messageInput.value;
     if (value === "") return;
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -896,6 +924,18 @@ let init = () => {
     console.log("Click the Image at top-left to open settings.");
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
 init();
 
 const voiceIcon = document.getElementById('voice-icon');
@@ -911,6 +951,9 @@ let mediaRecorder;
 let chunks = [];
 
 const startRecording = () => {
+    // Reset chunks for a new recording
+    chunks = [];
+
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
             mediaRecorder = new MediaRecorder(stream);
@@ -920,8 +963,7 @@ const startRecording = () => {
 
             voiceSvg.innerHTML = `
 				<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-<path d="M11.6667 9C11.2246 9 10.8007 9.18061 10.4882 9.5021C10.1756 9.82359 10 10.2596 10 10.7143V19.2857C10 19.7404 10.1756 20.1764 10.4882 20.4979C10.8007 20.8194 11.2246 21 11.6667 21C12.1087 21 12.5326 20.8194 12.8452 20.4979C13.1577 20.1764 13.3333 19.7404 13.3333 19.2857V10.7143C13.3333 10.2596 13.1577 9.82359 12.8452 9.5021C12.5326 9.18061 12.1087 9 11.6667 9ZM18.3333 9C17.8913 9 17.4674 9.18061 17.1548 9.5021C16.8423 9.82359 16.6667 10.2596 16.6667 10.7143V19.2857C16.6667 19.7404 16.8423 20.1764 17.1548 20.4979C17.4674 20.8194 17.8913 21 18.3333 21C18.7754 21 19.1993 20.8194 19.5118 20.4979C19.8244 20.1764 20 19.7404 20 19.2857V10.7143C20 10.2596 19.8244 9.82359 19.5118 9.5021C19.1993 9.18061 18.7754 9 18.3333 9Z" fill="white"/>
-
+				<path d="M11.6667 9C11.2246 9 10.8007 9.18061 10.4882 9.5021C10.1756 9.82359 10 10.2596 10 10.7143V19.2857C10 19.7404 10.1756 20.1764 10.4882 20.4979C10.8007 20.8194 11.2246 21 11.6667 21C12.1087 21 12.5326 20.8194 12.8452 20.4979C13.1577 20.1764 13.3333 19.7404 13.3333 19.2857V10.7143C13.3333 10.2596 13.1577 9.82359 12.8452 9.5021C12.5326 9.18061 12.1087 9 11.6667 9ZM18.3333 9C17.8913 9 17.4674 9.18061 17.1548 9.5021C16.8423 9.82359 16.6667 10.2596 16.6667 10.7143V19.2857C16.6667 19.7404 16.8423 20.1764 17.1548 20.4979C17.4674 20.8194 17.8913 21 18.3333 21C18.7754 21 19.1993 20.8194 19.5118 20.4979C19.8244 20.1764 20 19.7404 20 19.2857V10.7143C20 10.2596 19.8244 9.82359 19.5118 9.5021C19.1993 9.18061 18.7754 9 18.3333 9Z" fill="white"/>
 			`;
 
             mediaRecorder.ondataavailable = event => {
@@ -933,8 +975,6 @@ const startRecording = () => {
                 const audioUrl = URL.createObjectURL(blob);
                 const audio = new Audio(audioUrl);
                 audio.play();
-
-                // Create a download link for the recorded audio
 
                 const ref = firebase.storage().ref("audio/" + DOM.unique_id);
                 const mediaName = "recording.wav";
@@ -951,15 +991,7 @@ const startRecording = () => {
                     })
                     .catch(error => console.error(error));
 
-
-                // const downloadLink = document.createElement('a');
-                // downloadLink.href = audioUrl;
-                // downloadLink.download = 'recording.wav';
-                // document.body.appendChild(downloadLink);
-                // downloadLink.click();
-                // document.body.removeChild(downloadLink);
-
-                chunks = [];
+                // Reset UI states
                 chatInputContainer.classList.remove('recording-active');
                 voiceIcon.classList.remove('recording');
 
@@ -968,42 +1000,40 @@ const startRecording = () => {
 					<path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
 				`;
             };
-
-            stream.oninactive = () => {
-                mediaRecorder.stop();
-            };
         })
         .catch(error => {
             console.error('Error accessing media devices.', error);
             chatInputContainer.classList.remove('recording-active');
             voiceIcon.classList.remove('recording');
-
             voiceSvg.innerHTML = `
 				<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
 				<path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
-				`;
+			`;
         });
 };
 
-voiceIcon.addEventListener('mousedown', () => {
-    startRecording();
-});
 
-voiceIcon.addEventListener('mouseup', () => {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
+voiceIcon.addEventListener('click', () => {
+    if (!mediaRecorder || mediaRecorder.state !== 'recording') {
+        startRecording();
+    } else {
         mediaRecorder.stop();
     }
 });
 
-voiceIcon.addEventListener('touchstart', () => {
-    startRecording();
-});
 
-voiceIcon.addEventListener('touchend', () => {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-    }
-});
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 fileIcon.addEventListener('click', () => {
@@ -1470,5 +1500,94 @@ function removeHighlight() {
     const messageElements = DOM.messages.querySelectorAll(".shadow-sm");
     messageElements.forEach((element) => {
         element.innerHTML = element.textContent;
+    });
+}
+
+
+
+let currentlyPlayingAudio = null; // Variable to hold the currently playing audio player
+
+function get_voice_list() {
+    const audioMessages = document.querySelectorAll('.chat_list_messages .audio-message');
+    
+   // console.log(audioMessages); // Debugging - Check if audio messages are selected
+    
+    audioMessages.forEach((message) => {
+        const playButton = message.querySelector('.play-button');
+        const progressBarContainer = message.querySelector('.audio-progress');
+        const progressFilled = message.querySelector('.progress-filled');
+        const audioDuration = message.querySelector('.audio-duration');
+        const audioSrc = message.getAttribute('data-audio-src');
+        const audioPlayer = new Audio(audioSrc);
+        
+        // Debugging - Check if the audio source is valid
+        //console.log('Audio Source:', audioSrc);
+        
+        // Play/Pause functionality
+        playButton.addEventListener('click', function() {
+            if (audioPlayer.paused) {
+                // If another audio is currently playing, pause it
+                if (currentlyPlayingAudio && currentlyPlayingAudio !== audioPlayer) {
+                    currentlyPlayingAudio.pause();
+                    currentlyPlayingAudio.currentTime = 0; // Reset the currently playing audio
+                    const currentlyPlayingButton = document.querySelector('.play-button img[src*="Pause-icon.jpg"]');
+                    if (currentlyPlayingButton) {
+                        currentlyPlayingButton.src = '/images/Play-icon.jpg'; // Change back to play icon
+                    }
+                }
+
+                // Play the selected audio
+                audioPlayer.play();
+                playButton.innerHTML = '<img src="/images/Pause-icon.jpg" alt="Pause" />'; // Change to pause icon
+                currentlyPlayingAudio = audioPlayer; // Update currently playing audio
+            } else {
+                audioPlayer.pause();
+                playButton.innerHTML = '<img src="/images/Play-icon.jpg" alt="Play" />'; // Change to play icon
+                currentlyPlayingAudio = null; // Clear currently playing audio
+            }
+        });
+
+        // Update the progress bar as the audio plays
+        audioPlayer.addEventListener('timeupdate', function() {
+            if (audioPlayer.duration) {
+                const progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                progressFilled.style.width = `${progressPercent}%`;
+                audioDuration.textContent = formatTime(audioPlayer.currentTime);
+            }
+        });
+
+        // Reset to default state when the audio ends
+        audioPlayer.addEventListener('ended', function() {
+            playButton.innerHTML = '<img src="/images/Play-icon.jpg" alt="Play" />'; // Reset to play icon
+            progressFilled.style.width = '0%'; // Reset the progress bar
+            audioDuration.textContent = '0:00'; // Reset the timer display
+            currentlyPlayingAudio = null; // Clear currently playing audio
+        });
+
+        // Format time function (mm:ss)
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Set audio time when clicking the progress bar
+progressBarContainer.addEventListener('click', (event) => {
+    const progressBarWidth = progressBarContainer.offsetWidth;
+    const clickX = event.offsetX;
+
+    // Ensure audioPlayer.duration is a finite number before calculating newTime
+    if (audioPlayer.duration && audioPlayer.duration > 0) {
+        const newTime = (clickX / progressBarWidth) * audioPlayer.duration;
+        audioPlayer.currentTime = Math.min(Math.max(newTime, 0), audioPlayer.duration); // Ensure newTime is within valid range
+    } else {
+        console.warn('Audio duration is not available or invalid:', audioPlayer.duration);
+    }
+});
+
+
+        // Debugging - Check audio player status
+        audioPlayer.addEventListener('play', () => console.log('Playing audio:', audioSrc));
+        audioPlayer.addEventListener('pause', () => console.log('Paused audio:', audioSrc));
     });
 }
