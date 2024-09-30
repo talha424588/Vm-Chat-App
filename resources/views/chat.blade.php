@@ -16,6 +16,83 @@
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
     <style>
+     
+
+       
+
+       .audio-message {
+    display: flex;
+    align-items: center;
+    width: 285px;
+}
+
+        .avatar {
+            margin-right: 10px;
+        }
+
+        .avatar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .audio-content {
+            flex: 1;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .play-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .audio-progress {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            height: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-filled {
+            height: 5px;
+            background-color: #34b7f1;
+            border-radius: 10px;
+            width: 0%;
+        }
+
+        .audio-duration {
+            font-size: 12px;
+            color: #555;
+            text-align: left;
+            margin-top: 5px;
+        }
+
+        .audio-time {
+            font-size: 12px;
+            color: #888;
+            text-align: right;
+        }
+
+        .audio-time-container {
+            display: flex;
+            justify-content: space-between;
+           
+			margin-left: 30px;
+        }
+
+    </style>
+   
+   
+   <style>
         .selected-message {
         background-color: #E8E9EA; / Change background color /
        padding:2px;
@@ -106,6 +183,9 @@ font-size: 14px;
 </head>
 
 <body>
+
+
+
     <div class="container-fluid" id="main-container">
         <div class="row h-100">
             <div class="col-12 col-sm-5 col-md-4 d-flex flex-column" id="chat-list-area" style="position:relative;">
@@ -211,7 +291,7 @@ font-size: 14px;
                     </div>
                 </div>
 
-                <div class="d-flex flex-column" id="messages"></div>
+                <div class="d-flex flex-column chat_list_messages" id="messages"></div>
 
 
 <!-- New Code To Move Message -->
@@ -242,7 +322,8 @@ font-size: 14px;
                     <span style="font-weight: bold; display: block; margin-bottom: 5px;">Recent Chat</span>
 
                     <!-- Chat list items -->
-                    <div class="d-flex flex-row w-100 p-2 border-bottom unread align-items-center">
+                    <div class="row" id="chat-list2" style="overflow:auto;"></div>
+                    <!-- <div class="d-flex flex-row w-100 p-2 border-bottom unread align-items-center">
                         <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('Programmers')">
                         <img src="images/0923102932_aPRkoW.jpg" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
@@ -258,21 +339,29 @@ font-size: 14px;
                             <div class="name list-user-name">Developers</div>
                             <div class="small last-message">message or status is here </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
             <!-- Bottom section for selected user display -->
             <div id="selected-usertosend" class="selected-user d-flex align-items-center justify-content-between" style="padding: 10px; background-color: #F0F2F5; border-top: 1px solid #ddd; display: none;">
                 <span id="selected-username" class="selected-username"></span>
-                <svg width="31" height="31" id="openModalTrigger" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"></circle>
-                    <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white"></path>
-                </svg>
+              <!-- Hidden inputs to store message IDs and group ID -->
+<input type="hidden" name="messages_ids" id="messages_ids">
+<input type="hidden" name="group_to_move_message" id="group_to_move_message">
+
+<!-- SVG element that triggers the post action -->
+<svg width="31" height="31" id="MoveMessagetoGroup" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"></circle>
+    <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white"></path>
+</svg>
             </div>
         </div>
     </div>
 </div>
+
+
+
 
 <!---new code is above that line --->
 
@@ -301,10 +390,16 @@ font-size: 14px;
                                     fill="#687780" />
                             </svg>
                         </i>
+<style>
+    .auto-resize-textarea{
+ overflow: hidden; 
+}
+</style>
+                       
+                            <textarea id="input" class="chat-input auto-resize-textarea" rows="1" cols="62"  placeholder="Type a message"></textarea>
 
-                        <input type="text" name="message" id="input" class="chat-input"
-                            placeholder="Type a message">
 
+      
                         <div class="chat-action-icons">
                             <i id="file-icon" class="chat-icon" style="padding-left: 3px; ">
                                 <svg width="23" height="20" viewBox="0 0 23 20" fill="none"
@@ -321,6 +416,11 @@ font-size: 14px;
                                         fill="#687780" />
 
                                 </svg></i>
+
+       
+                             
+
+
 
                             <div id="camera-container">
                                 <video id="camera-stream" autoplay></video>
@@ -526,72 +626,69 @@ div#chat-list-unread {
 
 
 
-    <script type="module">
-        import {
-            Picker
-        } from 'https://esm.sh/emoji-picker-element@1.18.2';
+<script type="module">
+    import { Picker } from 'https://esm.sh/emoji-picker-element@1.18.2';
 
-        $(document).ready(function() {
-            const picker = new Picker({
-                locale: 'en'
-            });
-            const emojiPickerWrapper = document.getElementById('emoji-picker-wrapper');
-            emojiPickerWrapper.appendChild(picker);
-
-            const input = document.getElementById('input');
-            const emojiBtn = document.getElementById('sticker-icon');
-
-            let isPickerVisible = false;
-
-            emojiBtn.addEventListener('click', () => {
-                // Toggle the visibility of the emoji picker
-                isPickerVisible = !isPickerVisible;
-
-                if (isPickerVisible) {
-                    // Position the emoji picker at the bottom of the viewport
-                    emojiPickerWrapper.style.position =
-                        'fixed'; // Position it fixed relative to the viewport
-                    emojiPickerWrapper.style.top = 'auto'; // Reset the top position
-                    emojiPickerWrapper.style.bottom =
-                        '8%'; // Align the bottom of the picker with the bottom of the viewport
-                    emojiPickerWrapper.style.left = '34%'; // Adjust the left position if needed
-
-                    emojiPickerWrapper.style.display = 'block'; // Show the picker
-                } else {
-                    emojiPickerWrapper.style.display = 'none'; // Hide the picker
-                }
-            });
-
-            picker.addEventListener('emoji-click', event => {
-                const emoji = event.detail.emoji.unicode;
-                const inputField = input;
-
-                // Get the current cursor position
-                const start = inputField.selectionStart;
-                const end = inputField.selectionEnd;
-
-                // Insert emoji at cursor position
-                inputField.value = inputField.value.substring(0, start) + emoji + inputField.value
-                    .substring(end);
-
-                // Move the cursor to the end of the inserted emoji
-                inputField.selectionStart = inputField.selectionEnd = start + emoji.length;
-
-                inputField.focus(); // Refocus the input field
-
-                emojiPickerWrapper.style.display = 'none'; // Hide the picker after selection
-                isPickerVisible = false; // Update visibility state
-            });
-
-            // Optional: Hide the picker if clicking outside
-            $(document).click((event) => {
-                if (!emojiPickerWrapper.contains(event.target) && !emojiBtn.contains(event.target)) {
-                    emojiPickerWrapper.style.display = 'none';
-                    isPickerVisible = false; // Update visibility state
-                }
-            });
+    $(document).ready(function() {
+        const picker = new Picker({
+            locale: 'en'
         });
-    </script>
+        const emojiPickerWrapper = document.getElementById('emoji-picker-wrapper');
+        emojiPickerWrapper.appendChild(picker);
+
+        const input = document.getElementById('input');
+        const emojiBtn = document.getElementById('sticker-icon');
+
+        let isPickerVisible = false;
+
+        emojiBtn.addEventListener('click', () => {
+            // Toggle the visibility of the emoji picker
+            isPickerVisible = !isPickerVisible;
+
+            if (isPickerVisible) {
+                // Position the emoji picker at the bottom of the viewport
+                emojiPickerWrapper.style.position = 'fixed'; // Position it fixed relative to the viewport
+                emojiPickerWrapper.style.top = 'auto'; // Reset the top position
+                emojiPickerWrapper.style.bottom = '8%'; // Align the bottom of the picker with the bottom of the viewport
+                emojiPickerWrapper.style.left = '34%'; // Adjust the left position if needed
+
+                emojiPickerWrapper.style.display = 'block'; // Show the picker
+            } else {
+                emojiPickerWrapper.style.display = 'none'; // Hide the picker
+            }
+        });
+
+        picker.addEventListener('emoji-click', event => {
+            const emoji = event.detail.emoji.unicode;
+            const inputField = input;
+
+            // Get the current cursor position
+            const start = inputField.selectionStart;
+            const end = inputField.selectionEnd;
+
+            // Insert emoji at cursor position
+            inputField.value = inputField.value.substring(0, start) + emoji + inputField.value.substring(end);
+
+            // Move the cursor to the end of the inserted emoji
+            inputField.selectionStart = inputField.selectionEnd = start + emoji.length;
+
+            inputField.focus(); // Refocus the input field
+
+            // Removed the line that hides the picker
+            // emojiPickerWrapper.style.display = 'none'; // Hide the picker after selection
+            // isPickerVisible = false; // Update visibility state
+        });
+
+        // Optional: Hide the picker if clicking outside
+        $(document).click((event) => {
+            if (!emojiPickerWrapper.contains(event.target) && !emojiBtn.contains(event.target)) {
+                emojiPickerWrapper.style.display = 'none';
+                isPickerVisible = false; // Update visibility state
+            }
+        });
+    });
+</script>
+
     <!-- Your JavaScript -->
     <script>
         function showReply() {
@@ -614,7 +711,43 @@ div#chat-list-unread {
             iconContainer.style.bottom = '90px';
         }
     </script>
+   <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const textarea = document.querySelector('.chat-input');
+    const fileIcon = document.querySelector('#file-icon');
+    const chaticon = document.querySelector('#captureid');
+    // Function to update file icon visibility
+    function updateFileIconVisibility() {
+        if (textarea.value.trim() === "") {
+            fileIcon.style.visibility = 'visible'; // Show the file-icon when textarea is empty
+            chaticon.style.visibility = 'visible'; // Show the file-icon when textarea is empty
+        } else {
+            fileIcon.style.visibility = 'hidden'; // Hide the file-icon when textarea has text
+            chaticon.style.visibility = 'hidden'; // Hide the file-icon when textarea has text
+        }
+    }
 
+    // Event listener for input changes
+    textarea.addEventListener('input', function () {
+        // Auto-resize the textarea
+        textarea.style.height = 'auto'; // Reset the height
+        textarea.style.height = (textarea.scrollHeight) + 'px'; // Set it to the scroll height
+        
+        // Update file icon visibility
+        updateFileIconVisibility();
+    });
+
+    // Event listener for focus on textarea
+    textarea.addEventListener('focus', function () {
+        updateFileIconVisibility(); // Check visibility when focused
+    });
+
+    // Event listener for blur to check if empty
+    textarea.addEventListener('blur', function () {
+        updateFileIconVisibility(); // Ensure correct visibility when focus is lost
+    });
+});
+</script>
     <script src="{{ asset('assets/js/filesize-aleart.js') }}"></script>
     <script src="{{ asset('assets/js/sidemodel.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -638,6 +771,10 @@ div#chat-list-unread {
         var csrfToken = '{{ csrf_token() }}';
         var broadcastChatRoute = '{{ route('broadcast.chat') }}';
     </script>
+
+
+
+
 </body>
 
 </html>

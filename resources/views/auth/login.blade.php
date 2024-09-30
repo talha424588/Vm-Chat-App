@@ -3,8 +3,8 @@
     <section class="h-100">
 
 
-        <div class="container h-100">
-            <div class="row justify-content-md-center h-100">
+        <div class="container">
+            <div class="row justify-content-md-center">
                 <div class="card-wrapper">
                     <!-- <div class="brand">
                                             <img src="img/logo.jpg" alt="logo">
