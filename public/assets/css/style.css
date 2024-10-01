@@ -456,7 +456,6 @@ color: #666; /* adjust the color to your liking */
 
 	  .chat-icon {
 		  margin-right: 10px;
-
 		  color: #666;
 		  font-size: 24px;
 	  }
@@ -511,8 +510,13 @@ color: #666; /* adjust the color to your liking */
 	  }
 	  .chat-action-icons {
   margin-left: -80px;
-}
+       }
 
+
+	   .Editchat-action-icons {
+		margin-left: 6px;
+			 }
+	  
 
 
 

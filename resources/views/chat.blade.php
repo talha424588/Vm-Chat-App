@@ -178,10 +178,17 @@ font-size: 16px;
 color: #888;
 font-size: 14px;
 }
+.blur {
+    filter: blur(1px); 
+    transition: filter 0.3s ease; /* Optional: Smooth transition */
+}
 </style>
-
+<style>
+    .auto-resize-textarea{
+ overflow: hidden; 
+}
+</style>
 </head>
-
 <body>
 
 
@@ -363,6 +370,7 @@ font-size: 14px;
 
 
 
+
 <!---new code is above that line --->
 
                 <div id="emoji-picker-wrapper"></div>
@@ -380,6 +388,29 @@ font-size: 14px;
                         </div>
                     </div>
 
+
+      
+
+<!---Edit Message Area Start-->
+<div id="editMessageDiv" style="padding-right:30px; padding-left:30px; padding-top:10px;display:none;">
+
+<div class="">
+<div class="align-self-end self d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item right-nidle" >
+<div style="margin-top:-4px">
+    <div class="shadow-sm EditmessageContent" style="background:#dcf8c6; padding:10px; border-radius:5px;">
+        ${messageContent}
+    </div>
+  
+</div>
+</div>
+</div>
+</div>
+
+<!---Edit Message Area End--> 
+    
+	
+	
+	
                     <div class="chat-input-container  justify-self-end align-items-center flex-row" id="reply-area">
                         <i id="sticker-icon" class="chat-icon">
                             <!-- Default Sticker Icon -->
@@ -390,17 +421,20 @@ font-size: 14px;
                                     fill="#687780" />
                             </svg>
                         </i>
+
 <style>
     .auto-resize-textarea{
  overflow: hidden;
 }
 </style>
 
+
                             <textarea id="input" class="chat-input auto-resize-textarea" rows="1" cols="62"  placeholder="Type a message"></textarea>
 
 
 
-                        <div class="chat-action-icons">
+      
+                        <div class="chat-action-icons" id="chat_action">
                             <i id="file-icon" class="chat-icon" style="padding-left: 3px; ">
                                 <svg width="23" height="20" viewBox="0 0 23 20" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -416,29 +450,8 @@ font-size: 14px;
                                         fill="#687780" />
 
                                 </svg></i>
+					<i id="voice-icon" class="chat-icon" >
 
-
-
-
-
-
-                            <div id="camera-container">
-                                <video id="camera-stream" autoplay></video>
-                                <button id="switch-camera-btn">Switch Camera</button>
-                                <button id="capture-btn">Capture Photo</button>
-                                <button id="close-btn">Close</button>
-                                <canvas id="snapshot" style="display:none;"></canvas>
-                                <img id="photo" alt="Captured Image" />
-                                <div id="photo-options">
-                                    <button class="button" id="send-btn">Send</button>
-                                    <button class="button" id="retake-btn">Retake</button>
-                                </div>
-                            </div>
-
-                            <input type="file" id="hidden-file-input" name="photo" accept="image/*" />
-
-
-                            <i id="voice-icon" class="chat-icon">
                                 <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
                                     viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
@@ -447,9 +460,53 @@ font-size: 14px;
                                         fill="white" />
                                 </svg>
                             </i>
-                        </div>
-                    </div>
 
+
+                        
+                        </div>
+						
+						
+						<div class="chat-action-icons" id="Editreply-area">
+                            <i id="file-icon" class="chat-icon" style="padding-left: 3px; ">
+                                <svg width="23" height="20" viewBox="0 0 23 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                        d="M7 2C5.67392 2 4.40215 2.52678 3.46447 3.46447C2.52678 4.40215 2 5.67392 2 7V13C2 13.2652 1.89464 13.5196 1.70711 13.7071C1.51957 13.8946 1.26522 14 1 14C0.734784 14 0.48043 13.8946 0.292893 13.7071C0.105357 13.5196 0 13.2652 0 13V7C-1.36979e-08 6.08075 0.18106 5.1705 0.532843 4.32122C0.884626 3.47194 1.40024 2.70026 2.05025 2.05025C2.70026 1.40024 3.47194 0.884626 4.32122 0.532843C5.17049 0.18106 6.08075 0 7 0C7.91925 0 8.8295 0.18106 9.67878 0.532843C10.5281 0.884626 11.2997 1.40024 11.9497 2.05025C12.5998 2.70026 13.1154 3.47194 13.4672 4.32122C13.8189 5.1705 14 6.08075 14 7V15C14 16.3261 13.4732 17.5979 12.5355 18.5355C11.5979 19.4732 10.3261 20 9 20C7.67392 20 6.40215 19.4732 5.46447 18.5355C4.52678 17.5979 4 16.3261 4 15V7C4 6.20435 4.31607 5.44129 4.87868 4.87868C5.44129 4.31607 6.20435 4 7 4C7.79565 4 8.55871 4.31607 9.12132 4.87868C9.68393 5.44129 10 6.20435 10 7V15C10 15.2652 9.89464 15.5196 9.70711 15.7071C9.51957 15.8946 9.26522 16 9 16C8.73478 16 8.48043 15.8946 8.29289 15.7071C8.10536 15.5196 8 15.2652 8 15V7C8 6.73478 7.89464 6.48043 7.70711 6.29289C7.51957 6.10536 7.26522 6 7 6C6.73478 6 6.48043 6.10536 6.29289 6.29289C6.10536 6.48043 6 6.73478 6 7V15C6 15.7956 6.31607 16.5587 6.87868 17.1213C7.44129 17.6839 8.20435 18 9 18C9.79565 18 10.5587 17.6839 11.1213 17.1213C11.6839 16.5587 12 15.7956 12 15V7C12 5.67392 11.4732 4.40215 10.5355 3.46447C9.59785 2.52678 8.32608 2 7 2Z"
+                                        fill="#687780" />
+                                </svg>
+                            </i>
+                            <i class="chat-icon" id="captureid"><svg width="31" height="20"
+                                    viewBox="0 0 19 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M20 2.6087H16.987L15.5054 0.386957C15.4261 0.267991 15.3186 0.170438 15.1925 0.102941C15.0664 0.0354437 14.9256 8.58749e-05 14.7826 0H7.82609C7.68307 8.58749e-05 7.54229 0.0354437 7.41621 0.102941C7.29012 0.170438 7.18263 0.267991 7.10326 0.386957L5.62065 2.6087H2.6087C1.91683 2.6087 1.25329 2.88354 0.764069 3.37276C0.274844 3.86199 0 4.52552 0 5.21739V17.3913C0 18.0832 0.274844 18.7467 0.764069 19.2359C1.25329 19.7252 1.91683 20 2.6087 20H20C20.6919 20 21.3554 19.7252 21.8446 19.2359C22.3339 18.7467 22.6087 18.0832 22.6087 17.3913V5.21739C22.6087 4.52552 22.3339 3.86199 21.8446 3.37276C21.3554 2.88354 20.6919 2.6087 20 2.6087ZM20.8696 17.3913C20.8696 17.6219 20.778 17.8431 20.6149 18.0062C20.4518 18.1693 20.2306 18.2609 20 18.2609H2.6087C2.37807 18.2609 2.1569 18.1693 1.99382 18.0062C1.83075 17.8431 1.73913 17.6219 1.73913 17.3913V5.21739C1.73913 4.98677 1.83075 4.76559 1.99382 4.60252C2.1569 4.43944 2.37807 4.34783 2.6087 4.34783H6.08696C6.23015 4.34792 6.37116 4.31265 6.49745 4.24514C6.62373 4.17764 6.7314 4.07999 6.81087 3.96087L8.2913 1.73913H14.3163L15.7978 3.96087C15.8773 4.07999 15.985 4.17764 16.1112 4.24514C16.2375 4.31265 16.3785 4.34792 16.5217 4.34783H20C20.2306 4.34783 20.4518 4.43944 20.6149 4.60252C20.778 4.76559 20.8696 4.98677 20.8696 5.21739V17.3913ZM11.3043 6.08696C10.3584 6.08696 9.43377 6.36745 8.64727 6.89297C7.86078 7.41849 7.24778 8.16543 6.88579 9.03934C6.52381 9.91325 6.4291 10.8749 6.61364 11.8026C6.79817 12.7303 7.25367 13.5825 7.92253 14.2514C8.59139 14.9202 9.44357 15.3757 10.3713 15.5603C11.299 15.7448 12.2607 15.6501 13.1346 15.2881C14.0085 14.9261 14.7554 14.3131 15.2809 13.5266C15.8065 12.7401 16.087 11.8155 16.087 10.8696C16.0855 9.60158 15.5812 8.38594 14.6846 7.48934C13.788 6.59274 12.5723 6.08839 11.3043 6.08696ZM11.3043 13.913C10.7024 13.913 10.114 13.7345 9.61348 13.4001C9.11298 13.0657 8.72289 12.5904 8.49254 12.0343C8.26219 11.4781 8.20192 10.8662 8.31935 10.2758C8.43678 9.68543 8.72665 9.14314 9.15228 8.7175C9.57792 8.29186 10.1202 8.002 10.7106 7.88457C11.301 7.76713 11.9129 7.8274 12.469 8.05776C13.0252 8.28811 13.5005 8.6782 13.8349 9.1787C14.1693 9.6792 14.3478 10.2676 14.3478 10.8696C14.3478 11.6767 14.0272 12.4509 13.4564 13.0216C12.8857 13.5924 12.1115 13.913 11.3043 13.913Z"
+                                        fill="#687780" />
+
+                                </svg></i>
+				
+
+
+                            <i id="send-message-btn" class="chat-icon" >
+                              
+                            <svg width="31" height="30" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+<path d="M22.4355 8.33332L5.11261 12.4775C4.93818 12.5193 4.77916 12.6096 4.65403 12.7381C4.5289 12.8666 4.44279 13.028 4.40569 13.2035C4.3686 13.3789 4.38204 13.5613 4.44446 13.7295C4.50688 13.8976 4.61571 14.0446 4.75833 14.1534L8.52702 17.0255L15.9931 14.5851L11.9722 21.3327L13.9464 25.6403C14.0206 25.8039 14.1399 25.943 14.2903 26.0413C14.4407 26.1397 14.6159 26.1931 14.7956 26.1955C14.9753 26.1979 15.1519 26.149 15.3048 26.0547C15.4577 25.9603 15.5806 25.8244 15.6591 25.6628L23.5073 9.67331C23.5867 9.51179 23.6184 9.33102 23.5989 9.15212C23.5793 8.97323 23.5092 8.8036 23.3968 8.66306C23.2844 8.52252 23.1343 8.41689 22.9641 8.35849C22.7938 8.3001 22.6105 8.29137 22.4355 8.33332Z" fill="white"/>
+</svg>
+
+                            </i>
+                        </div>
+						 </div>
+						 
+						 
+						 
+						 
+						  
+						 
+						 
+						 
+						 
+						 
+                    <input type="hidden" class="number" id="edit_message_id">
+ <input type="file" id="hidden-file-input" name="photo" accept="image/*" />
                     <!-- Hidden file input for multiple files -->
                     <input type="file" id="file-input" multiple>
 
@@ -690,18 +747,6 @@ div#chat-list-unread {
 </script>
 
     <!-- Your JavaScript -->
-    <script>
-
-
-        function removeQuotedMessage() {
-            var replyDiv = document.getElementById('reply-div');
-            var iconContainer = document.querySelector('.icon-container');
-
-            // Display the reply div
-            replyDiv.style.display = 'none';
-            iconContainer.style.bottom = '90px';
-        }
-    </script>
    <script>
 document.addEventListener('DOMContentLoaded', function () {
     const textarea = document.querySelector('.chat-input');

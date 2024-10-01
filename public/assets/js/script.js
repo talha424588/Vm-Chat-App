@@ -399,6 +399,9 @@ let addMessageToMessageArea = (message) => {
     DOM.messages.innerHTML += `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
+
+
+            
             <div class="">
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                     <div style="margin-top:-4px">
@@ -413,7 +416,7 @@ let addMessageToMessageArea = (message) => {
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
                                 </span> |
                                 <span>
-                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
+                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
                                 </span>
 
                                <!--- | <span>
@@ -428,13 +431,15 @@ let addMessageToMessageArea = (message) => {
             <i class="fas fa-angle-down text-muted px-2"></i>
           </a>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="#" onclick="editMessage(${message.id})">Edit</a>
+        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
+
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+            <a class="dropdown-item" href="#" onclick="CorrectionMessage(${message.id})">Correction</a>
           </div>
         </div>
       ` : ''}
-                        </div>
+                       </div>
                     </div>
                 </div>
             </div>
@@ -443,9 +448,131 @@ let addMessageToMessageArea = (message) => {
 
     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
 };
+
+
+
+
+
+
+function editMessage(messageId, messageContent) {
+
+
+    // Set the display of #editMessageDiv to block
+    document.getElementById('editMessageDiv').style.display = 'block';
+
+    // Pass the messageId to the input field with the ID edit_message_id
+    const editMessageIdField = document.getElementById('edit_message_id');
+    if (editMessageIdField) {
+        editMessageIdField.value = messageId; // Set the value to the messageId
+    }
+
+    // Select elements with the class .EditmessageContent
+    const editMessageContents = document.querySelectorAll('.EditmessageContent');
+
+    // Populate the message content into each element with the class
+    editMessageContents.forEach(content => {
+        content.textContent = messageContent; // Use .textContent for safety
+    });
+
+    // Add the message content to the textarea
+    const textarea = document.getElementById('input');
+    textarea.value = (textarea.value ? '\n' : '') + messageContent; // Append with a newline if there's already text
+
+    // Optionally scroll to the bottom of the textarea if needed
+    textarea.scrollTop = textarea.scrollHeight;
+
+    // Add blur class to the #messages div
+    const messageDiv = document.getElementById('messages');
+    messageDiv.classList.add('blur');
+
+    // Hide the voice icon
+    const voiceIcon = document.getElementById('chat_action');
+ 
+    const Editreplyarea = document.getElementById('Editreply-area');
+    if (voiceIcon) {
+        voiceIcon.style.display = 'none'; // Set visibility to hidden
+        Editreplyarea.style.display = 'block'; 
+    }
+
+    
+}
+
+
+
+// Function to handle Edit send message button click
+function handleSendMessage() {
+    // Get the value from the hidden input field
+    const messageId = document.getElementById('edit_message_id').value;
+    // Get the value from the textarea
+    const messageContent = document.getElementById('input').value;
+    // Display the values in an alert
+    alert(`Message ID: ${messageId}\nMessage Content: ${messageContent}`);
+
+
+    document.getElementById('editMessageDiv').style.display = 'none';
+    const textarea = document.getElementById('input');
+    textarea.value =''; // Append with a newline if there's already text
+    const messageDiv = document.getElementById('messages');
+    messageDiv.classList.remove('blur');
+    const chat_action = document.getElementById('chat_action');
+    const Editreplyarea = document.getElementById('Editreply-area');
+    if (chat_action) {
+        chat_action.style.display = 'block'; // Set visibility to hidden
+        Editreplyarea.style.display = 'none'; 
+    }
+   
+}
+
+// Add event listener to the send message button
+document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
+
+
+
+
+
+
+
+
+
+
+
+//Show Reply Message 
+function showReply(message_id, messagebody,senderName) {
+    console.log('MessageId: ' + message_id);
+    console.log('MessageBody: ' + messagebody);
+    console.log('SenderName: ' + senderName);
+    var replyDiv = document.getElementById('reply-div');
+    var iconContainer = document.querySelector('.icon-container');
+
+    // Update the quoted text with the message body
+    var quotedTextElement = document.querySelector('#quoted-message .sender-name');
+    quotedTextElement.textContent = senderName; // Set the new message body
+
+    var quotedNameElement = document.querySelector('#quoted-message .quoted-text');
+    quotedNameElement.textContent = messagebody; // Set the new message body
+
+    // Display the reply div
+    replyDiv.style.display = 'block';
+
+    // Change the bottom property of the icon container
+    iconContainer.style.bottom = '145px';
+}
+
+function removeQuotedMessage() {
+    var replyDiv = document.getElementById('reply-div');
+    var iconContainer = document.querySelector('.icon-container');
+
+    // Hide the reply div
+    replyDiv.style.display = 'none';
+    iconContainer.style.bottom = '90px';
+}
+
+
+
+
+
+
 //Multiple Select Messages Start
-
-
 // Array to store selected message IDs
 let selectedMessageIds = [];
 
@@ -550,10 +677,7 @@ $(document).ready(function () {
 
 
 
-function editMessage(messageId) {
-    // Your logic to edit the message
-    console.log(`Edit message with ID: ${messageId}`);
-}
+
 
 let isLoadingMessages = false;
 let hasMoreMessages = true; // Assume we have more messages initially
@@ -647,7 +771,7 @@ let addNewMessageToArea = (message) => {
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
                             </span> |
                             <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply()" data-message-id="${message.id}">Reply</a>
+                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
                             </span> <!---|
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
@@ -659,7 +783,7 @@ let addNewMessageToArea = (message) => {
                                 <i class="fas fa-angle-down text-muted px-2"></i>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" href="#" onclick="editMessage(${message.id})">Edit</a>
+                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                 <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                             </div>
@@ -746,7 +870,7 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         console.error('Error fetching messages:', error);
     }
 };
-
+let currentlyPlayingAudio = null; // Variable to hold the currently playing audio player
 let generateMessageArea = async (elem, chatIndex) => {
 
     pagnicateChatList = [];
@@ -852,6 +976,7 @@ let generateMessageArea = async (elem, chatIndex) => {
     pagnicateChatList.data.reverse()
         .forEach((msg) => addMessageToMessageArea(msg));
 
+      
 
     get_voice_list();
 };
@@ -1514,13 +1639,12 @@ function removeHighlight() {
 
 
 
-let currentlyPlayingAudio = null; // Variable to hold the currently playing audio player
+
+
 
 function get_voice_list() {
     const audioMessages = document.querySelectorAll('.chat_list_messages .audio-message');
-
-    // console.log(audioMessages); // Debugging - Check if audio messages are selected
-
+  
     audioMessages.forEach((message) => {
         const playButton = message.querySelector('.play-button');
         const progressBarContainer = message.querySelector('.audio-progress');
@@ -1528,9 +1652,6 @@ function get_voice_list() {
         const audioDuration = message.querySelector('.audio-duration');
         const audioSrc = message.getAttribute('data-audio-src');
         const audioPlayer = new Audio(audioSrc);
-
-        // Debugging - Check if the audio source is valid
-        //console.log('Audio Source:', audioSrc);
 
         // Play/Pause functionality
         playButton.addEventListener('click', function () {
