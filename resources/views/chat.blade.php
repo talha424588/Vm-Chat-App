@@ -16,9 +16,9 @@
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
     <style>
-     
 
-       
+
+
 
        .audio-message {
     display: flex;
@@ -85,13 +85,13 @@
         .audio-time-container {
             display: flex;
             justify-content: space-between;
-           
+
 			margin-left: 30px;
         }
 
     </style>
-   
-   
+
+
    <style>
         .selected-message {
         background-color: #E8E9EA; / Change background color /
@@ -422,7 +422,15 @@ font-size: 14px;
                             </svg>
                         </i>
 
+<style>
+    .auto-resize-textarea{
+ overflow: hidden;
+}
+</style>
+
+
                             <textarea id="input" class="chat-input auto-resize-textarea" rows="1" cols="62"  placeholder="Type a message"></textarea>
+
 
 
       
@@ -443,6 +451,7 @@ font-size: 14px;
 
                                 </svg></i>
 					<i id="voice-icon" class="chat-icon" >
+
                                 <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
                                     viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
@@ -635,7 +644,7 @@ div#chat-list-unread {
     for (let i = 0; i < chatItems.length; i++) {
         const unreadCountElement = chatItems[i].getElementsByClassName('badge-success')[0];
         let unreadCount = 0; // Default to 0 if no badge found
-        
+
         // Check if the unreadCountElement exists and parse its value if visible
         if (unreadCountElement && unreadCountElement.style.display !== 'none') {
             unreadCount = parseInt(unreadCountElement.innerText);
@@ -646,11 +655,11 @@ div#chat-list-unread {
         if (unreadCount > 0) {
             hasUnreadMessages = true;
             chatItems[i].style.setProperty('display', 'block'); // Show the chat item
-        } 
+        }
         // If type is 'unread', hide chat items with unreadCount 0
         else if (type === 'unread') {
             chatItems[i].style.setProperty('display', 'none', 'important'); // Hide chat item
-        } 
+        }
         // If type is 'all', show all chat items
         else {
             chatItems[i].style.setProperty('display', 'block');
@@ -738,7 +747,6 @@ div#chat-list-unread {
 </script>
 
     <!-- Your JavaScript -->
-    
    <script>
 document.addEventListener('DOMContentLoaded', function () {
     const textarea = document.querySelector('.chat-input');
@@ -760,7 +768,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Auto-resize the textarea
         textarea.style.height = 'auto'; // Reset the height
         textarea.style.height = (textarea.scrollHeight) + 'px'; // Set it to the scroll height
-        
+
         // Update file icon visibility
         updateFileIconVisibility();
     });

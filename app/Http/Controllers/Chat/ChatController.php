@@ -87,7 +87,7 @@ class ChatController extends Controller
         $message->msg = $request->message;
         $message->sender = $uniqueId;
         $message->seen_by = $uniqueId;
-        $message->reply_id = $request->replyId;
+        $message->reply_id = $request->reply_id;
         $message->group_id = $request->group_id;
         $message->type = $request->type;
         $message->media_name = $request->mediaName;
