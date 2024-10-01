@@ -514,8 +514,6 @@ function handleSendMessage() {
     textarea.value =''; // Append with a newline if there's already text
     const messageDiv = document.getElementById('messages');
     messageDiv.classList.remove('blur');
-    
-
     const chat_action = document.getElementById('chat_action');
     const Editreplyarea = document.getElementById('Editreply-area');
     if (chat_action) {
