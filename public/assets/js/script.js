@@ -335,6 +335,11 @@ let addMessageToMessageArea = (message) => {
         lastDate = msgDate;
     }
 
+    // unread message count and area
+    // if (message.id==32919) {
+    //     addunreadToMessageArea.addUnread();
+    // }
+
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
 
@@ -1282,7 +1287,10 @@ let searchGroups = async (searchQuery) => {
             const groupResponse = await fetch(url);
             const response = await groupResponse.json();
             if (response) {
-                const groups = response.groups;
+                console.log("response",response);
+                const groups = response.data.groups;
+                console.log("groups",response.data.groups);
+                console.log("messages",response.data.messages);
                 chatList = [];
                 groups.forEach((group) => {
                     let chat = {};

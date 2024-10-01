@@ -56,8 +56,7 @@ class GroupService implements GroupRepository
                 $array = explode(',', $message['seen_by']);
                 $string = implode(',', $array);
                 $user_unique_id = explode(',', $string);
-                if(!in_array(Auth::user()->unique_id,$user_unique_id))
-                {
+                if (!in_array(Auth::user()->unique_id, $user_unique_id)) {
                     $unreadGroups[] = $eachGroup;
                 }
             }
@@ -77,11 +76,18 @@ class GroupService implements GroupRepository
             }, 'groupMessages.user', 'users_with_access'])
             ->get();
 
-        if (count($groups) > 0) {
+        $messages = GroupMessage::where("msg", "LIKE", "%$name%")->with("user", "group")->get();
+
+        $groupMessageSearchArray = [
+            "groups"=> $groups,
+            "messages"=> $messages
+        ];
+        if ($groupMessageSearchArray) {
             return response()->json([
                 "status" => true,
                 "message" => "success",
-                "groups" => $groups
+                // "groups" => $groups
+                "data" => $groupMessageSearchArray
             ]);
         } else {
             return response()->json([
