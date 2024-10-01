@@ -401,7 +401,7 @@ let addMessageToMessageArea = (message) => {
             ${message.user.id == user.id ? '' : profileImage}
 
 
-            
+
             <div class="">
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                     <div style="margin-top:-4px">
@@ -487,14 +487,14 @@ function editMessage(messageId, messageContent) {
 
     // Hide the voice icon
     const voiceIcon = document.getElementById('chat_action');
- 
+
     const Editreplyarea = document.getElementById('Editreply-area');
     if (voiceIcon) {
         voiceIcon.style.display = 'none'; // Set visibility to hidden
-        Editreplyarea.style.display = 'block'; 
+        Editreplyarea.style.display = 'block';
     }
 
-    
+
 }
 
 
@@ -518,9 +518,9 @@ function handleSendMessage() {
     const Editreplyarea = document.getElementById('Editreply-area');
     if (chat_action) {
         chat_action.style.display = 'block'; // Set visibility to hidden
-        Editreplyarea.style.display = 'none'; 
+        Editreplyarea.style.display = 'none';
     }
-   
+
 }
 
 // Add event listener to the send message button
@@ -536,7 +536,7 @@ document.getElementById('send-message-btn').addEventListener('click', handleSend
 
 
 
-//Show Reply Message 
+//Show Reply Message
 function showReply(message_id, messagebody,senderName) {
     console.log('MessageId: ' + message_id);
     console.log('MessageBody: ' + messagebody);
@@ -976,7 +976,7 @@ let generateMessageArea = async (elem, chatIndex) => {
     pagnicateChatList.data.reverse()
         .forEach((msg) => addMessageToMessageArea(msg));
 
-      
+
 
     get_voice_list();
 };
@@ -1268,157 +1268,10 @@ $("#seenModal").on("show.bs.modal", async function (event) {
     }
 })
 
-const captureId = document.getElementById('captureid');
-const cameraContainer = document.getElementById('camera-container');
-const video = document.getElementById('camera-stream');
-const canvas = document.getElementById('snapshot');
-const photo = document.getElementById('photo');
-const captureBtn = document.getElementById('capture-btn');
-const switchCameraBtn = document.getElementById('switch-camera-btn');
-const closeBtn = document.getElementById('close-btn');
-const photoOptions = document.getElementById('photo-options');
-const sendBtn = document.getElementById('send-btn');
-const retakeBtn = document.getElementById('retake-btn');
-const hiddenFileInput = document.getElementById('hidden-file-input');
-const context = canvas.getContext('2d');
-let currentStream = null;
-let currentFacingMode = 'user';
-
-function generateRandomFileName() {
-    const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 10000);
-    return `image_${timestamp}_${random}.png`;
-}
-
-async function startCamera(facingMode) {
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-    }
-
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode }
-        });
-        video.srcObject = stream;
-        currentStream = stream;
-    } catch (err) {
-        console.error("Error accessing camera: ", err);
-    }
-}
-
-captureId.addEventListener('click', () => {
-    cameraContainer.style.display = 'flex';
-    startCamera(currentFacingMode);
-});
-
-captureBtn.addEventListener('click', async () => {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL('image/png');
-
-    const blob = await (await fetch(dataUrl)).blob();
-    const fileName = generateRandomFileName();
-    const file = new File([blob], fileName, { type: 'image/png' });
-
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(file);
-    hiddenFileInput.files = dataTransfer.files;
-
-    photo.src = dataUrl;
-    photo.style.display = 'block';
-    photoOptions.style.display = 'block';
-
-    video.style.display = 'none';
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-    }
-});
-
-sendBtn.addEventListener('click', () => {
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-    }
-    cameraContainer.style.display = 'none';
-    const imageInput = document.getElementById('hidden-file-input');
-
-    if (imageInput.files.length > 0) {
-        const image = imageInput.files[0];
-        const ref = firebase.storage().ref("images/" + DOM.unique_id);
-        const mediaName = image.name;
-        const metadata = {
-            contentType: image.type
-        };
-        const task = ref.child(mediaName).put(image, metadata);
-        task
-            .then(snapshot => snapshot.ref.getDownloadURL())
-            .then(url => {
-                console.log(url);
-
-                DOM.messageInput.value = url;
-                sendMessage("Image", mediaName);
-
-            })
-            .catch(error => console.error(error));
-
-    } else {
-        console.log("No image selected");
-    }
-
-
-});
-
-retakeBtn.addEventListener('click', () => {
-    photo.style.display = 'none';
-    photoOptions.style.display = 'none';
-    video.style.display = 'block';
-    startCamera(currentFacingMode);
-});
-
-switchCameraBtn.addEventListener('click', () => {
-    currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
-    startCamera(currentFacingMode);
-});
-
-closeBtn.addEventListener('click', () => {
-    cameraContainer.style.display = 'none';
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-    }
-});
-
-cameraContainer.addEventListener('click', (e) => {
-    if (e.target === cameraContainer) {
-        cameraContainer.style.display = 'none';
-        if (currentStream) {
-            currentStream.getTracks().forEach(track => track.stop());
-        }
-    }
-});
-
-
 //search groups
 
 let groupSearchField = document.getElementById("search_group");
 let debounceTimeout = null;
-
-// groupSearchField.addEventListener("input", function (event) {
-//     if (event.target.value.length > 0) {
-//         clearTimeout(debounceTimeout);
-//         debounceTimeout = setTimeout(async function () {
-//             const url = `search-group-by-name/${event.target.value}`
-//             try {
-//                 const groupResponse = await fetch(url);
-//                 const response = await groupResponse.json();
-//                 if (response) {
-//                     console.log(response);
-//                 }
-//             } catch (error) {
-//                 console.log(error);
-//             }
-//         }, 500);
-//     }
-// });
 
 
 let searchGroups = async (searchQuery) => {
@@ -1458,8 +1311,6 @@ let searchGroups = async (searchQuery) => {
         }
     }
 };
-
-
 
 groupSearchField.addEventListener("input", function (event) {
     if (event.target.value.length > 0) {
@@ -1644,7 +1495,7 @@ function removeHighlight() {
 
 function get_voice_list() {
     const audioMessages = document.querySelectorAll('.chat_list_messages .audio-message');
-  
+
     audioMessages.forEach((message) => {
         const playButton = message.querySelector('.play-button');
         const progressBarContainer = message.querySelector('.audio-progress');
