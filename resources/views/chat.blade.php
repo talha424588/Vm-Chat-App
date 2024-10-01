@@ -15,7 +15,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
-    <style>
+    <script src="https://cdn.tiny.cloud/1/6hun1luhhppu7pkwfe4vetbftca09vpcny2aoik7l4fmmlcf/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+  
+  
+  <style>
      
 
        
@@ -389,6 +392,17 @@ font-size: 14px;
                     </div>
 
 
+                    <div id="correction-div"
+                        style="padding-right:30px; padding-left:30px; padding-top:10px; display: none;">
+                        <div id="quoted-messages" class="quoted-message">
+                            <div class="quoted-content">
+                                <span class="sender-name">Siraj</span>
+                                <p class="quoted-text">Hello, this is testing</p>
+                            </div>
+                            <span class="close-quoted" onclick="removecorrectionMessage()">✖</span>
+                        </div>
+                    </div>
+
       
 
 <!---Edit Message Area Start-->
@@ -457,7 +471,7 @@ font-size: 14px;
                         </div>
 						
 						
-						<div class="chat-action-icons" id="Editreply-area">
+						<div class="chat-action-icons" id="Editreply-area" style="display:none;">
                             <i id="file-icon" class="chat-icon" style="padding-left: 3px; ">
                                 <svg width="23" height="20" viewBox="0 0 23 20" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -485,6 +499,18 @@ font-size: 14px;
 
                             </i>
                         </div>
+						
+						
+						<div class="chat-action-icons" id="correctionreply-area" style="display:none; margin-left:4px !important; ">
+                            <i id="correction-send-message-btn" class="chat-icon" >
+                              
+                            <svg width="31" height="30" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+<path d="M22.4355 8.33332L5.11261 12.4775C4.93818 12.5193 4.77916 12.6096 4.65403 12.7381C4.5289 12.8666 4.44279 13.028 4.40569 13.2035C4.3686 13.3789 4.38204 13.5613 4.44446 13.7295C4.50688 13.8976 4.61571 14.0446 4.75833 14.1534L8.52702 17.0255L15.9931 14.5851L11.9722 21.3327L13.9464 25.6403C14.0206 25.8039 14.1399 25.943 14.2903 26.0413C14.4407 26.1397 14.6159 26.1931 14.7956 26.1955C14.9753 26.1979 15.1519 26.149 15.3048 26.0547C15.4577 25.9603 15.5806 25.8244 15.6591 25.6628L23.5073 9.67331C23.5867 9.51179 23.6184 9.33102 23.5989 9.15212C23.5793 8.97323 23.5092 8.8036 23.3968 8.66306C23.2844 8.52252 23.1343 8.41689 22.9641 8.35849C22.7938 8.3001 22.6105 8.29137 22.4355 8.33332Z" fill="white"/>
+</svg>
+
+                            </i>
+                        </div>
 						 </div>
 						 
 						 
@@ -495,8 +521,8 @@ font-size: 14px;
 						 
 						 
 						 
-						 
-                    <input type="hidden" class="number" id="edit_message_id">
+                         <input type="hidden" class="number" id="correction_message_id">				 
+ <input type="hidden" class="number" id="edit_message_id">
  <input type="file" id="hidden-file-input" name="photo" accept="image/*" />
                     <!-- Hidden file input for multiple files -->
                     <input type="file" id="file-input" multiple>

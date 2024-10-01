@@ -435,7 +435,7 @@ let addMessageToMessageArea = (message) => {
 
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-            <a class="dropdown-item" href="#" onclick="CorrectionMessage(${message.id})">Correction</a>
+            <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${message.msg}','${senderName}')">Correction</a>
           </div>
         </div>
       ` : ''}
@@ -452,8 +452,167 @@ let addMessageToMessageArea = (message) => {
 
 
 
+let isTinyMCEInitialized = false; // Track if TinyMCE has been initialized
+
+function tinymce_init(callback) {
+    // Check if TinyMCE is already initialized
+    if (!isTinyMCEInitialized) {
+        tinymce.init({
+            selector: '#input',
+            toolbar: 'bold italic underline strikethrough',
+            menubar: false,
+            branding: false,
+            height: 140,
+            width: 1000,
+            plugins: 'lists',
+            toolbar_mode: 'wrap',
+            placeholder: 'Write your message here which you want to be correct by the user or want any further change...',
+            content_style: "body { font-family: Arial, sans-serif; font-size: 16px; }",
+            setup: function(editor) {
+                editor.on('init', function() {
+                    // Mark TinyMCE as initialized
+                    isTinyMCEInitialized = true;
+
+                    // Call the callback function when TinyMCE is initialized
+                    if (callback && typeof callback === 'function') {
+                        callback();
+                    }
+                });
+            }
+        });
+    } else {
+        // If already initialized, directly call the callback
+        if (callback && typeof callback === 'function') {
+            callback();
+        }
+    }
+}
+
+// Edit Correction Message Code
+function CorrectionMessage(message_id, messagebody, senderName) {
+    console.log(message_id);
+    
+    // Initialize TinyMCE and pass the correction_call function as a callback
+    tinymce_init(function() {
+        correction_call(message_id, messagebody, senderName);
+    });
+}
+
+function correction_call(message_id, messagebody, senderName) {
+    // Set the content of TinyMCE
+    if (tinymce.get('input')) {
+        tinymce.get('input').setContent(messagebody);
+    } else {
+        console.error("TinyMCE editor not initialized for #input");
+    }
 
 
+    const correction_message_id = document.getElementById('correction_message_id');
+    correction_message_id.value =message_id;
+    // Check and log voiceIcon and Editreplyarea
+    const voiceIcon = document.getElementById('chat_action');
+    const Editreplyarea = document.getElementById('correctionreply-area');
+
+    if (Editreplyarea) {
+        if (voiceIcon) {
+            voiceIcon.style.display = 'none'; // Set visibility to hidden
+        } else {
+            console.error("Element 'chat_action' not found");
+        }
+        Editreplyarea.style.display = 'block';
+    } else {
+        console.error("Element 'correctionreply-area' not found");
+    }
+
+    // Check and log replyDiv and iconContainer
+    var replyDiv = document.getElementById('correction-div');
+  
+
+    if (replyDiv) {
+        // Display the reply div
+        replyDiv.style.display = 'block';
+    } else {
+        console.error("Element 'correction-div' not found");
+    }
+
+   
+
+    // Update the quoted text with the message body
+    var quotedTextElement = document.querySelector('#quoted-messages .sender-name');
+    var quotedNameElement = document.querySelector('#quoted-messages .quoted-text');
+
+    if (quotedTextElement) {
+        quotedTextElement.textContent = senderName;
+    } else {
+        console.error("Element '#quoted-message .sender-name' not found");
+    }
+
+    if (quotedNameElement) {
+        quotedNameElement.textContent = messagebody;
+    } else {
+        console.error("Element '#quoted-message .quoted-text' not found");
+    }
+
+ 
+
+
+}
+
+
+
+
+function correction_send_handel(){
+   // const messageContent = document.getElementById('input').value;
+    const messageContent = tinymce.get('input').getContent();
+  
+      const correction_message_id = document.getElementById('correction_message_id').value;
+    alert(correction_message_id);
+    alert(messageContent);
+}
+document.getElementById('correction-send-message-btn').addEventListener('click', correction_send_handel);
+
+// Function to remove the correction message and disable TinyMCE
+function removecorrectionMessage() {
+    // Disable TinyMCE
+    if (tinymce.get('input')) { // Replace 'your_textarea_id' with the actual ID of your textarea
+        tinymce.get('input').remove(); // This will remove the editor instance
+    }
+
+    var replyDiv = document.getElementById('correction-div');
+    var iconContainer = document.querySelector('.icon-container');
+    const chat_action = document.getElementById('chat_action');
+    const correctionarea = document.getElementById('correction-div');
+
+    const Editreplyarea = document.getElementById('Editreply-area');
+    const correctionreplyarea = document.getElementById('correctionreply-area');
+    if (chat_action) {
+        chat_action.style.display = 'block'; // Set visibility to block
+        correctionarea.style.display = 'none'; 
+        Editreplyarea.style.display = 'none'; 
+        correctionreplyarea.style.display = 'none'; 
+        const textarea = document.getElementById('input');
+        textarea.value =''; // Append with a newline if there's already text
+    
+    }
+    
+    // Hide the reply div
+    replyDiv.style.display = 'none';
+    iconContainer.style.bottom = '90px'; // Adjust position as needed
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Edit Message Code
 function editMessage(messageId, messageContent) {
 
 
@@ -520,6 +679,14 @@ function handleSendMessage() {
         chat_action.style.display = 'block'; // Set visibility to hidden
         Editreplyarea.style.display = 'none'; 
     }
+
+     // Hide the voice icon
+ const chat_actioncorrection = document.getElementById('chat_action');
+ const correctionarea = document.getElementById('correction-div');
+ if (chat_actioncorrection) {
+   chat_action.style.display = 'block'; // Set visibility to hidden
+   correctionarea.style.display = 'none'; 
+ }
    
 }
 
@@ -1266,133 +1433,134 @@ $("#seenModal").on("show.bs.modal", async function (event) {
     }
 })
 
-const captureId = document.getElementById('captureid');
-const cameraContainer = document.getElementById('camera-container');
-const video = document.getElementById('camera-stream');
-const canvas = document.getElementById('snapshot');
-const photo = document.getElementById('photo');
-const captureBtn = document.getElementById('capture-btn');
-const switchCameraBtn = document.getElementById('switch-camera-btn');
-const closeBtn = document.getElementById('close-btn');
-const photoOptions = document.getElementById('photo-options');
-const sendBtn = document.getElementById('send-btn');
-const retakeBtn = document.getElementById('retake-btn');
-const hiddenFileInput = document.getElementById('hidden-file-input');
-const context = canvas.getContext('2d');
-let currentStream = null;
-let currentFacingMode = 'user';
 
-function generateRandomFileName() {
-    const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 10000);
-    return `image_${timestamp}_${random}.png`;
-}
+// const captureId = document.getElementById('captureid');
+// const cameraContainer = document.getElementById('camera-container');
+// const video = document.getElementById('camera-stream');
+// const canvas = document.getElementById('snapshot');
+// const photo = document.getElementById('photo');
+// const captureBtn = document.getElementById('capture-btn');
+// const switchCameraBtn = document.getElementById('switch-camera-btn');
+// const closeBtn = document.getElementById('close-btn');
+// const photoOptions = document.getElementById('photo-options');
+// const sendBtn = document.getElementById('send-btn');
+// const retakeBtn = document.getElementById('retake-btn');
+// const hiddenFileInput = document.getElementById('hidden-file-input');
+// const context = canvas.getContext('2d');
+// let currentStream = null;
+// let currentFacingMode = 'user';
 
-async function startCamera(facingMode) {
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-    }
+// function generateRandomFileName() {
+//     const timestamp = Date.now();
+//     const random = Math.floor(Math.random() * 10000);
+//     return `image_${timestamp}_${random}.png`;
+// }
 
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode }
-        });
-        video.srcObject = stream;
-        currentStream = stream;
-    } catch (err) {
-        console.error("Error accessing camera: ", err);
-    }
-}
+// async function startCamera(facingMode) {
+//     if (currentStream) {
+//         currentStream.getTracks().forEach(track => track.stop());
+//     }
 
-captureId.addEventListener('click', () => {
-    cameraContainer.style.display = 'flex';
-    startCamera(currentFacingMode);
-});
+//     try {
+//         const stream = await navigator.mediaDevices.getUserMedia({
+//             video: { facingMode }
+//         });
+//         video.srcObject = stream;
+//         currentStream = stream;
+//     } catch (err) {
+//         console.error("Error accessing camera: ", err);
+//     }
+// }
 
-captureBtn.addEventListener('click', async () => {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL('image/png');
+// captureId.addEventListener('click', () => {
+//     cameraContainer.style.display = 'flex';
+//     startCamera(currentFacingMode);
+// });
 
-    const blob = await (await fetch(dataUrl)).blob();
-    const fileName = generateRandomFileName();
-    const file = new File([blob], fileName, { type: 'image/png' });
+// captureBtn.addEventListener('click', async () => {
+//     canvas.width = video.videoWidth;
+//     canvas.height = video.videoHeight;
+//     context.drawImage(video, 0, 0, canvas.width, canvas.height);
+//     const dataUrl = canvas.toDataURL('image/png');
 
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(file);
-    hiddenFileInput.files = dataTransfer.files;
+//     const blob = await (await fetch(dataUrl)).blob();
+//     const fileName = generateRandomFileName();
+//     const file = new File([blob], fileName, { type: 'image/png' });
 
-    photo.src = dataUrl;
-    photo.style.display = 'block';
-    photoOptions.style.display = 'block';
+//     const dataTransfer = new DataTransfer();
+//     dataTransfer.items.add(file);
+//     hiddenFileInput.files = dataTransfer.files;
 
-    video.style.display = 'none';
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-    }
-});
+//     photo.src = dataUrl;
+//     photo.style.display = 'block';
+//     photoOptions.style.display = 'block';
 
-sendBtn.addEventListener('click', () => {
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-    }
-    cameraContainer.style.display = 'none';
-    const imageInput = document.getElementById('hidden-file-input');
+//     video.style.display = 'none';
+//     if (currentStream) {
+//         currentStream.getTracks().forEach(track => track.stop());
+//     }
+// });
 
-    if (imageInput.files.length > 0) {
-        const image = imageInput.files[0];
-        const ref = firebase.storage().ref("images/" + DOM.unique_id);
-        const mediaName = image.name;
-        const metadata = {
-            contentType: image.type
-        };
-        const task = ref.child(mediaName).put(image, metadata);
-        task
-            .then(snapshot => snapshot.ref.getDownloadURL())
-            .then(url => {
-                console.log(url);
+// sendBtn.addEventListener('click', () => {
+//     if (currentStream) {
+//         currentStream.getTracks().forEach(track => track.stop());
+//     }
+//     cameraContainer.style.display = 'none';
+//     const imageInput = document.getElementById('hidden-file-input');
 
-                DOM.messageInput.value = url;
-                sendMessage("Image", mediaName);
+//     if (imageInput.files.length > 0) {
+//         const image = imageInput.files[0];
+//         const ref = firebase.storage().ref("images/" + DOM.unique_id);
+//         const mediaName = image.name;
+//         const metadata = {
+//             contentType: image.type
+//         };
+//         const task = ref.child(mediaName).put(image, metadata);
+//         task
+//             .then(snapshot => snapshot.ref.getDownloadURL())
+//             .then(url => {
+//                 console.log(url);
 
-            })
-            .catch(error => console.error(error));
+//                 DOM.messageInput.value = url;
+//                 sendMessage("Image", mediaName);
 
-    } else {
-        console.log("No image selected");
-    }
+//             })
+//             .catch(error => console.error(error));
+
+//     } else {
+//         console.log("No image selected");
+//     }
 
 
-});
+// });
 
-retakeBtn.addEventListener('click', () => {
-    photo.style.display = 'none';
-    photoOptions.style.display = 'none';
-    video.style.display = 'block';
-    startCamera(currentFacingMode);
-});
+// retakeBtn.addEventListener('click', () => {
+//     photo.style.display = 'none';
+//     photoOptions.style.display = 'none';
+//     video.style.display = 'block';
+//     startCamera(currentFacingMode);
+// });
 
-switchCameraBtn.addEventListener('click', () => {
-    currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
-    startCamera(currentFacingMode);
-});
+// switchCameraBtn.addEventListener('click', () => {
+//     currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
+//     startCamera(currentFacingMode);
+// });
 
-closeBtn.addEventListener('click', () => {
-    cameraContainer.style.display = 'none';
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-    }
-});
+// closeBtn.addEventListener('click', () => {
+//     cameraContainer.style.display = 'none';
+//     if (currentStream) {
+//         currentStream.getTracks().forEach(track => track.stop());
+//     }
+// });
 
-cameraContainer.addEventListener('click', (e) => {
-    if (e.target === cameraContainer) {
-        cameraContainer.style.display = 'none';
-        if (currentStream) {
-            currentStream.getTracks().forEach(track => track.stop());
-        }
-    }
-});
+// cameraContainer.addEventListener('click', (e) => {
+//     if (e.target === cameraContainer) {
+//         cameraContainer.style.display = 'none';
+//         if (currentStream) {
+//             currentStream.getTracks().forEach(track => track.stop());
+//         }
+//     }
+// });
 
 
 //search groups

@@ -32,6 +32,40 @@ border-top-left-radius: 10px; /* Rounded corner on top */
 border-bottom-left-radius: 10px; /* Rounded corner on bottom */
 z-index: 1; /* Ensure it is above other content */
 }
+#quoted-messages {
+	display: flex;
+	align-items: center;
+	background-color: #E5E7E9;
+	padding: 5px;
+	
+	border-radius: 10px;
+	margin-bottom: 0px;
+	position: relative;
+	overflow: hidden; /* Ensure content does not overflow */
+	}
+	
+	#quoted-messages::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 3px; /* Border width */
+	background-color: #1DAB61; /* Border color */
+	border-top-left-radius: 10px; /* Rounded corner on top */
+	border-bottom-left-radius: 10px; /* Rounded corner on bottom */
+	z-index: 1; /* Ensure it is above other content */
+	}
+
+
+	@media (max-width: 768px) {  /* Adjust the max-width as necessary */
+		.chat-action-icons {
+	
+			display: contents;
+		}
+	}
+	
+
 
 
 		.quoted-content {
