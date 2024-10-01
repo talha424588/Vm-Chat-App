@@ -17,16 +17,15 @@
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
     <script src="https://cdn.tiny.cloud/1/6hun1luhhppu7pkwfe4vetbftca09vpcny2aoik7l4fmmlcf/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
   
-  
-  <style>
+    <style>
      
 
-       
+
 
        .audio-message {
     display: flex;
     align-items: center;
-    width: 285px;
+    width: 239px;
 }
 
         .avatar {
@@ -88,13 +87,13 @@
         .audio-time-container {
             display: flex;
             justify-content: space-between;
-           
+
 			margin-left: 30px;
         }
 
     </style>
-   
-   
+
+
    <style>
         .selected-message {
         background-color: #E8E9EA; / Change background color /
@@ -426,17 +425,25 @@ font-size: 14px;
 	
 	
                     <div class="chat-input-container  justify-self-end align-items-center flex-row" id="reply-area">
-                        <i id="sticker-icon" class="chat-icon">
-                            <!-- Default Sticker Icon -->
-                            <svg width="23" height="23" viewBox="0 0 23 23" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M11.375 0C9.12524 0 6.926 0.667132 5.05539 1.91703C3.18478 3.16693 1.72682 4.94347 0.865875 7.02198C0.00492861 9.10048 -0.220334 11.3876 0.218573 13.5942C0.657479 15.8007 1.74084 17.8275 3.33167 19.4183C4.92249 21.0092 6.94932 22.0925 9.15585 22.5314C11.3624 22.9703 13.6495 22.7451 15.728 21.8841C17.8065 21.0232 19.5831 19.5652 20.833 17.6946C22.0829 15.824 22.75 13.6248 22.75 11.375C22.7468 8.35914 21.5474 5.46771 19.4148 3.33518C17.2823 1.20264 14.3909 0.0031848 11.375 0ZM11.375 21C9.47136 21 7.61046 20.4355 6.02764 19.3779C4.44482 18.3203 3.21116 16.8171 2.48266 15.0583C1.75417 13.2996 1.56356 11.3643 1.93495 9.49726C2.30633 7.63019 3.22302 5.91518 4.5691 4.5691C5.91518 3.22302 7.63019 2.30632 9.49726 1.93494C11.3643 1.56356 13.2996 1.75417 15.0583 2.48266C16.8171 3.21115 18.3203 4.44481 19.3779 6.02764C20.4355 7.61046 21 9.47135 21 11.375C20.9971 13.9268 19.9821 16.3733 18.1777 18.1777C16.3733 19.9821 13.9268 20.9971 11.375 21ZM6.125 9.1875C6.125 8.92791 6.20198 8.67415 6.3462 8.45831C6.49042 8.24247 6.69541 8.07425 6.93523 7.97491C7.17506 7.87557 7.43896 7.84958 7.69356 7.90022C7.94816 7.95086 8.18203 8.07587 8.36558 8.25942C8.54914 8.44298 8.67414 8.67684 8.72479 8.93144C8.77543 9.18604 8.74944 9.44994 8.6501 9.68977C8.55076 9.9296 8.38253 10.1346 8.16669 10.2788C7.95085 10.423 7.69709 10.5 7.4375 10.5C7.08941 10.5 6.75557 10.3617 6.50943 10.1156C6.26329 9.86944 6.12501 9.5356 6.125 9.1875ZM16.625 9.1875C16.625 9.44709 16.548 9.70085 16.4038 9.91669C16.2596 10.1325 16.0546 10.3008 15.8148 10.4001C15.5749 10.4994 15.311 10.5254 15.0564 10.4748C14.8018 10.4241 14.568 10.2991 14.3844 10.1156C14.2009 9.93202 14.0759 9.69816 14.0252 9.44356C13.9746 9.18896 14.0006 8.92506 14.0999 8.68523C14.1993 8.4454 14.3675 8.24042 14.5833 8.0962C14.7992 7.95198 15.0529 7.875 15.3125 7.875C15.6606 7.875 15.9944 8.01328 16.2406 8.25942C16.4867 8.50556 16.625 8.8394 16.625 9.1875ZM16.508 14.4375C15.3825 16.3833 13.5111 17.5 11.375 17.5C9.23891 17.5 7.3686 16.3844 6.24313 14.4375C6.17982 14.3379 6.13731 14.2265 6.11816 14.1101C6.099 13.9937 6.1036 13.8745 6.13168 13.7599C6.15976 13.6453 6.21073 13.5375 6.28153 13.4431C6.35233 13.3487 6.4415 13.2696 6.54367 13.2105C6.64584 13.1515 6.7589 13.1137 6.87605 13.0995C6.9932 13.0852 7.11201 13.0949 7.22535 13.1277C7.33869 13.1606 7.4442 13.2161 7.53555 13.2908C7.62689 13.3655 7.70218 13.4579 7.75688 13.5625C8.57391 14.9745 9.85797 15.75 11.375 15.75C12.892 15.75 14.1761 14.9734 14.992 13.5625C15.1081 13.3615 15.2992 13.2148 15.5234 13.1547C15.7476 13.0946 15.9865 13.126 16.1875 13.242C16.3885 13.3581 16.5352 13.5492 16.5953 13.7734C16.6554 13.9976 16.624 14.2365 16.508 14.4375Z"
-                                    fill="#687780" />
-                            </svg>
-                        </i>
+                     
+
+<style>
+    .auto-resize-textarea{
+ overflow: hidden;
+}
+</style>
+
+<div class="icon-container" id="scrollBottomBtn" style="display: none;">
+<div class="notification-count" id="notification-count" style="display: none;"></div>				
+<div class="icon" style="font-size: 24px !important;"><svg width="40" height="10" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M0.344159 0.344159C0.56459 0.123794 0.863519 0 1.17521 0C1.4869 0 1.78583 0.123794 2.00626 0.344159L7.82479 6.16269L13.6433 0.344159C13.865 0.130039 14.1619 0.0115592 14.4701 0.0142373C14.7783 0.0169155 15.0732 0.140538 15.2911 0.358478C15.509 0.576418 15.6327 0.871238 15.6353 1.17944C15.638 1.48764 15.5195 1.78457 15.3054 2.00626L8.65584 8.65584C8.43541 8.87621 8.13648 9 7.82479 9C7.5131 9 7.21417 8.87621 6.99374 8.65584L0.344159 2.00626C0.123794 1.78583 0 1.4869 0 1.17521C0 0.863519 0.123794 0.564591 0.344159 0.344159Z" fill="#687780"/>
+				</svg></div> <!-- This is a down arrow symbol -->
+				</div>
+
+
 
                             <textarea id="input" class="chat-input auto-resize-textarea" rows="1" cols="62"  placeholder="Type a message"></textarea>
+
 
 
       
@@ -457,6 +464,7 @@ font-size: 14px;
 
                                 </svg></i>
 					<i id="voice-icon" class="chat-icon" >
+
                                 <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
                                     viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
@@ -661,7 +669,7 @@ div#chat-list-unread {
     for (let i = 0; i < chatItems.length; i++) {
         const unreadCountElement = chatItems[i].getElementsByClassName('badge-success')[0];
         let unreadCount = 0; // Default to 0 if no badge found
-        
+
         // Check if the unreadCountElement exists and parse its value if visible
         if (unreadCountElement && unreadCountElement.style.display !== 'none') {
             unreadCount = parseInt(unreadCountElement.innerText);
@@ -672,11 +680,11 @@ div#chat-list-unread {
         if (unreadCount > 0) {
             hasUnreadMessages = true;
             chatItems[i].style.setProperty('display', 'block'); // Show the chat item
-        } 
+        }
         // If type is 'unread', hide chat items with unreadCount 0
         else if (type === 'unread') {
             chatItems[i].style.setProperty('display', 'none', 'important'); // Hide chat item
-        } 
+        }
         // If type is 'all', show all chat items
         else {
             chatItems[i].style.setProperty('display', 'block');
@@ -764,7 +772,6 @@ div#chat-list-unread {
 </script>
 
     <!-- Your JavaScript -->
-    
    <script>
 document.addEventListener('DOMContentLoaded', function () {
     const textarea = document.querySelector('.chat-input');
@@ -786,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Auto-resize the textarea
         textarea.style.height = 'auto'; // Reset the height
         textarea.style.height = (textarea.scrollHeight) + 'px'; // Set it to the scroll height
-        
+
         // Update file icon visibility
         updateFileIconVisibility();
     });

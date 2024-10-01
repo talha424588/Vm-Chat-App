@@ -58,12 +58,6 @@ z-index: 1; /* Ensure it is above other content */
 	}
 
 
-	@media (max-width: 768px) {  /* Adjust the max-width as necessary */
-		.chat-action-icons {
-	
-			display: contents;
-		}
-	}
 	
 
 
@@ -494,6 +488,18 @@ color: #666; /* adjust the color to your liking */
 		  font-size: 24px;
 	  }
 
+
+
+
+	  i#voice-icon {
+		margin-left: 6px;
+		margin-top: 13px;
+	}
+	.chat-action-icons i {
+		margin-top: 17px;
+	}
+
+	
 	  .chat-action-icons i {
 
 		  color: #666;
@@ -544,6 +550,8 @@ color: #666; /* adjust the color to your liking */
 	  }
 	  .chat-action-icons {
   margin-left: -80px;
+  display: flex;
+
        }
 
 
@@ -662,9 +670,7 @@ body{
 }
 
 
-::-webkit-scrollbar {
-	width: 10px;
-}
+
 
 ::-webkit-scrollbar-track {
 	background: none;
@@ -718,9 +724,7 @@ body{
 	text-overflow: ellipsis;
 }
 
-#message-area {
-	border-left: 1px solid white;
-}
+
 
 #message-area .overlay {
 	background: #f0f2f5;
