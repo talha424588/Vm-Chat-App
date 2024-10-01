@@ -532,24 +532,15 @@ function handleSendMessage() {
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
 
 
-
-
-
-
-
-
-
-
-
 //Show Reply Message
 function showReply(message_id, messagebody,senderName) {
     console.log('MessageId: ' + message_id);
     console.log('MessageBody: ' + messagebody);
     console.log('SenderName: ' + senderName);
+    DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
 
-    // Update the quoted text with the message body
     var quotedTextElement = document.querySelector('#quoted-message .sender-name');
     quotedTextElement.textContent = senderName; // Set the new message body
 
@@ -1582,30 +1573,3 @@ function get_voice_list() {
 }
 
 
-async function showReply() {
-    const element = document.getElementById('reply-link');
-    DOM.replyId = element.getAttribute('data-message-id');
-    console.log(DOM.replyId);
-    try {
-        console.log("show reply");
-        const result = await fetch(`message/detail/${DOM.replyId}`);
-        if (!result.ok) {
-            throw new Error(`HTTP error! status: ${result.status}`);
-        }
-        const data = await result.json();
-        const quotedMessageDiv = document.getElementById('quoted-message');
-        const senderNameSpan = quotedMessageDiv.querySelector('.sender-name');
-        const quotedTextP = quotedMessageDiv.querySelector('.quoted-text');
-
-        senderNameSpan.textContent = data.message.user.name;
-        quotedTextP.textContent = data.message.msg;
-
-        const replyDiv = document.getElementById('reply-div');
-        replyDiv.style.display = 'block';
-
-        const iconContainer = document.querySelector('.icon-container');
-        iconContainer.style.bottom = '145px';
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
