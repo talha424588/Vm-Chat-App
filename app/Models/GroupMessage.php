@@ -21,4 +21,9 @@ class GroupMessage extends Model
     {
         return $this->belongsTo(User::class,"sender","unique_id");
     }
+
+    function reply()
+    {
+        return $this->belongsto(GroupMessage::class,'reply_id','id');
+    }
 }
