@@ -499,7 +499,6 @@ function editMessage(messageId, messageContent) {
         Editreplyarea.style.display = 'block';
     }
 
-
 }
 
 
@@ -564,55 +563,37 @@ function removeQuotedMessage() {
 }
 
 
-
-
-
-
-//Multiple Select Messages Start
 // Array to store selected message IDs
 let selectedMessageIds = [];
 
 function moveMessage(messageId) {
-    // Check if the message ID is already selected
     const index = selectedMessageIds.indexOf(messageId);
 
     if (index > -1) {
-        // If it's already selected, remove it (unselect it)
         selectedMessageIds.splice(index, 1);
     } else {
-        // If it's not selected, add it to the array
         selectedMessageIds.push(messageId);
     }
 
-    // Select the message div using its data attribute
     const messageElement = document.querySelector(`[data-message-id='${messageId}']`);
 
-    // Check if the message element exists
     if (messageElement) {
-        // Find the closest parent with the class "ml-3"
         const parentDiv = messageElement.closest('.ml-3');
 
-        // Toggle the 'selected-message' class to highlight/unhighlight the parent div
         if (parentDiv) {
             parentDiv.classList.toggle('selected-message');
         } else {
             // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
         }
 
-        // Hide the input area
         $('#input-area').hide();
 
-        // Show the action bar (assuming you have it hidden initially)
         $('#action-bar').show();
 
-        // Update the count in the selected-count div
         document.getElementById('selected-count').textContent = `${selectedMessageIds.length} message${selectedMessageIds.length > 1 ? 's' : ''} selected`;
 
-        // Update the value of the hidden input field with selected message IDs
         document.getElementById('messages_ids').value = selectedMessageIds.join(',');
 
-        // console.log(`Message with ID: ${messageId} has been highlighted/unhighlighted.`);
-        // console.log(`Selected messages: ${selectedMessageIds.join(', ')}`);
     } else {
         console.error(`Message with ID: ${messageId} not found.`);
     }
