@@ -515,7 +515,7 @@ function handleSendMessage() {
 
     document.getElementById('editMessageDiv').style.display = 'none';
     const textarea = document.getElementById('input');
-    textarea.value =''; // Append with a newline if there's already text
+    textarea.value = ''; // Append with a newline if there's already text
     const messageDiv = document.getElementById('messages');
     messageDiv.classList.remove('blur');
     const chat_action = document.getElementById('chat_action');
@@ -532,7 +532,7 @@ document.getElementById('send-message-btn').addEventListener('click', handleSend
 
 
 //Show Reply Message
-function showReply(message_id, messagebody,senderName) {
+function showReply(message_id, messagebody, senderName) {
     console.log('MessageId: ' + message_id);
     console.log('MessageBody: ' + messagebody);
     console.log('SenderName: ' + senderName);
@@ -967,7 +967,7 @@ let showChatList = () => {
 };
 
 let sendMessage = (type = 'Message', mediaName = null) => {
-    console.log("DOM.replyId",DOM.replyId);
+    console.log("DOM.replyId", DOM.replyId);
     var loginUser = {
         id: document.getElementById("login_user_id").value,
         name: document.getElementById("login_user_name").value,
@@ -1036,19 +1036,49 @@ let init = () => {
     console.log("Click the Image at top-left to open settings.");
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
 init();
+
+const messaging = firebase.messaging();
+
+Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+        console.log('Notification permission granted.');
+
+        // Get the FCM token
+        messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
+            if (token) {
+                console.log('FCM Token:', token);
+                let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                const updateUserFcmToken = fetch("user/update/" + token, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-Token": csrfToken,
+                    },
+                }).then(updateUserFcmToken => {
+                    if (!updateUserFcmToken.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    console.log(updateUserFcmToken);
+                }).catch(error => {
+                    console.log(error);
+                }
+                )
+                console.log("result", updateUser);
+            } else {
+                console.log('No registration token available. Request permission to generate one.');
+            }
+        }).catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+        });
+    } else {
+        console.log('Unable to get permission to notify.');
+    }
+});
+
+//   messaging.onMessage((payload) => {
+//     console.log('Message received. ', payload);
+//   });
 
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');
@@ -1259,10 +1289,10 @@ let searchGroups = async (searchQuery) => {
             const groupResponse = await fetch(url);
             const response = await groupResponse.json();
             if (response) {
-                console.log("response",response);
+                console.log("response", response);
                 const groups = response.data.groups;
-                console.log("groups",response.data.groups);
-                console.log("messages",response.data.messages);
+                console.log("groups", response.data.groups);
+                console.log("messages", response.data.messages);
                 chatList = [];
                 groups.forEach((group) => {
                     let chat = {};

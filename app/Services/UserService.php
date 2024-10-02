@@ -10,6 +10,12 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
 class UserService implements UserRepository
 {
+
+
+    public function updateFcmToken($token)
+    {
+        return $token;
+    }
     // public function authenticateUser(LoginRequestBody $request)
     // {
     //     $user = User::where('email' , $request->email)->first();
