@@ -15,16 +15,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-messaging.js"></script>
+
     <style>
-
-
-
-
-       .audio-message {
-    display: flex;
-    align-items: center;
-    width: 285px;
-}
+        .audio-message {
+            display: flex;
+            align-items: center;
+            width: 285px;
+        }
 
         .avatar {
             margin-right: 10px;
@@ -86,109 +84,100 @@
             display: flex;
             justify-content: space-between;
 
-			margin-left: 30px;
+            margin-left: 30px;
         }
-
     </style>
 
 
-   <style>
+    <style>
         .selected-message {
-        background-color: #E8E9EA; / Change background color /
-       padding:2px;
-        transition: background-color 0.3s ease; / Smooth transition effect /
-    }
-    #action-bar {
-        display: flex;
-        justify-content: space-between; / Distributes space between items /
-        align-items: center; / Vertically centers items /
-        height: 62px;
-    }
+            background-color: #E8E9EA;/ Change background color / padding: 2px;
+            transition: background-color 0.3s ease;/ Smooth transition effect /
+        }
 
-    #selected-count {
-        margin-right: auto; / Pushes the SVG to the right /
-        font-size: 16px;
-    }
+        #action-bar {
+            display: flex;
+            justify-content: space-between;/ Distributes space between items / align-items: center;/ Vertically centers items / height: 62px;
+        }
+
+        #selected-count {
+            margin-right: auto;/ Pushes the SVG to the right / font-size: 16px;
+        }
 
 
-    .selected-message {
-background-color: #E8E9EA; / Change background color /
-padding:2px;
-transition: background-color 0.3s ease; / Smooth transition effect /
-}
-#action-bar {
-display: flex;
-justify-content: space-between; / Distributes space between items /
-align-items: center; / Vertically centers items /
-height: 62px;
-}
+        .selected-message {
+            background-color: #E8E9EA;/ Change background color / padding: 2px;
+            transition: background-color 0.3s ease;/ Smooth transition effect /
+        }
 
-#selected-count {
-margin-right: auto; / Pushes the SVG to the right /
-font-size: 16px;
-}
+        #action-bar {
+            display: flex;
+            justify-content: space-between;/ Distributes space between items / align-items: center;/ Vertically centers items / height: 62px;
+        }
 
-.selected-user {
-background-color: #f8f9fa;
-border-top: 1px solid #ddd;
-padding: 10px;
-display: none !important; / Initially hidden /
-}
+        #selected-count {
+            margin-right: auto;/ Pushes the SVG to the right / font-size: 16px;
+        }
+
+        .selected-user {
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+            padding: 10px;
+            display: none !important;/ Initially hidden /
+        }
 
 
-.selected-username {
-font-weight: bold;
-font-size: 16px;
-}
+        .selected-username {
+            font-weight: bold;
+            font-size: 16px;
+        }
 
-.btn-success {
-border-radius: 50%;
-width: 40px;
-height: 40px;
-display: flex;
-align-items: center;
-justify-content: center;
-}
+        .btn-success {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-/ General styling for chat list item /
-.chat-list-item {
-cursor: pointer;
-display: flex;
-align-items: center; / This will vertically center the radio button /
-transition: background-color 0.3s ease;
-}
+        / General styling for chat list item / .chat-list-item {
+            cursor: pointer;
+            display: flex;
+            align-items: center;/ This will vertically center the radio button / transition: background-color 0.3s ease;
+        }
 
-.chat-list-item:hover {
-background-color: #f0f0f0;
-}
+        .chat-list-item:hover {
+            background-color: #f0f0f0;
+        }
 
-/ Centering the radio button vertically /
-.chat-radio {
-margin-right: 10px; / Space between radio button and profile image /
-width: 18px; / Adjust size of radio button /
-height: 18px;
-}
+        / Centering the radio button vertically / .chat-radio {
+            margin-right: 10px;/ Space between radio button and profile image / width: 18px;/ Adjust size of radio button / height: 18px;
+        }
 
-.name {
-font-weight: bold;
-font-size: 16px;
-}
+        .name {
+            font-weight: bold;
+            font-size: 16px;
+        }
 
-.last-message {
-color: #888;
-font-size: 14px;
-}
-.blur {
-    filter: blur(1px); 
-    transition: filter 0.3s ease; /* Optional: Smooth transition */
-}
-</style>
-<style>
-    .auto-resize-textarea{
- overflow: hidden; 
-}
-</style>
+        .last-message {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .blur {
+            filter: blur(1px);
+            transition: filter 0.3s ease;
+            /* Optional: Smooth transition */
+        }
+    </style>
+    <style>
+        .auto-resize-textarea {
+            overflow: hidden;
+        }
+    </style>
 </head>
+
 <body>
 
 
@@ -209,7 +198,9 @@ font-size: 14px;
 
                     <div class="nav-item dropdown ml-auto">
 
-                        <button type="button" class="btn loginbutton btn-block" id="logout" style="background-color:#1DAB61; color:white; border-radius: 10px; padding-right:15px;padding-left: 15px;" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <button type="button" class="btn loginbutton btn-block" id="logout"
+                            style="background-color:#1DAB61; color:white; border-radius: 10px; padding-right:15px;padding-left: 15px;"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             Logout
                         </button>
 
@@ -230,7 +221,7 @@ font-size: 14px;
                             <button class="button active" onclick="display_chat('all')">All</button>
                             <button class="button" onclick="display_chat('unread')">Unread</button>
 
-                           <!--- <button class="button active">All</button>
+                            <!--- <button class="button active">All</button>
                             <button class="button" id="unread">Unread</button>
                             {{-- <button class="button">Groups</button> --}}--->
                         </div>
@@ -301,36 +292,44 @@ font-size: 14px;
                 <div class="d-flex flex-column chat_list_messages" id="messages"></div>
 
 
-<!-- New Code To Move Message -->
-<div class="chat-input-container" id="action-bar" style="display:none;">
-    &nbsp;&nbsp;&nbsp;
-    <svg width="14" height="14" id="cancel-icon"  viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M1 12.9966L13 1M1 1L13 12.9966" stroke="#687780" stroke-width="2" stroke-linecap="round"/>
-        </svg>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="selected-count">Selected Messages: 0</div>
-    <svg width="31" height="31" id="openModalTrigger" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-        <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white"/>
-    </svg>
-</div>
-<div class="modal fade" id="chatModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content" style="width:100%; height:752px">
-            <div class="modal-header" style="background-color: #1DAB61; font-size: 18px; font-weight: 400;">
-                <h5 class="modal-title" style="color:white;">Move message to</h5>
-                <button type="button" style="color:white;" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" style="padding: 0px !important;">
-                <div class="search-header" style="padding: 10px 9px 12px 0px; border-bottom: 0px;">
-                    <input type="search" placeholder="Search messages" class="search-input" style="width: 100%;">
+                <!-- New Code To Move Message -->
+                <div class="chat-input-container" id="action-bar" style="display:none;">
+                    &nbsp;&nbsp;&nbsp;
+                    <svg width="14" height="14" id="cancel-icon" viewBox="0 0 14 14" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 12.9966L13 1M1 1L13 12.9966" stroke="#687780" stroke-width="2"
+                            stroke-linecap="round" />
+                    </svg>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="selected-count">Selected Messages: 0</div>
+                    <svg width="31" height="31" id="openModalTrigger" viewBox="0 0 31 31" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
+                        <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white" />
+                    </svg>
                 </div>
-                <div class="recent-chat" style="padding: 0px 0px 0px 10px; text-align: left;">
-                    <span style="font-weight: bold; display: block; margin-bottom: 5px;">Recent Chat</span>
+                <div class="modal fade" id="chatModal" tabindex="-1" role="dialog"
+                    aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content" style="width:100%; height:752px">
+                            <div class="modal-header"
+                                style="background-color: #1DAB61; font-size: 18px; font-weight: 400;">
+                                <h5 class="modal-title" style="color:white;">Move message to</h5>
+                                <button type="button" style="color:white;" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" style="padding: 0px !important;">
+                                <div class="search-header" style="padding: 10px 9px 12px 0px; border-bottom: 0px;">
+                                    <input type="search" placeholder="Search messages" class="search-input"
+                                        style="width: 100%;">
+                                </div>
+                                <div class="recent-chat" style="padding: 0px 0px 0px 10px; text-align: left;">
+                                    <span style="font-weight: bold; display: block; margin-bottom: 5px;">Recent
+                                        Chat</span>
 
-                    <!-- Chat list items -->
-                    <div class="row" id="chat-list2" style="overflow:auto;"></div>
-                    <!-- <div class="d-flex flex-row w-100 p-2 border-bottom unread align-items-center">
+                                    <!-- Chat list items -->
+                                    <div class="row" id="chat-list2" style="overflow:auto;"></div>
+                                    <!-- <div class="d-flex flex-row w-100 p-2 border-bottom unread align-items-center">
                         <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('Programmers')">
                         <img src="images/0923102932_aPRkoW.jpg" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
@@ -347,31 +346,34 @@ font-size: 14px;
                             <div class="small last-message">message or status is here </div>
                         </div>
                     </div> -->
+                                </div>
+                            </div>
+
+                            <!-- Bottom section for selected user display -->
+                            <div id="selected-usertosend"
+                                class="selected-user d-flex align-items-center justify-content-between"
+                                style="padding: 10px; background-color: #F0F2F5; border-top: 1px solid #ddd; display: none;">
+                                <span id="selected-username" class="selected-username"></span>
+                                <!-- Hidden inputs to store message IDs and group ID -->
+                                <input type="hidden" name="messages_ids" id="messages_ids">
+                                <input type="hidden" name="group_to_move_message" id="group_to_move_message">
+
+                                <!-- SVG element that triggers the post action -->
+                                <svg width="31" height="31" id="MoveMessagetoGroup" viewBox="0 0 31 31"
+                                    fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"></circle>
+                                    <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Bottom section for selected user display -->
-            <div id="selected-usertosend" class="selected-user d-flex align-items-center justify-content-between" style="padding: 10px; background-color: #F0F2F5; border-top: 1px solid #ddd; display: none;">
-                <span id="selected-username" class="selected-username"></span>
-              <!-- Hidden inputs to store message IDs and group ID -->
-<input type="hidden" name="messages_ids" id="messages_ids">
-<input type="hidden" name="group_to_move_message" id="group_to_move_message">
-
-<!-- SVG element that triggers the post action -->
-<svg width="31" height="31" id="MoveMessagetoGroup" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"></circle>
-    <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white"></path>
-</svg>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 
 
 
-<!---new code is above that line --->
+                <!---new code is above that line --->
 
                 <div id="emoji-picker-wrapper"></div>
                 <!-- Input -->
@@ -389,28 +391,31 @@ font-size: 14px;
                     </div>
 
 
-      
 
-<!---Edit Message Area Start-->
-<div id="editMessageDiv" style="padding-right:30px; padding-left:30px; padding-top:10px;display:none;">
 
-<div class="">
-<div class="align-self-end self d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item right-nidle" >
-<div style="margin-top:-4px">
-    <div class="shadow-sm EditmessageContent" style="background:#dcf8c6; padding:10px; border-radius:5px;">
-        ${messageContent}
-    </div>
-  
-</div>
-</div>
-</div>
-</div>
+                    <!---Edit Message Area Start-->
+                    <div id="editMessageDiv"
+                        style="padding-right:30px; padding-left:30px; padding-top:10px;display:none;">
 
-<!---Edit Message Area End--> 
-    
-	
-	
-	
+                        <div class="">
+                            <div
+                                class="align-self-end self d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item right-nidle">
+                                <div style="margin-top:-4px">
+                                    <div class="shadow-sm EditmessageContent"
+                                        style="background:#dcf8c6; padding:10px; border-radius:5px;">
+                                        ${messageContent}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!---Edit Message Area End-->
+
+
+
+
                     <div class="chat-input-container  justify-self-end align-items-center flex-row" id="reply-area">
                         <i id="sticker-icon" class="chat-icon">
                             <!-- Default Sticker Icon -->
@@ -422,18 +427,19 @@ font-size: 14px;
                             </svg>
                         </i>
 
-<style>
-    .auto-resize-textarea{
- overflow: hidden;
-}
-</style>
+                        <style>
+                            .auto-resize-textarea {
+                                overflow: hidden;
+                            }
+                        </style>
 
 
-                            <textarea id="input" class="chat-input auto-resize-textarea" rows="1" cols="62"  placeholder="Type a message"></textarea>
+                        <textarea id="input" class="chat-input auto-resize-textarea" rows="1" cols="62"
+                            placeholder="Type a message"></textarea>
 
 
 
-      
+
                         <div class="chat-action-icons" id="chat_action">
                             <i id="file-icon" class="chat-icon" style="padding-left: 3px; ">
                                 <svg width="23" height="20" viewBox="0 0 23 20" fill="none"
@@ -450,7 +456,7 @@ font-size: 14px;
                                         fill="#687780" />
 
                                 </svg></i>
-					<i id="voice-icon" class="chat-icon" >
+                            <i id="voice-icon" class="chat-icon">
 
                                 <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
                                     viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -462,11 +468,11 @@ font-size: 14px;
                             </i>
 
 
-                        
+
                         </div>
-						
-						
-						<div class="chat-action-icons" id="Editreply-area">
+
+
+                        <div class="chat-action-icons" id="Editreply-area">
                             <i id="file-icon" class="chat-icon" style="padding-left: 3px; ">
                                 <svg width="23" height="20" viewBox="0 0 23 20" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -482,31 +488,34 @@ font-size: 14px;
                                         fill="#687780" />
 
                                 </svg></i>
-				
 
 
-                            <i id="send-message-btn" class="chat-icon" >
-                              
-                            <svg width="31" height="30" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-<path d="M22.4355 8.33332L5.11261 12.4775C4.93818 12.5193 4.77916 12.6096 4.65403 12.7381C4.5289 12.8666 4.44279 13.028 4.40569 13.2035C4.3686 13.3789 4.38204 13.5613 4.44446 13.7295C4.50688 13.8976 4.61571 14.0446 4.75833 14.1534L8.52702 17.0255L15.9931 14.5851L11.9722 21.3327L13.9464 25.6403C14.0206 25.8039 14.1399 25.943 14.2903 26.0413C14.4407 26.1397 14.6159 26.1931 14.7956 26.1955C14.9753 26.1979 15.1519 26.149 15.3048 26.0547C15.4577 25.9603 15.5806 25.8244 15.6591 25.6628L23.5073 9.67331C23.5867 9.51179 23.6184 9.33102 23.5989 9.15212C23.5793 8.97323 23.5092 8.8036 23.3968 8.66306C23.2844 8.52252 23.1343 8.41689 22.9641 8.35849C22.7938 8.3001 22.6105 8.29137 22.4355 8.33332Z" fill="white"/>
-</svg>
+
+                            <i id="send-message-btn" class="chat-icon">
+
+                                <svg width="31" height="30" viewBox="0 0 31 31" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
+                                    <path
+                                        d="M22.4355 8.33332L5.11261 12.4775C4.93818 12.5193 4.77916 12.6096 4.65403 12.7381C4.5289 12.8666 4.44279 13.028 4.40569 13.2035C4.3686 13.3789 4.38204 13.5613 4.44446 13.7295C4.50688 13.8976 4.61571 14.0446 4.75833 14.1534L8.52702 17.0255L15.9931 14.5851L11.9722 21.3327L13.9464 25.6403C14.0206 25.8039 14.1399 25.943 14.2903 26.0413C14.4407 26.1397 14.6159 26.1931 14.7956 26.1955C14.9753 26.1979 15.1519 26.149 15.3048 26.0547C15.4577 25.9603 15.5806 25.8244 15.6591 25.6628L23.5073 9.67331C23.5867 9.51179 23.6184 9.33102 23.5989 9.15212C23.5793 8.97323 23.5092 8.8036 23.3968 8.66306C23.2844 8.52252 23.1343 8.41689 22.9641 8.35849C22.7938 8.3001 22.6105 8.29137 22.4355 8.33332Z"
+                                        fill="white" />
+                                </svg>
 
                             </i>
                         </div>
-						 </div>
-						 
-						 
-						 
-						 
-						  
-						 
-						 
-						 
-						 
-						 
+                    </div>
+
+
+
+
+
+
+
+
+
+
                     <input type="hidden" class="number" id="edit_message_id">
- <input type="file" id="hidden-file-input" name="photo" accept="image/*" />
+                    <input type="file" id="hidden-file-input" name="photo" accept="image/*" />
                     <!-- Hidden file input for multiple files -->
                     <input type="file" id="file-input" multiple>
 
@@ -529,7 +538,8 @@ font-size: 14px;
                                 d="M0 17C0 18.7 1.3 20 3 20H17C18.7 20 20 18.7 20 17V9H0V17ZM17 2H15V1C15 0.4 14.6 0 14 0C13.4 0 13 0.4 13 1V2H7V1C7 0.4 6.6 0 6 0C5.4 0 5 0.4 5 1V2H3C1.3 2 0 3.3 0 5V7H20V5C20 3.3 18.7 2 17 2Z"
                                 fill="#687780" />
                         </svg>
-                        &nbsp;&nbsp;<input type="search" placeholder="Search messages" class="search-input" id="messsage_search_query">
+                        &nbsp;&nbsp;<input type="search" placeholder="Search messages" class="search-input"
+                            id="messsage_search_query">
                     </div>
 
                 </div>
@@ -605,185 +615,191 @@ font-size: 14px;
     <input type="hidden" value="{{ Auth::user()->email }}" id="login_user_email">
     {{-- <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script> --}}
     {{-- @vite(['resources/js/app.js']) --}}
-  <style>.hidden {
-    display: none !important; /* Use !important to override any inline styles */
-}
-
-div#chat-list-unread {
-    text-align: center;
-    margin-top: 60px;
-}
-</style>
-
-</style>
-
-<script>
-    function display_chat(type) {
-    const chatList = document.getElementById('chat-list');
-    const chatItems = chatList.getElementsByClassName('chat-list-item');
-
-    // Get the alert div
-    const alertDiv = document.getElementById('chat-list-unread');
-    // Get all buttons
-    const buttons = document.querySelectorAll('.buttons .button');
-
-    // Remove 'active' class from all buttons
-    buttons.forEach(button => {
-        button.classList.remove('active');
-    });
-
-    // Set 'active' class on the clicked button
-    if (type === 'unread') {
-        buttons[1].classList.add('active'); // Assuming the unread button is the second one
-    } else {
-        buttons[0].classList.add('active'); // Assuming the all button is the first one
-    }
-
-    let hasUnreadMessages = false; // Flag to check if any unread messages are present
-
-    for (let i = 0; i < chatItems.length; i++) {
-        const unreadCountElement = chatItems[i].getElementsByClassName('badge-success')[0];
-        let unreadCount = 0; // Default to 0 if no badge found
-
-        // Check if the unreadCountElement exists and parse its value if visible
-        if (unreadCountElement && unreadCountElement.style.display !== 'none') {
-            unreadCount = parseInt(unreadCountElement.innerText);
+    <style>
+        .hidden {
+            display: none !important;
+            /* Use !important to override any inline styles */
         }
-        console.log(unreadCount);
 
-        // If unreadCount is greater than 0, show the chat item and set the flag
-        if (unreadCount > 0) {
-            hasUnreadMessages = true;
-            chatItems[i].style.setProperty('display', 'block'); // Show the chat item
+        div#chat-list-unread {
+            text-align: center;
+            margin-top: 60px;
         }
-        // If type is 'unread', hide chat items with unreadCount 0
-        else if (type === 'unread') {
-            chatItems[i].style.setProperty('display', 'none', 'important'); // Hide chat item
-        }
-        // If type is 'all', show all chat items
-        else {
-            chatItems[i].style.setProperty('display', 'block');
-        }
-    }
+    </style>
 
-    // If type is 'unread' and there are no unread messages
-    if (type === 'unread' && !hasUnreadMessages) {
-        chatList.style.display = 'none'; // Hide the chat list
-        alertDiv.style.display = 'block'; // Show the alert div
-        alertDiv.innerHTML = 'No unread messages are available.'; // Display the message inside the alert div
-    } else {
-        alertDiv.style.display = 'none'; // Hide the alert if not applicable
-        chatList.style.display = 'block'; // Show the chat list if there are unread messages
-    }
-}
+    </style>
 
-</script>
+    <script>
+        function display_chat(type) {
+            const chatList = document.getElementById('chat-list');
+            const chatItems = chatList.getElementsByClassName('chat-list-item');
 
+            // Get the alert div
+            const alertDiv = document.getElementById('chat-list-unread');
+            // Get all buttons
+            const buttons = document.querySelectorAll('.buttons .button');
 
+            // Remove 'active' class from all buttons
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
 
-
-
-<script type="module">
-    import { Picker } from 'https://esm.sh/emoji-picker-element@1.18.2';
-
-    $(document).ready(function() {
-        const picker = new Picker({
-            locale: 'en'
-        });
-        const emojiPickerWrapper = document.getElementById('emoji-picker-wrapper');
-        emojiPickerWrapper.appendChild(picker);
-
-        const input = document.getElementById('input');
-        const emojiBtn = document.getElementById('sticker-icon');
-
-        let isPickerVisible = false;
-
-        emojiBtn.addEventListener('click', () => {
-            // Toggle the visibility of the emoji picker
-            isPickerVisible = !isPickerVisible;
-
-            if (isPickerVisible) {
-                // Position the emoji picker at the bottom of the viewport
-                emojiPickerWrapper.style.position = 'fixed'; // Position it fixed relative to the viewport
-                emojiPickerWrapper.style.top = 'auto'; // Reset the top position
-                emojiPickerWrapper.style.bottom = '8%'; // Align the bottom of the picker with the bottom of the viewport
-                emojiPickerWrapper.style.left = '34%'; // Adjust the left position if needed
-
-                emojiPickerWrapper.style.display = 'block'; // Show the picker
+            // Set 'active' class on the clicked button
+            if (type === 'unread') {
+                buttons[1].classList.add('active'); // Assuming the unread button is the second one
             } else {
-                emojiPickerWrapper.style.display = 'none'; // Hide the picker
+                buttons[0].classList.add('active'); // Assuming the all button is the first one
             }
-        });
 
-        picker.addEventListener('emoji-click', event => {
-            const emoji = event.detail.emoji.unicode;
-            const inputField = input;
+            let hasUnreadMessages = false; // Flag to check if any unread messages are present
 
-            // Get the current cursor position
-            const start = inputField.selectionStart;
-            const end = inputField.selectionEnd;
+            for (let i = 0; i < chatItems.length; i++) {
+                const unreadCountElement = chatItems[i].getElementsByClassName('badge-success')[0];
+                let unreadCount = 0; // Default to 0 if no badge found
 
-            // Insert emoji at cursor position
-            inputField.value = inputField.value.substring(0, start) + emoji + inputField.value.substring(end);
+                // Check if the unreadCountElement exists and parse its value if visible
+                if (unreadCountElement && unreadCountElement.style.display !== 'none') {
+                    unreadCount = parseInt(unreadCountElement.innerText);
+                }
+                console.log(unreadCount);
 
-            // Move the cursor to the end of the inserted emoji
-            inputField.selectionStart = inputField.selectionEnd = start + emoji.length;
-
-            inputField.focus(); // Refocus the input field
-
-            // Removed the line that hides the picker
-            // emojiPickerWrapper.style.display = 'none'; // Hide the picker after selection
-            // isPickerVisible = false; // Update visibility state
-        });
-
-        // Optional: Hide the picker if clicking outside
-        $(document).click((event) => {
-            if (!emojiPickerWrapper.contains(event.target) && !emojiBtn.contains(event.target)) {
-                emojiPickerWrapper.style.display = 'none';
-                isPickerVisible = false; // Update visibility state
+                // If unreadCount is greater than 0, show the chat item and set the flag
+                if (unreadCount > 0) {
+                    hasUnreadMessages = true;
+                    chatItems[i].style.setProperty('display', 'block'); // Show the chat item
+                }
+                // If type is 'unread', hide chat items with unreadCount 0
+                else if (type === 'unread') {
+                    chatItems[i].style.setProperty('display', 'none', 'important'); // Hide chat item
+                }
+                // If type is 'all', show all chat items
+                else {
+                    chatItems[i].style.setProperty('display', 'block');
+                }
             }
+
+            // If type is 'unread' and there are no unread messages
+            if (type === 'unread' && !hasUnreadMessages) {
+                chatList.style.display = 'none'; // Hide the chat list
+                alertDiv.style.display = 'block'; // Show the alert div
+                alertDiv.innerHTML = 'No unread messages are available.'; // Display the message inside the alert div
+            } else {
+                alertDiv.style.display = 'none'; // Hide the alert if not applicable
+                chatList.style.display = 'block'; // Show the chat list if there are unread messages
+            }
+        }
+    </script>
+
+
+
+
+
+    <script type="module">
+        import {
+            Picker
+        } from 'https://esm.sh/emoji-picker-element@1.18.2';
+
+        $(document).ready(function() {
+            const picker = new Picker({
+                locale: 'en'
+            });
+            const emojiPickerWrapper = document.getElementById('emoji-picker-wrapper');
+            emojiPickerWrapper.appendChild(picker);
+
+            const input = document.getElementById('input');
+            const emojiBtn = document.getElementById('sticker-icon');
+
+            let isPickerVisible = false;
+
+            emojiBtn.addEventListener('click', () => {
+                // Toggle the visibility of the emoji picker
+                isPickerVisible = !isPickerVisible;
+
+                if (isPickerVisible) {
+                    // Position the emoji picker at the bottom of the viewport
+                    emojiPickerWrapper.style.position =
+                    'fixed'; // Position it fixed relative to the viewport
+                    emojiPickerWrapper.style.top = 'auto'; // Reset the top position
+                    emojiPickerWrapper.style.bottom =
+                    '8%'; // Align the bottom of the picker with the bottom of the viewport
+                    emojiPickerWrapper.style.left = '34%'; // Adjust the left position if needed
+
+                    emojiPickerWrapper.style.display = 'block'; // Show the picker
+                } else {
+                    emojiPickerWrapper.style.display = 'none'; // Hide the picker
+                }
+            });
+
+            picker.addEventListener('emoji-click', event => {
+                const emoji = event.detail.emoji.unicode;
+                const inputField = input;
+
+                // Get the current cursor position
+                const start = inputField.selectionStart;
+                const end = inputField.selectionEnd;
+
+                // Insert emoji at cursor position
+                inputField.value = inputField.value.substring(0, start) + emoji + inputField.value
+                    .substring(end);
+
+                // Move the cursor to the end of the inserted emoji
+                inputField.selectionStart = inputField.selectionEnd = start + emoji.length;
+
+                inputField.focus(); // Refocus the input field
+
+                // Removed the line that hides the picker
+                // emojiPickerWrapper.style.display = 'none'; // Hide the picker after selection
+                // isPickerVisible = false; // Update visibility state
+            });
+
+            // Optional: Hide the picker if clicking outside
+            $(document).click((event) => {
+                if (!emojiPickerWrapper.contains(event.target) && !emojiBtn.contains(event.target)) {
+                    emojiPickerWrapper.style.display = 'none';
+                    isPickerVisible = false; // Update visibility state
+                }
+            });
         });
-    });
-</script>
+    </script>
 
     <!-- Your JavaScript -->
-   <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const textarea = document.querySelector('.chat-input');
-    const fileIcon = document.querySelector('#file-icon');
-    const chaticon = document.querySelector('#captureid');
-    // Function to update file icon visibility
-    function updateFileIconVisibility() {
-        if (textarea.value.trim() === "") {
-            fileIcon.style.visibility = 'visible'; // Show the file-icon when textarea is empty
-            chaticon.style.visibility = 'visible'; // Show the file-icon when textarea is empty
-        } else {
-            fileIcon.style.visibility = 'hidden'; // Hide the file-icon when textarea has text
-            chaticon.style.visibility = 'hidden'; // Hide the file-icon when textarea has text
-        }
-    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.querySelector('.chat-input');
+            const fileIcon = document.querySelector('#file-icon');
+            const chaticon = document.querySelector('#captureid');
+            // Function to update file icon visibility
+            function updateFileIconVisibility() {
+                if (textarea.value.trim() === "") {
+                    fileIcon.style.visibility = 'visible'; // Show the file-icon when textarea is empty
+                    chaticon.style.visibility = 'visible'; // Show the file-icon when textarea is empty
+                } else {
+                    fileIcon.style.visibility = 'hidden'; // Hide the file-icon when textarea has text
+                    chaticon.style.visibility = 'hidden'; // Hide the file-icon when textarea has text
+                }
+            }
 
-    // Event listener for input changes
-    textarea.addEventListener('input', function () {
-        // Auto-resize the textarea
-        textarea.style.height = 'auto'; // Reset the height
-        textarea.style.height = (textarea.scrollHeight) + 'px'; // Set it to the scroll height
+            // Event listener for input changes
+            textarea.addEventListener('input', function() {
+                // Auto-resize the textarea
+                textarea.style.height = 'auto'; // Reset the height
+                textarea.style.height = (textarea.scrollHeight) + 'px'; // Set it to the scroll height
 
-        // Update file icon visibility
-        updateFileIconVisibility();
-    });
+                // Update file icon visibility
+                updateFileIconVisibility();
+            });
 
-    // Event listener for focus on textarea
-    textarea.addEventListener('focus', function () {
-        updateFileIconVisibility(); // Check visibility when focused
-    });
+            // Event listener for focus on textarea
+            textarea.addEventListener('focus', function() {
+                updateFileIconVisibility(); // Check visibility when focused
+            });
 
-    // Event listener for blur to check if empty
-    textarea.addEventListener('blur', function () {
-        updateFileIconVisibility(); // Ensure correct visibility when focus is lost
-    });
-});
-</script>
+            // Event listener for blur to check if empty
+            textarea.addEventListener('blur', function() {
+                updateFileIconVisibility(); // Ensure correct visibility when focus is lost
+            });
+        });
+    </script>
     <script src="{{ asset('assets/js/filesize-aleart.js') }}"></script>
     <script src="{{ asset('assets/js/sidemodel.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
