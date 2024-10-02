@@ -702,12 +702,25 @@ function editMessage(messageId, messageContent) {
     messageDiv.classList.add('blur');
 
     // Hide the voice icon
-    const voiceIcon = document.getElementById('chat_action');
- 
+    const chat_action = document.getElementById('chat_action');
+   
     const Editreplyarea = document.getElementById('Editreply-area');
-    if (voiceIcon) {
+    const voiceIcon = document.getElementById('voice-icon');
+    const fileicon = document.getElementById('file-icon');
+    const captureid = document.getElementById('captureid');
+
+
+   
+    
+
+
+    if (chat_action) {
         voiceIcon.style.display = 'none'; // Set visibility to hidden
+       
         Editreplyarea.style.display = 'block'; 
+        voiceIcon.style.visibility = 'hidden';
+        fileicon.style.visibility = 'hidden';
+        captureid.style.visibility = 'hidden';
     }
 
     
@@ -717,6 +730,9 @@ function editMessage(messageId, messageContent) {
 
 // Function to handle Edit send message button click
 function handleSendMessage() {
+
+   
+
     // Get the value from the hidden input field
     const messageId = document.getElementById('edit_message_id').value;
     // Get the value from the textarea
@@ -1368,8 +1384,10 @@ voiceIcon.addEventListener('click', () => {
 
 
 
-
-
+//Select the Images From the Local Drive
+document.getElementById('captureid').addEventListener('click', function() {
+    document.getElementById('hidden-file-input').click();
+});
 
 
 
@@ -1400,8 +1418,19 @@ fileInput.addEventListener('change', (event) => {
 
 document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
-        event.preventDefault();
-        sendMessage();
+
+        const editReplyArea = document.getElementById('Editreply-area');
+
+        if (window.getComputedStyle(editReplyArea).display === 'none') {
+            console.log('The div is hidden (display: none).');
+            event.preventDefault();
+            sendMessage();
+
+        } else if (window.getComputedStyle(editReplyArea).display === 'block') {
+          document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
+        } else {
+            console.log('The div has a different display property.');
+        }
     }
 });
 

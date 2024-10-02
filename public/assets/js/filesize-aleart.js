@@ -1,6 +1,6 @@
 document.getElementById('file-input').addEventListener('change', function(event) {
     const files = event.target.files;
-    const maxSize = 500 * 1024 * 1024; // 500MB in bytes // 10KB in bytes
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes // 10KB in bytes
 
     for (let i = 0; i < files.length; i++) {
       if (files[i].size > maxSize) {

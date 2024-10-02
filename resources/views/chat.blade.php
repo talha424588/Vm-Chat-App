@@ -538,6 +538,9 @@ font-size: 14px;
                 </div>
             </div>
 
+
+     
+
             <div id="sidebar" class="sidebar-closed col-md-4">
                 <div class="header-shadow">
                     <div class="row d-flex flex-row align-items-center" id="navbar"
