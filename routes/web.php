@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\Chat\GroupController;
 use App\Http\Controllers\UserController;
+use App\Services\FirebaseService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -65,3 +66,7 @@ Route::post('/messages', [ChatController::class, 'store']);
 
 // Auth::routes();
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+Route::get("/accessToken", [FirebaseService::class, 'sendMessageNotification']);
+

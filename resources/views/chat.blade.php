@@ -613,6 +613,7 @@
     <input type="hidden" value="{{ Auth::user()->name }}" id="login_user_name">
     <input type="hidden" value="{{ Auth::user()->unique_id }}" id="login_user_unique_id">
     <input type="hidden" value="{{ Auth::user()->email }}" id="login_user_email">
+    <input type="hidden" value="{{ Auth::user()->fcm_token }}" id="login_user_fcm_token">
     {{-- <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script> --}}
     {{-- @vite(['resources/js/app.js']) --}}
     <style>
