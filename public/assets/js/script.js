@@ -457,8 +457,9 @@ let addMessageToMessageArea = (message) => {
             <i class="fas fa-angle-down text-muted px-2"></i>
           </a>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+         ${!['Audio', 'Image', 'File'].includes(message.type) ? `
         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
-
+      ` : ''}
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
             <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${message.msg}','${senderName}')">Correction</a>
@@ -789,6 +790,17 @@ function handleSendMessage() {
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
 
 
+function removeEditMessage(){
+    document.getElementById('editMessageDiv').style.display = 'none';
+    const Editreplyarea = document.getElementById('Editreply-area');
+    Editreplyarea.style.display = 'none'; 
+    const correctionarea = document.getElementById('correction-div');
+    correctionarea.style.display = 'none'; 
+    const messageDiv = document.getElementById('messages');
+    messageDiv.classList.remove('blur');
+    const textarea = document.getElementById('input');
+    textarea.value ='';
+}
 
 
 
@@ -1023,7 +1035,9 @@ let addNewMessageToArea = (message) => {
                                 <i class="fas fa-angle-down text-muted px-2"></i>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
+                                ${!['Audio', 'Image', 'File'].includes(message.type) ? `
+        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
+      ` : ''}
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                 <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                             </div>
@@ -1282,6 +1296,7 @@ const ids = pagnicateChatList.data.map(item => item.id);
       
 
     get_voice_list();
+    removeEditMessage();
 };
 
 let showChatList = () => {
@@ -1412,7 +1427,7 @@ const startRecording = () => {
                 const blob = new Blob(chunks, { type: 'audio/wav' });
                 const audioUrl = URL.createObjectURL(blob);
                 const audio = new Audio(audioUrl);
-                audio.play();
+                
 
                 const ref = firebase.storage().ref("audio/" + DOM.unique_id);
                 const mediaName = "recording.wav";

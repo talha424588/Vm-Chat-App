@@ -405,19 +405,19 @@ font-size: 14px;
       
 
 <!---Edit Message Area Start-->
-<div id="editMessageDiv" style="padding-right:30px; padding-left:30px; padding-top:10px;display:none;">
-
-<div class="">
-<div class="align-self-end self d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item right-nidle" >
-<div style="margin-top:-4px">
-    <div class="shadow-sm EditmessageContent" style="background:#dcf8c6; padding:10px; border-radius:5px;">
-        ${messageContent}
+<div id="editMessageDiv" style="padding-right:30px; padding-left:30px; padding-top:10px; display:none;">
+  <div class="d-flex justify-content-between align-items-center">
+    <span class="" onclick="removeEditMessage()" style="margin-right: auto;">✖</span>
+    <div class="align-self-end self d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item right-nidle">
+      <div style="margin-top:-4px">
+        <div class="shadow-sm EditmessageContent" style="background:#dcf8c6; padding:10px; border-radius:5px;">
+          ${messageContent}
+        </div>
+      </div>
     </div>
-  
+  </div>
 </div>
-</div>
-</div>
-</div>
+
 
 <!---Edit Message Area End--> 
     
@@ -529,7 +529,7 @@ font-size: 14px;
 						 
 						 
 						 
-                         <input type="hidden" class="number" id="correction_message_id">				 
+<input type="hidden" class="number" id="correction_message_id">				 
  <input type="hidden" class="number" id="edit_message_id">
  <input type="file" id="hidden-file-input" name="photo" accept="image/*" />
                     <!-- Hidden file input for multiple files -->
