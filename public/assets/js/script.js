@@ -35,6 +35,7 @@ let user = {
     name: document.getElementById("login_user_name").value,
     unique_id: document.getElementById("login_user_unique_id").value,
     email: document.getElementById("login_user_email").value,
+    fcm_token: document.getElementById("login_user_fcm_token").value,
     pic: "assets/images/profile-picture.webp"
 };
 let userGroupList = [];
@@ -972,8 +973,10 @@ let sendMessage = (type = 'Message', mediaName = null) => {
         id: document.getElementById("login_user_id").value,
         name: document.getElementById("login_user_name").value,
         unique_id: document.getElementById("login_user_unique_id").value,
-        email: document.getElementById("login_user_email").value
+        email: document.getElementById("login_user_email").value,
+        fcm_token: document.getElementById("login_user_fcm_token").value
     }
+    console.log("send message", user.fcm_token);
     const fileIcon = document.querySelector('#file-icon');
     const chaticon = document.querySelector('#captureid');
     fileIcon.style.visibility = 'visible';
@@ -1047,7 +1050,6 @@ Notification.requestPermission().then(permission => {
         // Get the FCM token
         messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
             if (token) {
-                console.log('FCM Token:', token);
                 let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
                 const updateUserFcmToken = fetch("user/update/" + token, {
                     method: "POST",
@@ -1059,12 +1061,11 @@ Notification.requestPermission().then(permission => {
                     if (!updateUserFcmToken.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
-                    console.log(updateUserFcmToken);
+                    document.getElementById("login_user_fcm_token").value = token;
                 }).catch(error => {
                     console.log(error);
                 }
                 )
-                console.log("result", updateUser);
             } else {
                 console.log('No registration token available. Request permission to generate one.');
             }
