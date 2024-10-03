@@ -39,7 +39,13 @@ class ChatService implements ChatRepository
         $perPage = 20;
         if (!$request->messageId) {
             $page = $request->get('page', 1);
-            $paginator = GroupMessage::where('group_id', $request->groupId)->with('user','reply')->orderBy('id', 'desc')
+            // $paginator = GroupMessage::where('group_id', $request->groupId)->with('user','reply')->orderBy('id', 'desc')
+            //     ->paginate($perPage, ['*'], 'page', $page);
+
+            $paginator = GroupMessage::where('group_id', $request->groupId)
+                ->where('is_deleted', false) // Add this line to filter out deleted messages
+                ->with('user', 'reply')
+                ->orderBy('id', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);
 
             if ($paginator != null) {
@@ -68,8 +74,7 @@ class ChatService implements ChatRepository
                     ]
                 ], 404);
             }
-        }else
-        {
+        } else {
             return $this->fetchMessagesUpToSearched($request);
         }
     }
@@ -80,11 +85,12 @@ class ChatService implements ChatRepository
         $groupId = $request->groupId;
 
         $messages = GroupMessage::where('group_id', $groupId)
-        ->where('id', '>=', $messageId)
-        ->orderBy('id', 'desc')
-        ->take(PHP_INT_MAX)
-        ->skip($pageNo * 20)
-        ->get();
+            ->where('id', '>=', $messageId)
+            ->where('is_deleted', false)
+            ->orderBy('id', 'desc')
+            ->take(PHP_INT_MAX)
+            ->skip($pageNo * 20)
+            ->get();
         return response()->json([
             'status' => true,
             'message' => 'Messages found',
@@ -123,7 +129,11 @@ class ChatService implements ChatRepository
 
     public function searchGroupMessages($query, $groupId)
     {
-        $messages = GroupMessage::where("msg", "LIKE", "%$query%")->where("group_id", $groupId)->with("user")->get();
+        $messages = GroupMessage::where("msg", "LIKE", "%$query%")
+            ->where("group_id", $groupId)
+            ->where('is_deleted', false)
+            ->with("user")
+            ->get();
         if (count($messages) > 0) {
             return response()->json(["status" => true, "message" => "success", "messages" => $messages]);
         } else {
@@ -133,10 +143,30 @@ class ChatService implements ChatRepository
 
     public function getMessageById($id)
     {
-        $message = GroupMessage::where('id', $id)->first();
+        $message = GroupMessage::where('id', $id)
+            ->where('is_deleted', false)
+            ->first();
         if ($message)
             return response()->json(["status" => true, "msessage" => "success", "message" => new MessageResource($message)]);
         else
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+    }
+
+    public function updateMessage($request)
+    {
+        $messageId = $request->input('id');
+        $messageContent = $request->input('message');
+
+        $message = GroupMessage::where('id', $messageId)->first();
+        if ($message) {
+            $message->msg = $messageContent;
+            if ($message->save()) {
+                return response()->json(["status" => true, "message" => "success", "message" => new MessageResource($message)]);
+            } else {
+                return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+            }
+        } else {
+            return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+        }
     }
 }

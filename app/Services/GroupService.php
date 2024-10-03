@@ -23,11 +23,19 @@ class GroupService implements GroupRepository
         // }, 'groupMessages.user'])
         // ->get();
 
+        // $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
+        //     ->with(['groupMessages' => function ($query) {
+        //         $query->latest('time');
+        //     }, 'groupMessages.user'])
+        //     ->get();
+
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
             ->with(['groupMessages' => function ($query) {
-                $query->latest('time');
+                $query->latest('time')
+                    ->where('is_deleted', false); // Add this line to filter out deleted messages
             }, 'groupMessages.user'])
             ->get();
+
 
         foreach ($groups as $group) {
             $userIds = explode(',', $group->access);
@@ -42,9 +50,17 @@ class GroupService implements GroupRepository
 
     public function fetchUnreadMessageGroups()
     {
+        // $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
+        //     ->with(['groupMessages' => function ($query) {
+        //         $query->latest('time');
+        //     }, 'groupMessages.user'])
+        //     ->get();
+
+
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
             ->with(['groupMessages' => function ($query) {
-                $query->latest('time');
+                $query->latest('time')
+                    ->where('is_deleted', false);
             }, 'groupMessages.user'])
             ->get();
 
@@ -70,17 +86,28 @@ class GroupService implements GroupRepository
     // working
     public function getGroupByName($name)
     {
-        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])->where('name', 'LIKE', "%$name%")
+        // $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])->where('name', 'LIKE', "%$name%")
+        //     ->with(['groupMessages' => function ($query) {
+        //         $query->latest('time');
+        //     }, 'groupMessages.user', 'users_with_access'])
+        //     ->get();
+
+
+        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
+            ->where('name', 'LIKE', "%$name%")
             ->with(['groupMessages' => function ($query) {
-                $query->latest('time');
+                $query->latest('time')
+                    ->where('is_deleted', false);
             }, 'groupMessages.user', 'users_with_access'])
             ->get();
-
-        $messages = GroupMessage::where("msg", "LIKE", "%$name%")->with("user", "group")->get();
+        $messages = GroupMessage::where("msg", "LIKE", "%$name%")
+            ->where('is_deleted', false)
+            ->with("user", "group")
+            ->get();
 
         $groupMessageSearchArray = [
-            "groups"=> $groups,
-            "messages"=> $messages
+            "groups" => $groups,
+            "messages" => $messages
         ];
         if ($groupMessageSearchArray) {
             return response()->json([
