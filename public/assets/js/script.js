@@ -25,6 +25,8 @@ const DOM = {
     username: getById("username"),
     displayPic: getById("display-pic"),
     groupId: null,
+    unreadMessagesPerGroup: {},
+    unread_messages_count: 0,
     activeChatIndex: null,
     unique_id: document.getElementById("login_user_unique_id").value,
     replyId: null,
@@ -105,14 +107,19 @@ let populateGroupList = async () => {
                     chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
                 });
             }
+            //console.log("Group Id is here"+group.group_id);
+            //DOM.unread_messages_count = chat.unread;
+            
+            DOM.unreadMessagesPerGroup[group.group_id] = chat.unread;
 
             if (present[chat.name] !== undefined) {
                 chatList[present[chat.name]].unread += chat.unread;
+               
             } else {
                 present[chat.name] = chatList.length;
                 chatList.push(chat);
-
-            }
+                }
+           //console.log("1st hit Updated unread messages count:",  DOM.unreadMessagesPerGroup[group.group_id]);
         });
     } catch (error) {
         console.log("Error fetching chat groups:", error);
@@ -145,7 +152,7 @@ let viewChatList = () => {
                 let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
                     if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
-                        console.log("latestMessage", latestMessage);
+                       // console.log("latestMessage", latestMessage);
                         messageText = latestMessage.media_name;
                     }
                     else {
@@ -192,7 +199,7 @@ let generateChatList = async () => {
     viewChatList();
 };
 
-console.log('Chat List is here' + chatList);
+//console.log('Chat List is here' + chatList);
 
 let addDateToMessageArea = (date) => {
     DOM.messages.innerHTML += `
@@ -280,11 +287,16 @@ socket.on('updateGroupMessages', (messageId) => {
     }
 });
 
+
+
+
+
+
 socket.on('sendChatToClient', (message) => {
 
     let unique_id = document.getElementById("login_user_unique_id").value;
-
     const groupId = message.group_id;
+
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
         groupToUpdate.group.group_messages.push(message);
@@ -292,8 +304,12 @@ socket.on('sendChatToClient', (message) => {
         groupToUpdate.time = new Date(message.time * 1000);
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
         if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
-            groupToUpdate.unread += 1;
-        }
+           
+            groupToUpdate.unread += 1;  
+            DOM.unreadMessagesPerGroup[groupId] +=1;
+            }
+
+
         chatList.sort((a, b) => {
             if (a.time && b.time) {
                 return new Date(b.time) - new Date(a.time);
@@ -315,6 +331,10 @@ socket.on('sendChatToClient', (message) => {
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
         if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
             groupToUpdate.unread += 1;
+         
+       
+            DOM.unreadMessagesPerGroup[groupId] +=1;
+           
         }
         chatList.sort((a, b) => {
             if (a.time && b.time) {
@@ -345,7 +365,9 @@ let addMessageToMessageArea = (message) => {
     // Determine the message content based on the message type
     let messageContent;
     if (message.type === 'File') {
-        messageContent = `
+       
+
+       messageContent = `
             <div class="file-message">
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -409,7 +431,7 @@ let addMessageToMessageArea = (message) => {
             <div class="">
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                     <div style="margin-top:-4px">
-                        <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+                        <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px 8px 10px 8px; border-radius:5px;">
                             ${messageContent}
                         </div>
                         <div>
@@ -430,7 +452,7 @@ let addMessageToMessageArea = (message) => {
                             </div>
                                       <!-- Dropdown menu for actions -->
       ${message.sender === user.unique_id ? `
-        <div class="dropdown" style="position: absolute; top: 5px; right: 5px;">
+        <div class="dropdown" style="position: absolute; top: 10px; right: 10px;">
           <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-angle-down text-muted px-2"></i>
           </a>
@@ -463,8 +485,8 @@ function scroll_function() {
     const messageDiv = document.getElementById('messages');
     const scrollBottomBtn = document.getElementById('scrollBottomBtn');
 
-    console.log('Message Div:', messageDiv);
-    console.log('Scroll Bottom Button:', scrollBottomBtn);
+    //console.log('Message Div:', messageDiv);
+    //console.log('Scroll Bottom Button:', scrollBottomBtn);
 
     if (!messageDiv || !scrollBottomBtn) {
         console.error("Required elements not found in the DOM.");
@@ -996,7 +1018,7 @@ let addNewMessageToArea = (message) => {
                             </span>--->
                         </div>
                         ${message.sender === user.unique_id ? `
-                        <div class="dropdown" style="position: absolute; top: 5px; right: 5px;">
+                        <div class="dropdown" style="position: absolute; top: 10px; right: 10px;">
                             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-angle-down text-muted px-2"></i>
                             </a>
@@ -1033,6 +1055,10 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
             }
         });
         const nextPageMessages = await response.json();
+        unread_settings(nextPageMessages);
+            console.log(nextPageMessages);
+
+
 
         const ids = nextPageMessages.data.map(item => item.id);
 
@@ -1088,6 +1114,57 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         console.error('Error fetching messages:', error);
     }
 };
+
+
+
+
+function unread_settings(query_set){
+var groupId=DOM.groupId;
+var groupIdToCheck=groupId;
+const userIdToCheck = user.unique_id;
+let seenCount = 0;
+let unseenCount = 0;
+query_set.data.forEach(message => {
+    if (message.group_id === groupIdToCheck) {
+        if (message.seen_by.includes(userIdToCheck)) {
+            seenCount++;
+        } else {
+            unseenCount++;
+        }
+    }
+});
+console.log('Read Seen Count of the messages'+seenCount+"of Group ID "+groupId);
+    console.log('Unread Count of the messages'+unseenCount+"of Group ID "+groupId);
+
+    var first_get_value=DOM.unreadMessagesPerGroup[DOM.groupId];
+    var unseen=unseenCount;
+    let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
+    var first_value=DOM.unreadMessagesPerGroup[DOM.groupId];
+    var left_count=first_value-unseen;
+    if(unseen>0){
+    document.querySelector(`.${DOM.groupId}`).innerText = left_count;
+    if(left_count==0 || left_count<0){
+    document.querySelector(`.${DOM.groupId}`).style.display = 'none';
+    }
+    if (groupToUpdate) {
+        groupToUpdate.unread =left_count;  
+    }
+    DOM.unreadMessagesPerGroup[DOM.groupId]=left_count;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 let currentlyPlayingAudio = null; // Variable to hold the currently playing audio player
 let generateMessageArea = async (elem, chatIndex) => {
 
@@ -1116,6 +1193,9 @@ let generateMessageArea = async (elem, chatIndex) => {
     //     mClassList(elem.querySelector("#unread-count")).add("d-none");
     // });
 
+
+
+
     if (window.innerWidth <= 575) {
         mClassList(DOM.chatListArea).remove("d-flex").add("d-none");
         mClassList(DOM.messageArea).remove("d-none").add("d-flex");
@@ -1132,18 +1212,27 @@ let generateMessageArea = async (elem, chatIndex) => {
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
+
     const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
         method: 'GET',
         headers: {
             'content-type': 'application/json'
         }
     });
-    pagnicateChatList = await response.json();
+   // Parse the response
+// Parse the response
+pagnicateChatList = await response.json();
 
-    var responce_count = pagnicateChatList.data.length;
+unread_settings(pagnicateChatList);
 
 
-    const ids = pagnicateChatList.data.map(item => item.id);
+
+const ids = pagnicateChatList.data.map(item => item.id);
+
+
+
+
+
 
     try {
         const response = await fetch("message/seen-by/update", {
@@ -1159,26 +1248,22 @@ let generateMessageArea = async (elem, chatIndex) => {
     } catch (error) {
         console.log(error);
     }
+ 
     var g_id = DOM.groupId; // Assume this contains the class name, e.g., "IMPZvumLHDgHjS10"
 
 
-    const element = document.querySelector(`.${g_id}`);
+   
+//     console.log("!st Count messages for group " + DOM.groupId + ": " + DOM.unreadMessagesPerGroup[DOM.groupId]);
 
-    if (element) {
-        const unreadCount = parseInt(element.innerText, 10);
+//     var unread_count=DOM.unreadMessagesPerGroup[DOM.groupId];
+//     if(unread_count>0 && unread_count<=20){
+//         DOM.unreadMessagesPerGroup[DOM.groupId]=unread_count-unread_count;
+//     }else if(unread_count>0 && unread_count>20){
+//         DOM.unreadMessagesPerGroup[DOM.groupId]=unread_count-20;
+//     }
+// //    console.log("Unread messages for group " + DOM.groupId + ": " + DOM.unreadMessagesPerGroup[DOM.groupId]);
+//   //  document.querySelector(`.${DOM.groupId}`).innerText = DOM.unreadMessagesPerGroup[DOM.groupId];
 
-        if (unreadCount > 0 && unreadCount <= responce_count) {
-            document.getElementById("unread-count").innerText = 0; // Reset the text to 0
-            element.style.display = 'none'; // Hides the element
-            //alert(unreadCount);
-            // console.log(unreadCount); // This will log the number
-        } else if (unreadCount > responce_count) { // No need to check unreadCount > 0 again
-            var valuetoset = unreadCount - responce_count;
-            document.getElementById("unread-count").innerText = valuetoset; // Set the new value
-        }
-    } else {
-        console.log("Element not found");
-    }
 
 
 
