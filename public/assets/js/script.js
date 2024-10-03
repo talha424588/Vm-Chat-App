@@ -25,6 +25,8 @@ const DOM = {
     username: getById("username"),
     displayPic: getById("display-pic"),
     groupId: null,
+    unreadMessagesPerGroup: {},
+    unread_messages_count: 0,
     activeChatIndex: null,
     unique_id: document.getElementById("login_user_unique_id").value,
     replyId: null,
@@ -106,14 +108,19 @@ let populateGroupList = async () => {
                     chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
                 });
             }
+            //console.log("Group Id is here"+group.group_id);
+            //DOM.unread_messages_count = chat.unread;
+            
+            DOM.unreadMessagesPerGroup[group.group_id] = chat.unread;
 
             if (present[chat.name] !== undefined) {
                 chatList[present[chat.name]].unread += chat.unread;
+               
             } else {
                 present[chat.name] = chatList.length;
                 chatList.push(chat);
-
-            }
+                }
+           //console.log("1st hit Updated unread messages count:",  DOM.unreadMessagesPerGroup[group.group_id]);
         });
     } catch (error) {
         console.log("Error fetching chat groups:", error);
@@ -146,7 +153,7 @@ let viewChatList = () => {
                 let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
                     if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
-                        console.log("latestMessage", latestMessage);
+                       // console.log("latestMessage", latestMessage);
                         messageText = latestMessage.media_name;
                     }
                     else {
@@ -193,7 +200,7 @@ let generateChatList = async () => {
     viewChatList();
 };
 
-console.log('Chat List is here' + chatList);
+//console.log('Chat List is here' + chatList);
 
 let addDateToMessageArea = (date) => {
     DOM.messages.innerHTML += `
@@ -204,22 +211,25 @@ let addDateToMessageArea = (date) => {
 };
 let addunreadToMessageArea = {
     addUnread: function () {
-
+        const notificationValue = 5; // You can change this value as needed
+        // Get the div element by its ID
+        const notificationDiv = document.getElementById('notification-count');
+        // Set the value to the div
+        notificationDiv.textContent = notificationValue;
+        notificationDiv.style.display = 'block';
         DOM.messages.innerHTML += `
- <div class="notification-wrapper">
-  <div class="unread-messages">
-        1 UNREAD MESSAGES
-    </div>
-</div>
-<div class="icon-container">
-<div class="notification-count">1</div>
-					<div class="icon"><svg width="16" height="9" viewBox="0 0 16 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path d="M0.344159 0.344159C0.56459 0.123794 0.863519 0 1.17521 0C1.4869 0 1.78583 0.123794 2.00626 0.344159L7.82479 6.16269L13.6433 0.344159C13.865 0.130039 14.1619 0.0115592 14.4701 0.0142373C14.7783 0.0169155 15.0732 0.140538 15.2911 0.358478C15.509 0.576418 15.6327 0.871238 15.6353 1.17944C15.638 1.48764 15.5195 1.78457 15.3054 2.00626L8.65584 8.65584C8.43541 8.87621 8.13648 9 7.82479 9C7.5131 9 7.21417 8.87621 6.99374 8.65584L0.344159 2.00626C0.123794 1.78583 0 1.4869 0 1.17521C0 0.863519 0.123794 0.564591 0.344159 0.344159Z" fill="#687780"/>
-				</svg></div> <!-- This is a down arrow symbol -->
-				</div>
+        <div class="notification-wrapper">
+            <div class="unread-messages">
+                ${notificationValue} UNREAD MESSAGES
+            </div>
+        </div>
         `;
     }
 };
+
+
+
+
 
 
 function makeformatDate(dateString) {
@@ -278,11 +288,16 @@ socket.on('updateGroupMessages', (messageId) => {
     }
 });
 
+
+
+
+
+
 socket.on('sendChatToClient', (message) => {
 
     let unique_id = document.getElementById("login_user_unique_id").value;
-
     const groupId = message.group_id;
+
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
         groupToUpdate.group.group_messages.push(message);
@@ -290,8 +305,12 @@ socket.on('sendChatToClient', (message) => {
         groupToUpdate.time = new Date(message.time * 1000);
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
         if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
-            groupToUpdate.unread += 1;
-        }
+           
+            groupToUpdate.unread += 1;  
+            DOM.unreadMessagesPerGroup[groupId] +=1;
+            }
+
+
         chatList.sort((a, b) => {
             if (a.time && b.time) {
                 return new Date(b.time) - new Date(a.time);
@@ -305,6 +324,7 @@ socket.on('sendChatToClient', (message) => {
         });
         viewChatList();
         addMessageToMessageArea(message);
+        get_voice_list();
     } else {
         groupToUpdate.group.group_messages.push(message);
         groupToUpdate.msg = message;
@@ -312,6 +332,10 @@ socket.on('sendChatToClient', (message) => {
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
         if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
             groupToUpdate.unread += 1;
+         
+       
+            DOM.unreadMessagesPerGroup[groupId] +=1;
+           
         }
         chatList.sort((a, b) => {
             if (a.time && b.time) {
@@ -347,7 +371,9 @@ let addMessageToMessageArea = (message) => {
     // Determine the message content based on the message type
     let messageContent;
     if (message.type === 'File') {
-        messageContent = `
+       
+
+       messageContent = `
             <div class="file-message">
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -411,7 +437,7 @@ let addMessageToMessageArea = (message) => {
             <div class="">
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                     <div style="margin-top:-4px">
-                        <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+                        <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px 8px 10px 8px; border-radius:5px;">
                             ${messageContent}
                         </div>
                         <div>
@@ -432,7 +458,7 @@ let addMessageToMessageArea = (message) => {
                             </div>
                                       <!-- Dropdown menu for actions -->
       ${message.sender === user.unique_id ? `
-        <div class="dropdown" style="position: absolute; top: 5px; right: 5px;">
+        <div class="dropdown" style="position: absolute; top: 10px; right: 10px;">
           <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-angle-down text-muted px-2"></i>
           </a>
@@ -441,7 +467,7 @@ let addMessageToMessageArea = (message) => {
 
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-            <a class="dropdown-item" href="#" onclick="CorrectionMessage(${message.id})">Correction</a>
+            <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${message.msg}','${senderName}')">Correction</a>
           </div>
         </div>
       ` : ''}
@@ -453,6 +479,7 @@ let addMessageToMessageArea = (message) => {
     `;
 
     DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
+    scroll_function();
 };
 
 
@@ -460,6 +487,217 @@ let addMessageToMessageArea = (message) => {
 
 
 
+function scroll_function() {
+    const messageDiv = document.getElementById('messages');
+    const scrollBottomBtn = document.getElementById('scrollBottomBtn');
+
+    //console.log('Message Div:', messageDiv);
+    //console.log('Scroll Bottom Button:', scrollBottomBtn);
+
+    if (!messageDiv || !scrollBottomBtn) {
+        console.error("Required elements not found in the DOM.");
+        return; // Exit the function if elements are not found
+    }
+
+    // Scroll to the bottom of the message div when the page loads
+    messageDiv.scrollTop = messageDiv.scrollHeight;
+
+    // Show the scroll button when the user scrolls up
+    messageDiv.addEventListener('scroll', function() {
+        // Show the button if the user scrolls up from the bottom
+        if (messageDiv.scrollTop < messageDiv.scrollHeight - messageDiv.clientHeight - 50) {
+            scrollBottomBtn.style.display = 'block';
+        } else {
+            scrollBottomBtn.style.display = 'none';
+        }
+    });
+
+    // Scroll to the bottom of the message div when the button is clicked
+    scrollBottomBtn.addEventListener('click', function() {
+        messageDiv.scrollTo({
+            top: messageDiv.scrollHeight,
+            behavior: 'smooth'  // Smooth scrolling effect
+        });
+    });
+}
+
+
+
+let isTinyMCEInitialized = false; // Track if TinyMCE has been initialized
+
+function tinymce_init(callback) {
+    // Check if TinyMCE is already initialized
+    if (!isTinyMCEInitialized) {
+        tinymce.init({
+            selector: '#input',
+            toolbar: 'bold italic underline strikethrough',
+            menubar: false,
+            branding: false,
+            height: 140,
+            width: 1000,
+            plugins: 'lists',
+            toolbar_mode: 'wrap',
+            placeholder: 'Write your message here which you want to be correct by the user or want any further change...',
+            content_style: "body { font-family: Arial, sans-serif; font-size: 16px; }",
+            setup: function(editor) {
+                editor.on('init', function() {
+                    // Mark TinyMCE as initialized
+                    isTinyMCEInitialized = true;
+
+                    // Call the callback function when TinyMCE is initialized
+                    if (callback && typeof callback === 'function') {
+                        callback();
+                    }
+                });
+            }
+        });
+    } else {
+        // If already initialized, directly call the callback
+        if (callback && typeof callback === 'function') {
+            callback();
+        }
+    }
+}
+
+// Edit Correction Message Code
+function CorrectionMessage(message_id, messagebody, senderName) {
+    console.log(message_id);
+    
+    // Initialize TinyMCE and pass the correction_call function as a callback
+    tinymce_init(function() {
+        correction_call(message_id, messagebody, senderName);
+    });
+}
+
+function correction_call(message_id, messagebody, senderName) {
+    // Set the content of TinyMCE
+    if (tinymce.get('input')) {
+        tinymce.get('input').setContent(messagebody);
+    } else {
+        console.error("TinyMCE editor not initialized for #input");
+    }
+
+
+    const correction_message_id = document.getElementById('correction_message_id');
+    correction_message_id.value =message_id;
+    // Check and log voiceIcon and Editreplyarea
+    const voiceIcon = document.getElementById('chat_action');
+    const Editreplyarea = document.getElementById('correctionreply-area');
+
+    if (Editreplyarea) {
+        if (voiceIcon) {
+            voiceIcon.style.display = 'none'; // Set visibility to hidden
+        } else {
+            console.error("Element 'chat_action' not found");
+        }
+        Editreplyarea.style.display = 'block';
+    } else {
+        console.error("Element 'correctionreply-area' not found");
+    }
+
+    // Check and log replyDiv and iconContainer
+    var replyDiv = document.getElementById('correction-div');
+  
+
+    if (replyDiv) {
+        // Display the reply div
+        replyDiv.style.display = 'block';
+    } else {
+        console.error("Element 'correction-div' not found");
+    }
+
+   
+
+    // Update the quoted text with the message body
+    var quotedTextElement = document.querySelector('#quoted-messages .sender-name');
+    var quotedNameElement = document.querySelector('#quoted-messages .quoted-text');
+
+    if (quotedTextElement) {
+        quotedTextElement.textContent = senderName;
+    } else {
+        console.error("Element '#quoted-message .sender-name' not found");
+    }
+
+    if (quotedNameElement) {
+        quotedNameElement.textContent = messagebody;
+    } else {
+        console.error("Element '#quoted-message .quoted-text' not found");
+    }
+
+ 
+
+
+}
+
+
+
+
+function correction_send_handel(){
+   // const messageContent = document.getElementById('input').value;
+    const messageContent = tinymce.get('input').getContent();
+  
+      const correction_message_id = document.getElementById('correction_message_id').value;
+    alert(correction_message_id);
+    alert(messageContent);
+
+
+    
+}
+document.getElementById('correction-send-message-btn').addEventListener('click', correction_send_handel);
+
+// Function to remove the correction message and disable TinyMCE
+function removecorrectionMessage() {
+    // Disable TinyMCE
+    if (tinymce.get('input')) { // Replace 'your_textarea_id' with the actual ID of your textarea
+        tinymce.get('input').remove(); // This will remove the editor instance
+    }
+
+    var replyDiv = document.getElementById('correction-div');
+    var iconContainer = document.querySelector('.icon-container');
+    const chat_action = document.getElementById('chat_action');
+    const correctionarea = document.getElementById('correction-div');
+
+    const Editreplyarea = document.getElementById('Editreply-area');
+    const correctionreplyarea = document.getElementById('correctionreply-area');
+    if (chat_action) {
+        chat_action.style.display = 'block'; // Set visibility to block
+        correctionarea.style.display = 'none'; 
+        Editreplyarea.style.display = 'none'; 
+        correctionreplyarea.style.display = 'none'; 
+        const textarea = document.getElementById('input');
+        textarea.value =''; // Append with a newline if there's already text
+    
+    }
+    // Select the element with the ID 'chat_action'
+
+
+// Create a new style element
+var style = document.createElement('style');
+
+// Add a CSS rule with 'display: contents !important' for the #chat_action
+style.innerHTML = "#chat_action { display: flex !important; }";
+
+// Append the style element to the document head
+document.head.appendChild(style);
+
+    // Hide the reply div
+    replyDiv.style.display = 'none';
+    iconContainer.style.bottom = '90px'; // Adjust position as needed
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Edit Message Code
 function editMessage(messageId, messageContent) {
 
 
@@ -492,12 +730,26 @@ function editMessage(messageId, messageContent) {
     messageDiv.classList.add('blur');
 
     // Hide the voice icon
-    const voiceIcon = document.getElementById('chat_action');
+    const chat_action = document.getElementById('chat_action');
 
     const Editreplyarea = document.getElementById('Editreply-area');
-    if (voiceIcon) {
+    const voiceIcon = document.getElementById('voice-icon');
+    const fileicon = document.getElementById('file-icon');
+    const captureid = document.getElementById('captureid');
+
+
+   
+    
+
+
+    if (chat_action) {
         voiceIcon.style.display = 'none'; // Set visibility to hidden
-        Editreplyarea.style.display = 'block';
+       
+        Editreplyarea.style.display = 'block'; 
+        voiceIcon.style.visibility = 'hidden';
+        fileicon.style.visibility = 'hidden';
+        captureid.style.visibility = 'hidden';
+
     }
 
 }
@@ -506,6 +758,9 @@ function editMessage(messageId, messageContent) {
 
 // Function to handle Edit send message button click
 function handleSendMessage() {
+
+   
+
     // Get the value from the hidden input field
     const messageId = document.getElementById('edit_message_id').value;
     // Get the value from the textarea
@@ -526,10 +781,19 @@ function handleSendMessage() {
         Editreplyarea.style.display = 'none';
     }
 
+     // Hide the voice icon
+ const chat_actioncorrection = document.getElementById('chat_action');
+ const correctionarea = document.getElementById('correction-div');
+ if (chat_actioncorrection) {
+   chat_action.style.display = 'block'; // Set visibility to hidden
+   correctionarea.style.display = 'none'; 
+ }
+
 }
 
 // Add event listener to the send message button
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
+
 
 
 //Show Reply Message
@@ -557,7 +821,6 @@ function showReply(message_id, messagebody, senderName) {
 function removeQuotedMessage() {
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
-
     // Hide the reply div
     replyDiv.style.display = 'none';
     iconContainer.style.bottom = '90px';
@@ -749,14 +1012,17 @@ let addNewMessageToArea = (message) => {
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
                             </span> |
                             <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
+                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="
+                                
+                                
+                                ('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
                             </span> <!---|
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                             </span>--->
                         </div>
                         ${message.sender === user.unique_id ? `
-                        <div class="dropdown" style="position: absolute; top: 5px; right: 5px;">
+                        <div class="dropdown" style="position: absolute; top: 10px; right: 10px;">
                             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-angle-down text-muted px-2"></i>
                             </a>
@@ -793,6 +1059,10 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
             }
         });
         const nextPageMessages = await response.json();
+        unread_settings(nextPageMessages);
+            console.log(nextPageMessages);
+
+
 
         const ids = nextPageMessages.data.map(item => item.id);
 
@@ -848,6 +1118,57 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         console.error('Error fetching messages:', error);
     }
 };
+
+
+
+
+function unread_settings(query_set){
+var groupId=DOM.groupId;
+var groupIdToCheck=groupId;
+const userIdToCheck = user.unique_id;
+let seenCount = 0;
+let unseenCount = 0;
+query_set.data.forEach(message => {
+    if (message.group_id === groupIdToCheck) {
+        if (message.seen_by.includes(userIdToCheck)) {
+            seenCount++;
+        } else {
+            unseenCount++;
+        }
+    }
+});
+console.log('Read Seen Count of the messages'+seenCount+"of Group ID "+groupId);
+    console.log('Unread Count of the messages'+unseenCount+"of Group ID "+groupId);
+
+    var first_get_value=DOM.unreadMessagesPerGroup[DOM.groupId];
+    var unseen=unseenCount;
+    let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
+    var first_value=DOM.unreadMessagesPerGroup[DOM.groupId];
+    var left_count=first_value-unseen;
+    if(unseen>0){
+    document.querySelector(`.${DOM.groupId}`).innerText = left_count;
+    if(left_count==0 || left_count<0){
+    document.querySelector(`.${DOM.groupId}`).style.display = 'none';
+    }
+    if (groupToUpdate) {
+        groupToUpdate.unread =left_count;  
+    }
+    DOM.unreadMessagesPerGroup[DOM.groupId]=left_count;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 let currentlyPlayingAudio = null; // Variable to hold the currently playing audio player
 let generateMessageArea = async (elem, chatIndex) => {
 
@@ -876,6 +1197,9 @@ let generateMessageArea = async (elem, chatIndex) => {
     //     mClassList(elem.querySelector("#unread-count")).add("d-none");
     // });
 
+
+
+
     if (window.innerWidth <= 575) {
         mClassList(DOM.chatListArea).remove("d-flex").add("d-none");
         mClassList(DOM.messageArea).remove("d-none").add("d-flex");
@@ -892,18 +1216,27 @@ let generateMessageArea = async (elem, chatIndex) => {
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
+
     const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
         method: 'GET',
         headers: {
             'content-type': 'application/json'
         }
     });
-    pagnicateChatList = await response.json();
+   // Parse the response
+// Parse the response
+pagnicateChatList = await response.json();
 
-    var responce_count = pagnicateChatList.data.length;
+unread_settings(pagnicateChatList);
 
 
-    const ids = pagnicateChatList.data.map(item => item.id);
+
+const ids = pagnicateChatList.data.map(item => item.id);
+
+
+
+
+
 
     try {
         const response = await fetch("message/seen-by/update", {
@@ -919,26 +1252,22 @@ let generateMessageArea = async (elem, chatIndex) => {
     } catch (error) {
         console.log(error);
     }
+ 
     var g_id = DOM.groupId; // Assume this contains the class name, e.g., "IMPZvumLHDgHjS10"
 
 
-    const element = document.querySelector(`.${g_id}`);
+   
+//     console.log("!st Count messages for group " + DOM.groupId + ": " + DOM.unreadMessagesPerGroup[DOM.groupId]);
 
-    if (element) {
-        const unreadCount = parseInt(element.innerText, 10);
+//     var unread_count=DOM.unreadMessagesPerGroup[DOM.groupId];
+//     if(unread_count>0 && unread_count<=20){
+//         DOM.unreadMessagesPerGroup[DOM.groupId]=unread_count-unread_count;
+//     }else if(unread_count>0 && unread_count>20){
+//         DOM.unreadMessagesPerGroup[DOM.groupId]=unread_count-20;
+//     }
+// //    console.log("Unread messages for group " + DOM.groupId + ": " + DOM.unreadMessagesPerGroup[DOM.groupId]);
+//   //  document.querySelector(`.${DOM.groupId}`).innerText = DOM.unreadMessagesPerGroup[DOM.groupId];
 
-        if (unreadCount > 0 && unreadCount <= responce_count) {
-            document.getElementById("unread-count").innerText = 0; // Reset the text to 0
-            element.style.display = 'none'; // Hides the element
-            //alert(unreadCount);
-            // console.log(unreadCount); // This will log the number
-        } else if (unreadCount > responce_count) { // No need to check unreadCount > 0 again
-            var valuetoset = unreadCount - responce_count;
-            document.getElementById("unread-count").innerText = valuetoset; // Set the new value
-        }
-    } else {
-        console.log("Element not found");
-    }
 
 
 
@@ -1174,8 +1503,10 @@ voiceIcon.addEventListener('click', () => {
 
 
 
-
-
+//Select the Images From the Local Drive
+document.getElementById('captureid').addEventListener('click', function() {
+    document.getElementById('hidden-file-input').click();
+});
 
 
 
@@ -1206,8 +1537,19 @@ fileInput.addEventListener('change', (event) => {
 
 document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
-        event.preventDefault();
-        sendMessage();
+
+        const editReplyArea = document.getElementById('Editreply-area');
+
+        if (window.getComputedStyle(editReplyArea).display === 'none') {
+            console.log('The div is hidden (display: none).');
+            event.preventDefault();
+            sendMessage();
+
+        } else if (window.getComputedStyle(editReplyArea).display === 'block') {
+          document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
+        } else {
+            console.log('The div has a different display property.');
+        }
     }
 });
 
@@ -1275,6 +1617,7 @@ $("#seenModal").on("show.bs.modal", async function (event) {
         console.log("Something went wrong");
     }
 })
+
 
 //search groups
 
