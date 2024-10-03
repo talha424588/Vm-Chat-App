@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
 
     socket.on('sendChatToServer', async (msg) => {
         console.log("message details", msg);
-        const response = await axios.post('http://localhost:8000/messages', msg);
+        const response = await axios.post('http://127.0.0.1:8000/messages', msg);
         console.log("resposer", response);
         if (response.status == 201) {
             const savedMessage = response.data;

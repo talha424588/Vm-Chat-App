@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\Chat\GroupController;
+use App\Http\Controllers\UserController;
+use App\Services\FirebaseService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +37,10 @@ Route::post('/broadcast', [ChatController::class, 'broadcastChat'])->name('broad
 
 Route::group(['middleware' => ['auth:web']], function () {
 
+    // user
+
+    Route::post("/user/update/{token}" , [UserController::class, 'updateUserFcmToken']);
+
     //Groups Routes
     Route::get('get-user-chat-groups', [GroupController::class, 'getUserChatGroup']);
     Route::get('search-group-by-name/{query}', [GroupController::class, 'getChatGroupsByName']);
@@ -60,3 +66,7 @@ Route::post('/messages', [ChatController::class, 'store']);
 
 // Auth::routes();
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+Route::get("/accessToken", [FirebaseService::class, 'sendMessageNotification']);
+
