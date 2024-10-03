@@ -636,7 +636,7 @@ function correction_call(message_id, messagebody, senderName) {
 function correction_send_handel(){
    // const messageContent = document.getElementById('input').value;
     const messageContent = tinymce.get('input').getContent();
-  
+    document.querySelector('.auto-resize-textarea').style.height = '44px';
       const correction_message_id = document.getElementById('correction_message_id').value;
     alert(correction_message_id);
     alert(messageContent);
@@ -806,6 +806,7 @@ function removeEditMessage(){
     messageDiv.classList.remove('blur');
     const textarea = document.getElementById('input');
     textarea.value ='';
+    document.querySelector('.auto-resize-textarea').style.height = '44px';
 }
 
 //Show Reply Message
@@ -1552,16 +1553,15 @@ fileInput.addEventListener('change', (event) => {
 
 document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
-
         const editReplyArea = document.getElementById('Editreply-area');
-
         if (window.getComputedStyle(editReplyArea).display === 'none') {
             console.log('The div is hidden (display: none).');
             event.preventDefault();
             sendMessage();
-
+            document.querySelector('.auto-resize-textarea').style.height = '44px';
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
           document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
+          document.querySelector('.auto-resize-textarea').style.height = '44px';
         } else {
             console.log('The div has a different display property.');
         }
