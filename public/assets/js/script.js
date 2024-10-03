@@ -37,6 +37,7 @@ let user = {
     name: document.getElementById("login_user_name").value,
     unique_id: document.getElementById("login_user_unique_id").value,
     email: document.getElementById("login_user_email").value,
+    fcm_token: document.getElementById("login_user_fcm_token").value,
     pic: "assets/images/profile-picture.webp"
 };
 let userGroupList = [];
@@ -359,6 +360,11 @@ let addMessageToMessageArea = (message) => {
         lastDate = msgDate;
     }
 
+    // unread message count and area
+    // if (message.id==32919) {
+    //     addunreadToMessageArea.addUnread();
+    // }
+
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
 
@@ -427,7 +433,7 @@ let addMessageToMessageArea = (message) => {
             ${message.user.id == user.id ? '' : profileImage}
 
 
-            
+
             <div class="">
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                     <div style="margin-top:-4px">
@@ -725,7 +731,7 @@ function editMessage(messageId, messageContent) {
 
     // Hide the voice icon
     const chat_action = document.getElementById('chat_action');
-   
+
     const Editreplyarea = document.getElementById('Editreply-area');
     const voiceIcon = document.getElementById('voice-icon');
     const fileicon = document.getElementById('file-icon');
@@ -743,9 +749,9 @@ function editMessage(messageId, messageContent) {
         voiceIcon.style.visibility = 'hidden';
         fileicon.style.visibility = 'hidden';
         captureid.style.visibility = 'hidden';
+
     }
 
-    
 }
 
 
@@ -765,14 +771,14 @@ function handleSendMessage() {
 
     document.getElementById('editMessageDiv').style.display = 'none';
     const textarea = document.getElementById('input');
-    textarea.value =''; // Append with a newline if there's already text
+    textarea.value = ''; // Append with a newline if there's already text
     const messageDiv = document.getElementById('messages');
     messageDiv.classList.remove('blur');
     const chat_action = document.getElementById('chat_action');
     const Editreplyarea = document.getElementById('Editreply-area');
     if (chat_action) {
         chat_action.style.display = 'block'; // Set visibility to hidden
-        Editreplyarea.style.display = 'none'; 
+        Editreplyarea.style.display = 'none';
     }
 
      // Hide the voice icon
@@ -782,7 +788,7 @@ function handleSendMessage() {
    chat_action.style.display = 'block'; // Set visibility to hidden
    correctionarea.style.display = 'none'; 
  }
-   
+
 }
 
 // Add event listener to the send message button
@@ -790,14 +796,27 @@ document.getElementById('send-message-btn').addEventListener('click', handleSend
 
 
 
+//Show Reply Message
+function showReply(message_id, messagebody, senderName) {
+    console.log('MessageId: ' + message_id);
+    console.log('MessageBody: ' + messagebody);
+    console.log('SenderName: ' + senderName);
+    DOM.replyId = message_id;
+    var replyDiv = document.getElementById('reply-div');
+    var iconContainer = document.querySelector('.icon-container');
 
+    var quotedTextElement = document.querySelector('#quoted-message .sender-name');
+    quotedTextElement.textContent = senderName; // Set the new message body
 
+    var quotedNameElement = document.querySelector('#quoted-message .quoted-text');
+    quotedNameElement.textContent = messagebody; // Set the new message body
 
+    // Display the reply div
+    replyDiv.style.display = 'block';
 
-
-
-
-
+    // Change the bottom property of the icon container
+    iconContainer.style.bottom = '145px';
+}
 
 function removeQuotedMessage() {
     var replyDiv = document.getElementById('reply-div');
@@ -808,55 +827,37 @@ function removeQuotedMessage() {
 }
 
 
-
-
-
-
-//Multiple Select Messages Start
 // Array to store selected message IDs
 let selectedMessageIds = [];
 
 function moveMessage(messageId) {
-    // Check if the message ID is already selected
     const index = selectedMessageIds.indexOf(messageId);
 
     if (index > -1) {
-        // If it's already selected, remove it (unselect it)
         selectedMessageIds.splice(index, 1);
     } else {
-        // If it's not selected, add it to the array
         selectedMessageIds.push(messageId);
     }
 
-    // Select the message div using its data attribute
     const messageElement = document.querySelector(`[data-message-id='${messageId}']`);
 
-    // Check if the message element exists
     if (messageElement) {
-        // Find the closest parent with the class "ml-3"
         const parentDiv = messageElement.closest('.ml-3');
 
-        // Toggle the 'selected-message' class to highlight/unhighlight the parent div
         if (parentDiv) {
             parentDiv.classList.toggle('selected-message');
         } else {
             // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
         }
 
-        // Hide the input area
         $('#input-area').hide();
 
-        // Show the action bar (assuming you have it hidden initially)
         $('#action-bar').show();
 
-        // Update the count in the selected-count div
         document.getElementById('selected-count').textContent = `${selectedMessageIds.length} message${selectedMessageIds.length > 1 ? 's' : ''} selected`;
 
-        // Update the value of the hidden input field with selected message IDs
         document.getElementById('messages_ids').value = selectedMessageIds.join(',');
 
-        // console.log(`Message with ID: ${messageId} has been highlighted/unhighlighted.`);
-        // console.log(`Selected messages: ${selectedMessageIds.join(', ')}`);
     } else {
         console.error(`Message with ID: ${messageId} not found.`);
     }
@@ -1011,7 +1012,10 @@ let addNewMessageToArea = (message) => {
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
                             </span> |
                             <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
+                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="
+                                
+                                
+                                ('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
                             </span> <!---|
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
@@ -1279,7 +1283,7 @@ const ids = pagnicateChatList.data.map(item => item.id);
     pagnicateChatList.data.reverse()
         .forEach((msg) => addMessageToMessageArea(msg));
 
-      
+
 
     get_voice_list();
 };
@@ -1293,13 +1297,15 @@ let showChatList = () => {
 };
 
 let sendMessage = (type = 'Message', mediaName = null) => {
-    console.log("DOM.replyId",DOM.replyId);
+    console.log("DOM.replyId", DOM.replyId);
     var loginUser = {
         id: document.getElementById("login_user_id").value,
         name: document.getElementById("login_user_name").value,
         unique_id: document.getElementById("login_user_unique_id").value,
-        email: document.getElementById("login_user_email").value
+        email: document.getElementById("login_user_email").value,
+        fcm_token: document.getElementById("login_user_fcm_token").value
     }
+    console.log("send message", user.fcm_token);
     const fileIcon = document.querySelector('#file-icon');
     const chaticon = document.querySelector('#captureid');
     fileIcon.style.visibility = 'visible';
@@ -1362,19 +1368,47 @@ let init = () => {
     console.log("Click the Image at top-left to open settings.");
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
 init();
+
+const messaging = firebase.messaging();
+
+Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+        console.log('Notification permission granted.');
+
+        // Get the FCM token
+        messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
+            if (token) {
+                let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                const updateUserFcmToken = fetch("user/update/" + token, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-Token": csrfToken,
+                    },
+                }).then(updateUserFcmToken => {
+                    if (!updateUserFcmToken.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    document.getElementById("login_user_fcm_token").value = token;
+                }).catch(error => {
+                    console.log(error);
+                }
+                )
+            } else {
+                console.log('No registration token available. Request permission to generate one.');
+            }
+        }).catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+        });
+    } else {
+        console.log('Unable to get permission to notify.');
+    }
+});
+
+//   messaging.onMessage((payload) => {
+//     console.log('Message received. ', payload);
+//   });
 
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');
@@ -1585,157 +1619,10 @@ $("#seenModal").on("show.bs.modal", async function (event) {
 })
 
 
-// const captureId = document.getElementById('captureid');
-// const cameraContainer = document.getElementById('camera-container');
-// const video = document.getElementById('camera-stream');
-// const canvas = document.getElementById('snapshot');
-// const photo = document.getElementById('photo');
-// const captureBtn = document.getElementById('capture-btn');
-// const switchCameraBtn = document.getElementById('switch-camera-btn');
-// const closeBtn = document.getElementById('close-btn');
-// const photoOptions = document.getElementById('photo-options');
-// const sendBtn = document.getElementById('send-btn');
-// const retakeBtn = document.getElementById('retake-btn');
-// const hiddenFileInput = document.getElementById('hidden-file-input');
-// const context = canvas.getContext('2d');
-// let currentStream = null;
-// let currentFacingMode = 'user';
-
-// function generateRandomFileName() {
-//     const timestamp = Date.now();
-//     const random = Math.floor(Math.random() * 10000);
-//     return `image_${timestamp}_${random}.png`;
-// }
-
-// async function startCamera(facingMode) {
-//     if (currentStream) {
-//         currentStream.getTracks().forEach(track => track.stop());
-//     }
-
-//     try {
-//         const stream = await navigator.mediaDevices.getUserMedia({
-//             video: { facingMode }
-//         });
-//         video.srcObject = stream;
-//         currentStream = stream;
-//     } catch (err) {
-//         console.error("Error accessing camera: ", err);
-//     }
-// }
-
-// captureId.addEventListener('click', () => {
-//     cameraContainer.style.display = 'flex';
-//     startCamera(currentFacingMode);
-// });
-
-// captureBtn.addEventListener('click', async () => {
-//     canvas.width = video.videoWidth;
-//     canvas.height = video.videoHeight;
-//     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-//     const dataUrl = canvas.toDataURL('image/png');
-
-//     const blob = await (await fetch(dataUrl)).blob();
-//     const fileName = generateRandomFileName();
-//     const file = new File([blob], fileName, { type: 'image/png' });
-
-//     const dataTransfer = new DataTransfer();
-//     dataTransfer.items.add(file);
-//     hiddenFileInput.files = dataTransfer.files;
-
-//     photo.src = dataUrl;
-//     photo.style.display = 'block';
-//     photoOptions.style.display = 'block';
-
-//     video.style.display = 'none';
-//     if (currentStream) {
-//         currentStream.getTracks().forEach(track => track.stop());
-//     }
-// });
-
-// sendBtn.addEventListener('click', () => {
-//     if (currentStream) {
-//         currentStream.getTracks().forEach(track => track.stop());
-//     }
-//     cameraContainer.style.display = 'none';
-//     const imageInput = document.getElementById('hidden-file-input');
-
-//     if (imageInput.files.length > 0) {
-//         const image = imageInput.files[0];
-//         const ref = firebase.storage().ref("images/" + DOM.unique_id);
-//         const mediaName = image.name;
-//         const metadata = {
-//             contentType: image.type
-//         };
-//         const task = ref.child(mediaName).put(image, metadata);
-//         task
-//             .then(snapshot => snapshot.ref.getDownloadURL())
-//             .then(url => {
-//                 console.log(url);
-
-//                 DOM.messageInput.value = url;
-//                 sendMessage("Image", mediaName);
-
-//             })
-//             .catch(error => console.error(error));
-
-//     } else {
-//         console.log("No image selected");
-//     }
-
-
-// });
-
-// retakeBtn.addEventListener('click', () => {
-//     photo.style.display = 'none';
-//     photoOptions.style.display = 'none';
-//     video.style.display = 'block';
-//     startCamera(currentFacingMode);
-// });
-
-// switchCameraBtn.addEventListener('click', () => {
-//     currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
-//     startCamera(currentFacingMode);
-// });
-
-// closeBtn.addEventListener('click', () => {
-//     cameraContainer.style.display = 'none';
-//     if (currentStream) {
-//         currentStream.getTracks().forEach(track => track.stop());
-//     }
-// });
-
-// cameraContainer.addEventListener('click', (e) => {
-//     if (e.target === cameraContainer) {
-//         cameraContainer.style.display = 'none';
-//         if (currentStream) {
-//             currentStream.getTracks().forEach(track => track.stop());
-//         }
-//     }
-// });
-
-
 //search groups
 
 let groupSearchField = document.getElementById("search_group");
 let debounceTimeout = null;
-
-// groupSearchField.addEventListener("input", function (event) {
-//     if (event.target.value.length > 0) {
-//         clearTimeout(debounceTimeout);
-//         debounceTimeout = setTimeout(async function () {
-//             const url = `search-group-by-name/${event.target.value}`
-//             try {
-//                 const groupResponse = await fetch(url);
-//                 const response = await groupResponse.json();
-//                 if (response) {
-//                     console.log(response);
-//                 }
-//             } catch (error) {
-//                 console.log(error);
-//             }
-//         }, 500);
-//     }
-// });
 
 
 let searchGroups = async (searchQuery) => {
@@ -1746,7 +1633,10 @@ let searchGroups = async (searchQuery) => {
             const groupResponse = await fetch(url);
             const response = await groupResponse.json();
             if (response) {
-                const groups = response.groups;
+                console.log("response", response);
+                const groups = response.data.groups;
+                console.log("groups", response.data.groups);
+                console.log("messages", response.data.messages);
                 chatList = [];
                 groups.forEach((group) => {
                     let chat = {};
@@ -1775,8 +1665,6 @@ let searchGroups = async (searchQuery) => {
         }
     }
 };
-
-
 
 groupSearchField.addEventListener("input", function (event) {
     if (event.target.value.length > 0) {
@@ -1961,8 +1849,7 @@ function removeHighlight() {
 
 function get_voice_list() {
     const audioMessages = document.querySelectorAll('.chat_list_messages .audio-message');
-  
-      
+
     audioMessages.forEach((message) => {
         const playButton = message.querySelector('.play-button');
         const progressBarContainer = message.querySelector('.audio-progress');
@@ -2041,30 +1928,3 @@ function get_voice_list() {
 }
 
 
-async function showReply() {
-    const element = document.getElementById('reply-link');
-    DOM.replyId = element.getAttribute('data-message-id');
-    console.log(DOM.replyId);
-    try {
-        console.log("show reply");
-        const result = await fetch(`message/detail/${DOM.replyId}`);
-        if (!result.ok) {
-            throw new Error(`HTTP error! status: ${result.status}`);
-        }
-        const data = await result.json();
-        const quotedMessageDiv = document.getElementById('quoted-message');
-        const senderNameSpan = quotedMessageDiv.querySelector('.sender-name');
-        const quotedTextP = quotedMessageDiv.querySelector('.quoted-text');
-
-        senderNameSpan.textContent = data.message.user.name;
-        quotedTextP.textContent = data.message.msg;
-
-        const replyDiv = document.getElementById('reply-div');
-        replyDiv.style.display = 'block';
-
-        const iconContainer = document.querySelector('.icon-container');
-        iconContainer.style.bottom = '145px';
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
