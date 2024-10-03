@@ -370,9 +370,50 @@ let addMessageToMessageArea = (message) => {
 
     // Determine the message content based on the message type
     let messageContent;
-    if (message.type === 'File') {
-       
 
+    console.log(message);
+  
+    
+
+    if (message.type === 'File') {
+        if (message.reply) {
+            console.log("Reply Message: " + message.reply.msg);
+      
+            var add_file_view = `
+            <div class="file-message">
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">${message.media_name}</p>
+
+                </div>
+                <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>
+        `;
+
+            messageContent = `
+            <div class="reply-message-div">
+                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                    Dummy Name              
+                </div>
+                <div class="reply-details">
+                    <p class="file-name">${add_file_view}</p>
+                </div>
+            </div>
+            <div class="reply-message-area">${message.message ?? message.msg}</div> <!-- Updated this line -->
+        `;
+           
+        }else{
+           
+        
        messageContent = `
             <div class="file-message">
                 <div class="file-icon">
@@ -392,12 +433,50 @@ let addMessageToMessageArea = (message) => {
                 </a>
             </div>
         `;
+    }
     } else if (message.type === 'Image') {
+        if (message.reply) {
+            var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:54;">`;
+        messageContent = `
+        <div class="reply-message-div">
+            <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                Dummy Name              
+            </div>
+            <div class="reply-details">
+                <p class="file-name">${message.reply.msg}</p>
+            </div>
+        </div>
+        <div class="reply-message-area">${message_new}</div> <!-- Updated this line -->
+    `;
+    }else{
+       
         messageContent = `
             <img src="${message.message ?? message.msg}" style="height:222px; width:54;">
         `;
+    }
     } else if (message.type === 'Message' || message.type === null) {
-        messageContent = message.message ?? message.msg;
+        
+        if (message.reply) {
+            console.log("Reply Message: " + message.reply.msg);
+        
+            messageContent = `
+            <div class="reply-message-div">
+                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                    Dummy Name              
+                </div>
+                <div class="reply-details">
+                    <p class="file-name">${message.reply.msg}</p>
+                </div>
+            </div>
+            <div class="reply-message-area">${messageContent || (message.message ?? message.msg)}</div> <!-- Updated this line -->
+        `;
+        }else{
+            messageContent =messageContent || (message.message ?? message.msg) ;
+        }
+        
+        // Set messageContent to message.message or message.msg if no reply
+       // 
+        
     }
     else if (message.type === 'Audio') {
         const audioSrc = message.msg;
@@ -1004,7 +1083,7 @@ let addNewMessageToArea = (message) => {
         default:
             messageContent = '';
     }
-
+  
     // Create the message element as a DOM element
     let messageElement = document.createElement('div');
     messageElement.className = 'ml-3';
