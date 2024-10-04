@@ -12,4 +12,6 @@ interface ChatRepository
     public function updateMessageIsReadStatus($request);
     public function searchGroupMessages($query,$groupId);
     public function getMessageById($id);
+    public function updateMessage($request);
+    public function messageCorrection($request);
 }

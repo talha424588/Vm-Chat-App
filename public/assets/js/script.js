@@ -110,17 +110,17 @@ let populateGroupList = async () => {
             }
             //console.log("Group Id is here"+group.group_id);
             //DOM.unread_messages_count = chat.unread;
-            
+
             DOM.unreadMessagesPerGroup[group.group_id] = chat.unread;
 
             if (present[chat.name] !== undefined) {
                 chatList[present[chat.name]].unread += chat.unread;
-               
+
             } else {
                 present[chat.name] = chatList.length;
                 chatList.push(chat);
-                }
-           //console.log("1st hit Updated unread messages count:",  DOM.unreadMessagesPerGroup[group.group_id]);
+            }
+            //console.log("1st hit Updated unread messages count:",  DOM.unreadMessagesPerGroup[group.group_id]);
         });
     } catch (error) {
         console.log("Error fetching chat groups:", error);
@@ -153,7 +153,7 @@ let viewChatList = () => {
                 let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
                     if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
-                       // console.log("latestMessage", latestMessage);
+                        // console.log("latestMessage", latestMessage);
                         messageText = latestMessage.media_name;
                     }
                     else {
@@ -305,10 +305,10 @@ socket.on('sendChatToClient', (message) => {
         groupToUpdate.time = new Date(message.time * 1000);
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
         if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
-           
-            groupToUpdate.unread += 1;  
-            DOM.unreadMessagesPerGroup[groupId] +=1;
-            }
+
+            groupToUpdate.unread += 1;
+            DOM.unreadMessagesPerGroup[groupId] += 1;
+        }
 
 
         chatList.sort((a, b) => {
@@ -332,10 +332,10 @@ socket.on('sendChatToClient', (message) => {
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
         if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
             groupToUpdate.unread += 1;
-         
-       
-            DOM.unreadMessagesPerGroup[groupId] +=1;
-           
+
+
+            DOM.unreadMessagesPerGroup[groupId] += 1;
+
         }
         chatList.sort((a, b) => {
             if (a.time && b.time) {
@@ -412,6 +412,7 @@ let addMessageToMessageArea = (message) => {
         `;
          }else{
        messageContent = `
+
             <div class="file-message">
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -588,7 +589,7 @@ function scroll_function() {
     messageDiv.scrollTop = messageDiv.scrollHeight;
 
     // Show the scroll button when the user scrolls up
-    messageDiv.addEventListener('scroll', function() {
+    messageDiv.addEventListener('scroll', function () {
         // Show the button if the user scrolls up from the bottom
         if (messageDiv.scrollTop < messageDiv.scrollHeight - messageDiv.clientHeight - 50) {
             scrollBottomBtn.style.display = 'block';
@@ -598,7 +599,7 @@ function scroll_function() {
     });
 
     // Scroll to the bottom of the message div when the button is clicked
-    scrollBottomBtn.addEventListener('click', function() {
+    scrollBottomBtn.addEventListener('click', function () {
         messageDiv.scrollTo({
             top: messageDiv.scrollHeight,
             behavior: 'smooth'  // Smooth scrolling effect
@@ -624,8 +625,8 @@ function tinymce_init(callback) {
             toolbar_mode: 'wrap',
             placeholder: 'Write your message here which you want to be correct by the user or want any further change...',
             content_style: "body { font-family: Arial, sans-serif; font-size: 16px; }",
-            setup: function(editor) {
-                editor.on('init', function() {
+            setup: function (editor) {
+                editor.on('init', function () {
                     // Mark TinyMCE as initialized
                     isTinyMCEInitialized = true;
 
@@ -647,15 +648,15 @@ function tinymce_init(callback) {
 // Edit Correction Message Code
 function CorrectionMessage(message_id, messagebody, senderName) {
     console.log(message_id);
-    
+
     // Initialize TinyMCE and pass the correction_call function as a callback
-    tinymce_init(function() {
+    tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
     });
 }
 
 function correction_call(message_id, messagebody, senderName) {
-    // Set the content of TinyMCE
+
     if (tinymce.get('input')) {
         tinymce.get('input').setContent(messagebody);
     } else {
@@ -664,7 +665,15 @@ function correction_call(message_id, messagebody, senderName) {
 
 
     const correction_message_id = document.getElementById('correction_message_id');
-    correction_message_id.value =message_id;
+    correction_message_id.value = message_id;
+
+    const messageContent = tinymce.get('input').getContent();
+
+    const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
+    console.log("messageElement",messageElement);
+    const messageContentDiv = messageElement.querySelector('div.shadow-sm');
+    messageContentDiv.innerHTML = messageContent;
+
     // Check and log voiceIcon and Editreplyarea
     const voiceIcon = document.getElementById('chat_action');
     const Editreplyarea = document.getElementById('correctionreply-area');
@@ -682,7 +691,7 @@ function correction_call(message_id, messagebody, senderName) {
 
     // Check and log replyDiv and iconContainer
     var replyDiv = document.getElementById('correction-div');
-  
+
 
     if (replyDiv) {
         // Display the reply div
@@ -690,8 +699,6 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("Element 'correction-div' not found");
     }
-
-   
 
     // Update the quoted text with the message body
     var quotedTextElement = document.querySelector('#quoted-messages .sender-name');
@@ -708,27 +715,24 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("Element '#quoted-message .quoted-text' not found");
     }
-
- 
-
-
 }
 
+function correction_send_handel() {
+    console.log("hit");
+    // const messageContent = document.getElementById('input').value;
+    const messageContent = tinymce.get('input').getContent();
+
+    const correction_message_id = document.getElementById('correction_message_id').value;
 
 
 
 function correction_send_handel(){
-    alert('Handle Correction');
     
     // Get the content from TinyMCE
     const messageContent = tinymce.get('input').getContent();
     
     // Get the correction message ID
     const correction_message_id = document.getElementById('correction_message_id').value;
-    
-    // Display the alerts
-    alert(correction_message_id);
-    alert(messageContent);
 
     // Remove TinyMCE from the #input field
     tinymce.remove('#input');
@@ -742,6 +746,33 @@ function correction_send_handel(){
     correction_div.style.display = 'none'; 
     const chat_action = document.getElementById('chat_action');
     chat_action.style.display = 'block'; 
+
+
+
+    const messageElement = DOM.messages.querySelector(`[data-message-id="${correction_message_id}"]`);
+    const messageContentDiv = messageElement.querySelector('div.shadow-sm');
+    messageContentDiv.innerHTML = messageContent;
+
+    // Update the paginated chat list
+    const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(correction_message_id));
+    if (messageIndex !== -1) {
+        pagnicateChatList.data[messageIndex].msg = messageContent;
+    }
+    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    fetch('message/correction', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({
+            id: correction_message_id,
+            message: messageContent,
+        }),
+    })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error(error));
 
 }
 
@@ -764,24 +795,24 @@ function removecorrectionMessage() {
     const correctionreplyarea = document.getElementById('correctionreply-area');
     if (chat_action) {
         chat_action.style.display = 'block'; // Set visibility to block
-        correctionarea.style.display = 'none'; 
-        Editreplyarea.style.display = 'none'; 
-        correctionreplyarea.style.display = 'none'; 
+        correctionarea.style.display = 'none';
+        Editreplyarea.style.display = 'none';
+        correctionreplyarea.style.display = 'none';
         const textarea = document.getElementById('input');
-        textarea.value =''; // Append with a newline if there's already text
-    
+        textarea.value = ''; // Append with a newline if there's already text
+
     }
     // Select the element with the ID 'chat_action'
 
 
-// Create a new style element
-var style = document.createElement('style');
+    // Create a new style element
+    var style = document.createElement('style');
 
-// Add a CSS rule with 'display: contents !important' for the #chat_action
-style.innerHTML = "#chat_action { display: flex !important; }";
+    // Add a CSS rule with 'display: contents !important' for the #chat_action
+    style.innerHTML = "#chat_action { display: flex !important; }";
 
-// Append the style element to the document head
-document.head.appendChild(style);
+    // Append the style element to the document head
+    document.head.appendChild(style);
 
     // Hide the reply div
     replyDiv.style.display = 'none';
@@ -801,79 +832,165 @@ document.head.appendChild(style);
 
 
 //Edit Message Code
-function editMessage(messageId, messageContent) {
+// function editMessage(messageId, messageContent) {
 
 
-    // Set the display of #editMessageDiv to block
-    document.getElementById('editMessageDiv').style.display = 'block';
+//     // Set the display of #editMessageDiv to block
+//     document.getElementById('editMessageDiv').style.display = 'block';
 
-    // Pass the messageId to the input field with the ID edit_message_id
-    const editMessageIdField = document.getElementById('edit_message_id');
-    if (editMessageIdField) {
-        editMessageIdField.value = messageId; // Set the value to the messageId
-    }
+//     // Pass the messageId to the input field with the ID edit_message_id
+//     const editMessageIdField = document.getElementById('edit_message_id');
+//     if (editMessageIdField) {
+//         editMessageIdField.value = messageId; // Set the value to the messageId
+//     }
 
-    // Select elements with the class .EditmessageContent
-    const editMessageContents = document.querySelectorAll('.EditmessageContent');
+//     // Select elements with the class .EditmessageContent
+//     const editMessageContents = document.querySelectorAll('.EditmessageContent');
 
-    // Populate the message content into each element with the class
-    editMessageContents.forEach(content => {
-        content.textContent = messageContent; // Use .textContent for safety
-    });
+//     // Populate the message content into each element with the class
+//     editMessageContents.forEach(content => {
+//         content.textContent = messageContent; // Use .textContent for safety
+//     });
 
-    // Add the message content to the textarea
-    const textarea = document.getElementById('input');
-    textarea.value = (textarea.value ? '\n' : '') + messageContent; // Append with a newline if there's already text
+//     // Add the message content to the textarea
+//     const textarea = document.getElementById('input');
+//     textarea.value = (textarea.value ? '\n' : '') + messageContent; // Append with a newline if there's already text
 
-    // Optionally scroll to the bottom of the textarea if needed
-    textarea.scrollTop = textarea.scrollHeight;
+//     // Optionally scroll to the bottom of the textarea if needed
+//     textarea.scrollTop = textarea.scrollHeight;
 
-    // Add blur class to the #messages div
-    const messageDiv = document.getElementById('messages');
-    messageDiv.classList.add('blur');
+//     // Add blur class to the #messages div
+//     const messageDiv = document.getElementById('messages');
+//     messageDiv.classList.add('blur');
 
-    // Hide the voice icon
-    const chat_action = document.getElementById('chat_action');
+//     // Hide the voice icon
+//     const chat_action = document.getElementById('chat_action');
 
-    const Editreplyarea = document.getElementById('Editreply-area');
-    const voiceIcon = document.getElementById('voice-icon');
-    const fileicon = document.getElementById('file-icon');
-    const captureid = document.getElementById('captureid');
+//     const Editreplyarea = document.getElementById('Editreply-area');
+//     const voiceIcon = document.getElementById('voice-icon');
+//     const fileicon = document.getElementById('file-icon');
+//     const captureid = document.getElementById('captureid');
 
     const edit_file = document.querySelector('.edit_file');
     edit_file.style.visibility = 'hidden';
     const edit_capture = document.querySelector('.edit_capture');
     edit_capture.style.visibility = 'hidden';
-   
-    
 
+//     if (chat_action) {
+//         voiceIcon.style.display = 'none'; // Set visibility to hidden
 
-    if (chat_action) {
-        voiceIcon.style.display = 'none'; // Set visibility to hidden
-       
-        Editreplyarea.style.display = 'block'; 
-        voiceIcon.style.visibility = 'hidden';
-        fileicon.style.visibility = 'hidden';
-        captureid.style.visibility = 'hidden';
+//         Editreplyarea.style.display = 'block';
+//         voiceIcon.style.visibility = 'hidden';
+//         fileicon.style.visibility = 'hidden';
+//         captureid.style.visibility = 'hidden';
 
+//     }
+
+// }
+function editMessage(messageId, messageContent) {
+    // Find the message with the messageId in the pagnicateChatList array
+    const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
+
+    // If the message is found, update the editMessageDiv with its content
+    if (message) {
+        // Set the display of #editMessageDiv to block
+        document.getElementById('editMessageDiv').style.display = 'block';
+
+        // Pass the messageId to the input field with the ID edit_message_id
+        const editMessageIdField = document.getElementById('edit_message_id');
+        if (editMessageIdField) {
+            editMessageIdField.value = messageId; // Set the value to the messageId
+        }
+
+        // Select elements with the class .EditmessageContent
+        const editMessageContents = document.querySelectorAll('.EditmessageContent');
+
+        // Populate the message content into each element with the class
+        editMessageContents.forEach((content) => {
+            content.textContent = message.msg; // Use .textContent for safety
+        });
+
+        // Add the message content to the textarea
+        const textarea = document.getElementById('input');
+        textarea.value = message.msg; // Append with a newline if there's already text
+
+        // Optionally scroll to the bottom of the textarea if needed
+        textarea.scrollTop = textarea.scrollHeight;
+
+        // Add blur class to the #messages div
+        const messageDiv = document.getElementById('messages');
+        messageDiv.classList.add('blur');
+
+        // Hide the voice icon
+        const chat_action = document.getElementById('chat_action');
+
+        const Editreplyarea = document.getElementById('Editreply-area');
+        const voiceIcon = document.getElementById('voice-icon');
+        const fileicon = document.getElementById('file-icon');
+        const captureid = document.getElementById('captureid');
+
+        if (chat_action) {
+            voiceIcon.style.display = 'none'; // Set visibility to hidden
+
+            Editreplyarea.style.display = 'block';
+            voiceIcon.style.visibility = 'hidden';
+            fileicon.style.visibility = 'hidden';
+            captureid.style.visibility = 'hidden';
+        }
     }
-
 }
 
 
-
 // Function to handle Edit send message button click
+// Edit message area
 function handleSendMessage() {
 
     document.getElementById('input').style.setProperty('height', '44px', 'important');
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px', 'important');
-    
+
     // Get the value from the hidden input field
     const messageId = document.getElementById('edit_message_id').value;
     // Get the value from the textarea
-    const messageContent = document.getElementById('input').value;
-    // Display the values in an alert
-    alert(`Message ID: ${messageId}\nMessage Content: ${messageContent}`);
+    let messageContent = document.getElementById('input').value;
+
+
+    // beta version
+
+    // Find the message in the original array and update it
+    const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
+    console.log(messageIndex);
+    if (messageIndex !== -1) {
+        console.log("insidec");
+        console.log(pagnicateChatList.data[messageIndex].msg = messageContent);
+        console.log(pagnicateChatList);
+      pagnicateChatList.data[messageIndex].msg = messageContent;
+    }
+
+
+    const editMessageDiv = document.getElementById('editMessageDiv');
+    const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
+    editMessageContentDiv.innerHTML = messageContent;
+
+    // Update the DOM
+    const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+    const messageContentDiv = messageElement.querySelector('div.shadow-sm');
+    messageContentDiv.innerHTML = messageContent;
+
+    document.getElementById('input').value = "";
+    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+    // Hit API to update the message in backend
+    fetch("message/update", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          "X-CSRF-Token": csrfToken,
+        },
+        body: JSON.stringify({ id: messageId, message: messageContent }),
+      })
+        .then((response) => response.json())
+        .then((data) => console.log(data))
+        .catch((error) => console.error(error));
 
 
     document.getElementById('editMessageDiv').style.display = 'none';
@@ -885,6 +1002,7 @@ function handleSendMessage() {
     chat_action.style.display = 'block';
     chat_action.style.display = 'flex';
     const Editreplyarea = document.getElementById('Editreply-area');
+  
     Editreplyarea.style.display = 'none'; 
     const fileicon = document.querySelector('.chat_action_file');
     fileicon.style.visibility = 'visible';
@@ -895,7 +1013,19 @@ function handleSendMessage() {
     chat_action_voice.style.display = 'block'; 
  const correctionarea = document.getElementById('correction-div');
  correctionarea.style.display = 'none'; 
-  
+
+//     if (chat_action) {
+//         chat_action.style.display = 'block'; // Set visibility to hidden
+//         Editreplyarea.style.display = 'none';
+//     }
+
+//     // Hide the voice icon
+//     const chat_actioncorrection = document.getElementById('chat_action');
+//     const correctionarea = document.getElementById('correction-div');
+//     if (chat_actioncorrection) {
+//         chat_action.style.display = 'block'; // Set visibility to hidden
+//         correctionarea.style.display = 'none';
+//     }
 
 
 }
@@ -1134,8 +1264,8 @@ let addNewMessageToArea = (message) => {
                             </span> |
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="
-                                
-                                
+
+
                                 ('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
                             </span> <!---|
                             <span>
@@ -1183,7 +1313,7 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         });
         const nextPageMessages = await response.json();
         unread_settings(nextPageMessages);
-            console.log(nextPageMessages);
+        console.log(nextPageMessages);
 
 
 
@@ -1245,38 +1375,38 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
 
 
 
-function unread_settings(query_set){
-var groupId=DOM.groupId;
-var groupIdToCheck=groupId;
-const userIdToCheck = user.unique_id;
-let seenCount = 0;
-let unseenCount = 0;
-query_set.data.forEach(message => {
-    if (message.group_id === groupIdToCheck) {
-        if (message.seen_by.includes(userIdToCheck)) {
-            seenCount++;
-        } else {
-            unseenCount++;
+function unread_settings(query_set) {
+    var groupId = DOM.groupId;
+    var groupIdToCheck = groupId;
+    const userIdToCheck = user.unique_id;
+    let seenCount = 0;
+    let unseenCount = 0;
+    query_set.data.forEach(message => {
+        if (message.group_id === groupIdToCheck) {
+            if (message.seen_by.includes(userIdToCheck)) {
+                seenCount++;
+            } else {
+                unseenCount++;
+            }
         }
-    }
-});
-console.log('Read Seen Count of the messages'+seenCount+"of Group ID "+groupId);
-    console.log('Unread Count of the messages'+unseenCount+"of Group ID "+groupId);
+    });
+    console.log('Read Seen Count of the messages' + seenCount + "of Group ID " + groupId);
+    console.log('Unread Count of the messages' + unseenCount + "of Group ID " + groupId);
 
-    var first_get_value=DOM.unreadMessagesPerGroup[DOM.groupId];
-    var unseen=unseenCount;
+    var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
+    var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
-    var first_value=DOM.unreadMessagesPerGroup[DOM.groupId];
-    var left_count=first_value-unseen;
-    if(unseen>0){
-    document.querySelector(`.${DOM.groupId}`).innerText = left_count;
-    if(left_count==0 || left_count<0){
-    document.querySelector(`.${DOM.groupId}`).style.display = 'none';
-    }
-    if (groupToUpdate) {
-        groupToUpdate.unread =left_count;  
-    }
-    DOM.unreadMessagesPerGroup[DOM.groupId]=left_count;
+    var first_value = DOM.unreadMessagesPerGroup[DOM.groupId];
+    var left_count = first_value - unseen;
+    if (unseen > 0) {
+        document.querySelector(`.${DOM.groupId}`).innerText = left_count;
+        if (left_count == 0 || left_count < 0) {
+            document.querySelector(`.${DOM.groupId}`).style.display = 'none';
+        }
+        if (groupToUpdate) {
+            groupToUpdate.unread = left_count;
+        }
+        DOM.unreadMessagesPerGroup[DOM.groupId] = left_count;
     }
 }
 
@@ -1346,15 +1476,15 @@ let generateMessageArea = async (elem, chatIndex) => {
             'content-type': 'application/json'
         }
     });
-   // Parse the response
-// Parse the response
-pagnicateChatList = await response.json();
+    // Parse the response
+    // Parse the response
+    pagnicateChatList = await response.json();
 
-unread_settings(pagnicateChatList);
+    unread_settings(pagnicateChatList);
 
 
 
-const ids = pagnicateChatList.data.map(item => item.id);
+    const ids = pagnicateChatList.data.map(item => item.id);
 
 
 
@@ -1375,21 +1505,21 @@ const ids = pagnicateChatList.data.map(item => item.id);
     } catch (error) {
         console.log(error);
     }
- 
+
     var g_id = DOM.groupId; // Assume this contains the class name, e.g., "IMPZvumLHDgHjS10"
 
 
-   
-//     console.log("!st Count messages for group " + DOM.groupId + ": " + DOM.unreadMessagesPerGroup[DOM.groupId]);
 
-//     var unread_count=DOM.unreadMessagesPerGroup[DOM.groupId];
-//     if(unread_count>0 && unread_count<=20){
-//         DOM.unreadMessagesPerGroup[DOM.groupId]=unread_count-unread_count;
-//     }else if(unread_count>0 && unread_count>20){
-//         DOM.unreadMessagesPerGroup[DOM.groupId]=unread_count-20;
-//     }
-// //    console.log("Unread messages for group " + DOM.groupId + ": " + DOM.unreadMessagesPerGroup[DOM.groupId]);
-//   //  document.querySelector(`.${DOM.groupId}`).innerText = DOM.unreadMessagesPerGroup[DOM.groupId];
+    //     console.log("!st Count messages for group " + DOM.groupId + ": " + DOM.unreadMessagesPerGroup[DOM.groupId]);
+
+    //     var unread_count=DOM.unreadMessagesPerGroup[DOM.groupId];
+    //     if(unread_count>0 && unread_count<=20){
+    //         DOM.unreadMessagesPerGroup[DOM.groupId]=unread_count-unread_count;
+    //     }else if(unread_count>0 && unread_count>20){
+    //         DOM.unreadMessagesPerGroup[DOM.groupId]=unread_count-20;
+    //     }
+    // //    console.log("Unread messages for group " + DOM.groupId + ": " + DOM.unreadMessagesPerGroup[DOM.groupId]);
+    //   //  document.querySelector(`.${DOM.groupId}`).innerText = DOM.unreadMessagesPerGroup[DOM.groupId];
 
 
 
@@ -1430,7 +1560,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
         email: document.getElementById("login_user_email").value,
         fcm_token: document.getElementById("login_user_fcm_token").value
     }
-    console.log("send message", user.fcm_token);
     const fileIcon = document.querySelector('#file-icon');
     const chaticon = document.querySelector('#captureid');
     fileIcon.style.visibility = 'visible';
@@ -1619,20 +1748,30 @@ voiceIcon.addEventListener('click', () => {
 });
 
 
-
-
-
-
-
-
-
-
-
-//Select the Images From the Local Drive
-document.getElementById('captureid').addEventListener('click', function() {
+document.getElementById('captureid').addEventListener('click', function () {
     document.getElementById('hidden-file-input').click();
 });
 
+document.getElementById('hidden-file-input').addEventListener('change', function () {
+    const imageInput = this;
+    if (imageInput.files.length > 0) {
+        const image = imageInput.files[0];
+        const ref = firebase.storage().ref("images/" + DOM.unique_id);
+        const mediaName = image.name;
+        const metadata = {
+            contentType: image.type
+        };
+        const task = ref.child(mediaName).put(image, metadata);
+        task
+            .then(snapshot => snapshot.ref.getDownloadURL())
+            .then(url => {
+                console.log(url);
+                DOM.messageInput.value = url;
+                sendMessage("Image", mediaName);
+            })
+            .catch(error => console.error(error));
+    }
+});
 
 
 fileIcon.addEventListener('click', () => {
@@ -1669,8 +1808,11 @@ document.getElementById('input').addEventListener('keydown', function (event) {
             sendMessage();
             document.querySelector('.auto-resize-textarea').style.height = '44px';
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
+
           document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
           document.querySelector('.auto-resize-textarea').style.height = '44px';
+          
+
           
         } else {
             console.log('The div has a different display property.');

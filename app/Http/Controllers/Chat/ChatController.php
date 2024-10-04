@@ -189,7 +189,8 @@ class ChatController extends Controller
     {
         try {
             $message = GroupMessage::findOrFail($id);
-            if ($message->delete()) {
+            $message->is_deleted = true;
+            if ($message->save()) {
                 return response()->json([
                     'status' => true,
                     'message' => 'Message deleted successfully'
@@ -232,5 +233,15 @@ class ChatController extends Controller
     public function getMessageDetails($id)
     {
         return $this->chatRepository->getMessageById($id);
+    }
+
+    public function updateGroupMessage(Request $request)
+    {
+        return $this->chatRepository->updateMessage($request);
+    }
+
+    public function messageCorrection(Request $request)
+    {
+        return $this->chatRepository->messageCorrection($request);
     }
 }
