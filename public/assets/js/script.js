@@ -439,7 +439,7 @@ let addMessageToMessageArea = (message) => {
             messageContent = `
         <div class="reply-message-div">
             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                Dummy Name
+            ${message.reply.reply_user_name}
             </div>
             <div class="reply-details">
                 <p class="file-name">${message.reply.msg}</p>
@@ -461,7 +461,7 @@ let addMessageToMessageArea = (message) => {
             messageContent = `
             <div class="reply-message-div">
                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                    Dummy Name
+                ${message.reply.reply_user_name}
                 </div>
                 <div class="reply-details">
                     <p class="file-name">${message.reply.msg}</p>
@@ -669,27 +669,12 @@ function tinymce_init(callback) {
 }
 
 // Edit Correction Message Code
-// function CorrectionMessage(message_id, messagebody, senderName) {
-//     console.log(message_id);
-
-//     // Initialize TinyMCE and pass the correction_call function as a callback
-//     tinymce_init(function () {
-//         correction_call(message_id, messagebody, senderName);
-//     });
-// }
-
-
-// setting message with all styleing but edit did not working
 function CorrectionMessage(message_id, messagebody, senderName) {
     console.log(message_id);
 
     // Initialize TinyMCE and pass the correction_call function as a callback
-    tinymce_init(() => {
-        if (tinymce.get('input')) {
-            correction_call(message_id, messagebody, senderName);
-        } else {
-            console.error("TinyMCE editor not initialized for #input");
-        }
+    tinymce_init(function () {
+        correction_call(message_id, messagebody, senderName);
     });
 }
 
@@ -1266,10 +1251,7 @@ let addNewMessageToArea = (message) => {
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
                             </span> |
                             <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="
-
-
-                                ('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
+                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
                             </span> <!---|
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
@@ -1393,9 +1375,9 @@ function unread_settings(query_set) {
             }
         }
     });
+
     console.log('Read Seen Count of the messages' + seenCount + "of Group ID " + groupId);
     console.log('Unread Count of the messages' + unseenCount + "of Group ID " + groupId);
-
     var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
@@ -1410,6 +1392,7 @@ function unread_settings(query_set) {
             groupToUpdate.unread = left_count;
         }
         DOM.unreadMessagesPerGroup[DOM.groupId] = left_count;
+       
     }
 }
 
