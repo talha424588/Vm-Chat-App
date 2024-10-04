@@ -239,4 +239,9 @@ class ChatController extends Controller
     {
         return $this->chatRepository->updateMessage($request);
     }
+
+    public function messageCorrection(Request $request)
+    {
+        return $this->chatRepository->messageCorrection($request);
+    }
 }
