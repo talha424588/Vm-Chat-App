@@ -2194,5 +2194,3 @@ function get_voice_list() {
         audioPlayer.addEventListener('pause', () => console.log('Paused audio:', audioSrc));
     });
 }
-
-
