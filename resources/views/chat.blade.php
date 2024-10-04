@@ -555,16 +555,16 @@
                         </div>
 
 						 </div>
-						 
-						 
-						 
-						 
-						  
-						 
-						 
-						 
-						 
-                         <input type="hidden" class="number" id="correction_message_id">				 
+
+
+
+
+
+
+
+
+
+                         <input type="hidden" class="number" id="correction_message_id">
  <input type="hidden" class="number" id="edit_message_id">
  <input type="file" id="hidden-file-input" name="photo" accept="image/*" />
 
@@ -669,6 +669,7 @@
     <input type="hidden" value="{{ Auth::user()->unique_id }}" id="login_user_unique_id">
     <input type="hidden" value="{{ Auth::user()->email }}" id="login_user_email">
     <input type="hidden" value="{{ Auth::user()->fcm_token }}" id="login_user_fcm_token">
+    <input type="hidden" value="{{ Auth::user()->seen_privacy }}" id="login_user_seen_privacy">
     {{-- <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script> --}}
     {{-- @vite(['resources/js/app.js']) --}}
     <style>
