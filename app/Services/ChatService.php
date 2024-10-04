@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enum\MessageEnum as EnumMessageEnum;
 use App\Http\Requests\LoginRequestBody;
 use App\Http\Resources\GroupResource;
 use App\Http\Resources\MessageResource;
@@ -160,6 +161,8 @@ class ChatService implements ChatRepository
         $message = GroupMessage::where('id', $messageId)->first();
         if ($message) {
             $message->msg = $messageContent;
+            $message->status = EnumMessageEnum::EDIT;
+
             if ($message->save()) {
                 return response()->json(["status" => true, "message" => "success", "message" => new MessageResource($message)]);
             } else {
@@ -179,6 +182,7 @@ class ChatService implements ChatRepository
         $message = GroupMessage::where('id', $messageId)->first();
         if ($message) {
             $message->msg = $messageContent;
+            $message->status = EnumMessageEnum::CORRECTION;
             if ($message->save()) {
                 return response()->json(["status" => true, "message" => "Correction saved successfully", "message" => new MessageResource($message)]);
             } else {

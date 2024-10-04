@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('group_messages', function (Blueprint $table) {
-            $table->enum('status', ['New', 'Move', 'Correction', 'Editited', 'Deleted']);
+            $table->enum('status', ['New', 'Move', 'Correction', 'Edited', 'Deleted']);
         });
     }
 
