@@ -370,10 +370,16 @@ let addMessageToMessageArea = (message) => {
 
     // Determine the message content based on the message type
     let messageContent;
+
+    console.log(message);
+
+
+
     if (message.type === 'File') {
+        if (message.reply) {
+            console.log("Reply Message: " + message.reply.msg);
 
-
-        messageContent = `
+            var add_file_view = `
             <div class="file-message">
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -392,12 +398,83 @@ let addMessageToMessageArea = (message) => {
                 </a>
             </div>
         `;
+
+            messageContent = `
+            <div class="reply-message-div">
+                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                    Dummy Name
+                </div>
+                <div class="reply-details">
+                    <p class="file-name">${add_file_view}</p>
+                </div>
+            </div>
+            <div class="reply-message-area">${message.message ?? message.msg}</div> <!-- Updated this line -->
+        `;
+         }else{
+       messageContent = `
+
+            <div class="file-message">
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">${message.media_name}</p>
+
+                </div>
+                <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>
+        `;
+    }
     } else if (message.type === 'Image') {
+        if (message.reply) {
+            var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:54;">`;
+        messageContent = `
+        <div class="reply-message-div">
+            <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                Dummy Name
+            </div>
+            <div class="reply-details">
+                <p class="file-name">${message.reply.msg}</p>
+            </div>
+        </div>
+        <div class="reply-message-area">${message_new}</div> <!-- Updated this line -->
+    `;
+    }else{
+
         messageContent = `
             <img src="${message.message ?? message.msg}" style="height:222px; width:54;">
         `;
+    }
     } else if (message.type === 'Message' || message.type === null) {
-        messageContent = message.message ?? message.msg;
+
+        if (message.reply) {
+            console.log("Reply Message: " + message.reply.msg);
+
+            messageContent = `
+            <div class="reply-message-div">
+                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                    Dummy Name
+                </div>
+                <div class="reply-details">
+                    <p class="file-name">${message.reply.msg}</p>
+                </div>
+            </div>
+            <div class="reply-message-area">${messageContent || (message.message ?? message.msg)}</div> <!-- Updated this line -->
+        `;
+        }else{
+            messageContent =messageContent || (message.message ?? message.msg) ;
+        }
+
+        // Set messageContent to message.message or message.msg if no reply
+       //
+
     }
     else if (message.type === 'Audio') {
         const audioSrc = message.msg;
@@ -437,16 +514,23 @@ let addMessageToMessageArea = (message) => {
             <div class="">
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                     <div style="margin-top:-4px">
-                        <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px 8px 10px 8px; border-radius:5px;">
+                        <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
                             ${messageContent}
                         </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span> |
-                                <span>
-                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
-                                </span> |
+                                ${message.user.id == user.id ? `
+                                    <span>
+                                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+                                            data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
+                                            Seen
+                                        </a>
+                                    </span> |` : ''}
+
+
+
                                 <span>
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
                                 </span>
@@ -463,8 +547,9 @@ let addMessageToMessageArea = (message) => {
             <i class="fas fa-angle-down text-muted px-2"></i>
           </a>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+         ${!['Audio', 'Image', 'File'].includes(message.type) ? `
         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
-
+      ` : ''}
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
             <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${message.msg}','${senderName}')">Correction</a>
@@ -478,8 +563,9 @@ let addMessageToMessageArea = (message) => {
         </div>
     `;
 
-    DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
+    //DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
     scroll_function();
+
 };
 
 
@@ -638,6 +724,29 @@ function correction_send_handel() {
 
 
 
+function correction_send_handel(){
+
+    // Get the content from TinyMCE
+    const messageContent = tinymce.get('input').getContent();
+
+    // Get the correction message ID
+    const correction_message_id = document.getElementById('correction_message_id').value;
+
+    // Remove TinyMCE from the #input field
+    tinymce.remove('#input');
+    removecorrectionMessage();
+    // Set the height of the #input field to 44px
+    document.getElementById('input').style.height = '44px';
+    const textarea = document.getElementById('input');
+    textarea.value ='';
+
+    const correction_div = document.getElementById('correction-div');
+    correction_div.style.display = 'none';
+    const chat_action = document.getElementById('chat_action');
+    chat_action.style.display = 'block';
+
+
+
     const messageElement = DOM.messages.querySelector(`[data-message-id="${correction_message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
     messageContentDiv.innerHTML = messageContent;
@@ -662,7 +771,9 @@ function correction_send_handel() {
     .then((response) => response.json())
     .then((data) => console.log(data))
     .catch((error) => console.error(error));
+
 }
+
 document.getElementById('correction-send-message-btn').addEventListener('click', correction_send_handel);
 
 // Function to remove the correction message and disable TinyMCE
@@ -678,6 +789,7 @@ function removecorrectionMessage() {
     const correctionarea = document.getElementById('correction-div');
 
     const Editreplyarea = document.getElementById('Editreply-area');
+
     const correctionreplyarea = document.getElementById('correctionreply-area');
     if (chat_action) {
         chat_action.style.display = 'block'; // Set visibility to block
@@ -757,10 +869,10 @@ function removecorrectionMessage() {
 //     const fileicon = document.getElementById('file-icon');
 //     const captureid = document.getElementById('captureid');
 
-
-
-
-
+    const edit_file = document.querySelector('.edit_file');
+    edit_file.style.visibility = 'hidden';
+    const edit_capture = document.querySelector('.edit_capture');
+    edit_capture.style.visibility = 'hidden';
 
 //     if (chat_action) {
 //         voiceIcon.style.display = 'none'; // Set visibility to hidden
@@ -820,6 +932,11 @@ function editMessage(messageId, messageContent) {
 // Function to handle Edit send message button click
 // Edit message area
 function handleSendMessage() {
+
+    document.getElementById('input').style.setProperty('height', '44px', 'important');
+    document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px', 'important');
+
+    // Get the value from the hidden input field
     const messageId = document.getElementById('edit_message_id').value;
     let messageContent = document.getElementById('input').value;
 
@@ -865,19 +982,34 @@ function handleSendMessage() {
     const messageDiv = document.getElementById('messages');
     messageDiv.classList.remove('blur');
     const chat_action = document.getElementById('chat_action');
+    chat_action.style.display = 'block';
+    chat_action.style.display = 'flex';
     const Editreplyarea = document.getElementById('Editreply-area');
-    if (chat_action) {
-        chat_action.style.display = 'block';
-        Editreplyarea.style.display = 'none';
-    }
 
+    Editreplyarea.style.display = 'none';
+    const fileicon = document.querySelector('.chat_action_file');
+    fileicon.style.visibility = 'visible';
+    const chat_action_capture = document.querySelector('.chat_action_capture');
+    chat_action_capture.style.visibility = 'visible';
+    const chat_action_voice = document.querySelector('.chat_action_voice');
+    chat_action_voice.style.visibility = 'visible';
+    chat_action_voice.style.display = 'block';
+ const correctionarea = document.getElementById('correction-div');
+ correctionarea.style.display = 'none';
 
-    const chat_actioncorrection = document.getElementById('chat_action');
-    const correctionarea = document.getElementById('correction-div');
-    if (chat_actioncorrection) {
-        chat_action.style.display = 'block';
-        correctionarea.style.display = 'none';
-    }
+//     if (chat_action) {
+//         chat_action.style.display = 'block'; // Set visibility to hidden
+//         Editreplyarea.style.display = 'none';
+//     }
+
+//     // Hide the voice icon
+//     const chat_actioncorrection = document.getElementById('chat_action');
+//     const correctionarea = document.getElementById('correction-div');
+//     if (chat_actioncorrection) {
+//         chat_action.style.display = 'block'; // Set visibility to hidden
+//         correctionarea.style.display = 'none';
+//     }
+
 
 }
 
@@ -885,6 +1017,18 @@ function handleSendMessage() {
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
 
 
+function removeEditMessage(){
+    document.getElementById('editMessageDiv').style.display = 'none';
+    const Editreplyarea = document.getElementById('Editreply-area');
+    Editreplyarea.style.display = 'none';
+    const correctionarea = document.getElementById('correction-div');
+    correctionarea.style.display = 'none';
+    const messageDiv = document.getElementById('messages');
+    messageDiv.classList.remove('blur');
+    const textarea = document.getElementById('input');
+    textarea.value ='';
+    document.querySelector('.auto-resize-textarea').style.height = '44px';
+}
 
 //Show Reply Message
 function showReply(message_id, messagebody, senderName) {
@@ -1082,7 +1226,7 @@ let addNewMessageToArea = (message) => {
         <div class="">
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                 <div style="margin-top:-4px">
-                    <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+                    <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; ">
                         ${messageContent}
                     </div>
                     <div>
@@ -1108,7 +1252,9 @@ let addNewMessageToArea = (message) => {
                                 <i class="fas fa-angle-down text-muted px-2"></i>
                             </a>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
+                                ${!['Audio', 'Image', 'File'].includes(message.type) ? `
+        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
+      ` : ''}
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                 <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                             </div>
@@ -1334,6 +1480,8 @@ let generateMessageArea = async (elem, chatIndex) => {
 
 
     get_voice_list();
+    removeEditMessage();
+    removeQuotedMessage();
 };
 
 let showChatList = () => {
@@ -1489,7 +1637,7 @@ const startRecording = () => {
                 const blob = new Blob(chunks, { type: 'audio/wav' });
                 const audioUrl = URL.createObjectURL(blob);
                 const audio = new Audio(audioUrl);
-                audio.play();
+
 
                 const ref = firebase.storage().ref("audio/" + DOM.unique_id);
                 const mediaName = "recording.wav";
@@ -1590,19 +1738,23 @@ fileInput.addEventListener('change', (event) => {
 
 document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
-
         const editReplyArea = document.getElementById('Editreply-area');
-
         if (window.getComputedStyle(editReplyArea).display === 'none') {
             console.log('The div is hidden (display: none).');
             event.preventDefault();
             sendMessage();
-
+            document.querySelector('.auto-resize-textarea').style.height = '44px';
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
-            document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
+
+          document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
+          document.querySelector('.auto-resize-textarea').style.height = '44px';
+
+
+
         } else {
             console.log('The div has a different display property.');
         }
+        removeQuotedMessage();
     }
 });
 
