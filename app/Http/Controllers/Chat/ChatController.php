@@ -99,6 +99,11 @@ class ChatController extends Controller
         $message->time = $request->time;
         if ($message->save()) {
             $message->user = User::where("unique_id", $uniqueId)->first();
+            if($message->reply_id)
+            {
+                $message->reply ? GroupMessage::where("id", $message->reply_id)->first():"null";
+                $message->reply->user ? User::where("unique_id", $message->sender)->first():"null";
+            }
             // $data = [
             //     'message' => $message->msg,
             //     'token' => $token

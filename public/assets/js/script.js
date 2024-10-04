@@ -646,12 +646,27 @@ function tinymce_init(callback) {
 }
 
 // Edit Correction Message Code
+// function CorrectionMessage(message_id, messagebody, senderName) {
+//     console.log(message_id);
+
+//     // Initialize TinyMCE and pass the correction_call function as a callback
+//     tinymce_init(function () {
+//         correction_call(message_id, messagebody, senderName);
+//     });
+// }
+
+
+// setting message with all styleing but edit did not working
 function CorrectionMessage(message_id, messagebody, senderName) {
     console.log(message_id);
 
     // Initialize TinyMCE and pass the correction_call function as a callback
-    tinymce_init(function () {
-        correction_call(message_id, messagebody, senderName);
+    tinymce_init(() => {
+        if (tinymce.get('input')) {
+            correction_call(message_id, messagebody, senderName);
+        } else {
+            console.error("TinyMCE editor not initialized for #input");
+        }
     });
 }
 
