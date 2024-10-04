@@ -570,7 +570,7 @@ function CorrectionMessage(message_id, messagebody, senderName) {
 }
 
 function correction_call(message_id, messagebody, senderName) {
-    // Set the content of TinyMCE
+
     if (tinymce.get('input')) {
         tinymce.get('input').setContent(messagebody);
     } else {
@@ -580,6 +580,14 @@ function correction_call(message_id, messagebody, senderName) {
 
     const correction_message_id = document.getElementById('correction_message_id');
     correction_message_id.value = message_id;
+
+    const messageContent = tinymce.get('input').getContent();
+
+    const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
+    console.log("messageElement",messageElement);
+    const messageContentDiv = messageElement.querySelector('div.shadow-sm');
+    messageContentDiv.innerHTML = messageContent;
+
     // Check and log voiceIcon and Editreplyarea
     const voiceIcon = document.getElementById('chat_action');
     const Editreplyarea = document.getElementById('correctionreply-area');
@@ -606,8 +614,6 @@ function correction_call(message_id, messagebody, senderName) {
         console.error("Element 'correction-div' not found");
     }
 
-
-
     // Update the quoted text with the message body
     var quotedTextElement = document.querySelector('#quoted-messages .sender-name');
     var quotedNameElement = document.querySelector('#quoted-messages .quoted-text');
@@ -623,25 +629,41 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("Element '#quoted-message .quoted-text' not found");
     }
-
-
-
-
 }
 
-
-
-
 function correction_send_handel() {
+    console.log("hit");
     // const messageContent = document.getElementById('input').value;
     const messageContent = tinymce.get('input').getContent();
 
     const correction_message_id = document.getElementById('correction_message_id').value;
-    alert(correction_message_id);
-    alert(messageContent);
 
 
 
+    const messageElement = DOM.messages.querySelector(`[data-message-id="${correction_message_id}"]`);
+    const messageContentDiv = messageElement.querySelector('div.shadow-sm');
+    messageContentDiv.innerHTML = messageContent;
+
+    // Update the paginated chat list
+    const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(correction_message_id));
+    if (messageIndex !== -1) {
+        pagnicateChatList.data[messageIndex].msg = messageContent;
+    }
+    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    fetch('message/correction', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({
+            id: correction_message_id,
+            message: messageContent,
+        }),
+    })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error(error));
 }
 document.getElementById('correction-send-message-btn').addEventListener('click', correction_send_handel);
 

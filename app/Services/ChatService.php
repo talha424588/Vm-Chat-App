@@ -169,4 +169,23 @@ class ChatService implements ChatRepository
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
         }
     }
+
+
+    public function messageCorrection($request)
+    {
+        $messageId = $request->input('id');
+        $messageContent = $request->input('message');
+
+        $message = GroupMessage::where('id', $messageId)->first();
+        if ($message) {
+            $message->msg = $messageContent;
+            if ($message->save()) {
+                return response()->json(["status" => true, "message" => "Correction saved successfully", "message" => new MessageResource($message)]);
+            } else {
+                return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+            }
+        } else {
+            return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+        }
+    }
 }
