@@ -410,10 +410,7 @@ let addMessageToMessageArea = (message) => {
             </div>
             <div class="reply-message-area">${message.message ?? message.msg}</div> <!-- Updated this line -->
         `;
-           
-        }else{
-           
-        
+         }else{
        messageContent = `
             <div class="file-message">
                 <div class="file-icon">
@@ -516,16 +513,23 @@ let addMessageToMessageArea = (message) => {
             <div class="">
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                     <div style="margin-top:-4px">
-                        <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px 8px 10px 8px; border-radius:5px;">
+                        <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
                             ${messageContent}
                         </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span> |
-                                <span>
-                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
-                                </span> |
+                                ${message.user.id == user.id ? `
+                                    <span>
+                                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" 
+                                            data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
+                                            Seen
+                                        </a>
+                                    </span> |` : ''}
+                                
+                                
+                                
                                 <span>
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
                                 </span>
@@ -558,8 +562,9 @@ let addMessageToMessageArea = (message) => {
         </div>
     `;
 
-    DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
+    //DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
     scroll_function();
+    
 };
 
 
@@ -713,16 +718,33 @@ function correction_call(message_id, messagebody, senderName) {
 
 
 function correction_send_handel(){
-   // const messageContent = document.getElementById('input').value;
+    alert('Handle Correction');
+    
+    // Get the content from TinyMCE
     const messageContent = tinymce.get('input').getContent();
-    document.querySelector('.auto-resize-textarea').style.height = '44px';
-      const correction_message_id = document.getElementById('correction_message_id').value;
+    
+    // Get the correction message ID
+    const correction_message_id = document.getElementById('correction_message_id').value;
+    
+    // Display the alerts
     alert(correction_message_id);
     alert(messageContent);
 
+    // Remove TinyMCE from the #input field
+    tinymce.remove('#input');
+    removecorrectionMessage();
+    // Set the height of the #input field to 44px
+    document.getElementById('input').style.height = '44px';
+    const textarea = document.getElementById('input');
+    textarea.value ='';
 
-    
+    const correction_div = document.getElementById('correction-div');
+    correction_div.style.display = 'none'; 
+    const chat_action = document.getElementById('chat_action');
+    chat_action.style.display = 'block'; 
+
 }
+
 document.getElementById('correction-send-message-btn').addEventListener('click', correction_send_handel);
 
 // Function to remove the correction message and disable TinyMCE
@@ -738,6 +760,7 @@ function removecorrectionMessage() {
     const correctionarea = document.getElementById('correction-div');
 
     const Editreplyarea = document.getElementById('Editreply-area');
+    
     const correctionreplyarea = document.getElementById('correctionreply-area');
     if (chat_action) {
         chat_action.style.display = 'block'; // Set visibility to block
@@ -817,7 +840,10 @@ function editMessage(messageId, messageContent) {
     const fileicon = document.getElementById('file-icon');
     const captureid = document.getElementById('captureid');
 
-
+    const edit_file = document.querySelector('.edit_file');
+    edit_file.style.visibility = 'hidden';
+    const edit_capture = document.querySelector('.edit_capture');
+    edit_capture.style.visibility = 'hidden';
    
     
 
@@ -839,8 +865,9 @@ function editMessage(messageId, messageContent) {
 // Function to handle Edit send message button click
 function handleSendMessage() {
 
-   
-
+    document.getElementById('input').style.setProperty('height', '44px', 'important');
+    document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px', 'important');
+    
     // Get the value from the hidden input field
     const messageId = document.getElementById('edit_message_id').value;
     // Get the value from the textarea
@@ -855,19 +882,21 @@ function handleSendMessage() {
     const messageDiv = document.getElementById('messages');
     messageDiv.classList.remove('blur');
     const chat_action = document.getElementById('chat_action');
+    chat_action.style.display = 'block';
+    chat_action.style.display = 'flex';
     const Editreplyarea = document.getElementById('Editreply-area');
-    if (chat_action) {
-        chat_action.style.display = 'block'; // Set visibility to hidden
-        Editreplyarea.style.display = 'none';
-    }
-
-     // Hide the voice icon
- const chat_actioncorrection = document.getElementById('chat_action');
+    Editreplyarea.style.display = 'none'; 
+    const fileicon = document.querySelector('.chat_action_file');
+    fileicon.style.visibility = 'visible';
+    const chat_action_capture = document.querySelector('.chat_action_capture');
+    chat_action_capture.style.visibility = 'visible';
+    const chat_action_voice = document.querySelector('.chat_action_voice');
+    chat_action_voice.style.visibility = 'visible';
+    chat_action_voice.style.display = 'block'; 
  const correctionarea = document.getElementById('correction-div');
- if (chat_actioncorrection) {
-   chat_action.style.display = 'block'; // Set visibility to hidden
-   correctionarea.style.display = 'none'; 
- }
+ correctionarea.style.display = 'none'; 
+  
+
 
 }
 
@@ -1093,7 +1122,7 @@ let addNewMessageToArea = (message) => {
         <div class="">
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                 <div style="margin-top:-4px">
-                    <div class="shadow-sm" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; padding:10px; border-radius:5px;">
+                    <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; ">
                         ${messageContent}
                     </div>
                     <div>
@@ -1381,6 +1410,7 @@ const ids = pagnicateChatList.data.map(item => item.id);
 
     get_voice_list();
     removeEditMessage();
+    removeQuotedMessage();
 };
 
 let showChatList = () => {
@@ -1641,9 +1671,11 @@ document.getElementById('input').addEventListener('keydown', function (event) {
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
           document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
           document.querySelector('.auto-resize-textarea').style.height = '44px';
+          
         } else {
             console.log('The div has a different display property.');
         }
+        removeQuotedMessage();
     }
 });
 
