@@ -717,14 +717,6 @@ function correction_call(message_id, messagebody, senderName) {
     }
 }
 
-function correction_send_handel() {
-    console.log("hit");
-    // const messageContent = document.getElementById('input').value;
-    const messageContent = tinymce.get('input').getContent();
-
-    const correction_message_id = document.getElementById('correction_message_id').value;
-
-
 
 function correction_send_handel(){
     
