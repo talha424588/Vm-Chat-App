@@ -264,7 +264,10 @@ background-color: rgba(255, 255, 255, 0.3);
 	right: -34%; /* Sidebar hidden */
 }
 
-
+.additional_style{
+	padding:10px;
+	 border-radius:5px;
+}
 
 /* Media query for mobile devices */
 @media (max-width: 768px) {
@@ -274,6 +277,11 @@ background-color: rgba(255, 255, 255, 0.3);
 	#sidebar.sidebar-closed {
 		right: -100%; /* Sidebar hidden */
 	}
+	.additional_style{
+		padding:7px !important;
+		
+	}
+	
   }
 
 
@@ -495,6 +503,29 @@ color: #666; /* adjust the color to your liking */
 		margin-left: 6px;
 		margin-top: 13px;
 	}
+
+	#correction-div{
+	padding-right:30px; 
+	padding-left:30px; 
+	padding-top:10px;
+}
+
+	@media (max-width: 768px) {
+		#voice-icon {
+			margin-top: 7px !important;
+		}
+		#correction-div{
+			padding-right: 15px !important;
+    padding-left: 12px !important;
+    padding-top: 10px !important;
+		}
+	}
+	
+#action-bar{
+	padding: 17px;
+}
+
+
 	.chat-action-icons i {
 		margin-top: 17px;
 	}
@@ -549,8 +580,8 @@ color: #666; /* adjust the color to your liking */
 		  display: none;
 	  }
 	  .chat-action-icons {
-  margin-left: -80px;
-  display: flex;
+  	margin-left: -80px;
+  	display: flex;
 
        }
 
@@ -608,11 +639,9 @@ color: #666; /* adjust the color to your liking */
 
   .left-nidle {
 	position: relative;
-
 	text-align: left;
 	padding: 10px 15px;
 	border-radius: 6px;
-
 	float: left;
 	left: 44px;
 	top:-50px;
