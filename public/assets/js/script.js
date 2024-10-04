@@ -717,18 +717,10 @@ function correction_call(message_id, messagebody, senderName) {
     }
 }
 
-function correction_send_handel() {
-    const messageContent = tinymce.get('input').getContent();
-
-    const correction_message_id = document.getElementById('correction_message_id').value;
-
-
 
 function correction_send_handel(){
 
-    // Get the content from TinyMCE
     const messageContent = tinymce.get('input').getContent();
-
     // Get the correction message ID
     const correction_message_id = document.getElementById('correction_message_id').value;
 
@@ -744,8 +736,6 @@ function correction_send_handel(){
     correction_div.style.display = 'none';
     const chat_action = document.getElementById('chat_action');
     chat_action.style.display = 'block';
-
-
 
     const messageElement = DOM.messages.querySelector(`[data-message-id="${correction_message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
