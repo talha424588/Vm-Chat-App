@@ -1416,7 +1416,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
         email: document.getElementById("login_user_email").value,
         fcm_token: document.getElementById("login_user_fcm_token").value
     }
-    console.log("send message", user.fcm_token);
     const fileIcon = document.querySelector('#file-icon');
     const chaticon = document.querySelector('#captureid');
     fileIcon.style.visibility = 'visible';
@@ -1605,20 +1604,30 @@ voiceIcon.addEventListener('click', () => {
 });
 
 
-
-
-
-
-
-
-
-
-
-//Select the Images From the Local Drive
 document.getElementById('captureid').addEventListener('click', function () {
     document.getElementById('hidden-file-input').click();
 });
 
+document.getElementById('hidden-file-input').addEventListener('change', function () {
+    const imageInput = this;
+    if (imageInput.files.length > 0) {
+        const image = imageInput.files[0];
+        const ref = firebase.storage().ref("images/" + DOM.unique_id);
+        const mediaName = image.name;
+        const metadata = {
+            contentType: image.type
+        };
+        const task = ref.child(mediaName).put(image, metadata);
+        task
+            .then(snapshot => snapshot.ref.getDownloadURL())
+            .then(url => {
+                console.log(url);
+                DOM.messageInput.value = url;
+                sendMessage("Image", mediaName);
+            })
+            .catch(error => console.error(error));
+    }
+});
 
 
 fileIcon.addEventListener('click', () => {
