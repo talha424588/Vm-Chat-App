@@ -562,9 +562,31 @@ let addMessageToMessageArea = (message) => {
             </div>
         </div>
     `;
+   
 
+    
     //DOM.messages.scrollTo(0, DOM.messages.scrollHeight);
-    scroll_function();
+    var messageDiv = document.getElementById("messages");
+    var messageItems = messageDiv.getElementsByClassName("message-item");
+    var count = messageItems.length;
+    let exceededValue=0;
+    if (count > 20 && count % 20 !== 0) {
+         exceededValue = count - 20;
+         let unread=DOM.unreadMessagesPerGroup[DOM.groupId];
+        console.log("In the Group and messages Added:", exceededValue);
+        document.getElementById('scrollBottomBtn').style.display = 'block';
+        const notificationDiv = document.getElementById('notification-count');
+        notificationDiv.textContent = unread;
+      if(unread!=0){
+        notificationDiv.style.display = 'block';
+                   }
+    }else{
+       
+        scroll_function();
+    }
+
+
+    
 
 };
 
@@ -726,6 +748,7 @@ function correction_send_handel(){
 
     // Remove TinyMCE from the #input field
     tinymce.remove('#input');
+    isTinyMCEInitialized = false;
     removecorrectionMessage();
     // Set the height of the #input field to 44px
     document.getElementById('input').style.height = '44px';
@@ -2036,5 +2059,3 @@ function get_voice_list() {
         audioPlayer.addEventListener('pause', () => console.log('Paused audio:', audioSrc));
     });
 }
-
-
