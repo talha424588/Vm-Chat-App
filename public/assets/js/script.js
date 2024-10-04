@@ -38,6 +38,7 @@ let user = {
     unique_id: document.getElementById("login_user_unique_id").value,
     email: document.getElementById("login_user_email").value,
     fcm_token: document.getElementById("login_user_fcm_token").value,
+    seen_privacy: document.getElementById("login_user_seen_privacy").value,
     pic: "assets/images/profile-picture.webp"
 };
 let userGroupList = [];
@@ -410,8 +411,8 @@ let addMessageToMessageArea = (message) => {
             </div>
             <div class="reply-message-area">${message.message ?? message.msg}</div> <!-- Updated this line -->
         `;
-         }else{
-       messageContent = `
+        } else {
+            messageContent = `
 
             <div class="file-message">
                 <div class="file-icon">
@@ -431,11 +432,11 @@ let addMessageToMessageArea = (message) => {
                 </a>
             </div>
         `;
-    }
+        }
     } else if (message.type === 'Image') {
         if (message.reply) {
             var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:54;">`;
-        messageContent = `
+            messageContent = `
         <div class="reply-message-div">
             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                 Dummy Name
@@ -446,12 +447,12 @@ let addMessageToMessageArea = (message) => {
         </div>
         <div class="reply-message-area">${message_new}</div> <!-- Updated this line -->
     `;
-    }else{
+        } else {
 
-        messageContent = `
+            messageContent = `
             <img src="${message.message ?? message.msg}" style="height:222px; width:54;">
         `;
-    }
+        }
     } else if (message.type === 'Message' || message.type === null) {
 
         if (message.reply) {
@@ -468,12 +469,12 @@ let addMessageToMessageArea = (message) => {
             </div>
             <div class="reply-message-area">${messageContent || (message.message ?? message.msg)}</div> <!-- Updated this line -->
         `;
-        }else{
-            messageContent =messageContent || (message.message ?? message.msg) ;
+        } else {
+            messageContent = messageContent || (message.message ?? message.msg);
         }
 
         // Set messageContent to message.message or message.msg if no reply
-       //
+        //
 
     }
     else if (message.type === 'Audio') {
@@ -707,7 +708,7 @@ function correction_call(message_id, messagebody, senderName) {
     const messageContent = tinymce.get('input').getContent();
 
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
-    console.log("messageElement",messageElement);
+    console.log("messageElement", messageElement);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
     messageContentDiv.innerHTML = messageContent;
 
@@ -755,7 +756,7 @@ function correction_call(message_id, messagebody, senderName) {
 }
 
 
-function correction_send_handel(){
+function correction_send_handel() {
 
     const messageContent = tinymce.get('input').getContent();
     // Get the correction message ID
@@ -768,7 +769,7 @@ function correction_send_handel(){
     // Set the height of the #input field to 44px
     document.getElementById('input').style.height = '44px';
     const textarea = document.getElementById('input');
-    textarea.value ='';
+    textarea.value = '';
 
     const correction_div = document.getElementById('correction-div');
     correction_div.style.display = 'none';
@@ -796,9 +797,9 @@ function correction_send_handel(){
             message: messageContent,
         }),
     })
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-    .catch((error) => console.error(error));
+        .then((response) => response.json())
+        .then((data) => console.log(data))
+        .catch((error) => console.error(error));
 
 }
 
@@ -897,10 +898,10 @@ function removecorrectionMessage() {
 //     const fileicon = document.getElementById('file-icon');
 //     const captureid = document.getElementById('captureid');
 
-    const edit_file = document.querySelector('.edit_file');
-    edit_file.style.visibility = 'hidden';
-    const edit_capture = document.querySelector('.edit_capture');
-    edit_capture.style.visibility = 'hidden';
+const edit_file = document.querySelector('.edit_file');
+edit_file.style.visibility = 'hidden';
+const edit_capture = document.querySelector('.edit_capture');
+edit_capture.style.visibility = 'hidden';
 
 //     if (chat_action) {
 //         voiceIcon.style.display = 'none'; // Set visibility to hidden
@@ -974,7 +975,7 @@ function handleSendMessage() {
         console.log("insidec");
         console.log(pagnicateChatList.data[messageIndex].msg = messageContent);
         console.log(pagnicateChatList);
-      pagnicateChatList.data[messageIndex].msg = messageContent;
+        pagnicateChatList.data[messageIndex].msg = messageContent;
     }
 
 
@@ -994,11 +995,11 @@ function handleSendMessage() {
     fetch("message/update", {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          "X-CSRF-Token": csrfToken,
+            'Content-Type': 'application/json',
+            "X-CSRF-Token": csrfToken,
         },
         body: JSON.stringify({ id: messageId, message: messageContent }),
-      })
+    })
         .then((response) => response.json())
         .then((data) => console.log(data))
         .catch((error) => console.error(error));
@@ -1022,21 +1023,21 @@ function handleSendMessage() {
     const chat_action_voice = document.querySelector('.chat_action_voice');
     chat_action_voice.style.visibility = 'visible';
     chat_action_voice.style.display = 'block';
- const correctionarea = document.getElementById('correction-div');
- correctionarea.style.display = 'none';
+    const correctionarea = document.getElementById('correction-div');
+    correctionarea.style.display = 'none';
 
-//     if (chat_action) {
-//         chat_action.style.display = 'block'; // Set visibility to hidden
-//         Editreplyarea.style.display = 'none';
-//     }
+    //     if (chat_action) {
+    //         chat_action.style.display = 'block'; // Set visibility to hidden
+    //         Editreplyarea.style.display = 'none';
+    //     }
 
-//     // Hide the voice icon
-//     const chat_actioncorrection = document.getElementById('chat_action');
-//     const correctionarea = document.getElementById('correction-div');
-//     if (chat_actioncorrection) {
-//         chat_action.style.display = 'block'; // Set visibility to hidden
-//         correctionarea.style.display = 'none';
-//     }
+    //     // Hide the voice icon
+    //     const chat_actioncorrection = document.getElementById('chat_action');
+    //     const correctionarea = document.getElementById('correction-div');
+    //     if (chat_actioncorrection) {
+    //         chat_action.style.display = 'block'; // Set visibility to hidden
+    //         correctionarea.style.display = 'none';
+    //     }
 
 
 }
@@ -1045,7 +1046,7 @@ function handleSendMessage() {
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
 
 
-function removeEditMessage(){
+function removeEditMessage() {
     document.getElementById('editMessageDiv').style.display = 'none';
     const Editreplyarea = document.getElementById('Editreply-area');
     Editreplyarea.style.display = 'none';
@@ -1054,7 +1055,7 @@ function removeEditMessage(){
     const messageDiv = document.getElementById('messages');
     messageDiv.classList.remove('blur');
     const textarea = document.getElementById('input');
-    textarea.value ='';
+    textarea.value = '';
     document.querySelector('.auto-resize-textarea').style.height = '44px';
 }
 
@@ -1521,34 +1522,100 @@ let showChatList = () => {
 };
 
 let sendMessage = (type = 'Message', mediaName = null) => {
-    console.log("DOM.replyId", DOM.replyId);
-    var loginUser = {
-        id: document.getElementById("login_user_id").value,
-        name: document.getElementById("login_user_name").value,
-        unique_id: document.getElementById("login_user_unique_id").value,
-        email: document.getElementById("login_user_email").value,
-        fcm_token: document.getElementById("login_user_fcm_token").value
-    }
-    const fileIcon = document.querySelector('#file-icon');
-    const chaticon = document.querySelector('#captureid');
-    fileIcon.style.visibility = 'visible';
-    chaticon.style.visibility = 'visible';
-    let value = DOM.messageInput.value;
-    if (value === "") return;
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    let msg = {
-        user: loginUser,
-        message: value,
-        reply_id: DOM.replyId ?? "",
-        group_id: DOM.groupId,
-        type: type,
-        mediaName: mediaName,
-        time: Math.floor(Date.now() / 1000),
-        csrf_token: csrfToken
-    };
-    socket.emit('sendChatToServer', msg);
-    DOM.messageInput.value = "";
-    DOM.replyId = null;
+
+    if (type = 'Message') {
+        const numberPattern = /\b\d{7,}\b/;
+        const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
+
+        const fileIcon = document.querySelector('#file-icon');
+        const chaticon = document.querySelector('#captureid');
+        fileIcon.style.visibility = 'visible';
+        chaticon.style.visibility = 'visible';
+        let value = DOM.messageInput.value;
+        if (value === "") return;
+        let reason = '';
+        if (value.match(numberPattern)) {
+            reason = 'Contact Number';
+        } else if (value.match(emailPattern)) {
+            reason = 'Email Address';
+        }
+        if (reason !== '') {
+            // Send "Alert!!!" as the message
+            let alertMessage = "Alert!!!";
+            // Send email to dev3@visamtion.org with details
+            fetch('/alert-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    name: user.name,
+                    email: user.email,
+                    reason: reason,
+                    message: value,
+                })
+            })
+                .then(response => {
+                    console.log(response);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+            // Send "Alert!!!" to the backend to save in DB
+            let msg = {
+                user: user,
+                message: alertMessage,
+                reply_id: DOM.replyId ?? "",
+                group_id: DOM.groupId,
+                type: type,
+                mediaName: mediaName,
+                time: Math.floor(Date.now() / 1000),
+                csrf_token: csrfToken
+            };
+            socket.emit('sendChatToServer', msg);
+        } else {
+            // Send original message to the backend to save in DB
+            let msg = {
+                user: user,
+                message: value,
+                reply_id: DOM.replyId ?? "",
+                group_id: DOM.groupId,
+                type: type,
+                mediaName: mediaName,
+                time: Math.floor(Date.now() / 1000),
+                csrf_token: csrfToken
+            };
+            socket.emit('sendChatToServer', msg);
+        }
+        DOM.messageInput.value = "";
+        DOM.replyId = null;
+    }
+    else {
+        const fileIcon = document.querySelector('#file-icon');
+        const chaticon = document.querySelector('#captureid');
+        fileIcon.style.visibility = 'visible';
+        chaticon.style.visibility = 'visible';
+        let value = DOM.messageInput.value;
+        if (value === "") return;
+        let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        let msg = {
+            user: user,
+            message: value,
+            reply_id: DOM.replyId ?? "",
+            group_id: DOM.groupId,
+            type: type,
+            mediaName: mediaName,
+            time: Math.floor(Date.now() / 1000),
+            csrf_token: csrfToken
+        };
+        socket.emit('sendChatToServer', msg);
+        DOM.messageInput.value = "";
+        DOM.replyId = null;
+    }
+
 };
 
 
@@ -1774,10 +1841,8 @@ document.getElementById('input').addEventListener('keydown', function (event) {
             document.querySelector('.auto-resize-textarea').style.height = '44px';
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
 
-          document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
-          document.querySelector('.auto-resize-textarea').style.height = '44px';
-
-
+            document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
+            document.querySelector('.auto-resize-textarea').style.height = '44px';
 
         } else {
             console.log('The div has a different display property.');
@@ -1851,12 +1916,10 @@ $("#seenModal").on("show.bs.modal", async function (event) {
     }
 })
 
-
 //search groups
 
 let groupSearchField = document.getElementById("search_group");
 let debounceTimeout = null;
-
 
 let searchGroups = async (searchQuery) => {
     if (searchQuery.length > 0) {
@@ -1911,8 +1974,6 @@ groupSearchField.addEventListener("input", function (event) {
     }
 });
 
-
-
 async function unreadGrouChat() {
     try {
         const url = `get-unread-chat-groups`;
@@ -1926,7 +1987,6 @@ async function unreadGrouChat() {
 }
 
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
-
 
 searchMessageInputFeild.addEventListener("input", function (e) {
     if (e.target.value.length > 0) {
@@ -2001,7 +2061,6 @@ function removeHighlight() {
         element.innerHTML = element.textContent;
     });
 }
-
 
 function get_voice_list() {
     const audioMessages = document.querySelectorAll('.chat_list_messages .audio-message');

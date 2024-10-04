@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Chat;
 
+use App\Enum\MessageEnum as EnumMessageEnum;
 use App\Events\Chat;
 use App\Http\Controllers\Controller;
 use App\Models\GroupMessage;
@@ -16,7 +17,7 @@ use Laravel\Ui\Presets\React;
 use Exception;
 use Google\Client;
 use Illuminate\Support\Facades\Log;
-
+use App\Enums\MessageEnum;
 class ChatController extends Controller
 {
     public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService) {}
@@ -97,6 +98,7 @@ class ChatController extends Controller
         $message->type = $request->type;
         $message->media_name = $request->mediaName;
         $message->time = $request->time;
+        $message->status = EnumMessageEnum::NEW;
         if ($message->save()) {
             $message->user = User::where("unique_id", $uniqueId)->first();
             if($message->reply_id)
