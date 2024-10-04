@@ -632,8 +632,6 @@ function correction_call(message_id, messagebody, senderName) {
 }
 
 function correction_send_handel() {
-    console.log("hit");
-    // const messageContent = document.getElementById('input').value;
     const messageContent = tinymce.get('input').getContent();
 
     const correction_message_id = document.getElementById('correction_message_id').value;
@@ -776,40 +774,30 @@ function removecorrectionMessage() {
 
 // }
 function editMessage(messageId, messageContent) {
-    // Find the message with the messageId in the pagnicateChatList array
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
 
-    // If the message is found, update the editMessageDiv with its content
     if (message) {
-        // Set the display of #editMessageDiv to block
         document.getElementById('editMessageDiv').style.display = 'block';
 
-        // Pass the messageId to the input field with the ID edit_message_id
         const editMessageIdField = document.getElementById('edit_message_id');
         if (editMessageIdField) {
-            editMessageIdField.value = messageId; // Set the value to the messageId
+            editMessageIdField.value = messageId;
         }
 
-        // Select elements with the class .EditmessageContent
         const editMessageContents = document.querySelectorAll('.EditmessageContent');
 
-        // Populate the message content into each element with the class
         editMessageContents.forEach((content) => {
-            content.textContent = message.msg; // Use .textContent for safety
+            content.textContent = message.msg;
         });
 
-        // Add the message content to the textarea
         const textarea = document.getElementById('input');
-        textarea.value = message.msg; // Append with a newline if there's already text
+        textarea.value = message.msg;
 
-        // Optionally scroll to the bottom of the textarea if needed
         textarea.scrollTop = textarea.scrollHeight;
 
-        // Add blur class to the #messages div
         const messageDiv = document.getElementById('messages');
         messageDiv.classList.add('blur');
 
-        // Hide the voice icon
         const chat_action = document.getElementById('chat_action');
 
         const Editreplyarea = document.getElementById('Editreply-area');
@@ -818,7 +806,7 @@ function editMessage(messageId, messageContent) {
         const captureid = document.getElementById('captureid');
 
         if (chat_action) {
-            voiceIcon.style.display = 'none'; // Set visibility to hidden
+            voiceIcon.style.display = 'none';
 
             Editreplyarea.style.display = 'block';
             voiceIcon.style.visibility = 'hidden';
@@ -832,18 +820,9 @@ function editMessage(messageId, messageContent) {
 // Function to handle Edit send message button click
 // Edit message area
 function handleSendMessage() {
-
-
-
-    // Get the value from the hidden input field
     const messageId = document.getElementById('edit_message_id').value;
-    // Get the value from the textarea
     let messageContent = document.getElementById('input').value;
 
-
-    // beta version
-
-    // Find the message in the original array and update it
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
     console.log(messageIndex);
     if (messageIndex !== -1) {
@@ -888,15 +867,15 @@ function handleSendMessage() {
     const chat_action = document.getElementById('chat_action');
     const Editreplyarea = document.getElementById('Editreply-area');
     if (chat_action) {
-        chat_action.style.display = 'block'; // Set visibility to hidden
+        chat_action.style.display = 'block';
         Editreplyarea.style.display = 'none';
     }
 
-    // Hide the voice icon
+
     const chat_actioncorrection = document.getElementById('chat_action');
     const correctionarea = document.getElementById('correction-div');
     if (chat_actioncorrection) {
-        chat_action.style.display = 'block'; // Set visibility to hidden
+        chat_action.style.display = 'block';
         correctionarea.style.display = 'none';
     }
 
@@ -922,17 +901,14 @@ function showReply(message_id, messagebody, senderName) {
     var quotedNameElement = document.querySelector('#quoted-message .quoted-text');
     quotedNameElement.textContent = messagebody; // Set the new message body
 
-    // Display the reply div
     replyDiv.style.display = 'block';
 
-    // Change the bottom property of the icon container
     iconContainer.style.bottom = '145px';
 }
 
 function removeQuotedMessage() {
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
-    // Hide the reply div
     replyDiv.style.display = 'none';
     iconContainer.style.bottom = '90px';
 }
@@ -987,13 +963,10 @@ document.getElementById('cancel-icon').addEventListener('click', function () {
         element.classList.remove('selected-message');
     });
 
-    // Hide the action bar
     document.getElementById('action-bar').style.display = 'none';
 
-    // Show the input area
     document.getElementById('input-area').style.display = 'block';
 
-    // Update the selected count display
     document.getElementById('selected-count').textContent = 'Selected Messages: 0';
 
     console.log('Selected messages have been cleared and input area is displayed.');
@@ -1015,7 +988,6 @@ function selectUsertosend(username, postgroup_id) {
 }
 
 $(document).ready(function () {
-    // Listen for click event on the SVG
     $('#MoveMessagetoGroup').on('click', function () {
         // Collect values from hidden inputs
         var messagesIds = $('#messages_ids').val();
@@ -1032,15 +1004,13 @@ $(document).ready(function () {
 
 
 let isLoadingMessages = false;
-let hasMoreMessages = true; // Assume we have more messages initially
+let hasMoreMessages = true;
 
 
 
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
-    //console.log('Scroll event triggered'); // Log when the scroll event is triggered
 
-    // Check if the user has scrolled to the top of the message area
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         //console.log('User reached the top of the message area, starting to load more messages'); // Log when reaching the top
 
@@ -1054,11 +1024,11 @@ DOM.messages.addEventListener('scroll', async () => {
 
 // Function to add a new message to the message area
 let addNewMessageToArea = (message) => {
-    let msgDate = new Date(message.time * 1000).getDate(); // Convert timestamp to date
+    let msgDate = new Date(message.time * 1000).getDate();
 
     if (lastDate !== msgDate) {
-        addDateToMessageArea(msgDate); // Add date separator if needed
-        lastDate = msgDate; // Update lastDate
+        addDateToMessageArea(msgDate);
+        lastDate = msgDate;
     }
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
@@ -1280,7 +1250,7 @@ function unread_settings(query_set) {
 
 
 
-let currentlyPlayingAudio = null; // Variable to hold the currently playing audio player
+let currentlyPlayingAudio = null;
 let generateMessageArea = async (elem, chatIndex) => {
 
     pagnicateChatList = [];
@@ -1334,20 +1304,10 @@ let generateMessageArea = async (elem, chatIndex) => {
             'content-type': 'application/json'
         }
     });
-    // Parse the response
-    // Parse the response
     pagnicateChatList = await response.json();
 
     unread_settings(pagnicateChatList);
-
-
-
     const ids = pagnicateChatList.data.map(item => item.id);
-
-
-
-
-
 
     try {
         const response = await fetch("message/seen-by/update", {
@@ -1364,31 +1324,8 @@ let generateMessageArea = async (elem, chatIndex) => {
         console.log(error);
     }
 
-    var g_id = DOM.groupId; // Assume this contains the class name, e.g., "IMPZvumLHDgHjS10"
+    var g_id = DOM.groupId;
 
-
-
-    //     console.log("!st Count messages for group " + DOM.groupId + ": " + DOM.unreadMessagesPerGroup[DOM.groupId]);
-
-    //     var unread_count=DOM.unreadMessagesPerGroup[DOM.groupId];
-    //     if(unread_count>0 && unread_count<=20){
-    //         DOM.unreadMessagesPerGroup[DOM.groupId]=unread_count-unread_count;
-    //     }else if(unread_count>0 && unread_count>20){
-    //         DOM.unreadMessagesPerGroup[DOM.groupId]=unread_count-20;
-    //     }
-    // //    console.log("Unread messages for group " + DOM.groupId + ": " + DOM.unreadMessagesPerGroup[DOM.groupId]);
-    //   //  document.querySelector(`.${DOM.groupId}`).innerText = DOM.unreadMessagesPerGroup[DOM.groupId];
-
-
-
-
-    // var setcount = 0;
-    // document.getElementById("unread-count").value = setcount;
-
-    // const badgeSuccessElem = elem.querySelector('#unread-count');
-    // if (badgeSuccessElem) {
-    //   badgeSuccessElem.style.display = 'none'; // or use hide() if you have a jQuery reference
-    // }
 
     lastDate = "";
     pagnicateChatList.data.reverse()
@@ -1516,9 +1453,6 @@ Notification.requestPermission().then(permission => {
     }
 });
 
-//   messaging.onMessage((payload) => {
-//     console.log('Message received. ', payload);
-//   });
 
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');
@@ -1533,7 +1467,6 @@ let mediaRecorder;
 let chunks = [];
 
 const startRecording = () => {
-    // Reset chunks for a new recording
     chunks = [];
 
     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -1799,9 +1732,7 @@ groupSearchField.addEventListener("input", function (event) {
 });
 
 
-// get unread message groups
-// let unreadGroup = document.getElementById("unread");
-// unreadGroup.addEventListener("click", async function (e) {
+
 async function unreadGrouChat() {
     try {
         const url = `get-unread-chat-groups`;
@@ -1813,79 +1744,9 @@ async function unreadGrouChat() {
         console.log(error);
     }
 }
-// })
 
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
 
-// searchMessageInputFeild.addEventListener("input", function (e) {
-//     if (e.target.value.length >0) {
-//         clearTimeout(debounceTimeout);
-//         debounceTimeout = setTimeout(async function () {
-//             const url = `message/search/${e.target.value}/${DOM.groupId}`;
-//             try {
-//                 fetch(url)
-//                     .then(response => response.json())
-//                     .then(messageResponse => {
-//                         console.log("search message response",messageResponse);
-//                     })
-//                     .catch(error => {
-//                         console.error('Error:', error);
-//                     });
-//             }
-//             catch (error) {
-//                 console.log(error);
-//             }
-//         }, 500)
-//     }
-// })
-
-
-// searchMessageInputFeild.addEventListener("input", function (e) {
-//     if (e.target.value.length > 0) {
-//         clearTimeout(debounceTimeout);
-//         debounceTimeout = setTimeout(async function () {
-//             const url = `message/search/${e.target.value}/${DOM.groupId}`;
-//             try {
-//                 fetch(url)
-//                     .then(response => response.json())
-//                     .then(messageResponse => {
-//                         console.log("search message response", messageResponse);
-//                         const searchResultsDiv = document.querySelector(".search-results");
-//                         searchResultsDiv.innerHTML = "";
-//                         messageResponse.messages.forEach((message) => {
-//                             const resultItemDiv = document.createElement("div");
-//                             resultItemDiv.className = "result-item";
-//                             const resultDateDiv = document.createElement("div");
-//                             resultDateDiv.className = "result-date";
-//                             resultDateDiv.textContent = new Date(message.time * 1000).toLocaleDateString();
-//                             const resultTextDiv = document.createElement("div");
-//                             resultTextDiv.className = "result-text";
-//                             resultTextDiv.textContent = message.msg;
-//                             resultItemDiv.appendChild(resultDateDiv);
-//                             resultItemDiv.appendChild(resultTextDiv);
-//                             searchResultsDiv.appendChild(resultItemDiv);
-//                             resultItemDiv.addEventListener("click", function () {
-//                                 const messageId = message.id;
-//                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-//                                 if (messageElement) {
-//                                     messageElement.scrollIntoView({ behavior: "smooth" });
-//                                 }
-//                             });
-//                         });
-//                     })
-//                     .catch(error => {
-//                         console.error('Error:', error);
-//                     });
-//             } catch (error) {
-//                 console.log(error);
-//             }
-//         }, 500)
-//     }
-//     else {
-//         const searchResultsDiv = document.querySelector(".search-results");
-//         searchResultsDiv.innerHTML = "";
-//     }
-// })
 
 searchMessageInputFeild.addEventListener("input", function (e) {
     if (e.target.value.length > 0) {
@@ -1913,7 +1774,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultItemDiv.appendChild(resultTextDiv);
                             searchResultsDiv.appendChild(resultItemDiv);
 
-                            // Add event listener to each result item
                             resultItemDiv.addEventListener("click", function () {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
@@ -1963,10 +1823,6 @@ function removeHighlight() {
 }
 
 
-
-
-
-
 function get_voice_list() {
     const audioMessages = document.querySelectorAll('.chat_list_messages .audio-message');
 
@@ -1978,27 +1834,24 @@ function get_voice_list() {
         const audioSrc = message.getAttribute('data-audio-src');
         const audioPlayer = new Audio(audioSrc);
 
-        // Play/Pause functionality
         playButton.addEventListener('click', function () {
             if (audioPlayer.paused) {
-                // If another audio is currently playing, pause it
                 if (currentlyPlayingAudio && currentlyPlayingAudio !== audioPlayer) {
                     currentlyPlayingAudio.pause();
-                    currentlyPlayingAudio.currentTime = 0; // Reset the currently playing audio
+                    currentlyPlayingAudio.currentTime = 0;
                     const currentlyPlayingButton = document.querySelector('.play-button img[src*="Pause-icon.jpg"]');
                     if (currentlyPlayingButton) {
-                        currentlyPlayingButton.src = '/images/Play-icon.jpg'; // Change back to play icon
+                        currentlyPlayingButton.src = '/images/Play-icon.jpg';
                     }
                 }
 
-                // Play the selected audio
                 audioPlayer.play();
-                playButton.innerHTML = '<img src="/images/Pause-icon.jpg" alt="Pause" />'; // Change to pause icon
-                currentlyPlayingAudio = audioPlayer; // Update currently playing audio
+                playButton.innerHTML = '<img src="/images/Pause-icon.jpg" alt="Pause" />';
+                currentlyPlayingAudio = audioPlayer;
             } else {
                 audioPlayer.pause();
-                playButton.innerHTML = '<img src="/images/Play-icon.jpg" alt="Play" />'; // Change to play icon
-                currentlyPlayingAudio = null; // Clear currently playing audio
+                playButton.innerHTML = '<img src="/images/Play-icon.jpg" alt="Play" />';
+                currentlyPlayingAudio = null;
             }
         });
 
@@ -2011,37 +1864,32 @@ function get_voice_list() {
             }
         });
 
-        // Reset to default state when the audio ends
         audioPlayer.addEventListener('ended', function () {
-            playButton.innerHTML = '<img src="/images/Play-icon.jpg" alt="Play" />'; // Reset to play icon
-            progressFilled.style.width = '0%'; // Reset the progress bar
-            audioDuration.textContent = '0:00'; // Reset the timer display
-            currentlyPlayingAudio = null; // Clear currently playing audio
+            playButton.innerHTML = '<img src="/images/Play-icon.jpg" alt="Play" />';
+            progressFilled.style.width = '0%';
+            audioDuration.textContent = '0:00';
+            currentlyPlayingAudio = null;
         });
 
-        // Format time function (mm:ss)
         function formatTime(seconds) {
             const minutes = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
             return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        // Set audio time when clicking the progress bar
         progressBarContainer.addEventListener('click', (event) => {
             const progressBarWidth = progressBarContainer.offsetWidth;
             const clickX = event.offsetX;
 
-            // Ensure audioPlayer.duration is a finite number before calculating newTime
             if (audioPlayer.duration && audioPlayer.duration > 0) {
                 const newTime = (clickX / progressBarWidth) * audioPlayer.duration;
-                audioPlayer.currentTime = Math.min(Math.max(newTime, 0), audioPlayer.duration); // Ensure newTime is within valid range
+                audioPlayer.currentTime = Math.min(Math.max(newTime, 0), audioPlayer.duration);
             } else {
                 console.warn('Audio duration is not available or invalid:', audioPlayer.duration);
             }
         });
 
 
-        // Debugging - Check audio player status
         audioPlayer.addEventListener('play', () => console.log('Playing audio:', audioSrc));
         audioPlayer.addEventListener('pause', () => console.log('Paused audio:', audioSrc));
     });
