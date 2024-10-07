@@ -820,7 +820,6 @@ function handleSendMessage() {
         pagnicateChatList.data[messageIndex].msg = messageContent;
     }
 
-
     const editMessageDiv = document.getElementById('editMessageDiv');
     const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
     editMessageContentDiv.innerHTML = messageContent;
@@ -843,7 +842,6 @@ function handleSendMessage() {
         .then((response) => response.json())
         .then((data) => console.log(data))
         .catch((error) => console.error(error));
-
 
     document.getElementById('editMessageDiv').style.display = 'none';
     const textarea = document.getElementById('input');
@@ -869,7 +867,6 @@ function handleSendMessage() {
 
 // Add event listener to the send message button
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
-
 
 function removeEditMessage() {
     document.getElementById('editMessageDiv').style.display = 'none';
@@ -948,8 +945,6 @@ function moveMessage(messageId) {
 }
 
 //Multiple Select Messages End
-
-
 function moveSelectedMessagesToGroup() {
     const selectedMessages = selectedMessageIds.map(id => {
         return {
@@ -957,9 +952,6 @@ function moveSelectedMessagesToGroup() {
             groupId: DOM.groupId,
         };
     });
-
-
-    console.log("selectedMessages", selectedMessages);
 
     const newGroupId = document.getElementById('group_to_move_message').value;
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -1012,7 +1004,6 @@ function moveSelectedMessagesToGroup() {
                     }
                     chatList[newGroupIndex].msg = newMessage;
                     chatList[newGroupIndex].time = new Date(newMessage.time * 1000);
-                    // chatList[newGroupIndex].unread += 1;
 
                     // Update the last message text
                     const senderName = newMessage.user.name;
@@ -1057,7 +1048,6 @@ function moveSelectedMessagesToGroup() {
         .catch(error => console.error(error));
 }
 
-
 document.getElementById('cancel-icon').addEventListener('click', function () {
     cancelMoveMessage();
 });
@@ -1099,8 +1089,6 @@ $(document).ready(function () {
 
 let isLoadingMessages = false;
 let hasMoreMessages = true;
-
-
 
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
@@ -1212,14 +1200,11 @@ let addNewMessageToArea = (message) => {
     return messageElement;
 };
 
-
 const fetchNextPageMessages = async (message_id = null, current_Page = null) => {
     if (!message_id) {
         currentPage++;
     }
     const currentScrollHeight = DOM.messages.scrollHeight;
-    console.log(`Current scroll height: ${currentScrollHeight}`);
-
 
     try {
         const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}&currentPage=${encodeURIComponent(current_Page)}` : ''}`;
@@ -1302,8 +1287,6 @@ function unread_settings(query_set) {
         }
     });
 
-    console.log('Read Seen Count of the messages' + seenCount + "of Group ID " + groupId);
-    console.log('Unread Count of the messages' + unseenCount + "of Group ID " + groupId);
     var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
@@ -1658,7 +1641,6 @@ voiceIcon.addEventListener('click', () => {
     }
 });
 
-
 document.getElementById('captureid').addEventListener('click', function () {
     document.getElementById('hidden-file-input').click();
 });
@@ -1684,7 +1666,6 @@ document.getElementById('hidden-file-input').addEventListener('change', function
     }
 });
 
-
 fileIcon.addEventListener('click', () => {
     fileInput.click();
 });
@@ -1708,7 +1689,6 @@ fileInput.addEventListener('change', (event) => {
         })
         .catch(error => console.error(error));
 });
-
 
 document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
@@ -2006,7 +1986,6 @@ function get_voice_list() {
                 console.warn('Audio duration is not available or invalid:', audioPlayer.duration);
             }
         });
-
 
         audioPlayer.addEventListener('play', () => console.log('Playing audio:', audioSrc));
         audioPlayer.addEventListener('pause', () => console.log('Paused audio:', audioSrc));
