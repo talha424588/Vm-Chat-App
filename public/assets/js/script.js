@@ -296,7 +296,6 @@ socket.on('sendChatToClient', (message) => {
             DOM.unreadMessagesPerGroup[groupId] += 1;
         }
 
-
         chatList.sort((a, b) => {
             if (a.time && b.time) {
                 return new Date(b.time) - new Date(a.time);
@@ -336,12 +335,9 @@ socket.on('sendChatToClient', (message) => {
     }
 });
 
-
 socket.on('moveMessage', () => {
     generateChatList();
 });
-
-
 
 let addMessageToMessageArea = (message) => {
     let msgDate = mDate(message.time).getDate();
@@ -681,7 +677,6 @@ function correction_call(message_id, messagebody, senderName) {
         console.error("Element '#quoted-message .quoted-text' not found");
     }
 }
-
 
 function correction_send_handel() {
 
