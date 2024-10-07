@@ -37,10 +37,9 @@ io.on('connection', (socket) => {
         io.emit('updateGroupMessages', messageId);
     });
 
-    // Server-side code
-    socket.on('moveMessage', (data) => {
-        // Update the chat list for all connected clients
-        io.emit('updateChatList', data);
+    socket.on('moveMessage', (messageId, newGroupId) => {
+        console.log("move message event", messageId, newGroupId);
+        io.emit('moveMessage', messageId, newGroupId);
     });
 
     socket.on('disconnect', () => {
