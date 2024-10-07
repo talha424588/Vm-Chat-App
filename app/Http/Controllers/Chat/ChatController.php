@@ -259,19 +259,19 @@ class ChatController extends Controller
         $messages = $request->input('messages');
         $newGroupId = $request->input('newGroupId');
 
-        $updatedMessages = [];
+        $messageIds = [];
 
         foreach ($messages as $message) {
-            $updatedMessage = DB::table('group_messages')
+            $messageIds[] = $message['id'];
+            DB::table('group_messages')
                 ->where('id', $message['id'])
                 ->update(['group_id' => $newGroupId]);
-
-            $updatedMessage = GroupMessage::findorFail($message['id'])->with("user")
-                ->first();
-
-            $updatedMessages[] = $updatedMessage;
         }
 
-        return response()->json(['message' => $updatedMessages]);
+        $updatedMessages = GroupMessage::whereIn('id', $messageIds)
+            ->with("user")
+            ->get();
+
+        return response()->json($updatedMessages);
     }
 }

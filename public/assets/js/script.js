@@ -944,6 +944,91 @@ function moveMessage(messageId) {
     }
 }
 
+// function moveSelectedMessagesToGroup() {
+//     const selectedMessages = selectedMessageIds.map(id => {
+//         return {
+//             id: id,
+//             groupId: DOM.groupId,
+//         };
+//     });
+
+//     console.log("selectedMessages",selectedMessages);
+//     const newGroupId = document.getElementById('group_to_move_message').value;
+//     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+//     fetch('messages/move', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-CSRF-TOKEN': csrfToken,
+//         },
+//         body: JSON.stringify({
+//             messages: selectedMessages,
+//             newGroupId: newGroupId,
+//         }),
+//     })
+//         .then(response => response.json())
+//         .then(data => {
+//             console.log(data);
+//             // Update the UI to reflect the changes
+
+//             const previousGroupId = DOM.groupId;
+//             const previousGroupIndex = chatList.findIndex(group => group.group.group_id === previousGroupId);
+//             if (previousGroupIndex !== -1) {
+//                 const messageIndex = chatList[previousGroupIndex].group.group_messages.findIndex(message => message.id === selectedMessageIds[0]);
+//                 if (messageIndex !== -1) {
+//                     chatList[previousGroupIndex].group.group_messages.splice(messageIndex, 1);
+//                     chatList[previousGroupIndex].unread -= 1;
+//                 }
+//             }
+
+//             // Add the message to the new group
+//             const newGroupIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
+
+//             if (newGroupIndex !== -1) {
+//                 const newMessage = data.message[0];
+//                 const messageIndex = chatList[newGroupIndex].group.group_messages.findIndex(message => message.time > newMessage.time);
+//                 if (messageIndex === -1) {
+//                     chatList[newGroupIndex].group.group_messages.push(newMessage);
+//                 } else {
+//                     chatList[newGroupIndex].group.group_messages.splice(messageIndex, 0, newMessage);
+//                 }
+//                 chatList[newGroupIndex].msg = newMessage;
+//                 chatList[newGroupIndex].time = new Date(newMessage.time * 1000);
+//                 // chatList[newGroupIndex].unread += 1;
+//             }
+
+//             // Update the chat list
+//             chatList.sort((a, b) => {
+//                 if (a.time && b.time) {
+//                     return new Date(b.time) - new Date(a.time);
+//                 } else if (a.time) {
+//                     return -1;
+//                 } else if (b.time) {
+//                     return 1;
+//                 } else {
+//                     return 0;
+//                 }
+//             });
+
+//             viewChatList();
+
+//             const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
+//             generateMessageArea(newGroupChatListItem, newGroupIndex);
+//             cancelMoveMessage();
+//             document.querySelector(".close").click();
+//         })
+//         .catch(error => console.error(error));
+// }
+
+
+
+
+
+
+//Multiple Select Messages End
+
+
 function moveSelectedMessagesToGroup() {
     const selectedMessages = selectedMessageIds.map(id => {
         return {
@@ -951,6 +1036,8 @@ function moveSelectedMessagesToGroup() {
             groupId: DOM.groupId,
         };
     });
+
+    console.log("selectedMessages", selectedMessages);
 
     const newGroupId = document.getElementById('group_to_move_message').value;
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -971,31 +1058,54 @@ function moveSelectedMessagesToGroup() {
             console.log(data);
             // Update the UI to reflect the changes
 
-            // Remove the message from the previous group
             const previousGroupId = DOM.groupId;
             const previousGroupIndex = chatList.findIndex(group => group.group.group_id === previousGroupId);
             if (previousGroupIndex !== -1) {
-                const messageIndex = chatList[previousGroupIndex].group.group_messages.findIndex(message => message.id === selectedMessageIds[0]);
-                if (messageIndex !== -1) {
-                    chatList[previousGroupIndex].group.group_messages.splice(messageIndex, 1);
-                    chatList[previousGroupIndex].unread -= 1;
-                }
+                selectedMessageIds.forEach(id => {
+                    const messageIndex = chatList[previousGroupIndex].group.group_messages.findIndex(message => message.id === id);
+                    if (messageIndex !== -1) {
+                        chatList[previousGroupIndex].group.group_messages.splice(messageIndex, 1);
+                        chatList[previousGroupIndex].unread -= 1;
+
+                        // Update the time property of the group
+                        if (chatList[previousGroupIndex].group.group_messages.length > 0) {
+                            chatList[previousGroupIndex].time = new Date(chatList[previousGroupIndex].group.group_messages[chatList[previousGroupIndex].group.group_messages.length - 1].time * 1000);
+                        } else {
+                            chatList[previousGroupIndex].time = null;
+                        }
+                    }
+                });
             }
 
             // Add the message to the new group
             const newGroupIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
 
             if (newGroupIndex !== -1) {
-                const newMessage = data.message[0];
-                const messageIndex = chatList[newGroupIndex].group.group_messages.findIndex(message => message.time > newMessage.time);
-                if (messageIndex === -1) {
-                    chatList[newGroupIndex].group.group_messages.push(newMessage);
-                } else {
-                    chatList[newGroupIndex].group.group_messages.splice(messageIndex, 0, newMessage);
-                }
-                chatList[newGroupIndex].msg = newMessage;
-                chatList[newGroupIndex].time = new Date(newMessage.time * 1000);
-                // chatList[newGroupIndex].unread += 1;
+                data.forEach(newMessage => {
+                    const messageIndex = chatList[newGroupIndex].group.group_messages.findIndex(message => message.time > newMessage.time);
+                    if (messageIndex === -1) {
+                        chatList[newGroupIndex].group.group_messages.push(newMessage);
+                    } else {
+                        chatList[newGroupIndex].group.group_messages.splice(messageIndex, 0, newMessage);
+                    }
+                    chatList[newGroupIndex].msg = newMessage;
+                    chatList[newGroupIndex].time = new Date(newMessage.time * 1000);
+                    // chatList[newGroupIndex].unread += 1;
+
+                    // Update the last message text
+                    const senderName = newMessage.user.name;
+                    let messageText = '';
+                    if (newMessage.type === 'File') {
+                        messageText = newMessage.media_name;
+                    } else if (newMessage.type === 'Image') {
+                        messageText = '[Image]';
+                    } else if (newMessage.type === 'Audio') {
+                        messageText = '[Audio]';
+                    } else {
+                        messageText = newMessage.msg;
+                    }
+                    chatList[newGroupIndex].lastMessage = `${senderName}: ${messageText}`;
+                });
             }
 
             // Update the chat list
@@ -1011,10 +1121,12 @@ function moveSelectedMessagesToGroup() {
                 }
             });
 
+            const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
+
             viewChatList();
 
             const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
-            generateMessageArea(newGroupChatListItem, newGroupIndex);
+            generateMessageArea(newGroupChatListItem, newIndex);
             cancelMoveMessage();
             document.querySelector(".close").click();
         })
@@ -1022,7 +1134,6 @@ function moveSelectedMessagesToGroup() {
 }
 
 
-//Multiple Select Messages End
 document.getElementById('cancel-icon').addEventListener('click', function () {
     cancelMoveMessage();
 });
@@ -1049,6 +1160,7 @@ document.getElementById("openModalTrigger").addEventListener("click", function (
 
 function selectUsertosend(username, postgroup_id) {
 
+    console.log("selectUsertosend");
     document.getElementById('selected-username').textContent = username;
     document.getElementById('group_to_move_message').value = postgroup_id;
     document.getElementById('selected-usertosend').style.setProperty('display', 'flex', 'important');
