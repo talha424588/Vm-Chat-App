@@ -30,6 +30,7 @@ const DOM = {
     activeChatIndex: null,
     unique_id: document.getElementById("login_user_unique_id").value,
     replyId: null,
+    moveMessageUser:null,
 };
 let user = {
 
@@ -334,6 +335,13 @@ socket.on('sendChatToClient', (message) => {
         viewChatList();
     }
 });
+
+
+socket.on('moveMessage', () => {
+    generateChatList();
+});
+
+
 
 let addMessageToMessageArea = (message) => {
     let msgDate = mDate(message.time).getDate();
@@ -955,6 +963,7 @@ function moveSelectedMessagesToGroup() {
         };
     });
 
+
     console.log("selectedMessages", selectedMessages);
 
     const newGroupId = document.getElementById('group_to_move_message').value;
@@ -1043,7 +1052,7 @@ function moveSelectedMessagesToGroup() {
 
             viewChatList();
 
-            socket.emit('moveMessage', selectedMessageIds, newGroupId);
+            socket.emit('moveMessage', selectedMessageIds, newGroupId,DOM.groupId);
 
             const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
             generateMessageArea(newGroupChatListItem, newIndex);
@@ -1076,7 +1085,6 @@ document.getElementById("openModalTrigger").addEventListener("click", function (
     var myModal = new bootstrap.Modal(document.getElementById('chatModal'));
     myModal.show();
 });
-
 
 function selectUsertosend(username, postgroup_id) {
 
@@ -1646,7 +1654,6 @@ const startRecording = () => {
 			`;
         });
 };
-
 
 voiceIcon.addEventListener('click', () => {
     if (!mediaRecorder || mediaRecorder.state !== 'recording') {
