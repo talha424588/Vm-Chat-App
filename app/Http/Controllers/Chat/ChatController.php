@@ -18,6 +18,8 @@ use Exception;
 use Google\Client;
 use Illuminate\Support\Facades\Log;
 use App\Enums\MessageEnum;
+use Illuminate\Support\Facades\DB;
+
 class ChatController extends Controller
 {
     public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService) {}
@@ -101,10 +103,9 @@ class ChatController extends Controller
         $message->status = EnumMessageEnum::NEW;
         if ($message->save()) {
             $message->user = User::where("unique_id", $uniqueId)->first();
-            if($message->reply_id)
-            {
-                $message->reply ? GroupMessage::where("id", $message->reply_id)->first():"null";
-                $message->reply->user ? User::where("unique_id", $message->sender)->first():"null";
+            if ($message->reply_id) {
+                $message->reply ? GroupMessage::where("id", $message->reply_id)->first() : "null";
+                $message->reply->user ? User::where("unique_id", $message->sender)->first() : "null";
             }
             // $data = [
             //     'message' => $message->msg,
@@ -250,5 +251,27 @@ class ChatController extends Controller
     public function messageCorrection(Request $request)
     {
         return $this->chatRepository->messageCorrection($request);
+    }
+
+
+    public function moveMessages(Request $request)
+    {
+        $messages = $request->input('messages');
+        $newGroupId = $request->input('newGroupId');
+
+        $messageIds = [];
+
+        foreach ($messages as $message) {
+            $messageIds[] = $message['id'];
+            DB::table('group_messages')
+                ->where('id', $message['id'])
+                ->update(['group_id' => $newGroupId]);
+        }
+
+        $updatedMessages = GroupMessage::whereIn('id', $messageIds)
+            ->with("user")
+            ->get();
+
+        return response()->json($updatedMessages);
     }
 }
