@@ -30,6 +30,7 @@ const DOM = {
     activeChatIndex: null,
     unique_id: document.getElementById("login_user_unique_id").value,
     replyId: null,
+    moveMessageUser:null,
 };
 let user = {
 
@@ -334,6 +335,13 @@ socket.on('sendChatToClient', (message) => {
         viewChatList();
     }
 });
+
+
+socket.on('moveMessage', () => {
+    generateChatList();
+});
+
+
 
 let addMessageToMessageArea = (message) => {
     let msgDate = mDate(message.time).getDate();
@@ -944,88 +952,6 @@ function moveMessage(messageId) {
     }
 }
 
-// function moveSelectedMessagesToGroup() {
-//     const selectedMessages = selectedMessageIds.map(id => {
-//         return {
-//             id: id,
-//             groupId: DOM.groupId,
-//         };
-//     });
-
-//     console.log("selectedMessages",selectedMessages);
-//     const newGroupId = document.getElementById('group_to_move_message').value;
-//     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
-//     fetch('messages/move', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-CSRF-TOKEN': csrfToken,
-//         },
-//         body: JSON.stringify({
-//             messages: selectedMessages,
-//             newGroupId: newGroupId,
-//         }),
-//     })
-//         .then(response => response.json())
-//         .then(data => {
-//             console.log(data);
-//             // Update the UI to reflect the changes
-
-//             const previousGroupId = DOM.groupId;
-//             const previousGroupIndex = chatList.findIndex(group => group.group.group_id === previousGroupId);
-//             if (previousGroupIndex !== -1) {
-//                 const messageIndex = chatList[previousGroupIndex].group.group_messages.findIndex(message => message.id === selectedMessageIds[0]);
-//                 if (messageIndex !== -1) {
-//                     chatList[previousGroupIndex].group.group_messages.splice(messageIndex, 1);
-//                     chatList[previousGroupIndex].unread -= 1;
-//                 }
-//             }
-
-//             // Add the message to the new group
-//             const newGroupIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
-
-//             if (newGroupIndex !== -1) {
-//                 const newMessage = data.message[0];
-//                 const messageIndex = chatList[newGroupIndex].group.group_messages.findIndex(message => message.time > newMessage.time);
-//                 if (messageIndex === -1) {
-//                     chatList[newGroupIndex].group.group_messages.push(newMessage);
-//                 } else {
-//                     chatList[newGroupIndex].group.group_messages.splice(messageIndex, 0, newMessage);
-//                 }
-//                 chatList[newGroupIndex].msg = newMessage;
-//                 chatList[newGroupIndex].time = new Date(newMessage.time * 1000);
-//                 // chatList[newGroupIndex].unread += 1;
-//             }
-
-//             // Update the chat list
-//             chatList.sort((a, b) => {
-//                 if (a.time && b.time) {
-//                     return new Date(b.time) - new Date(a.time);
-//                 } else if (a.time) {
-//                     return -1;
-//                 } else if (b.time) {
-//                     return 1;
-//                 } else {
-//                     return 0;
-//                 }
-//             });
-
-//             viewChatList();
-
-//             const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
-//             generateMessageArea(newGroupChatListItem, newGroupIndex);
-//             cancelMoveMessage();
-//             document.querySelector(".close").click();
-//         })
-//         .catch(error => console.error(error));
-// }
-
-
-
-
-
-
 //Multiple Select Messages End
 
 
@@ -1036,6 +962,7 @@ function moveSelectedMessagesToGroup() {
             groupId: DOM.groupId,
         };
     });
+
 
     console.log("selectedMessages", selectedMessages);
 
@@ -1125,6 +1052,8 @@ function moveSelectedMessagesToGroup() {
 
             viewChatList();
 
+            socket.emit('moveMessage', selectedMessageIds, newGroupId,DOM.groupId);
+
             const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
             generateMessageArea(newGroupChatListItem, newIndex);
             cancelMoveMessage();
@@ -1156,7 +1085,6 @@ document.getElementById("openModalTrigger").addEventListener("click", function (
     var myModal = new bootstrap.Modal(document.getElementById('chatModal'));
     myModal.show();
 });
-
 
 function selectUsertosend(username, postgroup_id) {
 
@@ -1481,7 +1409,7 @@ let showChatList = () => {
 let sendMessage = (type = 'Message', mediaName = null) => {
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-    if (type = 'Message') {
+    if (type == 'Message') {
         const numberPattern = /\b\d{7,}\b/;
         const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
 
@@ -1726,7 +1654,6 @@ const startRecording = () => {
 			`;
         });
 };
-
 
 voiceIcon.addEventListener('click', () => {
     if (!mediaRecorder || mediaRecorder.state !== 'recording') {
