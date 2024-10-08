@@ -371,7 +371,7 @@ let addMessageToMessageArea = (message) => {
     // Determine the message content based on the message type
     let messageContent;
 
-   // console.log(message);
+  console.log(message);
 
 
 
