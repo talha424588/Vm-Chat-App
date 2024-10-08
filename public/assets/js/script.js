@@ -371,7 +371,7 @@ let addMessageToMessageArea = (message) => {
     // Determine the message content based on the message type
     let messageContent;
 
-    console.log(message);
+   // console.log(message);
 
 
 
@@ -438,7 +438,7 @@ let addMessageToMessageArea = (message) => {
         messageContent = `
         <div class="reply-message-div">
             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-            ${message.reply.reply_user_name}
+            ${message.user.name}
             </div>
             <div class="reply-details">
                 <p class="file-name">${message.reply.msg}</p>
@@ -460,7 +460,7 @@ let addMessageToMessageArea = (message) => {
             messageContent = `
             <div class="reply-message-div">
                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                ${message.reply.reply_user_name}
+                  ${message.user.name}
                 </div>
                 <div class="reply-details">
                     <p class="file-name">${message.reply.msg}</p>
