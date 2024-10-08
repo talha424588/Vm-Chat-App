@@ -591,11 +591,15 @@ let addMessageToMessageArea = (message) => {
         document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
         notificationDiv.textContent = unread;
-        if (unread != 0) {
-            notificationDiv.style.display = 'block';
-        } else {
-            scroll_function();
-        }
+      if(unread!=0){
+        notificationDiv.style.display = 'block';
+                   }else{
+
+                 scroll_function();
+
+//                     scroll_function();
+
+                   }
 
     } else {
         scroll_function();
@@ -814,10 +818,12 @@ function removecorrectionMessage() {
     iconContainer.style.bottom = '90px';
 }
 
+/*
 const edit_file = document.querySelector('.edit_file');
 edit_file.style.visibility = 'hidden';
 const edit_capture = document.querySelector('.edit_capture');
 edit_capture.style.visibility = 'hidden';
+*/
 
 function editMessage(messageId, messageContent) {
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
