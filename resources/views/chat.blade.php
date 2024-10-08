@@ -38,6 +38,8 @@
 
         .audio-content {
             flex: 1;
+            padding-top: 14px;
+    padding-right: 10px;
         }
 
         .audio-controls {
