@@ -134,6 +134,7 @@ let viewChatList = () => {
     }
 
     DOM.chatList.innerHTML = "";
+    DOM.chatList2.innerHTML="";
     chatList.sort((a, b) => {
         if (a.time && b.time) {
             return mDate(b.time).subtract(a.time);
@@ -528,10 +529,11 @@ let addMessageToMessageArea = (message) => {
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
          ${!['Audio', 'Image', 'File'].includes(message.type) ? `
         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
+          <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${message.msg}','${senderName}')">Correction</a>
       ` : ''}
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-            <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${message.msg}','${senderName}')">Correction</a>
+          
           </div>
         </div>
       ` : ''}
@@ -1071,6 +1073,15 @@ function moveSelectedMessagesToGroup() {
             document.querySelector(".close").click();
         })
         .catch(error => console.error(error));
+
+   
+        document.getElementById('selected-count').textContent = '';
+        document.getElementById('messages_ids').value = '';
+        document.getElementById('group_to_move_message').value = '';
+        selectedMessageIds = [];
+        selectedMessageIds.length = 0; // Clears the array
+
+
 }
 
 document.getElementById('cancel-icon').addEventListener('click', function () {
@@ -1109,9 +1120,7 @@ $(document).ready(function () {
         var messagesIds = $('#messages_ids').val();
         var groupToMove = $('#group_to_move_message').val();
 
-        alert(messagesIds);
-
-        alert(groupToMove);
+    
         document.getElementById('messages_ids').value = '';
        
 
