@@ -703,7 +703,7 @@ function correction_send_handel() {
 
     const messageContent = tinymce.get('input').getContent();
     const correction_message_id = document.getElementById('correction_message_id').value;
-
+    
     tinymce.remove('#input');
     isTinyMCEInitialized = false;
     removecorrectionMessage();
@@ -749,7 +749,7 @@ function removecorrectionMessage() {
     if (tinymce.get('input')) {
         tinymce.get('input').remove();
     }
-
+    isTinyMCEInitialized = false;
     var replyDiv = document.getElementById('correction-div');
     var iconContainer = document.querySelector('.icon-container');
     const chat_action = document.getElementById('chat_action');
