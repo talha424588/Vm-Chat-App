@@ -37,13 +37,13 @@ z-index: 1; /* Ensure it is above other content */
 	align-items: center;
 	background-color: #E5E7E9;
 	padding: 5px;
-	
+
 	border-radius: 10px;
 	margin-bottom: 0px;
 	position: relative;
 	overflow: hidden; /* Ensure content does not overflow */
 	}
-	
+
 	#quoted-messages::before {
 	content: "";
 	position: absolute;
@@ -58,7 +58,7 @@ z-index: 1; /* Ensure it is above other content */
 	}
 
 
-	
+
 
 
 
@@ -280,9 +280,9 @@ background-color: rgba(255, 255, 255, 0.3);
 	}
 	.additional_style{
 		padding:7px !important;
-		
+
 	}
-	
+
   }
 
 
@@ -506,8 +506,8 @@ color: #666; /* adjust the color to your liking */
 	}
 
 	#correction-div{
-	padding-right:30px; 
-	padding-left:30px; 
+	padding-right:30px;
+	padding-left:30px;
 	padding-top:10px;
 }
 
@@ -521,7 +521,7 @@ color: #666; /* adjust the color to your liking */
     padding-top: 10px !important;
 		}
 	}
-	
+
 #action-bar{
 	padding: 17px;
 }
@@ -531,7 +531,7 @@ color: #666; /* adjust the color to your liking */
 		margin-top: 17px;
 	}
 
-	
+
 	  .chat-action-icons i {
 
 		  color: #666;
@@ -590,7 +590,7 @@ color: #666; /* adjust the color to your liking */
 	   .Editchat-action-icons {
 		margin-left: 6px;
 			 }
-	  
+
 
 
 
@@ -909,7 +909,7 @@ body{
     display: none;
 }
 .reply-message-div {
-   
+
     align-items: center;
     justify-content: space-between;
     background-color: #D1F4CC;
@@ -970,3 +970,33 @@ body{
   .highlight {
     background-color: yellow;
 }
+
+/* No Group Found */
+.no-groups-found,.heading {
+    text-align: center;
+    padding: 20px;
+}
+
+.no-groups-found h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.no-groups-found p {
+    font-size: 18px;
+    color: #666;
+}
+
+/* Message Heading */
+.heading {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    width: 100%;
+    text-align: start;
+  }
+
+  .heading h2 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #666;
+  }

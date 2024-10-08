@@ -235,6 +235,8 @@
                 <!-- Chat List -->
                 <div class="row" id="chat-list" style="overflow:auto;"></div>
                 <div class="row" id="chat-list-unread" style="overflow:auto; display:none;">Unread List </div>
+                <div class="row" id="messagesList" style="overflow:auto;"></div>
+
 
 
                 <!-- Profile Settings -->
