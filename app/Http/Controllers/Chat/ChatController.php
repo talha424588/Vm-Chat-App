@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Enum\MessageEnum as EnumMessageEnum;
-use App\Events\Chat;
 use App\Http\Controllers\Controller;
 use App\Models\GroupMessage;
 use App\Models\User;
@@ -11,13 +10,7 @@ use App\Repositories\ChatRepository;
 use App\Services\FirebaseService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Laravel\Ui\Presets\React;
-use Exception;
-use Google\Client;
-use Illuminate\Support\Facades\Log;
-use App\Enums\MessageEnum;
 use Illuminate\Support\Facades\DB;
 
 class ChatController extends Controller
@@ -78,12 +71,6 @@ class ChatController extends Controller
 
         return null;
     }
-
-
-    // public function index(Request $request)
-    // {
-    //     return $this->chatRepository->fetchUserAllGroupsMessages($request);
-    // }
 
     public function store(Request $request)
     {
