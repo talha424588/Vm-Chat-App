@@ -32,6 +32,7 @@ const DOM = {
     replyId: null,
     moveMessageUser: null,
     messagesList: getById("messagesList"),
+    clickSearchMessageId: null,
 };
 let user = {
 
@@ -226,17 +227,18 @@ let viewMessageList = () => {
     })
         .forEach((elem, index) => {
             let unreadClass = elem.unread ? "unread" : "";
-
+            DOM.clickSearchMessageId = elem.id;
             const senderName = elem.user.name;
             let time = new Date(elem.time * 1000)
             const timeText = elem.time ? mDate(time).chatListFormat() : "No messages";
+            let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
             DOM.messagesList.innerHTML += `
             <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
-            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index})">
+            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index},1)">
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
                 <div class="name list-user-name">${elem.group.name}</div>
-                <div class="small last-message">${elem ? senderName + ": " : ""}${elem.msg}</div>
+                <div class="small last-message">${elem ? senderName + ": " : ""}${messageText}</div>
               </div>
 
               <div class="flex-grow-1 text-right">
@@ -1375,8 +1377,7 @@ function unread_settings(query_set) {
 }
 
 let currentlyPlayingAudio = null;
-let generateMessageArea = async (elem, chatIndex) => {
-
+let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
     pagnicateChatList = [];
     chat = chatList[chatIndex];
 
@@ -1407,43 +1408,52 @@ let generateMessageArea = async (elem, chatIndex) => {
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-    const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
-        method: 'GET',
-        headers: {
-            'content-type': 'application/json'
-        }
-    });
-    pagnicateChatList = await response.json();
-
-    unread_settings(pagnicateChatList);
-
-    const ids = pagnicateChatList.data.map(item => item.id);
-
-    try {
-        const response = await fetch("message/seen-by/update", {
-            method: "POST",
+    if(searchMessage)
+    {
+        await fetchNextPageMessages(DOM.clickSearchMessageId,DOM.groupId);
+    }
+    else
+    {
+        const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
+            method: 'GET',
             headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken,
-            },
-            body: JSON.stringify({ ids }),
+                'content-type': 'application/json'
+            }
         });
+        pagnicateChatList = await response.json();
 
-        const readMessageResponse = await response.json();
-    } catch (error) {
-        console.log(error);
+        unread_settings(pagnicateChatList);
+
+        const ids = pagnicateChatList.data.map(item => item.id);
+
+        try {
+            const response = await fetch("message/seen-by/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken,
+                },
+                body: JSON.stringify({ ids }),
+            });
+
+            const readMessageResponse = await response.json();
+        } catch (error) {
+            console.log(error);
+        }
+
+        var g_id = DOM.groupId;
+
+
+        lastDate = "";
+        pagnicateChatList.data.reverse()
+            .forEach((msg) => addMessageToMessageArea(msg));
+
+        get_voice_list();
+        removeEditMessage();
+        removeQuotedMessage();
     }
 
-    var g_id = DOM.groupId;
 
-
-    lastDate = "";
-    pagnicateChatList.data.reverse()
-        .forEach((msg) => addMessageToMessageArea(msg));
-
-    get_voice_list();
-    removeEditMessage();
-    removeQuotedMessage();
 };
 
 let showChatList = () => {
