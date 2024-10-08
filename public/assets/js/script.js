@@ -653,7 +653,7 @@ function correction_call(message_id, messagebody, senderName) {
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
     console.log("messageElement", messageElement);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    messageContentDiv.innerHTML = messageContent;
+    messageContentDiv.innerHTML = messageContent.replace(/<\/?[^>]+(>|$)/g, "");
 
     // Check and log voiceIcon and Editreplyarea
     const chat_actionss = document.getElementById('chat_action');
@@ -798,14 +798,20 @@ function editMessage(messageId, messageContent) {
             editMessageIdField.value = messageId;
         }
 
+
+
+        
+
         const editMessageContents = document.querySelectorAll('.EditmessageContent');
 
         editMessageContents.forEach((content) => {
-            content.textContent = message.msg;
+            const sanitizedMessage = message.msg.replace(/<\/?[^>]+(>|$)/g, ""); // Strip out HTML tags
+            content.textContent = sanitizedMessage; // Display only the plain text
         });
+        
 
         const textarea = document.getElementById('input');
-        textarea.value = message.msg;
+        textarea.value = message.msg.replace(/<\/?[^>]+(>|$)/g, "");
 
         textarea.scrollTop = textarea.scrollHeight;
 
