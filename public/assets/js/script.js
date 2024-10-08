@@ -438,7 +438,7 @@ let addMessageToMessageArea = (message) => {
         messageContent = `
         <div class="reply-message-div">
             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-            ${message.user.name}
+              ${message.user?.id == user?.id ? message.reply?.user?.name : message.user?.name}
             </div>
             <div class="reply-details">
                 <p class="file-name">${message.reply.msg}</p>
@@ -460,7 +460,8 @@ let addMessageToMessageArea = (message) => {
             messageContent = `
             <div class="reply-message-div">
                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                  ${message.user.name}
+                  ${message.user?.id == user?.id ? message.reply?.user?.name : message.user?.name}
+
                 </div>
                 <div class="reply-details">
                     <p class="file-name">${message.reply.msg}</p>
@@ -579,10 +580,13 @@ let addMessageToMessageArea = (message) => {
         notificationDiv.textContent = unread;
       if(unread!=0){
         notificationDiv.style.display = 'block';
+                   }else{
+                    scroll_function();   
                    }
+                    
     }else{
+        scroll_function();   
        
-        scroll_function();
     }
 
 
@@ -698,11 +702,16 @@ function correction_call(message_id, messagebody, senderName) {
 
     // Check and log voiceIcon and Editreplyarea
     const voiceIcon = document.getElementById('chat_action');
+   
+    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function(element) {
+        element.style.visibility = 'hidden';
+    });
+    
     const Editreplyarea = document.getElementById('correctionreply-area');
 
     if (Editreplyarea) {
         if (voiceIcon) {
-            voiceIcon.style.display = 'none'; // Set visibility to hidden
+            voiceIcon.style.display = 'none'; 
         } else {
             console.error("Element 'chat_action' not found");
         }
@@ -811,10 +820,12 @@ function removecorrectionMessage() {
         correctionreplyarea.style.display = 'none';
         const textarea = document.getElementById('input');
         textarea.value = ''; // Append with a newline if there's already text
-
     }
-    // Select the element with the ID 'chat_action'
 
+    // Select the element with the ID 'chat_action'
+    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function(element) {
+        element.style.visibility = 'visible';
+    });  
 
     // Create a new style element
     var style = document.createElement('style');
@@ -1464,6 +1475,7 @@ let generateMessageArea = async (elem, chatIndex) => {
     pagnicateChatList = await response.json();
 
     unread_settings(pagnicateChatList);
+    
     const ids = pagnicateChatList.data.map(item => item.id);
 
     try {
