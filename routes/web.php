@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\Chat\GroupController;
+use App\Http\Controllers\MailController;
 use App\Http\Controllers\UserController;
 use App\Services\FirebaseService;
 use Illuminate\Support\Facades\Auth;
@@ -61,7 +62,12 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::get("/message/detail/{id}" , [ChatController::class, 'getMessageDetails']);
     Route::post("/message/update" , [ChatController::class, 'updateGroupMessage']);
     Route::post("/message/correction" , [ChatController::class, 'messageCorrection']);
+    Route::post("/alert-email" , [MailController::class, 'sendAlertMail']);
+
 });
+
+Route::post('/messages/move', [ChatController::class, 'moveMessages']);
+
 
 Route::post('/messages', [ChatController::class, 'store']);
 // Route::get('/chat',[ChatController::class,'store'])->name('store.chat');
