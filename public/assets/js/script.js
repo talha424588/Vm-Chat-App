@@ -134,6 +134,7 @@ let viewChatList = () => {
     }
 
     DOM.chatList.innerHTML = "";
+    DOM.chatList2.innerHTML="";
     chatList.sort((a, b) => {
         if (a.time && b.time) {
             return mDate(b.time).subtract(a.time);
@@ -149,6 +150,8 @@ let viewChatList = () => {
             let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
+
+
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
                 let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
@@ -166,6 +169,18 @@ let viewChatList = () => {
 
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
+
+
+ DOM.chatList2.innerHTML += `
+            <div style="width:95%; margin-left:10px;" class="d-flex flex-row  p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
+                <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
+                <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                <div class="w-50">
+                    <div class="name list-user-name">${elem.group.name}</div>
+
+                </div>
+            </div>`;
+
                 DOM.chatList.innerHTML += `
             <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
             <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index})">
@@ -180,15 +195,7 @@ let viewChatList = () => {
                ${elem.unread > 0 ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>` : ""}
     </div>
             </div>`;
-                DOM.chatList2.innerHTML += `
-            <div style="width:95%; margin-left:10px;" class="d-flex flex-row  p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
-                <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
-                <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
-                <div class="w-50">
-                    <div class="name list-user-name">${elem.group.name}</div>
-
-                </div>
-            </div>`;
+               
 
 
             }
@@ -352,6 +359,10 @@ let addMessageToMessageArea = (message) => {
 
     let messageContent;
 
+  console.log(message);
+
+
+
     if (message.type === 'File') {
         if (message.reply) {
             console.log("Reply Message: " + message.reply.msg);
@@ -415,7 +426,7 @@ let addMessageToMessageArea = (message) => {
             messageContent = `
         <div class="reply-message-div">
             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-            ${message.reply.reply_user_name}
+              ${message.user?.id == user?.id ? message.reply?.user?.name : message.user?.name}
             </div>
             <div class="reply-details">
                 <p class="file-name">${message.reply.msg}</p>
@@ -437,7 +448,8 @@ let addMessageToMessageArea = (message) => {
             messageContent = `
             <div class="reply-message-div">
                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                ${message.reply.reply_user_name}
+                  ${message.user?.id == user?.id ? message.reply?.user?.name : message.user?.name}
+
                 </div>
                 <div class="reply-details">
                     <p class="file-name">${message.reply.msg}</p>
@@ -517,10 +529,11 @@ let addMessageToMessageArea = (message) => {
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
          ${!['Audio', 'Image', 'File'].includes(message.type) ? `
         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
+          <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${message.msg}','${senderName}')">Correction</a>
       ` : ''}
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-            <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${message.msg}','${senderName}')">Correction</a>
+          
           </div>
         </div>
       ` : ''}
@@ -542,12 +555,15 @@ let addMessageToMessageArea = (message) => {
         document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
         notificationDiv.textContent = unread;
-        if (unread != 0) {
-            notificationDiv.style.display = 'block';
-        }
-    } else {
-
-        scroll_function();
+      if(unread!=0){
+        notificationDiv.style.display = 'block';
+                   }else{
+                    scroll_function();   
+                   }
+                    
+    }else{
+        scroll_function();   
+       
     }
 };
 
@@ -639,15 +655,20 @@ function correction_call(message_id, messagebody, senderName) {
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
     messageContentDiv.innerHTML = messageContent;
 
-    const voiceIcon = document.getElementById('chat_action');
+    // Check and log voiceIcon and Editreplyarea
+    const chat_actionss = document.getElementById('chat_action');
+    chat_actionss.style.display = 'none';
+
+
+    document.querySelector('.chat_action_file').style.display = 'none';
+
+    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function(element) {
+        element.style.visibility = 'hidden';
+    });
+    
     const Editreplyarea = document.getElementById('correctionreply-area');
 
     if (Editreplyarea) {
-        if (voiceIcon) {
-            voiceIcon.style.display = 'none';
-        } else {
-            console.error("Element 'chat_action' not found");
-        }
         Editreplyarea.style.display = 'block';
     } else {
         console.error("Element 'correctionreply-area' not found");
@@ -694,6 +715,7 @@ function correction_send_handel() {
     correction_div.style.display = 'none';
     const chat_action = document.getElementById('chat_action');
     chat_action.style.display = 'block';
+    document.querySelector('.chat_action_file').style.display = 'block';
 
     const messageElement = DOM.messages.querySelector(`[data-message-id="${correction_message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
@@ -742,10 +764,15 @@ function removecorrectionMessage() {
         Editreplyarea.style.display = 'none';
         correctionreplyarea.style.display = 'none';
         const textarea = document.getElementById('input');
-        textarea.value = '';
-
+        textarea.value = ''; // Append with a newline if there's already text
     }
 
+    // Select the element with the ID 'chat_action'
+    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function(element) {
+        element.style.visibility = 'visible';
+    });  
+
+    // Create a new style element
     var style = document.createElement('style');
     style.innerHTML = "#chat_action { display: flex !important; }";
     document.head.appendChild(style);
@@ -1046,6 +1073,15 @@ function moveSelectedMessagesToGroup() {
             document.querySelector(".close").click();
         })
         .catch(error => console.error(error));
+
+   
+        document.getElementById('selected-count').textContent = '';
+        document.getElementById('messages_ids').value = '';
+        document.getElementById('group_to_move_message').value = '';
+        selectedMessageIds = [];
+        selectedMessageIds.length = 0; // Clears the array
+
+
 }
 
 document.getElementById('cancel-icon').addEventListener('click', function () {
@@ -1083,6 +1119,12 @@ $(document).ready(function () {
     $('#MoveMessagetoGroup').on('click', function () {
         var messagesIds = $('#messages_ids').val();
         var groupToMove = $('#group_to_move_message').val();
+
+    
+        document.getElementById('messages_ids').value = '';
+       
+
+
         moveSelectedMessagesToGroup();
     });
 });
@@ -1347,6 +1389,7 @@ let generateMessageArea = async (elem, chatIndex) => {
     pagnicateChatList = await response.json();
 
     unread_settings(pagnicateChatList);
+    
     const ids = pagnicateChatList.data.map(item => item.id);
 
     try {
