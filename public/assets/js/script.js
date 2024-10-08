@@ -162,6 +162,8 @@ let viewChatList = () => {
                     }
                     else {
                         messageText = latestMessage.msg;
+                    // Check if messageText contains <p> tags and remove them if present
+                        messageText = messageText.includes("<p>") ? messageText.replace(/<\/?p>/g, "") : messageText;
                     }
                 }
                 else {
@@ -591,15 +593,15 @@ let addMessageToMessageArea = (message) => {
         document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
         notificationDiv.textContent = unread;
-      if(unread!=0){
-        notificationDiv.style.display = 'block';
-                   }else{
+        if (unread != 0) {
+            notificationDiv.style.display = 'block';
+        } else {
 
-                 scroll_function();
+            scroll_function();
 
-//                     scroll_function();
+            //                     scroll_function();
 
-                   }
+        }
 
     } else {
         scroll_function();
