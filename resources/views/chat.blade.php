@@ -510,7 +510,7 @@
 
 
 						<div class="chat-action-icons" id="Editreply-area" style="display:none; margin-left: 5px;">
-                           
+
 
                             <i id="send-message-btn" class="chat-icon">
 
