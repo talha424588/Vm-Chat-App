@@ -802,6 +802,13 @@ function removecorrectionMessage() {
     const Editreplyarea = document.getElementById('Editreply-area');
 
     const correctionreplyarea = document.getElementById('correctionreply-area');
+
+    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function(element) {
+        element.style.display = 'block';
+        element.style.visibility = 'visible';
+    });
+
+
     if (chat_action) {
         chat_action.style.display = 'block';
         correctionarea.style.display = 'none';
@@ -831,10 +838,10 @@ const edit_capture = document.querySelector('.edit_capture');
 edit_capture.style.visibility = 'hidden';
 */
 
-function editMessage(messageId, messageContent) {
-    const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
 
-    if (message) {
+function editMessage(messageId, messageContent) {
+
+    if (messageContent) {
         document.getElementById('editMessageDiv').style.display = 'block';
 
         const editMessageIdField = document.getElementById('edit_message_id');
@@ -848,13 +855,13 @@ function editMessage(messageId, messageContent) {
 
         const editMessageContents = document.querySelectorAll('.EditmessageContent');
         editMessageContents.forEach((content) => {
-            const sanitizedMessage = message.msg; // Strip out HTML tags
+            const sanitizedMessage = messageContent; // Strip out HTML tags
             content.innerHTML = sanitizedMessage; // Display only the plain text
         });
         
 
         const textarea = document.getElementById('input');
-        textarea.value = message.msg.replace(/<\/?[^>]+(>|$)/g, "");
+        textarea.value = messageContent.replace(/<\/?[^>]+(>|$)/g, "");
 
         textarea.scrollTop = textarea.scrollHeight;
 
@@ -876,6 +883,8 @@ function editMessage(messageId, messageContent) {
             fileicon.style.visibility = 'hidden';
             captureid.style.visibility = 'hidden';
         }
+      
+
     }
 }
 
@@ -948,6 +957,18 @@ function removeEditMessage() {
     Editreplyarea.style.display = 'none';
     const correctionarea = document.getElementById('correction-div');
     correctionarea.style.display = 'none';
+
+
+    const fileicon = document.querySelector('.chat_action_file');
+    fileicon.style.visibility = 'visible';
+    const chat_action_capture = document.querySelector('.chat_action_capture');
+    chat_action_capture.style.visibility = 'visible';
+    const chat_action_voice = document.querySelector('.chat_action_voice');
+    chat_action_voice.style.visibility = 'visible';
+    chat_action_voice.style.display = 'block';
+   
+
+
     const messageDiv = document.getElementById('messages');
     messageDiv.classList.remove('blur');
     const textarea = document.getElementById('input');
@@ -1460,6 +1481,12 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
         removeQuotedMessage();
     }
 
+
+
+    get_voice_list();
+    removeEditMessage();
+    removeQuotedMessage();
+    removecorrectionMessage();
 
 };
 
