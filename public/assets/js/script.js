@@ -695,7 +695,7 @@ function correction_call(message_id, messagebody, senderName) {
 
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    messageContentDiv.innerHTML = messageContent.replace(/<\/?[^>]+(>|$)/g, "");
+    messageContentDiv.innerHTML = messageContent;
 
     // Check and log voiceIcon and Editreplyarea
     const chat_actionss = document.getElementById('chat_action');
@@ -735,7 +735,9 @@ function correction_call(message_id, messagebody, senderName) {
     }
 
     if (quotedNameElement) {
-        quotedNameElement.textContent = messagebody;
+        quotedNameElement.innerHTML = messagebody;
+
+        // quotedNameElement.textContent = messagebody;
     } else {
         console.error("Element '#quoted-message .quoted-text' not found");
     }
@@ -845,10 +847,9 @@ function editMessage(messageId, messageContent) {
         
 
         const editMessageContents = document.querySelectorAll('.EditmessageContent');
-
         editMessageContents.forEach((content) => {
-            const sanitizedMessage = message.msg.replace(/<\/?[^>]+(>|$)/g, ""); // Strip out HTML tags
-            content.textContent = sanitizedMessage; // Display only the plain text
+            const sanitizedMessage = message.msg; // Strip out HTML tags
+            content.innerHTML = sanitizedMessage; // Display only the plain text
         });
         
 
