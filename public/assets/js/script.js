@@ -1562,7 +1562,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 type: type,
                 mediaName: mediaName,
                 time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken
+                csrf_token: csrfToken,
+                fcm_token: user.fcm_token
             };
             socket.emit('sendChatToServer', msg);
         } else {
@@ -1575,7 +1576,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 type: type,
                 mediaName: mediaName,
                 time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken
+                csrf_token: csrfToken,
+                fcm_token: user.fcm_token
             };
             socket.emit('sendChatToServer', msg);
         }
@@ -1598,7 +1600,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
             type: type,
             mediaName: mediaName,
             time: Math.floor(Date.now() / 1000),
-            csrf_token: csrfToken
+            csrf_token: csrfToken,
+            fcm_token: user.fcm_token
         };
         socket.emit('sendChatToServer', msg);
         DOM.messageInput.value = "";
@@ -1656,6 +1659,7 @@ Notification.requestPermission().then(permission => {
         // Get the FCM token
         messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
             if (token) {
+                user.fcm_token = token;
                 let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
                 const updateUserFcmToken = fetch("user/update/" + token, {
                     method: "POST",
