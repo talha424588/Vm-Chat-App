@@ -411,7 +411,15 @@ let addMessageToMessageArea = (message) => {
     if (message.type === 'File') {
         if (message.reply) {
             console.log("Reply Message: " + message.reply.msg);
-
+            if(message.reply.type==='Image'){
+                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            }else if(message.reply.type==='File'){
+                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            }else if(message.reply.type==='Audio'){
+                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            }else{
+                var message_body=message.reply.msg;
+            }
             var add_file_view = `
             <div class="file-message">
                 <div class="file-icon">
@@ -467,14 +475,25 @@ let addMessageToMessageArea = (message) => {
         }
     } else if (message.type === 'Image') {
         if (message.reply) {
+            if(message.reply.type==='Image'){
+                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            }else if(message.reply.type==='File'){
+                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            }else if(message.reply.type==='Audio'){
+                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            }else{
+                var message_body=message.reply.msg;
+            }
+
+
             var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:54;">`;
             messageContent = `
         <div class="reply-message-div">
             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-              ${message.user?.id == user?.id ? message.reply?.user?.name : message.user?.name}
+                    ${message.user?.id == user?.id ? message.user.name : message.user.name}
             </div>
             <div class="reply-details">
-                <p class="file-name">${message.reply.msg}</p>
+                <p class="file-name">${message_body}</p>
             </div>
         </div>
         <div class="reply-message-area">${message_new}</div> <!-- Updated this line -->
@@ -488,16 +507,28 @@ let addMessageToMessageArea = (message) => {
     } else if (message.type === 'Message' || message.type === null) {
 
         if (message.reply) {
+
+
+            if(message.reply.type==='Image'){
+                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            }else if(message.reply.type==='File'){
+                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            }else if(message.reply.type==='Audio'){
+                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            }else{
+                var message_body=message.reply.msg;
+            }
+
             console.log("Reply Message: " + message.reply.msg);
 
             messageContent = `
             <div class="reply-message-div">
                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                  ${message.user?.id == user?.id ? message.reply?.user?.name : message.user?.name}
+                  ${message.user?.id == user?.id ? message.user.name : message.user.name}
 
                 </div>
                 <div class="reply-details">
-                    <p class="file-name">${message.reply.msg}</p>
+                    <p class="file-name">${message_body}</p>
                 </div>
             </div>
             <div class="reply-message-area">${messageContent || (message.message ?? message.msg)}</div> <!-- Updated this line -->
@@ -557,7 +588,7 @@ let addMessageToMessageArea = (message) => {
                                     </span> |` : ''}
 
                                 <span>
-                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
+                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
                                 </span>
 
                                <!--- | <span>
@@ -567,7 +598,7 @@ let addMessageToMessageArea = (message) => {
                             </div>
                                       <!-- Dropdown menu for actions -->
       ${message.sender === user.unique_id ? `
-        <div class="dropdown" style="position: absolute; top: 10px; right: 10px;">
+        <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
           <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-angle-down text-muted px-2"></i>
           </a>
@@ -904,6 +935,7 @@ function handleSendMessage() {
 
     const messageId = document.getElementById('edit_message_id').value;
     let messageContent = document.getElementById('input').value;
+ 
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
     console.log(messageIndex);
@@ -931,7 +963,7 @@ function handleSendMessage() {
             'Content-Type': 'application/json',
             "X-CSRF-Token": csrfToken,
         },
-        body: JSON.stringify({ id: messageId, message: messageContent }),
+        body: JSON.stringify({ id: messageId, message: messageContent.replace(/[\r\n]+/g, ' ') }),
     })
         .then((response) => response.json())
         .then((data) => console.log(data))
@@ -988,19 +1020,31 @@ function removeEditMessage() {
 }
 
 //Show Reply Message
-function showReply(message_id, messagebody, senderName) {
+function showReply(message_id, messagebody, senderName,type) {
     console.log('MessageId: ' + message_id);
     console.log('MessageBody: ' + messagebody);
-    console.log('SenderName: ' + senderName);
+    console.log('SenderName: ' + type);
     DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
 
+    
+    
+     
     var quotedTextElement = document.querySelector('#quoted-message .sender-name');
     quotedTextElement.textContent = senderName;
 
     var quotedNameElement = document.querySelector('#quoted-message .quoted-text');
-    quotedNameElement.textContent = messagebody;
+    if(type==='Image'){
+        var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
+    }else if(type==='File'){
+        var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
+    }else if(type==='Audio'){
+        var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
+    }else{
+        var message_body=messagebody;
+    }
+    quotedNameElement.innerHTML = message_body;
 
     replyDiv.style.display = 'block';
 
@@ -1293,14 +1337,14 @@ let addNewMessageToArea = (message) => {
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
                             </span> |
                             <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="('${message.id}','${message.msg}','${senderName}')" data-message-id="${message.id}">Reply</a>
+                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
                             </span> <!---|
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                             </span>--->
                         </div>
                         ${message.sender === user.unique_id ? `
-                        <div class="dropdown" style="position: absolute; top: 10px; right: 10px;">
+                        <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
                             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-angle-down text-muted px-2"></i>
                             </a>
