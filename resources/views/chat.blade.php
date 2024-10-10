@@ -11,7 +11,7 @@
         integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
@@ -186,6 +186,8 @@
 
 
 
+    
+   
     <div class="container-fluid" id="main-container">
         <div class="row h-100">
             <div class="col-12 col-sm-5 col-md-4 d-flex flex-column" id="chat-list-area" style="position:relative;">
@@ -194,7 +196,7 @@
 
                 <div class="row d-flex flex-row align-items-center p-2" id="navbar">
                     <img alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; cursor:pointer;"
-                        onclick="showProfileSettings()" id="display-pic">
+                         id="display-pic">
                     <div class="username-container">
                         <div class="text-dark font-weight-bold" id="username"></div>
                         <small class="text-muted">Online</small>
@@ -553,10 +555,11 @@
 
                          <input type="hidden" class="number" id="correction_message_id">
  <input type="hidden" class="number" id="edit_message_id">
- <input type="file" id="hidden-file-input" name="photo" accept="image/*" />
+ <input type="file" id="hidden-file-input" name="photo" accept=".jpg, .jpeg, .png"  />
 
                     <!-- Hidden file input for multiple files -->
-                    <input type="file" id="file-input" multiple>
+                    <input type="file" id="file-input" multiple accept=".pdf, .doc, .docx">
+
 
                 </div>
             </div>
@@ -643,7 +646,7 @@
                         height="78px">
 
                     <h5>Unable to send file!</h5>
-                    <p class="not-recover">The file you have selected is larger than 25 MB</p>
+                    <p class="not-recover">The file you have selected is larger than 5 MB</p>
 
                     <button type="button" class="btn btn-cancel" data-dismiss="modal">Ok</button>
                 </div>
@@ -857,7 +860,7 @@
     </script>
     <script src="{{ asset('assets/js/date-utils.js') }}"></script>
     <script src="{{ asset('assets/js/script.js') }}"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
     {{-- <script src="https://www.gstatic.com/firebasejs/8.2.2/firebase-app.js"></script>
@@ -869,7 +872,9 @@
     </script>
 
 
-
+ <!-- Include jQuery -->
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Bootstrap JS --> 
 
 </body>
 
