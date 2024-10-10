@@ -10,6 +10,7 @@ class MailController extends Controller
 {
     public function sendAlertMail(Request $request)
     {
+        // siraj@visamtion.org add it
         $devEmail = 'dev3@visamtion.org';
         $subject = "Alert: Potential Contact Information Shared by " . $request->name;
 

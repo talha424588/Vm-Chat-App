@@ -3,6 +3,7 @@ let getById = (id, parent) => parent ? parent.getElementById(id) : getById(id, d
 let getByClass = (className, parent) => parent ? parent.getElementsByClassName(className) : getByClass(className, document);
 
 const socket = io('http://localhost:3000');
+// const socket = io.connect('/');
 
 const DOM = {
     chatListArea: getById("chat-list-area"),
@@ -342,10 +343,15 @@ socket.on('sendChatToClient', (message) => {
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
-        if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
 
+
+        if (message.sender !== unique_id && (!seenBy || !seenBy.includes(unique_id)) && DOM.groupId != groupToUpdate.group.group_id) {
             groupToUpdate.unread += 1;
             DOM.unreadMessagesPerGroup[groupId] += 1;
+        } else if (seenBy && seenBy.includes(unique_id)) {
+            // Login user message leave it,
+        } else {
+            updateMessageSeenBy([groupToUpdate.msg.id,]);
         }
 
         chatList.sort((a, b) => {
@@ -822,7 +828,7 @@ function correction_send_handel() {
 
     const messageContent = tinymce.get('input').getContent();
     const correction_message_id = document.getElementById('correction_message_id').value;
-    
+
     tinymce.remove('#input');
     isTinyMCEInitialized = false;
     removecorrectionMessage();
@@ -931,14 +937,14 @@ function editMessage(messageId) {
 
 
 
-        
+
 
         const editMessageContents = document.querySelectorAll('.EditmessageContent');
         editMessageContents.forEach((content) => {
             const sanitizedMessage = messageContent; // Strip out HTML tags
             content.innerHTML = sanitizedMessage; // Display only the plain text
         });
-        
+
 
         const textarea = document.getElementById('input');
         textarea.value = messageContent.replace(/<\/?[^>]+(>|$)/g, "");
@@ -963,7 +969,7 @@ function editMessage(messageId) {
             fileicon.style.visibility = 'hidden';
             captureid.style.visibility = 'hidden';
         }
-      
+
 
     }
 }
@@ -1051,7 +1057,7 @@ function removeEditMessage() {
     const chat_action_voice = document.querySelector('.chat_action_voice');
     chat_action_voice.style.visibility = 'visible';
     chat_action_voice.style.display = 'block';
-   
+
 
 
     const messageDiv = document.getElementById('messages');
@@ -1549,13 +1555,34 @@ let generateMessageArea = async (elem, chatIndex) => {
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-    const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
-        method: 'GET',
-        headers: {
-            'content-type': 'application/json'
-        }
-    });
-    pagnicateChatList = await response.json();
+
+//     const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
+//         method: 'GET',
+//         headers: {
+//             'content-type': 'application/json'
+//         }
+//     });
+//     pagnicateChatList = await response.json();
+
+    if(searchMessage)
+    {
+        await fetchNextPageMessages(DOM.clickSearchMessageId,DOM.groupId);
+    }
+    else
+    {
+        const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json'
+            }
+        });
+        pagnicateChatList = await response.json();
+
+        unread_settings(pagnicateChatList);
+
+        const ids = pagnicateChatList.data.map(item => item.id);
+
+        updateMessageSeenBy(ids);
 
     unread_settings(pagnicateChatList);
 
@@ -1588,6 +1615,26 @@ let generateMessageArea = async (elem, chatIndex) => {
     removeQuotedMessage();
     removecorrectionMessage();
 };
+
+
+
+async function updateMessageSeenBy(ids)
+{
+    try {
+        const response = await fetch("message/seen-by/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": csrfToken,
+            },
+            body: JSON.stringify({ ids }),
+        });
+
+        const readMessageResponse = await response.json();
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 let showChatList = () => {
     if (areaSwapped) {
@@ -1649,7 +1696,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 type: type,
                 mediaName: mediaName,
                 time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken
+                csrf_token: csrfToken,
+                fcm_token: user.fcm_token
             };
             socket.emit('sendChatToServer', msg);
         } else {
@@ -1662,7 +1710,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 type: type,
                 mediaName: mediaName,
                 time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken
+                csrf_token: csrfToken,
+                fcm_token: user.fcm_token
             };
             socket.emit('sendChatToServer', msg);
         }
@@ -1685,7 +1734,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
             type: type,
             mediaName: mediaName,
             time: Math.floor(Date.now() / 1000),
-            csrf_token: csrfToken
+            csrf_token: csrfToken,
+            fcm_token: user.fcm_token
         };
         socket.emit('sendChatToServer', msg);
         DOM.messageInput.value = "";
@@ -1745,6 +1795,7 @@ Notification.requestPermission().then(permission => {
         // Get the FCM token
         messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
             if (token) {
+                user.fcm_token = token;
                 let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
                 const updateUserFcmToken = fetch("user/update/" + token, {
                     method: "POST",
