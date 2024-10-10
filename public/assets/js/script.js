@@ -3,7 +3,6 @@ let getById = (id, parent) => parent ? parent.getElementById(id) : getById(id, d
 let getByClass = (className, parent) => parent ? parent.getElementsByClassName(className) : getByClass(className, document);
 
 const socket = io('http://localhost:3000');
-// const socket = io.connect('/');
 
 const DOM = {
     chatListArea: getById("chat-list-area"),
@@ -342,15 +341,10 @@ socket.on('sendChatToClient', (message) => {
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
+        if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
 
-
-        if (message.sender !== unique_id && (!seenBy || !seenBy.includes(unique_id)) && DOM.groupId != groupToUpdate.group.group_id) {
             groupToUpdate.unread += 1;
             DOM.unreadMessagesPerGroup[groupId] += 1;
-        } else if (seenBy && seenBy.includes(unique_id)) {
-            // Login user message leave it,
-        } else {
-            updateMessageSeenBy([groupToUpdate.msg.id,]);
         }
 
         chatList.sort((a, b) => {
@@ -419,9 +413,43 @@ let addMessageToMessageArea = (message) => {
             if(message.reply.type==='Image'){
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
             }else if(message.reply.type==='File'){
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = ` <div class="file-message" >
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">File</p>
+
+                </div>
+                <a href="#"  class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>`;
             }else if(message.reply.type==='Audio'){
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+            <div class="avatar">
+                <!-- Avatar image here -->
+            </div>
+            <div class="audio-content">
+                <div class="audio-controls">
+                    <button class="playbutton">
+                        <img src="assets/img/play-icon.svg" alt="Play" />
+                    </button>
+                    <div class="audio-progress">
+                        <div class="progress-filled"></div>
+                    </div>
+                </div>
+                <div class="audio-time-container">
+                    <span class="audio-duration">0:00</span>
+                    <span class="audio-time">12:27 PM</span>
+                </div>
+            </div>
+        </div>`;
             }else{
                 var message_body=message.reply.msg;
             }
@@ -530,9 +558,43 @@ let addMessageToMessageArea = (message) => {
             if(message.reply.type==='Image'){
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
             }else if(message.reply.type==='File'){
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = ` <div class="file-message" >
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">File</p>
+
+                </div>
+                <a href="#"  class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>`;
             }else if(message.reply.type==='Audio'){
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+            <div class="avatar">
+                <!-- Avatar image here -->
+            </div>
+            <div class="audio-content">
+                <div class="audio-controls">
+                    <button class="playbutton">
+                        <img src="assets/img/play-icon.svg" alt="Play" />
+                    </button>
+                    <div class="audio-progress">
+                        <div class="progress-filled"></div>
+                    </div>
+                </div>
+                <div class="audio-time-container">
+                    <span class="audio-duration">0:00</span>
+                    <span class="audio-time">12:27 PM</span>
+                </div>
+            </div>
+        </div>`;
             }else{
                 var message_body=message.reply.msg;
             }
@@ -827,7 +889,7 @@ function correction_send_handel() {
 
     const messageContent = tinymce.get('input').getContent();
     const correction_message_id = document.getElementById('correction_message_id').value;
-
+    
     tinymce.remove('#input');
     isTinyMCEInitialized = false;
     removecorrectionMessage();
@@ -936,14 +998,14 @@ function editMessage(messageId) {
 
 
 
-
+        
 
         const editMessageContents = document.querySelectorAll('.EditmessageContent');
         editMessageContents.forEach((content) => {
             const sanitizedMessage = messageContent; // Strip out HTML tags
             content.innerHTML = sanitizedMessage; // Display only the plain text
         });
-
+        
 
         const textarea = document.getElementById('input');
         textarea.value = messageContent.replace(/<\/?[^>]+(>|$)/g, "");
@@ -968,7 +1030,7 @@ function editMessage(messageId) {
             fileicon.style.visibility = 'hidden';
             captureid.style.visibility = 'hidden';
         }
-
+      
 
     }
 }
@@ -982,6 +1044,8 @@ function handleSendMessage() {
 
     const messageId = document.getElementById('edit_message_id').value;
     let messageContent = document.getElementById('input').value;
+ 
+    if(messageContent!==''){
 
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
@@ -1036,8 +1100,10 @@ function handleSendMessage() {
     chat_action_voice.style.display = 'block';
     const correctionarea = document.getElementById('correction-div');
     correctionarea.style.display = 'none';
+}else{
+   // alert('Error');
 }
-
+}
 // Add event listener to the send message button
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
 
@@ -1056,7 +1122,7 @@ function removeEditMessage() {
     const chat_action_voice = document.querySelector('.chat_action_voice');
     chat_action_voice.style.visibility = 'visible';
     chat_action_voice.style.display = 'block';
-
+   
 
 
     const messageDiv = document.getElementById('messages');
@@ -1089,9 +1155,43 @@ function showReply(message_id,senderName,type) {
     if(type==='Image'){
         var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
     }else if(type==='File'){
-        var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
+        var message_body = ` <div class="file-message" >
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">File</p>
+
+                </div>
+                <a href="#"  class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>`;
     }else if(type==='Audio'){
-        var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
+        var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+            <div class="avatar">
+                <!-- Avatar image here -->
+            </div>
+            <div class="audio-content">
+                <div class="audio-controls">
+                    <button class="playbutton">
+                        <img src="assets/img/play-icon.svg" alt="Play" />
+                    </button>
+                    <div class="audio-progress">
+                        <div class="progress-filled"></div>
+                    </div>
+                </div>
+                <div class="audio-time-container">
+                    <span class="audio-duration">0:00</span>
+                    <span class="audio-time">12:27 PM</span>
+                </div>
+            </div>
+        </div>`;
     }else{
         var message_body=messagebody;
     }
@@ -1523,6 +1623,98 @@ function unread_settings(query_set) {
 
 let currentlyPlayingAudio = null;
 
+// let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
+//     pagnicateChatList = [];
+//     chat = chatList[chatIndex];
+
+//     DOM.activeChatIndex = chatIndex;
+
+//     DOM.messages.innerHTML = '';
+
+//     DOM.groupId = elem.dataset.groupId;
+
+//     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
+//     mClassList(DOM.messageAreaOverlay).add("d-none");
+
+//     [...DOM.chatListItem].forEach((elem) => mClassList(elem).remove("active"));
+
+//     if (window.innerWidth <= 575) {
+//         mClassList(DOM.chatListArea).remove("d-flex").add("d-none");
+//         mClassList(DOM.messageArea).remove("d-none").add("d-flex");
+//         areaSwapped = true;
+//     } else {
+//         mClassList(elem).add("active");
+//     }
+
+//     DOM.messageAreaName.innerHTML = chat.name;
+//     DOM.messageAreaPic.src = chat.isGroup ? chat.group.pic : chat.contact.pic;
+
+//     if (chat.isGroup) {
+//         let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
+//         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
+//     }
+
+// <<<<<<< hamzasaleemi
+//     const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
+//         method: 'GET',
+//         headers: {
+//             'content-type': 'application/json'
+//         }
+//     });
+//     pagnicateChatList = await response.json();
+
+//     unread_settings(pagnicateChatList);
+// =======
+//     if(searchMessage)
+//     {
+//         await fetchNextPageMessages(DOM.clickSearchMessageId,DOM.groupId);
+//     }
+//     else
+//     {
+//         const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
+//             method: 'GET',
+//             headers: {
+//                 'content-type': 'application/json'
+//             }
+//         });
+//         pagnicateChatList = await response.json();
+
+//         unread_settings(pagnicateChatList);
+
+//         const ids = pagnicateChatList.data.map(item => item.id);
+
+//         try {
+//             const response = await fetch("message/seen-by/update", {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                     "X-CSRF-Token": csrfToken,
+//                 },
+//                 body: JSON.stringify({ ids }),
+//             });
+// >>>>>>> master
+
+//             const readMessageResponse = await response.json();
+//         } catch (error) {
+//             console.log(error);
+//         }
+
+//         var g_id = DOM.groupId;
+
+
+//         lastDate = "";
+//         pagnicateChatList.data.reverse()
+//             .forEach((msg) => addMessageToMessageArea(msg));
+
+//         get_voice_list();
+//         removeEditMessage();
+//         removeQuotedMessage();
+//     }
+
+
+// };
+
+
 let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
     pagnicateChatList = [];
     chat = chatList[chatIndex];
@@ -1681,8 +1873,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 type: type,
                 mediaName: mediaName,
                 time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken,
-                fcm_token: user.fcm_token
+                csrf_token: csrfToken
             };
             socket.emit('sendChatToServer', msg);
         } else {
@@ -1695,8 +1886,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 type: type,
                 mediaName: mediaName,
                 time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken,
-                fcm_token: user.fcm_token
+                csrf_token: csrfToken
             };
             socket.emit('sendChatToServer', msg);
         }
@@ -1719,8 +1909,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
             type: type,
             mediaName: mediaName,
             time: Math.floor(Date.now() / 1000),
-            csrf_token: csrfToken,
-            fcm_token: user.fcm_token
+            csrf_token: csrfToken
         };
         socket.emit('sendChatToServer', msg);
         DOM.messageInput.value = "";
@@ -1780,7 +1969,6 @@ Notification.requestPermission().then(permission => {
         // Get the FCM token
         messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
             if (token) {
-                user.fcm_token = token;
                 let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
                 const updateUserFcmToken = fetch("user/update/" + token, {
                     method: "POST",
