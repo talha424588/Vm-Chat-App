@@ -1691,7 +1691,7 @@ let generateMessageArea = async (elem, chatIndex) => {
 
     unread_settings(pagnicateChatList);
 
-    const ids = pagnicateChatList.data.map(item => item.id);
+
 
     try {
         const response = await fetch("message/seen-by/update", {
@@ -2399,4 +2399,3 @@ function get_voice_list() {
         audioPlayer.addEventListener('play', () => console.log('Playing audio:', audioSrc));
         audioPlayer.addEventListener('pause', () => console.log('Paused audio:', audioSrc));
     });
-}
