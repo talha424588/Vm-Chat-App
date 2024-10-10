@@ -54,7 +54,12 @@
             cursor: pointer;
             margin-right: 10px;
         }
-
+        .playbutton {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
         .audio-progress {
             width: 100%;
             background-color: #f0f0f0;
@@ -629,7 +634,8 @@
                     <h5>Users who have seen this message:</h5>
                     {{-- <p class="not-recover" id="is_read">awais-designer, VM-UST-SA, Talha Dev</p> --}}
                     <p class="not-recover" id="is_read"></p>
-                    <button type="button" class="btn btn-cancel" data-dismiss="modal">Ok</button>
+                   
+                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Ok</button>
                 </div>
             </div>
         </div>
@@ -647,8 +653,8 @@
 
                     <h5>Unable to send file!</h5>
                     <p class="not-recover">The file you have selected is larger than 5 MB</p>
-
-                    <button type="button" class="btn btn-cancel" data-dismiss="modal">Ok</button>
+                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Ok</button>
+                   
                 </div>
 
             </div>
@@ -865,6 +871,8 @@
 
     {{-- <script src="https://www.gstatic.com/firebasejs/8.2.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.2/firebase-storage.js"></script> --}}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         var csrfToken = '{{ csrf_token() }}';

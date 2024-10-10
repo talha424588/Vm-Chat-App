@@ -414,9 +414,43 @@ let addMessageToMessageArea = (message) => {
             if(message.reply.type==='Image'){
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
             }else if(message.reply.type==='File'){
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = ` <div class="file-message" >
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">File</p>
+
+                </div>
+                <a href="#"  class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>`;
             }else if(message.reply.type==='Audio'){
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+            <div class="avatar">
+                <!-- Avatar image here -->
+            </div>
+            <div class="audio-content">
+                <div class="audio-controls">
+                    <button class="playbutton">
+                        <img src="assets/img/play-icon.svg" alt="Play" />
+                    </button>
+                    <div class="audio-progress">
+                        <div class="progress-filled"></div>
+                    </div>
+                </div>
+                <div class="audio-time-container">
+                    <span class="audio-duration">0:00</span>
+                    <span class="audio-time">12:27 PM</span>
+                </div>
+            </div>
+        </div>`;
             }else{
                 var message_body=message.reply.msg;
             }
@@ -525,9 +559,43 @@ let addMessageToMessageArea = (message) => {
             if(message.reply.type==='Image'){
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
             }else if(message.reply.type==='File'){
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = ` <div class="file-message" >
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">File</p>
+
+                </div>
+                <a href="#"  class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>`;
             }else if(message.reply.type==='Audio'){
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+            <div class="avatar">
+                <!-- Avatar image here -->
+            </div>
+            <div class="audio-content">
+                <div class="audio-controls">
+                    <button class="playbutton">
+                        <img src="assets/img/play-icon.svg" alt="Play" />
+                    </button>
+                    <div class="audio-progress">
+                        <div class="progress-filled"></div>
+                    </div>
+                </div>
+                <div class="audio-time-container">
+                    <span class="audio-duration">0:00</span>
+                    <span class="audio-time">12:27 PM</span>
+                </div>
+            </div>
+        </div>`;
             }else{
                 var message_body=message.reply.msg;
             }
@@ -978,6 +1046,7 @@ function handleSendMessage() {
     const messageId = document.getElementById('edit_message_id').value;
     let messageContent = document.getElementById('input').value;
  
+    if(messageContent!==''){
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
     console.log(messageIndex);
@@ -1031,8 +1100,10 @@ function handleSendMessage() {
     chat_action_voice.style.display = 'block';
     const correctionarea = document.getElementById('correction-div');
     correctionarea.style.display = 'none';
+}else{
+   // alert('Error');
 }
-
+}
 // Add event listener to the send message button
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
 
@@ -1084,9 +1155,43 @@ function showReply(message_id,senderName,type) {
     if(type==='Image'){
         var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
     }else if(type==='File'){
-        var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
+        var message_body = ` <div class="file-message" >
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">File</p>
+
+                </div>
+                <a href="#"  class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>`;
     }else if(type==='Audio'){
-        var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
+        var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+            <div class="avatar">
+                <!-- Avatar image here -->
+            </div>
+            <div class="audio-content">
+                <div class="audio-controls">
+                    <button class="playbutton">
+                        <img src="assets/img/play-icon.svg" alt="Play" />
+                    </button>
+                    <div class="audio-progress">
+                        <div class="progress-filled"></div>
+                    </div>
+                </div>
+                <div class="audio-time-container">
+                    <span class="audio-duration">0:00</span>
+                    <span class="audio-time">12:27 PM</span>
+                </div>
+            </div>
+        </div>`;
     }else{
         var message_body=messagebody;
     }
