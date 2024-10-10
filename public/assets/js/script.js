@@ -212,7 +212,6 @@ let viewMessageList = () => {
         <h2>Messages</h2>
     </div>
 `;
-    console.log("messageList", messageList);
     messageList.sort((a, b) => {
         if (a.time && b.time) {
             return mDate(b.time).subtract(a.time);
@@ -225,18 +224,19 @@ let viewMessageList = () => {
         }
     })
         .forEach((elem, index) => {
-            console.log(elem);
             let unreadClass = elem.unread ? "unread" : "";
-            if (elem.isGroup) {
-                const senderName = elem.user.name;
-                const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
-                DOM.messagesList.innerHTML += `
-            <input type="hidden" id="group-id" value="${elem.group_id}"></input>
-            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index})">
+            DOM.clickSearchMessageId = elem.id;
+            const senderName = elem.user.name;
+            let time = new Date(elem.time * 1000)
+            const timeText = elem.time ? mDate(time).chatListFormat() : "No messages";
+            let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
+            DOM.messagesList.innerHTML += `
+            <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
+            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index},1)">
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
                 <div class="name list-user-name">${elem.group.name}</div>
-                <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${elem.msg}</div>
+                <div class="small last-message">${elem ? senderName + ": " : ""}${messageText}</div>
               </div>
 
               <div class="flex-grow-1 text-right">
@@ -244,7 +244,6 @@ let viewMessageList = () => {
                ${elem.unread > 0 ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>` : ""}
     </div>
             </div>`;
-            }
         });
 };
 
@@ -464,7 +463,7 @@ let addMessageToMessageArea = (message) => {
                     </svg>
                 </a>
             </div>
-       
+
             `;
         } else {
             messageContent = `
@@ -500,10 +499,10 @@ let addMessageToMessageArea = (message) => {
             } else {
                 var message_body = message.reply.msg;
             }
-        
+
             // Message content (modify the img to match your use case)
             var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:54;">`;
-        
+
             // Set messageContent and include an onclick that scrolls to the replied message
             messageContent = `
                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
@@ -654,7 +653,7 @@ let addMessageToMessageArea = (message) => {
         notificationDiv.style.display = 'block';
                    }else{
 
-                 scroll_function();   
+                 scroll_function();
 
 //                     scroll_function();
 
@@ -750,7 +749,7 @@ function tinymce_init(callback) {
 }
 
 function CorrectionMessage(message_id,  senderName) {
-   
+
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody=message.msg;
     console.log(messagebody);
@@ -926,7 +925,7 @@ function editMessage(messageId) {
     var messageContent=message.msg;
     console.log(messageContent);
 
-    
+
     if (messageContent) {
         document.getElementById('editMessageDiv').style.display = 'block';
 
@@ -983,7 +982,7 @@ function handleSendMessage() {
 
     const messageId = document.getElementById('edit_message_id').value;
     let messageContent = document.getElementById('input').value;
- 
+
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
     console.log(messageIndex);
@@ -1069,8 +1068,8 @@ function removeEditMessage() {
 
 //Show Reply Message
 function showReply(message_id,senderName,type) {
-   
-    
+
+
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody=message.msg;
     console.log(messagebody);
@@ -1080,9 +1079,9 @@ function showReply(message_id,senderName,type) {
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
 
-    
-    
-     
+
+
+
     var quotedTextElement = document.querySelector('#quoted-message .sender-name');
     quotedTextElement.textContent = senderName;
 
@@ -1523,8 +1522,8 @@ function unread_settings(query_set) {
 }
 
 let currentlyPlayingAudio = null;
-let generateMessageArea = async (elem, chatIndex) => {
 
+let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
     pagnicateChatList = [];
     chat = chatList[chatIndex];
 
@@ -1555,15 +1554,6 @@ let generateMessageArea = async (elem, chatIndex) => {
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-
-//     const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
-//         method: 'GET',
-//         headers: {
-//             'content-type': 'application/json'
-//         }
-//     });
-//     pagnicateChatList = await response.json();
-
     if(searchMessage)
     {
         await fetchNextPageMessages(DOM.clickSearchMessageId,DOM.groupId);
@@ -1582,40 +1572,35 @@ let generateMessageArea = async (elem, chatIndex) => {
 
         const ids = pagnicateChatList.data.map(item => item.id);
 
-        updateMessageSeenBy(ids);
+        try {
+            const response = await fetch("message/seen-by/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken,
+                },
+                body: JSON.stringify({ ids }),
+            });
 
-    unread_settings(pagnicateChatList);
+            const readMessageResponse = await response.json();
+        } catch (error) {
+            console.log(error);
+        }
 
-    const ids = pagnicateChatList.data.map(item => item.id);
+        var g_id = DOM.groupId;
 
-    try {
-        const response = await fetch("message/seen-by/update", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken,
-            },
-            body: JSON.stringify({ ids }),
-        });
 
-        const readMessageResponse = await response.json();
-    } catch (error) {
-        console.log(error);
+        lastDate = "";
+        pagnicateChatList.data.reverse()
+            .forEach((msg) => addMessageToMessageArea(msg));
+
+        get_voice_list();
+        removeEditMessage();
+        removeQuotedMessage();
     }
 
-    var g_id = DOM.groupId;
 
-
-    lastDate = "";
-    pagnicateChatList.data.reverse()
-        .forEach((msg) => addMessageToMessageArea(msg));
-
-    get_voice_list();
-    removeEditMessage();
-    removeQuotedMessage();
-    removecorrectionMessage();
 };
-
 
 
 async function updateMessageSeenBy(ids)
@@ -2052,11 +2037,8 @@ let searchGroups = async (searchQuery) => {
             const groupResponse = await fetch(url);
             const response = await groupResponse.json();
             if (response) {
-                console.log("response", response);
                 const groups = response.data.groups;
-                const messages = response.data.groups;
-                console.log("groups", response.data.groups);
-                console.log("messages", response.data.messages);
+                const messages = response.data.messages;
                 if (groups.length > 0) {
                     chatList = [];
                     groups.forEach((group) => {
@@ -2083,25 +2065,10 @@ let searchGroups = async (searchQuery) => {
                 }
 
                 if (messages.length > 0) {
-                    messages.forEach((message) => {
-                        message.group_messages.forEach((groupMessage) => {
-                            let messageObject = {};
-                            messageObject.isGroup = true;
-                            messageObject.msg = groupMessage.msg;
-                            messageObject.time = new Date(groupMessage.time * 1000);
-                            messageObject.unread = 0;
-                            messageObject.user = groupMessage.user;
-                            messageObject.group = {
-                                group_id: message.group_id,
-                                name: message.name,
-                                access: message.access
-                            };
-
-                            messageList.push(messageObject);
-                        });
-                    });
+                    messageList.push(...messages);
                     viewMessageList();
                 }
+
                 else {
                     DOM.chatList.innerHTML = `
                         <div class="no-groups-found">
