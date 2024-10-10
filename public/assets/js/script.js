@@ -1921,22 +1921,26 @@ fileIcon.addEventListener('click', () => {
 
 fileInput.addEventListener('change', (event) => {
 
-    const file = event.target.files[0];
+    if(event.target.files[0])
+    {
+        const file = event.target.files[0];
+        console.log("file",file);
 
-    const ref = firebase.storage().ref("files/" + DOM.unique_id);
-    const mediaName = file.name;
-    const metadata = {
-        contentType: file.type
-    };
-    const task = ref.child(mediaName).put(file, metadata);
-    task
-        .then(snapshot => snapshot.ref.getDownloadURL())
-        .then(url => {
-            console.log(url);
-            DOM.messageInput.value = url;
-            sendMessage("File", mediaName);
-        })
-        .catch(error => console.error(error));
+        const ref = firebase.storage().ref("files/" + DOM.unique_id);
+        const mediaName = file.name;
+        const metadata = {
+            contentType: file.type
+        };
+        const task = ref.child(mediaName).put(file, metadata);
+        task
+            .then(snapshot => snapshot.ref.getDownloadURL())
+            .then(url => {
+                console.log(url);
+                DOM.messageInput.value = url;
+                sendMessage("File", mediaName);
+            })
+            .catch(error => console.error(error));
+    }
 });
 
 document.getElementById('input').addEventListener('keydown', function (event) {
