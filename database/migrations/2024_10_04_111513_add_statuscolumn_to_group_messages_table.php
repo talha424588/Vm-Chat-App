@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('group_messages', function (Blueprint $table) {
-            $table->enum('status', ['New', 'Move', 'Correction', 'Edited', 'Deleted']);
+            $table->enum('status', ['New', 'Move', 'Correction', 'Edited', 'Deleted'])->default(null);
+            $table->string("media_name",256)->default(null)->nullable();
+            $table->string("type",100)->default(null)->nullable();
+            $table->boolean('is_deleted')->default(0);
         });
     }
 

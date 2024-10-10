@@ -3,6 +3,7 @@ let getById = (id, parent) => parent ? parent.getElementById(id) : getById(id, d
 let getByClass = (className, parent) => parent ? parent.getElementsByClassName(className) : getByClass(className, document);
 
 const socket = io('http://localhost:3000');
+// const socket = io.connect('/');
 
 const DOM = {
     chatListArea: getById("chat-list-area"),
