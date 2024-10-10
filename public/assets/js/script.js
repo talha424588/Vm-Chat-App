@@ -889,7 +889,7 @@ function correction_send_handel() {
 
     const messageContent = tinymce.get('input').getContent();
     const correction_message_id = document.getElementById('correction_message_id').value;
-    
+
     tinymce.remove('#input');
     isTinyMCEInitialized = false;
     removecorrectionMessage();
@@ -983,12 +983,19 @@ edit_capture.style.visibility = 'hidden';
 
 function editMessage(messageId) {
 
+    let editMessage = null;
+
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
-    var messageContent=message.msg;
-    console.log(messageContent);
+    if (message) {
+        editMessage = message.msg
+    }
+    else {
+        const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+        const messageContentDiv = messageElement.querySelector('div.shadow-sm');
+        editMessage = messageContentDiv.innerHTML;
+    }
 
-
-    if (messageContent) {
+    if (editMessage) {
         document.getElementById('editMessageDiv').style.display = 'block';
 
         const editMessageIdField = document.getElementById('edit_message_id');
@@ -996,19 +1003,14 @@ function editMessage(messageId) {
             editMessageIdField.value = messageId;
         }
 
-
-
-        
-
         const editMessageContents = document.querySelectorAll('.EditmessageContent');
         editMessageContents.forEach((content) => {
-            const sanitizedMessage = messageContent; // Strip out HTML tags
-            content.innerHTML = sanitizedMessage; // Display only the plain text
+            const sanitizedMessage = editMessage;
+            content.innerHTML = sanitizedMessage;
         });
-        
 
         const textarea = document.getElementById('input');
-        textarea.value = messageContent.replace(/<\/?[^>]+(>|$)/g, "");
+        textarea.value = editMessage.replace(/<\/?[^>]+(>|$)/g, "").trim();
 
         textarea.scrollTop = textarea.scrollHeight;
 
@@ -1030,7 +1032,7 @@ function editMessage(messageId) {
             fileicon.style.visibility = 'hidden';
             captureid.style.visibility = 'hidden';
         }
-      
+
 
     }
 }
@@ -1044,7 +1046,7 @@ function handleSendMessage() {
 
     const messageId = document.getElementById('edit_message_id').value;
     let messageContent = document.getElementById('input').value;
- 
+
     if(messageContent!==''){
 
 
@@ -1122,7 +1124,7 @@ function removeEditMessage() {
     const chat_action_voice = document.querySelector('.chat_action_voice');
     chat_action_voice.style.visibility = 'visible';
     chat_action_voice.style.display = 'block';
-   
+
 
 
     const messageDiv = document.getElementById('messages');
@@ -1622,98 +1624,6 @@ function unread_settings(query_set) {
 }
 
 let currentlyPlayingAudio = null;
-
-// let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
-//     pagnicateChatList = [];
-//     chat = chatList[chatIndex];
-
-//     DOM.activeChatIndex = chatIndex;
-
-//     DOM.messages.innerHTML = '';
-
-//     DOM.groupId = elem.dataset.groupId;
-
-//     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
-//     mClassList(DOM.messageAreaOverlay).add("d-none");
-
-//     [...DOM.chatListItem].forEach((elem) => mClassList(elem).remove("active"));
-
-//     if (window.innerWidth <= 575) {
-//         mClassList(DOM.chatListArea).remove("d-flex").add("d-none");
-//         mClassList(DOM.messageArea).remove("d-none").add("d-flex");
-//         areaSwapped = true;
-//     } else {
-//         mClassList(elem).add("active");
-//     }
-
-//     DOM.messageAreaName.innerHTML = chat.name;
-//     DOM.messageAreaPic.src = chat.isGroup ? chat.group.pic : chat.contact.pic;
-
-//     if (chat.isGroup) {
-//         let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
-//         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
-//     }
-
-// <<<<<<< hamzasaleemi
-//     const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
-//         method: 'GET',
-//         headers: {
-//             'content-type': 'application/json'
-//         }
-//     });
-//     pagnicateChatList = await response.json();
-
-//     unread_settings(pagnicateChatList);
-// =======
-//     if(searchMessage)
-//     {
-//         await fetchNextPageMessages(DOM.clickSearchMessageId,DOM.groupId);
-//     }
-//     else
-//     {
-//         const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
-//             method: 'GET',
-//             headers: {
-//                 'content-type': 'application/json'
-//             }
-//         });
-//         pagnicateChatList = await response.json();
-
-//         unread_settings(pagnicateChatList);
-
-//         const ids = pagnicateChatList.data.map(item => item.id);
-
-//         try {
-//             const response = await fetch("message/seen-by/update", {
-//                 method: "POST",
-//                 headers: {
-//                     "Content-Type": "application/json",
-//                     "X-CSRF-Token": csrfToken,
-//                 },
-//                 body: JSON.stringify({ ids }),
-//             });
-// >>>>>>> master
-
-//             const readMessageResponse = await response.json();
-//         } catch (error) {
-//             console.log(error);
-//         }
-
-//         var g_id = DOM.groupId;
-
-
-//         lastDate = "";
-//         pagnicateChatList.data.reverse()
-//             .forEach((msg) => addMessageToMessageArea(msg));
-
-//         get_voice_list();
-//         removeEditMessage();
-//         removeQuotedMessage();
-//     }
-
-
-// };
-
 
 let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
     pagnicateChatList = [];
