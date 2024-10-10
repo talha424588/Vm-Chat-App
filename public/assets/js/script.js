@@ -421,7 +421,7 @@ let addMessageToMessageArea = (message) => {
                 var message_body=message.reply.msg;
             }
             var add_file_view = `
-            <div class="file-message">
+            <div class="file-message"  onclick="scrollToMessage('${message.reply.id}')">
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
@@ -441,16 +441,25 @@ let addMessageToMessageArea = (message) => {
         `;
 
             messageContent = `
-            <div class="reply-message-div">
-                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                    Dummy Name
+            <div class="file-message">
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
                 </div>
-                <div class="reply-details">
+                <div class="file-details">
                     <p class="file-name">${add_file_view}</p>
+
                 </div>
+                <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
             </div>
-            <div class="reply-message-area">${message.message ?? message.msg}</div> <!-- Updated this line -->
-        `;
+       
+            `;
         } else {
             messageContent = `
 
@@ -475,30 +484,34 @@ let addMessageToMessageArea = (message) => {
         }
     } else if (message.type === 'Image') {
         if (message.reply) {
-            if(message.reply.type==='Image'){
+            // Determine the type of reply and set the message_body accordingly
+            if (message.reply.type === 'Image') {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-            }else if(message.reply.type==='File'){
+            } else if (message.reply.type === 'File') {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-            }else if(message.reply.type==='Audio'){
+            } else if (message.reply.type === 'Audio') {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-            }else{
-                var message_body=message.reply.msg;
+            } else {
+                var message_body = message.reply.msg;
             }
-
-
+        
+            // Message content (modify the img to match your use case)
             var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:54;">`;
+        
+            // Set messageContent and include an onclick that scrolls to the replied message
             messageContent = `
-        <div class="reply-message-div">
-            <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                    ${message.user?.id == user?.id ? message.user.name : message.user.name}
-            </div>
-            <div class="reply-details">
-                <p class="file-name">${message_body}</p>
-            </div>
-        </div>
-        <div class="reply-message-area">${message_new}</div> <!-- Updated this line -->
-    `;
-        } else {
+                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
+                    <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                        ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                    </div>
+                    <div class="reply-details">
+                        <p class="file-name">${message_body}</p>
+                    </div>
+                </div>
+                <div class="reply-message-area">${message_new}</div>
+            `;
+        }
+        else {
 
             messageContent = `
             <img src="${message.message ?? message.msg}" style="height:222px; width:54;">
@@ -522,7 +535,7 @@ let addMessageToMessageArea = (message) => {
             console.log("Reply Message: " + message.reply.msg);
 
             messageContent = `
-            <div class="reply-message-div">
+            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                   ${message.user?.id == user?.id ? message.user.name : message.user.name}
 
@@ -569,8 +582,8 @@ let addMessageToMessageArea = (message) => {
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
 
-            <div class="">
-                <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
+            <div class="" >
+                <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
                             ${messageContent}
@@ -588,7 +601,7 @@ let addMessageToMessageArea = (message) => {
                                     </span> |` : ''}
 
                                 <span>
-                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
+                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
                                 </span>
 
                                <!--- | <span>
@@ -604,8 +617,8 @@ let addMessageToMessageArea = (message) => {
           </a>
           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
          ${!['Audio', 'Image', 'File'].includes(message.type) ? `
-        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
-          <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${message.msg}','${senderName}')">Correction</a>
+        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+          <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
       ` : ''}
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
@@ -646,6 +659,28 @@ let addMessageToMessageArea = (message) => {
 
     }
 };
+function scrollToMessage(messageId) {
+    const targetMessage = document.getElementById(`message-${messageId}`);
+    if (targetMessage) {
+        // Find the nearest parent with class 'ml-3'
+        const ml3Div = targetMessage.closest('.ml-3');
+
+        if (ml3Div) {
+            ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Add the highlight class to the parent .ml-3 div
+            ml3Div.classList.add('selected-message');
+
+            // Remove the highlight class after 3 seconds
+            setTimeout(() => {
+                ml3Div.classList.remove('selected-message');
+            }, 3000); // 3 seconds
+        }
+    }
+}
+
+
+
 
 function scroll_function() {
     const messageDiv = document.getElementById('messages');
@@ -708,9 +743,11 @@ function tinymce_init(callback) {
     }
 }
 
-function CorrectionMessage(message_id, messagebody, senderName) {
-    console.log(message_id);
-
+function CorrectionMessage(message_id,  senderName) {
+   
+    const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
+    var messagebody=message.msg;
+    console.log(messagebody);
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
     });
@@ -877,8 +914,13 @@ edit_capture.style.visibility = 'hidden';
 */
 
 
-function editMessage(messageId, messageContent) {
+function editMessage(messageId) {
 
+    const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
+    var messageContent=message.msg;
+    console.log(messageContent);
+
+    
     if (messageContent) {
         document.getElementById('editMessageDiv').style.display = 'block';
 
@@ -1020,10 +1062,14 @@ function removeEditMessage() {
 }
 
 //Show Reply Message
-function showReply(message_id, messagebody, senderName,type) {
-    console.log('MessageId: ' + message_id);
-    console.log('MessageBody: ' + messagebody);
-    console.log('SenderName: ' + type);
+function showReply(message_id,senderName,type) {
+   
+    
+    const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
+    var messagebody=message.msg;
+    console.log(messagebody);
+
+
     DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
