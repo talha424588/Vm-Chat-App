@@ -39,7 +39,7 @@
         .audio-content {
             flex: 1;
             padding-top: 14px;
-    padding-right: 10px;
+            padding-right: 10px;
         }
 
         .audio-controls {
@@ -54,12 +54,14 @@
             cursor: pointer;
             margin-right: 10px;
         }
+
         .playbutton {
             background: none;
             border: none;
             cursor: pointer;
             margin-right: 10px;
         }
+
         .audio-progress {
             width: 100%;
             background-color: #f0f0f0;
@@ -201,7 +203,7 @@
 
                 <div class="row d-flex flex-row align-items-center p-2" id="navbar">
                     <img alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; cursor:pointer;"
-                         id="display-pic">
+                        id="display-pic">
                     <div class="username-container">
                         <div class="text-dark font-weight-bold" id="username"></div>
                         <small class="text-muted">Online</small>
@@ -404,7 +406,7 @@
                     </div>
 
 
-                    <div id="correction-div"  style=" display: none;">
+                    <div id="correction-div" style=" display: none;">
                         <div id="quoted-messages" class="quoted-message">
                             <div class="quoted-content">
                                 <span class="sender-name">Siraj</span>
@@ -417,19 +419,22 @@
 
 
 
-<!---Edit Message Area Start-->
-<div id="editMessageDiv" style="padding-right:30px; padding-left:30px; padding-top:10px; display:none;">
-  <div class="d-flex justify-content-between align-items-center">
-    <span class="cursor" onclick="removeEditMessage()" style="margin-right: auto;">✖</span>
-    <div class="align-self-end self d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item right-nidle">
-      <div style="margin-top:-4px">
-        <div class="shadow-sm EditmessageContent" style="background:#dcf8c6; padding:10px; border-radius:5px;">
-          ${messageContent}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+                    <!---Edit Message Area Start-->
+                    <div id="editMessageDiv"
+                        style="padding-right:30px; padding-left:30px; padding-top:10px; display:none;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="cursor" onclick="removeEditMessage()" style="margin-right: auto;">✖</span>
+                            <div
+                                class="align-self-end self d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item right-nidle">
+                                <div style="margin-top:-4px">
+                                    <div class="shadow-sm EditmessageContent"
+                                        style="background:#dcf8c6; padding:10px; border-radius:5px;">
+                                        ${messageContent}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!---Edit Message Area Start-->
                     <div id="editMessageDiv"
@@ -491,14 +496,15 @@
                                         fill="#687780" />
                                 </svg>
                             </i>
-                            <i class="chat-icon chat_action_capture" id="captureid"><svg width="31" height="20"
-                                    viewBox="0 0 19 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <i class="chat-icon chat_action_capture" id="captureid"><svg width="31"
+                                    height="20" viewBox="0 0 19 23" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M20 2.6087H16.987L15.5054 0.386957C15.4261 0.267991 15.3186 0.170438 15.1925 0.102941C15.0664 0.0354437 14.9256 8.58749e-05 14.7826 0H7.82609C7.68307 8.58749e-05 7.54229 0.0354437 7.41621 0.102941C7.29012 0.170438 7.18263 0.267991 7.10326 0.386957L5.62065 2.6087H2.6087C1.91683 2.6087 1.25329 2.88354 0.764069 3.37276C0.274844 3.86199 0 4.52552 0 5.21739V17.3913C0 18.0832 0.274844 18.7467 0.764069 19.2359C1.25329 19.7252 1.91683 20 2.6087 20H20C20.6919 20 21.3554 19.7252 21.8446 19.2359C22.3339 18.7467 22.6087 18.0832 22.6087 17.3913V5.21739C22.6087 4.52552 22.3339 3.86199 21.8446 3.37276C21.3554 2.88354 20.6919 2.6087 20 2.6087ZM20.8696 17.3913C20.8696 17.6219 20.778 17.8431 20.6149 18.0062C20.4518 18.1693 20.2306 18.2609 20 18.2609H2.6087C2.37807 18.2609 2.1569 18.1693 1.99382 18.0062C1.83075 17.8431 1.73913 17.6219 1.73913 17.3913V5.21739C1.73913 4.98677 1.83075 4.76559 1.99382 4.60252C2.1569 4.43944 2.37807 4.34783 2.6087 4.34783H6.08696C6.23015 4.34792 6.37116 4.31265 6.49745 4.24514C6.62373 4.17764 6.7314 4.07999 6.81087 3.96087L8.2913 1.73913H14.3163L15.7978 3.96087C15.8773 4.07999 15.985 4.17764 16.1112 4.24514C16.2375 4.31265 16.3785 4.34792 16.5217 4.34783H20C20.2306 4.34783 20.4518 4.43944 20.6149 4.60252C20.778 4.76559 20.8696 4.98677 20.8696 5.21739V17.3913ZM11.3043 6.08696C10.3584 6.08696 9.43377 6.36745 8.64727 6.89297C7.86078 7.41849 7.24778 8.16543 6.88579 9.03934C6.52381 9.91325 6.4291 10.8749 6.61364 11.8026C6.79817 12.7303 7.25367 13.5825 7.92253 14.2514C8.59139 14.9202 9.44357 15.3757 10.3713 15.5603C11.299 15.7448 12.2607 15.6501 13.1346 15.2881C14.0085 14.9261 14.7554 14.3131 15.2809 13.5266C15.8065 12.7401 16.087 11.8155 16.087 10.8696C16.0855 9.60158 15.5812 8.38594 14.6846 7.48934C13.788 6.59274 12.5723 6.08839 11.3043 6.08696ZM11.3043 13.913C10.7024 13.913 10.114 13.7345 9.61348 13.4001C9.11298 13.0657 8.72289 12.5904 8.49254 12.0343C8.26219 11.4781 8.20192 10.8662 8.31935 10.2758C8.43678 9.68543 8.72665 9.14314 9.15228 8.7175C9.57792 8.29186 10.1202 8.002 10.7106 7.88457C11.301 7.76713 11.9129 7.8274 12.469 8.05776C13.0252 8.28811 13.5005 8.6782 13.8349 9.1787C14.1693 9.6792 14.3478 10.2676 14.3478 10.8696C14.3478 11.6767 14.0272 12.4509 13.4564 13.0216C12.8857 13.5924 12.1115 13.913 11.3043 13.913Z"
                                         fill="#687780" />
 
                                 </svg></i>
-					<i id="voice-icon" class="chat-icon chat_action_voice" >
+                            <i id="voice-icon" class="chat-icon chat_action_voice">
 
 
                                 <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
@@ -516,7 +522,7 @@
 
 
 
-						<div class="chat-action-icons" id="Editreply-area" style="display:none; margin-left: 5px;">
+                        <div class="chat-action-icons" id="Editreply-area" style="display:none; margin-left: 5px;">
 
 
                             <i id="send-message-btn" class="chat-icon">
@@ -548,29 +554,17 @@
                             </i>
                         </div>
 
-						 </div>
+                    </div>
 
-
-
-
-
-
-
-
-
-                         <input type="hidden" class="number" id="correction_message_id">
- <input type="hidden" class="number" id="edit_message_id">
- <input type="file" id="hidden-file-input" name="photo" accept=".jpg, .jpeg, .png"  />
+                    <input type="hidden" class="number" id="correction_message_id">
+                    <input type="hidden" class="number" id="edit_message_id">
+                    <input type="file" id="hidden-file-input" name="photo" accept=".jpg, .jpeg, .png" />
 
                     <!-- Hidden file input for multiple files -->
                     <input type="file" id="file-input" multiple accept=".pdf, .doc, .docx">
 
-
                 </div>
             </div>
-
-
-
 
             <div id="sidebar" class="sidebar-closed col-md-4">
                 <div class="header-shadow">
@@ -715,7 +709,6 @@
                 if (unreadCountElement && unreadCountElement.style.display !== 'none') {
                     unreadCount = parseInt(unreadCountElement.innerText);
                 }
-                console.log(unreadCount);
 
                 // If unreadCount is greater than 0, show the chat item and set the flag
                 if (unreadCount > 0) {
@@ -745,9 +738,6 @@
     </script>
 
 
-
-
-
     <script type="module">
         import {
             Picker
@@ -772,10 +762,10 @@
                 if (isPickerVisible) {
                     // Position the emoji picker at the bottom of the viewport
                     emojiPickerWrapper.style.position =
-                    'fixed'; // Position it fixed relative to the viewport
+                        'fixed'; // Position it fixed relative to the viewport
                     emojiPickerWrapper.style.top = 'auto'; // Reset the top position
                     emojiPickerWrapper.style.bottom =
-                    '8%'; // Align the bottom of the picker with the bottom of the viewport
+                        '8%'; // Align the bottom of the picker with the bottom of the viewport
                     emojiPickerWrapper.style.left = '34%'; // Adjust the left position if needed
 
                     emojiPickerWrapper.style.display = 'block'; // Show the picker
@@ -881,8 +871,8 @@
     </script>
 
 
- <!-- Include jQuery -->
- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Include Bootstrap JS -->
 
 </body>
