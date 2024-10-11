@@ -98,7 +98,7 @@ class ChatController extends Controller
                 $message->reply->user ? User::where("unique_id", $message->sender)->first() : "null";
             }
 
-            dispatch(new SendNotificationJob(json_encode($request->user['fcm_token']), $user['name'],$message->msg, $this->firebaseService));
+            // dispatch(new SendNotificationJob(json_encode($request->user['fcm_token']), $user['name'],$message->msg, $this->firebaseService));
             return response()->json($message, 201);
         }
     }

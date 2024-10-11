@@ -42,6 +42,7 @@ let user = {
     email: document.getElementById("login_user_email").value,
     fcm_token: document.getElementById("login_user_fcm_token").value,
     seen_privacy: document.getElementById("login_user_seen_privacy").value,
+    role: document.getElementById("login_user_role").value,
     pic: "assets/images/profile-picture.webp"
 };
 let userGroupList = [];
@@ -342,10 +343,13 @@ socket.on('sendChatToClient', (message) => {
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
-        if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
-
+        if (message.sender !== unique_id && (!seenBy || !seenBy.includes(unique_id)) && DOM.groupId != groupToUpdate.group.group_id) {
             groupToUpdate.unread += 1;
             DOM.unreadMessagesPerGroup[groupId] += 1;
+        } else if (seenBy && seenBy.includes(unique_id)) {
+            // Login user message leave it,
+        } else {
+            updateMessageSeenBy([groupToUpdate.msg.id,]);
         }
 
         chatList.sort((a, b) => {
@@ -678,6 +682,7 @@ let addMessageToMessageArea = (message) => {
 
                             </div>
                                       <!-- Dropdown menu for actions -->
+                                      <!---
       ${message.sender === user.unique_id ? `
         <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
           <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -693,7 +698,36 @@ let addMessageToMessageArea = (message) => {
 
           </div>
         </div>
+      ` : ''}---->
+
+      ${message.sender === user.unique_id ? `
+        <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
+          <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-angle-down text-muted px-2"></i>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            ${!(user.role === '0' || user.role === '2') ? `
+              <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+            ` : ''}
+            ${user.role === '0' || user.role === '2' ? `
+              <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+              <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+              <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+            ` : ''}
+            <!---
+            ${user.role === '0' || user.role === '2' ? `
+              <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+            ` : ''}---->
+            ${user.role === '0' || user.role === '2' ? `
+              <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+            ` : ''}
+            ${user.role === '3' && message.sender === user.unique_id ? `
+              <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+            ` : ''}
+          </div>
+        </div>
       ` : ''}
+
                        </div>
                     </div>
                 </div>
