@@ -77,12 +77,9 @@ class ChatController extends Controller
 
     public function store(Request $request)
     {
+
         $user = $request->input('user');
         $uniqueId = $user['unique_id'];
-        // $fcmToken = $user['fcm_token'];
-        Log::info('token from store function : ' . json_encode($user));
-        Log::info('request details : ' . json_encode($request->user['fcm_token']));
-
 
         $message = new GroupMessage;
         $message->msg = $request->message;
@@ -101,7 +98,7 @@ class ChatController extends Controller
                 $message->reply->user ? User::where("unique_id", $message->sender)->first() : "null";
             }
 
-            // dispatch(new SendNotificationJob(json_encode($request->user['fcm_token']), $message->msg, $this->firebaseService));
+            dispatch(new SendNotificationJob(json_encode($request->user['fcm_token']), $user['name'],$message->msg, $this->firebaseService));
             return response()->json($message, 201);
         }
     }

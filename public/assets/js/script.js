@@ -32,6 +32,7 @@ const DOM = {
     replyId: null,
     moveMessageUser: null,
     messagesList: getById("messagesList"),
+    fcmToken:null
 };
 let user = {
 
@@ -1776,14 +1777,14 @@ let sendMessage = (type = 'Message', mediaName = null) => {
 
             // Send "Alert!!!" to the backend to save in DB
             let msg = {
-                user: user,
+                user: user.fcm_token ? user:user.fcm_token = DOM.fcmToken,
                 message: alertMessage,
                 reply_id: DOM.replyId ?? "",
                 group_id: DOM.groupId,
                 type: type,
                 mediaName: mediaName,
                 time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken
+                csrf_token: csrfToken,
             };
             socket.emit('sendChatToServer', msg);
         } else {
@@ -1880,6 +1881,8 @@ Notification.requestPermission().then(permission => {
         messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
             if (token) {
                 let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                user.fcm_token = token;
+                DOM.fcmToken = token;
                 const updateUserFcmToken = fetch("user/update/" + token, {
                     method: "POST",
                     headers: {

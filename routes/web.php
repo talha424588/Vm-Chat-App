@@ -78,3 +78,8 @@ Route::post('/messages', [ChatController::class, 'store']);
 
 Route::get("/accessToken", [FirebaseService::class, 'sendMessageNotification']);
 
+
+
+Route::get('/send-notification', [FirebaseService::class, 'sendNotification']);
+
+
