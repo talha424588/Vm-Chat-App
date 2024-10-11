@@ -700,7 +700,6 @@ let addMessageToMessageArea = (message) => {
             </div>
         </div>
     `;
-
     
     var messageDiv = document.getElementById("messages");
     var messageItems = messageDiv.getElementsByClassName("message-item");
