@@ -11,7 +11,7 @@
         integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
@@ -191,8 +191,8 @@
 
 
 
-    
-   
+
+
     <div class="container-fluid" id="main-container">
         <div class="row h-100">
             <div class="col-12 col-sm-5 col-md-4 d-flex flex-column" id="chat-list-area" style="position:relative;">
@@ -634,7 +634,7 @@
                     <h5>Users who have seen this message:</h5>
                     {{-- <p class="not-recover" id="is_read">awais-designer, VM-UST-SA, Talha Dev</p> --}}
                     <p class="not-recover" id="is_read"></p>
-                   
+
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Ok</button>
                 </div>
             </div>
@@ -654,7 +654,7 @@
                     <h5>Unable to send file!</h5>
                     <p class="not-recover">The file you have selected is larger than 5 MB</p>
                     <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Ok</button>
-                   
+
                 </div>
 
             </div>
@@ -666,6 +666,7 @@
     <input type="hidden" value="{{ Auth::user()->email }}" id="login_user_email">
     <input type="hidden" value="{{ Auth::user()->fcm_token }}" id="login_user_fcm_token">
     <input type="hidden" value="{{ Auth::user()->seen_privacy }}" id="login_user_seen_privacy">
+    <input type="hidden" value="{{ Auth::user()->role }}" id="login_user_role">
     {{-- <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script> --}}
     {{-- @vite(['resources/js/app.js']) --}}
     <style>
@@ -866,7 +867,7 @@
     </script>
     <script src="{{ asset('assets/js/date-utils.js') }}"></script>
     <script src="{{ asset('assets/js/script.js') }}"></script>
-   
+
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
     {{-- <script src="https://www.gstatic.com/firebasejs/8.2.2/firebase-app.js"></script>
@@ -882,7 +883,7 @@
 
  <!-- Include jQuery -->
  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Include Bootstrap JS --> 
+    <!-- Include Bootstrap JS -->
 
 </body>
 
