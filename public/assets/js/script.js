@@ -688,6 +688,7 @@ let addMessageToMessageArea = (message) => {
         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
           <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
       ` : ''}
+
             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
 
@@ -701,6 +702,7 @@ let addMessageToMessageArea = (message) => {
         </div>
     `;
 
+    
     var messageDiv = document.getElementById("messages");
     var messageItems = messageDiv.getElementsByClassName("message-item");
     var count = messageItems.length;
