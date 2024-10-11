@@ -715,7 +715,6 @@ let addMessageToMessageArea = (message) => {
       if(unread!=0){
         notificationDiv.style.display = 'block';
                    }else{
-
                  scroll_function();
 
 //                     scroll_function();
