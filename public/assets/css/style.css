@@ -1001,3 +1001,7 @@ body{
     font-size: 18px;
     color: #666;
   }
+
+  .cursor{
+	cursor: pointer;
+  }
