@@ -91,6 +91,7 @@ class ChatController extends Controller
         $message->media_name = $request->mediaName;
         $message->time = $request->time;
         $message->status = EnumMessageEnum::NEW;
+        $message->is_compose = false;
         if ($message->save()) {
             $message->user = User::where("unique_id", $uniqueId)->first();
             if ($message->reply_id) {

@@ -57,6 +57,7 @@ class MessageResourceCollection extends ResourceCollection
             'reply_id' => $message->reply->reply_id,
             'seen_by' => $message->reply->seen_by,
             'time' => $message->reply->time,
+            'is_compose' => $message->is_compose,
         ] : null;
 
         return [
@@ -69,6 +70,7 @@ class MessageResourceCollection extends ResourceCollection
             'time' => $message->time,
             'type' => $message->type,
             'media_name' => $message->media_name,
+            'is_compose' => $message->is_compose,
             'user' => [
                 'id' => $message->user->id,
                 'unique_id' => $message->user->unique_id,
