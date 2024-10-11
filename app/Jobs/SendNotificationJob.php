@@ -16,12 +16,14 @@ class SendNotificationJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $token;
+    private $senderName;
     private $message;
     private $firebaseService;
 
-    public function __construct($token, $message, FirebaseService $firebaseService)
+    public function __construct($token,$senderName, $message, FirebaseService $firebaseService)
     {
         $this->token = $token;
+        $this->senderName = $senderName;
         $this->message = $message;
         $this->firebaseService = $firebaseService;
     }
@@ -30,10 +32,11 @@ class SendNotificationJob implements ShouldQueue
     {
         $request = new Request();
         $request->merge([
+            'senderName' => $this->senderName,
             'message' => $this->message,
             'token' => $this->token
         ]);
 
-        $this->firebaseService->sendMessageNotification($request);
+        $this->firebaseService->sendNotification($request);
     }
 }
