@@ -713,7 +713,9 @@ let addMessageToMessageArea = (message) => {
             ${user.role === '0' || user.role === '2' ? `
               <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
               <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+              ${ message.is_compose === 1 && message.type === "Message"? `
               <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+              ` : ''}
             ` : ''}
             <!---
             ${user.role === '0' || user.role === '2' ? `
@@ -735,7 +737,7 @@ let addMessageToMessageArea = (message) => {
             </div>
         </div>
     `;
-    
+
     var messageDiv = document.getElementById("messages");
     var messageItems = messageDiv.getElementsByClassName("message-item");
     var count = messageItems.length;
