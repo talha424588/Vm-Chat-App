@@ -44,7 +44,7 @@ class ChatService implements ChatRepository
             //     ->paginate($perPage, ['*'], 'page', $page);
 
             $paginator = GroupMessage::where('group_id', $request->groupId)
-                ->where('is_deleted', false) // Add this line to filter out deleted messages
+                ->where('is_deleted', false)
                 ->with('user', 'reply')
                 ->orderBy('id', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);

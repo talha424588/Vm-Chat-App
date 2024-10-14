@@ -32,7 +32,7 @@ const DOM = {
     replyId: null,
     moveMessageUser: null,
     messagesList: getById("messagesList"),
-    fcmToken:null
+    fcmToken: null
 };
 let user = {
 
@@ -138,7 +138,7 @@ let viewChatList = () => {
     }
 
     DOM.chatList.innerHTML = "";
-    DOM.chatList2.innerHTML="";
+    DOM.chatList2.innerHTML = "";
     chatList.sort((a, b) => {
         if (a.time && b.time) {
             return mDate(b.time).subtract(a.time);
@@ -175,7 +175,7 @@ let viewChatList = () => {
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
 
 
- DOM.chatList2.innerHTML += `
+                DOM.chatList2.innerHTML += `
             <div style="width:95%; margin-left:10px;" class="d-flex flex-row  p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
                 <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
                 <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
@@ -191,7 +191,7 @@ let viewChatList = () => {
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
                 <div class="name list-user-name">${elem.group.name}</div>
-                <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${messageText}</div>
+                <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${messageText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
               </div>
 
               <div class="flex-grow-1 text-right">
@@ -396,6 +396,7 @@ socket.on('moveMessage', () => {
 });
 
 let addMessageToMessageArea = (message) => {
+
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -407,17 +408,21 @@ let addMessageToMessageArea = (message) => {
     let senderName = message.user.name;
 
     let messageContent;
+    let oldMessageType;
+    // if (!message.type) {
+    //     if (/<audio[^>]+>/g.test(message.msg)) {
+    //         oldMessageType = "Audio";
+    //     } else if (/<[^>]+>/g.test(message.msg)) {
+    //         oldMessageType = "File";
+    //     }
+    // }
 
-  console.log(message);
-
-
-
-    if (message.type === 'File') {
+    if (message.type === 'File' || oldMessageType == "File") {
+        console.log("file:type",message);
         if (message.reply) {
-            console.log("Reply Message: " + message.reply.msg);
-            if(message.reply.type==='Image'){
+            if (message.reply.type === 'Image') {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-            }else if(message.reply.type==='File'){
+            } else if (message.reply.type === 'File') {
                 var message_body = ` <div class="file-message" >
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -435,7 +440,7 @@ let addMessageToMessageArea = (message) => {
                     </svg>
                 </a>
             </div>`;
-            }else if(message.reply.type==='Audio'){
+            } else if (message.reply.type === 'Audio') {
                 var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
             <div class="avatar">
                 <!-- Avatar image here -->
@@ -455,8 +460,8 @@ let addMessageToMessageArea = (message) => {
                 </div>
             </div>
         </div>`;
-            }else{
-                var message_body=message.reply.msg;
+            } else {
+                var message_body = message.reply.msg;
             }
             var add_file_view = `
             <div class="file-message"  onclick="scrollToMessage('${message.reply.id}')">
@@ -560,9 +565,9 @@ let addMessageToMessageArea = (message) => {
         if (message.reply) {
 
 
-            if(message.reply.type==='Image'){
+            if (message.reply.type === 'Image' || oldMessageType == "File") {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-            }else if(message.reply.type==='File'){
+            } else if (message.reply.type === 'File' || oldMessageType == "File") {
                 var message_body = ` <div class="file-message" >
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -580,7 +585,7 @@ let addMessageToMessageArea = (message) => {
                     </svg>
                 </a>
             </div>`;
-            }else if(message.reply.type==='Audio'){
+            } else if (message.reply.type === 'Audio' || oldMessageType == "Audio") {
                 var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
             <div class="avatar">
                 <!-- Avatar image here -->
@@ -600,11 +605,9 @@ let addMessageToMessageArea = (message) => {
                 </div>
             </div>
         </div>`;
-            }else{
-                var message_body=message.reply.msg;
+            } else {
+                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');;
             }
-
-            console.log("Reply Message: " + message.reply.msg);
 
             messageContent = `
             <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
@@ -616,14 +619,15 @@ let addMessageToMessageArea = (message) => {
                     <p class="file-name">${message_body}</p>
                 </div>
             </div>
-            <div class="reply-message-area">${messageContent || (message.message ?? message.msg)}</div> <!-- Updated this line -->
+        <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
         `;
         } else {
-            messageContent = messageContent || (message.message ?? message.msg);
+            // messageContent = messageContent || (message.message ?? message.msg);
+            messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');;
         }
 
     }
-    else if (message.type === 'Audio') {
+    else if (message.type === 'Audio' || oldMessageType == "Audio") {
         const audioSrc = message.msg;
 
         messageContent = `
@@ -649,7 +653,6 @@ let addMessageToMessageArea = (message) => {
         </div>
     `;
     }
-
     DOM.messages.innerHTML += `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
@@ -713,7 +716,7 @@ let addMessageToMessageArea = (message) => {
             ${user.role === '0' || user.role === '2' ? `
               <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
               <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-              ${ message.is_compose === 1 && message.type === "Message"? `
+              ${message.is_compose === 1 && message.type === "Message" ? `
               <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
               ` : ''}
             ` : ''}
@@ -749,16 +752,16 @@ let addMessageToMessageArea = (message) => {
         document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
         notificationDiv.textContent = unread;
-      if(unread!=0){
-        notificationDiv.style.display = 'block';
-                   }else{
-                 scroll_function();
+        if (unread != 0) {
+            notificationDiv.style.display = 'block';
+        } else {
+            scroll_function();
 
-//                     scroll_function();
+            //                     scroll_function();
 
-                   }
+        }
 
-    }else{
+    } else {
         scroll_function();
 
     }
@@ -847,10 +850,10 @@ function tinymce_init(callback) {
     }
 }
 
-function CorrectionMessage(message_id,  senderName) {
+function CorrectionMessage(message_id, senderName) {
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
-    var messagebody=message.msg;
+    var messagebody = message.msg;
     console.log(messagebody);
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
@@ -883,7 +886,7 @@ function correction_call(message_id, messagebody, senderName) {
 
     document.querySelector('.chat_action_file').style.display = 'none';
 
-    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function(element) {
+    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
         element.style.visibility = 'hidden';
     });
 
@@ -982,7 +985,7 @@ function removecorrectionMessage() {
 
     const correctionreplyarea = document.getElementById('correctionreply-area');
 
-    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function(element) {
+    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
         element.style.display = 'block';
         element.style.visibility = 'visible';
     });
@@ -998,7 +1001,7 @@ function removecorrectionMessage() {
     }
 
     // Select the element with the ID 'chat_action'
-    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function(element) {
+    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
         element.style.visibility = 'visible';
     });
 
@@ -1084,64 +1087,64 @@ function handleSendMessage() {
     const messageId = document.getElementById('edit_message_id').value;
     let messageContent = document.getElementById('input').value;
 
-    if(messageContent!==''){
+    if (messageContent !== '') {
 
 
-    const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
-    console.log(messageIndex);
-    if (messageIndex !== -1) {
-        console.log("insidec");
-        console.log(pagnicateChatList.data[messageIndex].msg = messageContent);
-        console.log(pagnicateChatList);
-        pagnicateChatList.data[messageIndex].msg = messageContent;
+        const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
+        console.log(messageIndex);
+        if (messageIndex !== -1) {
+            console.log("insidec");
+            console.log(pagnicateChatList.data[messageIndex].msg = messageContent);
+            console.log(pagnicateChatList);
+            pagnicateChatList.data[messageIndex].msg = messageContent;
+        }
+
+        const editMessageDiv = document.getElementById('editMessageDiv');
+        const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
+        editMessageContentDiv.innerHTML = messageContent;
+
+        const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+        const messageContentDiv = messageElement.querySelector('div.shadow-sm');
+        messageContentDiv.innerHTML = messageContent;
+
+        document.getElementById('input').value = "";
+        let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+        fetch("message/update", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-CSRF-Token": csrfToken,
+            },
+            body: JSON.stringify({ id: messageId, message: messageContent.replace(/[\r\n]+/g, ' ') }),
+        })
+            .then((response) => response.json())
+            .then((data) => console.log(data))
+            .catch((error) => console.error(error));
+
+        document.getElementById('editMessageDiv').style.display = 'none';
+        const textarea = document.getElementById('input');
+        textarea.value = '';
+        const messageDiv = document.getElementById('messages');
+        messageDiv.classList.remove('blur');
+        const chat_action = document.getElementById('chat_action');
+        chat_action.style.display = 'block';
+        chat_action.style.display = 'flex';
+        const Editreplyarea = document.getElementById('Editreply-area');
+
+        Editreplyarea.style.display = 'none';
+        const fileicon = document.querySelector('.chat_action_file');
+        fileicon.style.visibility = 'visible';
+        const chat_action_capture = document.querySelector('.chat_action_capture');
+        chat_action_capture.style.visibility = 'visible';
+        const chat_action_voice = document.querySelector('.chat_action_voice');
+        chat_action_voice.style.visibility = 'visible';
+        chat_action_voice.style.display = 'block';
+        const correctionarea = document.getElementById('correction-div');
+        correctionarea.style.display = 'none';
+    } else {
+        // alert('Error');
     }
-
-    const editMessageDiv = document.getElementById('editMessageDiv');
-    const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
-    editMessageContentDiv.innerHTML = messageContent;
-
-    const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-    const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    messageContentDiv.innerHTML = messageContent;
-
-    document.getElementById('input').value = "";
-    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
-    fetch("message/update", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            "X-CSRF-Token": csrfToken,
-        },
-        body: JSON.stringify({ id: messageId, message: messageContent.replace(/[\r\n]+/g, ' ') }),
-    })
-        .then((response) => response.json())
-        .then((data) => console.log(data))
-        .catch((error) => console.error(error));
-
-    document.getElementById('editMessageDiv').style.display = 'none';
-    const textarea = document.getElementById('input');
-    textarea.value = '';
-    const messageDiv = document.getElementById('messages');
-    messageDiv.classList.remove('blur');
-    const chat_action = document.getElementById('chat_action');
-    chat_action.style.display = 'block';
-    chat_action.style.display = 'flex';
-    const Editreplyarea = document.getElementById('Editreply-area');
-
-    Editreplyarea.style.display = 'none';
-    const fileicon = document.querySelector('.chat_action_file');
-    fileicon.style.visibility = 'visible';
-    const chat_action_capture = document.querySelector('.chat_action_capture');
-    chat_action_capture.style.visibility = 'visible';
-    const chat_action_voice = document.querySelector('.chat_action_voice');
-    chat_action_voice.style.visibility = 'visible';
-    chat_action_voice.style.display = 'block';
-    const correctionarea = document.getElementById('correction-div');
-    correctionarea.style.display = 'none';
-}else{
-   // alert('Error');
-}
 }
 // Add event listener to the send message button
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
@@ -1172,11 +1175,11 @@ function removeEditMessage() {
 }
 
 //Show Reply Message
-function showReply(message_id,senderName,type) {
+function showReply(message_id, senderName, type) {
 
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
-    var messagebody=message.msg;
+    var messagebody = message.msg;
     console.log(messagebody);
 
 
@@ -1191,9 +1194,9 @@ function showReply(message_id,senderName,type) {
     quotedTextElement.textContent = senderName;
 
     var quotedNameElement = document.querySelector('#quoted-message .quoted-text');
-    if(type==='Image'){
+    if (type === 'Image') {
         var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
-    }else if(type==='File'){
+    } else if (type === 'File') {
         var message_body = ` <div class="file-message" >
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1211,7 +1214,7 @@ function showReply(message_id,senderName,type) {
                     </svg>
                 </a>
             </div>`;
-    }else if(type==='Audio'){
+    } else if (type === 'Audio') {
         var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
             <div class="avatar">
                 <!-- Avatar image here -->
@@ -1231,8 +1234,8 @@ function showReply(message_id,senderName,type) {
                 </div>
             </div>
         </div>`;
-    }else{
-        var message_body=messagebody;
+    } else {
+        var message_body = messagebody;
     }
     quotedNameElement.innerHTML = message_body;
 
@@ -1388,11 +1391,11 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove) {
         .catch(error => console.error(error));
 
 
-        document.getElementById('selected-count').textContent = '';
-        document.getElementById('messages_ids').value = '';
-        document.getElementById('group_to_move_message').value = '';
-        selectedMessageIds = [];
-        selectedMessageIds.length = 0; // Clears the array
+    document.getElementById('selected-count').textContent = '';
+    document.getElementById('messages_ids').value = '';
+    document.getElementById('group_to_move_message').value = '';
+    selectedMessageIds = [];
+    selectedMessageIds.length = 0; // Clears the array
 
 
 }
@@ -1517,7 +1520,7 @@ let addNewMessageToArea = (message) => {
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                 <div style="margin-top:-4px">
                     <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; ">
-                        ${messageContent}
+                        ${messageContent.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}
                     </div>
                     <div>
                         <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -1526,9 +1529,10 @@ let addNewMessageToArea = (message) => {
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
                             </span> |
+                            <!---|
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
-                            </span> <!---|
+                            </span>
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                             </span>--->
@@ -1693,12 +1697,10 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-    if(searchMessage)
-    {
-        await fetchNextPageMessages(DOM.clickSearchMessageId,DOM.groupId);
+    if (searchMessage) {
+        await fetchNextPageMessages(DOM.clickSearchMessageId, DOM.groupId);
     }
-    else
-    {
+    else {
         const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
             method: 'GET',
             headers: {
@@ -1742,8 +1744,7 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
 };
 
 
-async function updateMessageSeenBy(ids)
-{
+async function updateMessageSeenBy(ids) {
     try {
         const response = await fetch("message/seen-by/update", {
             method: "POST",
@@ -1813,7 +1814,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
 
             // Send "Alert!!!" to the backend to save in DB
             let msg = {
-                user: user.fcm_token ? user:user.fcm_token = DOM.fcmToken,
+                user: user.fcm_token ? user : user.fcm_token = DOM.fcmToken,
                 message: alertMessage,
                 reply_id: DOM.replyId ?? "",
                 group_id: DOM.groupId,
@@ -2032,6 +2033,7 @@ document.getElementById('captureid').addEventListener('click', function () {
 });
 
 document.getElementById('hidden-file-input').addEventListener('change', function () {
+    console.log("asdfsdfsdfsdfsdfsdfsdfsdfsdf");
     const imageInput = this;
     if (imageInput.files.length > 0) {
         const image = imageInput.files[0];
@@ -2058,10 +2060,9 @@ fileIcon.addEventListener('click', () => {
 
 fileInput.addEventListener('change', (event) => {
 
-    if(event.target.files[0])
-    {
+    if (event.target.files[0]) {
         const file = event.target.files[0];
-        console.log("file",file);
+        console.log("file", file);
 
         const ref = firebase.storage().ref("files/" + DOM.unique_id);
         const mediaName = file.name;

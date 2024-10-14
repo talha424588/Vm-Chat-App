@@ -642,7 +642,7 @@
             <div class="modal-content">
 
                 <div class="modal-body">
-                    <img src="{{ asset('assets/svg/danger-5732_256.gif') }} svg/danger-5732_256.gif" alt=""
+                    <img src="{{ asset('assets/svg/danger-5732_256.gif') }}" alt=""
                         height="78px">
 
                     <h5>Unable to send file!</h5>
