@@ -396,6 +396,7 @@ socket.on('moveMessage', () => {
 });
 
 let addMessageToMessageArea = (message) => {
+
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -408,18 +409,16 @@ let addMessageToMessageArea = (message) => {
 
     let messageContent;
     let oldMessageType;
+    // if (!message.type) {
+    //     if (/<audio[^>]+>/g.test(message.msg)) {
+    //         oldMessageType = "Audio";
+    //     } else if (/<[^>]+>/g.test(message.msg)) {
+    //         oldMessageType = "File";
+    //     }
+    // }
 
-    if (/<audio[^>]+>/g.test(message.msg)) {
-        console.log("insider audio");
-        oldMessageType = "Audio";
-    } else if (/<[^>]+>/g.test(message.msg)) {
-        oldMessageType = "File";
-    }
-
-    console.log("message type", oldMessageType);
-
-
-    if (message.type === 'File' && oldMessageType == "File") {
+    if (message.type === 'File' || oldMessageType == "File") {
+        console.log("file:type",message);
         if (message.reply) {
             if (message.reply.type === 'Image') {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
@@ -566,9 +565,9 @@ let addMessageToMessageArea = (message) => {
         if (message.reply) {
 
 
-            if (message.reply.type === 'Image' && oldMessageType == "File") {
+            if (message.reply.type === 'Image' || oldMessageType == "File") {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-            } else if (message.reply.type === 'File' && oldMessageType == "File") {
+            } else if (message.reply.type === 'File' || oldMessageType == "File") {
                 var message_body = ` <div class="file-message" >
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -586,7 +585,7 @@ let addMessageToMessageArea = (message) => {
                     </svg>
                 </a>
             </div>`;
-            } else if (message.reply.type === 'Audio' && oldMessageType == "Audio") {
+            } else if (message.reply.type === 'Audio' || oldMessageType == "Audio") {
                 var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
             <div class="avatar">
                 <!-- Avatar image here -->
@@ -628,7 +627,7 @@ let addMessageToMessageArea = (message) => {
         }
 
     }
-    else if (message.type === 'Audio' && oldMessageType == "Audio") {
+    else if (message.type === 'Audio' || oldMessageType == "Audio") {
         const audioSrc = message.msg;
 
         messageContent = `
@@ -654,7 +653,6 @@ let addMessageToMessageArea = (message) => {
         </div>
     `;
     }
-    console.log("message details", message);
     DOM.messages.innerHTML += `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
@@ -2035,6 +2033,7 @@ document.getElementById('captureid').addEventListener('click', function () {
 });
 
 document.getElementById('hidden-file-input').addEventListener('change', function () {
+    console.log("asdfsdfsdfsdfsdfsdfsdfsdfsdf");
     const imageInput = this;
     if (imageInput.files.length > 0) {
         const image = imageInput.files[0];
