@@ -601,7 +601,7 @@ let addMessageToMessageArea = (message) => {
             </div>
         </div>`;
             }else{
-                var message_body=message.reply.msg;
+                var message_body= message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
             }
 
             console.log("Reply Message: " + message.reply.msg);
@@ -619,7 +619,10 @@ let addMessageToMessageArea = (message) => {
             <div class="reply-message-area">${messageContent || (message.message ?? message.msg)}</div> <!-- Updated this line -->
         `;
         } else {
-            messageContent = messageContent || (message.message ?? message.msg);
+            // messageContent = messageContent || (message.message ?? message.msg);
+            console.log("message content");
+            messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>');
+            console.log(messageContent);
         }
 
     }
@@ -649,7 +652,7 @@ let addMessageToMessageArea = (message) => {
         </div>
     `;
     }
-
+    console.log("message details",message);
     DOM.messages.innerHTML += `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}

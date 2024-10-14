@@ -193,4 +193,13 @@ class ChatController extends Controller
 
         return response()->json($updatedMessages);
     }
+
+
+    public function viewDocument(Request $request)
+    {
+        return $request;
+        $pdfPath = $request->input('doc');
+        // Validate or process the path if necessary
+        return view('pdf-viewer', compact('pdfPath'));
+    }
 }
