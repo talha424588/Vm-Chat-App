@@ -418,7 +418,7 @@ let addMessageToMessageArea = (message) => {
     // }
 
     if (message.type === 'File' || oldMessageType == "File") {
-        console.log("file:type",message);
+        console.log("file:type", message);
         if (message.reply) {
             if (message.reply.type === 'Image') {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
@@ -481,7 +481,7 @@ let addMessageToMessageArea = (message) => {
                     </svg>
                 </a>
             </div>
-        `;
+            `;
 
             messageContent = `
             <div class="file-message">
@@ -560,7 +560,7 @@ let addMessageToMessageArea = (message) => {
             <img src="${message.message ?? message.msg}" style="height:222px; width:54;">
         `;
         }
-    } else if (message.type === 'Message' || message.type === null) {
+    } else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
 
         if (message.reply) {
 
@@ -627,12 +627,18 @@ let addMessageToMessageArea = (message) => {
         }
 
     }
-    else if (message.type === 'Audio' || oldMessageType == "Audio") {
-        const audioSrc = message.msg;
+    else if (message.type === 'Audio' || /<audio[^>]+>/g.test(message.msg)) {
+        let audioSrc;
+        if (/<audio[^>]+>/g.test(message.msg)) {
+            const audioTag = message.msg.match(/<audio[^>]+>/g)[0];
+            audioSrc = audioTag.match(/src="([^"]+)"/)[1];
+        } else {
+            audioSrc = message.msg;
+        }
 
         messageContent = `
 
-<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+        <div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
@@ -653,6 +659,32 @@ let addMessageToMessageArea = (message) => {
         </div>
     `;
     }
+//     else if (message.type === 'Audio' || oldMessageType == "Audio") {
+//         const audioSrc = message.msg;
+
+//         messageContent = `
+
+// <div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+//             <div class="avatar">
+//                 <!-- Avatar image here -->
+//             </div>
+//             <div class="audio-content">
+//                 <div class="audio-controls">
+//                     <button class="play-button">
+//                         <img src="assets/img/play-icon.svg" alt="Play" />
+//                     </button>
+//                     <div class="audio-progress">
+//                         <div class="progress-filled"></div>
+//                     </div>
+//                 </div>
+//                 <div class="audio-time-container">
+//                     <span class="audio-duration">0:00</span>
+//                     <span class="audio-time">12:27 PM</span>
+//                 </div>
+//             </div>
+//         </div>
+//     `;
+//     }
     DOM.messages.innerHTML += `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
@@ -2296,7 +2328,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 if (messageElement) {
-                                    console.log("mesage element found",messageElement);
+                                    console.log("mesage element found", messageElement);
                                     // const messageTextElement = messageElement.querySelector(".shadow-sm");
                                     // console.log("message Text Element found",messageTextElement);
 
