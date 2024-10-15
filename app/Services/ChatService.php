@@ -131,6 +131,7 @@ class ChatService implements ChatRepository
     public function searchGroupMessages($query, $groupId)
     {
         $messages = GroupMessage::where("msg", "LIKE", "%$query%")
+            ->orWhere("media_name", "LIKE", "%$query%")
             ->where("group_id", $groupId)
             ->where('is_deleted', false)
             ->with("user")

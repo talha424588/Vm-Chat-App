@@ -2281,7 +2281,13 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultDateDiv.textContent = new Date(message.time * 1000).toLocaleDateString();
                             const resultTextDiv = document.createElement("div");
                             resultTextDiv.className = "result-text";
-                            resultTextDiv.textContent = message.msg;
+
+                            // resultTextDiv.textContent = message.msg;
+                            if (message.msg.startsWith("https://")) {
+                                resultTextDiv.textContent = message.media_name;
+                            } else {
+                                resultTextDiv.textContent = message.msg;
+                            }
                             resultItemDiv.appendChild(resultDateDiv);
                             resultItemDiv.appendChild(resultTextDiv);
                             searchResultsDiv.appendChild(resultItemDiv);
@@ -2320,12 +2326,12 @@ searchMessageInputFeild.addEventListener("input", function (e) {
     }
 })
 
-document.querySelector(".close-button").addEventListener("click", function () {
-    document.getElementById("messsage_search_query").value = "";
-    const searchResultsDiv = document.querySelector(".search-results");
-    searchResultsDiv.innerHTML = "";
-    removeHighlight();
-});
+// document.querySelector(".close-button").addEventListener("click", function () {
+//     document.getElementById("messsage_search_query").value = "";
+//     const searchResultsDiv = document.querySelector(".search-results");
+//     searchResultsDiv.innerHTML = "";
+//     removeHighlight();
+// });
 
 function removeHighlight() {
     const messageElements = DOM.messages.querySelectorAll(".shadow-sm");

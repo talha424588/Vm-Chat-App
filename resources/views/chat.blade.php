@@ -18,6 +18,8 @@
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-messaging.js"></script>
     <script src="https://cdn.tiny.cloud/1/6hun1luhhppu7pkwfe4vetbftca09vpcny2aoik7l4fmmlcf/tinymce/6/tinymce.min.js"
         referrerpolicy="origin"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
     <style>
         .audio-message {
@@ -565,7 +567,7 @@
 
                 </div>
             </div>
-
+            {{-- Message Search Bar --}}
             <div id="sidebar" class="sidebar-closed col-md-4">
                 <div class="header-shadow">
                     <div class="row d-flex flex-row align-items-center" id="navbar"
@@ -642,8 +644,7 @@
             <div class="modal-content">
 
                 <div class="modal-body">
-                    <img src="{{ asset('assets/svg/danger-5732_256.gif') }}" alt=""
-                        height="78px">
+                    <img src="{{ asset('assets/svg/danger-5732_256.gif') }}" alt="" height="78px">
 
                     <h5>Unable to send file!</h5>
                     <p class="not-recover">The file you have selected is larger than 5 MB</p>
@@ -872,7 +873,7 @@
 
 
     <!-- Include jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
     <!-- Include Bootstrap JS -->
 
 </body>
