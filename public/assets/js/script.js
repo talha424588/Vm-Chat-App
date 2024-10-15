@@ -2296,12 +2296,47 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 if (messageElement) {
-                                    const messageTextElement = messageElement.querySelector(".shadow-sm");
-                                    const messageText = messageTextElement.textContent.toLowerCase();
-                                    const index = messageText.indexOf(searchQuery);
-                                    if (index !== -1) {
-                                        const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
-                                        messageTextElement.innerHTML = highlightedText;
+                                    console.log("mesage element found",messageElement);
+                                    // const messageTextElement = messageElement.querySelector(".shadow-sm");
+                                    // console.log("message Text Element found",messageTextElement);
+
+                                    // const messageText = messageTextElement.textContent.toLowerCase();
+                                    // const index = messageText.indexOf(searchQuery);
+                                    // if (index !== -1) {
+                                    //     const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                                    //     messageTextElement.innerHTML = highlightedText;
+                                    // }
+                                    switch (message.type) {
+                                        case "Message":
+                                            const messageTextElement = messageElement.querySelector(".shadow-sm");
+                                            console.log("message Text Element found", messageTextElement);
+
+                                            const messageText = messageTextElement.textContent.toLowerCase();
+                                            const index = messageText.indexOf(searchQuery);
+                                            if (index !== -1) {
+                                                const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                                                messageTextElement.innerHTML = highlightedText;
+                                            }
+                                            break;
+                                        case "Image":
+                                            // Handle Image type
+                                            break;
+                                        case "Audio":
+                                            // Handle Audio type
+                                            break;
+                                        case "File":
+                                            const fileNameElement = messageElement.querySelector(".file-name");
+                                            if (fileNameElement) {
+                                                const fileName = fileNameElement.textContent;
+                                                const index = fileName.toLowerCase().indexOf(searchQuery);
+                                                if (index !== -1) {
+                                                    const highlightedFileName = fileName.substring(0, index) + `<span class="highlight">${fileName.substring(index, index + searchQuery.length)}</span>` + fileName.substring(index + searchQuery.length);
+                                                    fileNameElement.innerHTML = highlightedFileName;
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            console.log("Unknown message type:", message.type);
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
                                 } else {

@@ -128,11 +128,21 @@ class ChatService implements ChatRepository
         return response()->json(["status" => 200, "message" => "is read updated"]);
     }
 
-    public function searchGroupMessages($query, $groupId)
+    public function searchGroupMessages($searchQuery, $groupId)
     {
-        $messages = GroupMessage::where("msg", "LIKE", "%$query%")
-            ->orWhere("media_name", "LIKE", "%$query%")
+        // $messages = GroupMessage::where("msg", "LIKE", "%$query%")
+        //     ->orWhere("media_name", "LIKE", "%$query%")
+        //     ->where("group_id", $groupId)
+        //     ->where('is_deleted', false)
+        //     ->with("user")
+        //     ->get();
+
+        $messages = GroupMessage::where(function ($query) use ($searchQuery, $groupId) {
+            $query->where("msg", "LIKE", "%$searchQuery%")
+                ->orWhere("media_name", "LIKE", "%$searchQuery%");
+        })
             ->where("group_id", $groupId)
+            ->whereIn("type", ["File", "Message"])
             ->where('is_deleted', false)
             ->with("user")
             ->get();
