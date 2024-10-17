@@ -35,7 +35,7 @@ const DOM = {
     fcmToken: null,
     // displayed_edit_div:false,
     // displayed_correction_div:false,
-    displayed_message_div:false,
+    displayed_message_div: false,
 };
 let user = {
 
@@ -530,56 +530,40 @@ let addMessageToMessageArea = (message) => {
         `;
         }
     }
-    // else if (/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) && !message.reply) {
-    //     let fileLink;
-    //     if (/<a[^>]+>/g.test(message.msg)) {
-    //         const linkTag = message.msg.match(/<a[^>]+>/g)[0];
-    //         fileLink = linkTag.match(/href="([^"]+)"/)[1];
-    //         const mediaName = fileLink.split('uploads/')[1];
-    //         const displayMediaName = message.media_name || mediaName;
-    //         messageContent = `
-    //     <div class="file-message">
-    //         <div class="file-icon">
-    //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    //                 <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-    //                 <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-    //             </svg>
-    //         </div>
-    //         <div class="file-details">
-    //             <p class="file-name">${displayMediaName}</p>
+    else if (/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) && !message.reply) {
+        let fileLink;
+        // if (/<a[^>]+>/g.test(message.msg)) {
+        const linkTag = message.msg.match(/<a[^>]+>/g)[0];
+        fileLink = linkTag.match(/href="([^"]+)"/)[1];
+        const mediaName = fileLink.split('uploads/')[1];
+        const displayMediaName = message.media_name || mediaName;
+        const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
+        if (mediaType == "document") {
+            messageContent = `
+                <div class="file-message">
+                    <div class="file-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <p class="file-name">${displayMediaName}</p>
 
-    //         </div>
-    //         <a href="${fileLink}" target="_blank" download="${displayMediaName}" class="download-icon">
-    //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    //                 <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-    //             </svg>
-    //         </a>
-    //     </div>
-    // `;
-    //     } else {
-    //         // If the message is a Firebase link, use it as the file link
-    //         fileLink = message.msg;
-    //         messageContent = `
-    //     <div class="file-message">
-    //         <div class="file-icon">
-    //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    //                 <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-    //                 <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-    //             </svg>
-    //         </div>
-    //         <div class="file-details">
-    //             <p class="file-name">${message.media_name}</p>
-
-    //         </div>
-    //         <a href="${fileLink}" target="_blank" download="${message.media_name}" class="download-icon">
-    //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    //                 <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-    //             </svg>
-    //         </a>
-    //     </div>
-    // `;
-    //     }
-    // }
+                    </div>
+                    <a href="${fileLink}" target="_blank" download="${displayMediaName}" class="download-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                        </svg>
+                    </a>
+                </div>
+            `;
+        } else {
+            messageContent = `
+            <img src="${fileLink}" style="height:222px; width:54px;">
+        `;
+        }
+    }
 
     else if (message.type === 'Image') {
         if (message.reply) {
@@ -802,8 +786,12 @@ let addMessageToMessageArea = (message) => {
               <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
             ` : ''}
             ${user.role === '0' || user.role === '2' ? `
+            ${message.is_compose === 1 && message.type === "Message" ? `
               <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+               ` : ''}
+              ${message.is_compose === 1 && message.type === "Message" ? `
               <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+              ` : ''}
               ${message.is_compose === 1 && message.type === "Message" ? `
               <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
               ` : ''}
@@ -939,15 +927,14 @@ function tinymce_init(callback) {
 }
 
 function CorrectionMessage(message_id, senderName) {
-    
-    if(DOM.displayed_message_div)
-    {
-                removeEditMessage();
+
+    if (DOM.displayed_message_div) {
+        removeEditMessage();
     }
-    else{
-        DOM.displayed_message_div=!DOM.displayed_message_div;
+    else {
+        DOM.displayed_message_div = !DOM.displayed_message_div;
     }
- 
+
     // console.log(DOM);
     // const editDiv=document.getElementById('editMessageDiv');
     // if (window.getComputedStyle(editDiv).display === 'block') {
@@ -1123,12 +1110,11 @@ edit_capture.style.visibility = 'hidden';
 
 
 function editMessage(messageId) {
-    if(DOM.displayed_message_div)
-    {
+    if (DOM.displayed_message_div) {
         removecorrectionMessage();
     }
-    else{
-        DOM.displayed_message_div=!DOM.displayed_message_div;
+    else {
+        DOM.displayed_message_div = !DOM.displayed_message_div;
     }
 
     // const editDiv=document.getElementById('correction-div');
@@ -1770,6 +1756,34 @@ let addNewMessageToArea = (message) => {
                 <p>${message.message ?? message.msg}</p>
             `;
             break;
+        // case /<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) && !message.reply:
+        // let fileLink;
+        // // if (/<a[^>]+>/g.test(message.msg)) {
+        // const linkTag = message.msg.match(/<a[^>]+>/g)[0];
+        // fileLink = linkTag.match(/href="([^"]+)"/)[1];
+        // const mediaName = fileLink.split('uploads/')[1];
+        // const displayMediaName = message.media_name || mediaName;
+        // messageContent = `
+        //     <div class="file-message">
+        //         <div class="file-icon">
+        //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        //                 <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+        //                 <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+        //             </svg>
+        //         </div>
+        //         <div class="file-details">
+        //             <p class="file-name">${displayMediaName}</p>
+
+        //         </div>
+        //         <a href="${fileLink}" target="_blank" download="${displayMediaName}" class="download-icon">
+        //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        //                 <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+        //             </svg>
+        //         </a>
+        //     </div>
+        // `;
+        // break;
+
         default:
             messageContent = message.message ?? message.msg;
     }
@@ -1822,7 +1836,6 @@ let addNewMessageToArea = (message) => {
 
 const fetchNextPageMessages = async (message_id = null, current_Page = null) => {
     let nextPageMessages = [];
-    console.log("next page messages",pagnicateChatList);
     if (!message_id) {
         currentPage++;
     }
@@ -1959,8 +1972,7 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
     }
 
     DOM.messageAreaName.innerHTML = chat.name;
-   
-  
+
     // DOM.messageAreaPic.src = chat.isGroup ? chat.group.pic : chat.contact.pic;
 
     if (chat.isGroup) {
@@ -2041,62 +2053,85 @@ let showChatList = () => {
 };
 
 let sendMessage = (type = 'Message', mediaName = null) => {
-    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    if (socket.connected) {
+        let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        if (type == 'Message') {
+            const numberPattern = /\b\d{7,}\b/;
+            const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
 
-    if (type == 'Message') {
-        const numberPattern = /\b\d{7,}\b/;
-        const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
+            const fileIcon = document.querySelector('#file-icon');
+            const chaticon = document.querySelector('#captureid');
+            fileIcon.style.visibility = 'visible';
+            chaticon.style.visibility = 'visible';
+            let value = DOM.messageInput.value;
+            if (value === "") return;
+            let reason = '';
+            if (value.match(numberPattern)) {
+                reason = 'Contact Number';
+            } else if (value.match(emailPattern)) {
+                reason = 'Email Address';
+            }
+            if (reason !== '') {
+                // Send "Alert!!!" as the message
+                let alertMessage = "Alert!!!";
+                // Send email to dev3@visamtion.org with details
+                fetch('/alert-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        name: user.name,
+                        email: user.email,
+                        reason: reason,
+                        message: value,
+                    })
+                })
+                    .then(response => {
+                        console.log(response);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
 
-        const fileIcon = document.querySelector('#file-icon');
-        const chaticon = document.querySelector('#captureid');
-        fileIcon.style.visibility = 'visible';
-        chaticon.style.visibility = 'visible';
-        let value = DOM.messageInput.value;
-        if (value === "") return;
-        let reason = '';
-        if (value.match(numberPattern)) {
-            reason = 'Contact Number';
-        } else if (value.match(emailPattern)) {
-            reason = 'Email Address';
-        }
-        if (reason !== '') {
-            // Send "Alert!!!" as the message
-            let alertMessage = "Alert!!!";
-            // Send email to dev3@visamtion.org with details
-            fetch('/alert-email', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({
-                    name: user.name,
-                    email: user.email,
-                    reason: reason,
+                // Send "Alert!!!" to the backend to save in DB
+                let msg = {
+                    user: user.fcm_token ? user : user.fcm_token = DOM.fcmToken,
+                    message: alertMessage,
+                    reply_id: DOM.replyId ?? "",
+                    group_id: DOM.groupId,
+                    type: type,
+                    mediaName: mediaName,
+                    time: Math.floor(Date.now() / 1000),
+                    csrf_token: csrfToken,
+                };
+                socket.emit('sendChatToServer', msg);
+            } else {
+                // Send original message to the backend to save in DB
+                let msg = {
+                    user: user,
                     message: value,
-                })
-            })
-                .then(response => {
-                    console.log(response);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-
-            // Send "Alert!!!" to the backend to save in DB
-            let msg = {
-                user: user.fcm_token ? user : user.fcm_token = DOM.fcmToken,
-                message: alertMessage,
-                reply_id: DOM.replyId ?? "",
-                group_id: DOM.groupId,
-                type: type,
-                mediaName: mediaName,
-                time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken,
-            };
-            socket.emit('sendChatToServer', msg);
-        } else {
-            // Send original message to the backend to save in DB
+                    reply_id: DOM.replyId ?? "",
+                    group_id: DOM.groupId,
+                    type: type,
+                    mediaName: mediaName,
+                    time: Math.floor(Date.now() / 1000),
+                    csrf_token: csrfToken
+                };
+                socket.emit('sendChatToServer', msg);
+            }
+            DOM.messageInput.value = "";
+            DOM.replyId = null;
+        }
+        else {
+            const fileIcon = document.querySelector('#file-icon');
+            const chaticon = document.querySelector('#captureid');
+            fileIcon.style.visibility = 'visible';
+            chaticon.style.visibility = 'visible';
+            let value = DOM.messageInput.value;
+            if (value === "") return;
+            let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
             let msg = {
                 user: user,
                 message: value,
@@ -2108,31 +2143,12 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 csrf_token: csrfToken
             };
             socket.emit('sendChatToServer', msg);
+            DOM.messageInput.value = "";
+            DOM.replyId = null;
         }
-        DOM.messageInput.value = "";
-        DOM.replyId = null;
     }
     else {
-        const fileIcon = document.querySelector('#file-icon');
-        const chaticon = document.querySelector('#captureid');
-        fileIcon.style.visibility = 'visible';
-        chaticon.style.visibility = 'visible';
-        let value = DOM.messageInput.value;
-        if (value === "") return;
-        let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-        let msg = {
-            user: user,
-            message: value,
-            reply_id: DOM.replyId ?? "",
-            group_id: DOM.groupId,
-            type: type,
-            mediaName: mediaName,
-            time: Math.floor(Date.now() / 1000),
-            csrf_token: csrfToken
-        };
-        socket.emit('sendChatToServer', msg);
-        DOM.messageInput.value = "";
-        DOM.replyId = null;
+        alert("something went wrong")
     }
 
 };
