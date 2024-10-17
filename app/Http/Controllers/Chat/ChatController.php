@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Google\Client;
 
 class ChatController extends Controller
 {
@@ -98,10 +100,54 @@ class ChatController extends Controller
                 $message->reply ? GroupMessage::where("id", $message->reply_id)->first() : "null";
                 $message->reply->user ? User::where("unique_id", $message->sender)->first() : "null";
             }
+            $request->merge([
+                'senderName' => $request->senderName,
+                'message' => $request->message,
+                'token' => json_encode($request->user['fcm_token'])
+            ]);
 
+            $this->sendNotification($request);
             // dispatch(new SendNotificationJob(json_encode($request->user['fcm_token']), $user['name'],$message->msg, $this->firebaseService));
             return response()->json($message, 201);
         }
+    }
+
+    public function sendNotification(Request $request)
+    {
+        $message = $request->message;
+
+        $token = trim($request->token, "\"");
+
+        $accessToken = $this->getAccessToken();
+
+        $payload = [
+            'message' => [
+                'token' => $token,
+                'notification' => [
+                    'title' => 'New Message',
+                    'body'  => $message
+                ]
+            ]
+        ];
+
+        Log::info('Token: ' . $token);
+        Log::info('Payload: ' . json_encode($payload));
+
+        $fcmResponse = Http::withToken($accessToken)
+            ->post('https://fcm.googleapis.com/v1/projects/vm-chat-5c18d/messages:send', $payload);
+
+        Log::info('FCM Response: ' . $fcmResponse->body());
+
+        return response()->json(['status' => 'Notification Sent', 'fcm_response' => $fcmResponse->body()]);
+    }
+
+    public function getAccessToken()
+    {
+        $client = new Client();
+        $client->setAuthConfig(storage_path("app/json/vm-chat.json"));
+        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+        $token = $client->fetchAccessTokenWithAssertion();
+        return $token['access_token'];
     }
 
 
@@ -194,12 +240,10 @@ class ChatController extends Controller
         return response()->json($updatedMessages);
     }
 
-
     public function viewDocument(Request $request)
     {
         return $request;
         $pdfPath = $request->input('doc');
-        // Validate or process the path if necessary
         return view('pdf-viewer', compact('pdfPath'));
     }
 }
