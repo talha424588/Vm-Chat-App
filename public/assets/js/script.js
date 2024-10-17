@@ -1807,7 +1807,9 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
     }
 
     DOM.messageAreaName.innerHTML = chat.name;
-    DOM.messageAreaPic.src = chat.isGroup ? chat.group.pic : chat.contact.pic;
+   
+  
+    // DOM.messageAreaPic.src = chat.isGroup ? chat.group.pic : chat.contact.pic;
 
     if (chat.isGroup) {
         let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);

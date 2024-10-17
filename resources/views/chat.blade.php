@@ -601,10 +601,8 @@
 
                 <div class="modal-body">
                     <img src="{{ asset('assets/svg/message-delete.gif') }}" alt="" height="78.32px">
-
                     <h5>Are you sure you want to delete?</h5>
                     <p class="not-recover">This action cannot be undone.</p>
-
                     <button type="button" class="btn btn-delete">Delete</button> &nbsp;&nbsp;&nbsp;
                     <button type="button" class="btn btn-cancel" id="btn-close"
                         data-dismiss="modal">Cancel</button>
