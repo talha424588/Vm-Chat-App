@@ -394,26 +394,26 @@ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the values as needed */
 
 
 .search-bar {
-	position: relative; /* This allows positioning of the icon inside the container */
-	background-color: #f0f0f0; /* Background color of the container */
-	padding: 10px;
+	display: flex;
+	margin-top: 8px;
+	background-color: #f0f0f0; 
+	padding: 8px;
 	border-radius: 10px;
-	max-width: 500px; /* Optional: Set a max width */
+	max-width: 500px;
   }
 
   .search-bar i {
-	position: absolute; /* Position the icon inside the input */
-	left: 10px; /* Space from the left edge of the input */
 	color: #999;
-	font-size: 18px; /* Adjust size if necessary */
+	font-size: 18px;
 	margin-top: 5px;
- 			   }
+	padding-left: 5px;
+ }
 
   .search-bar input {
 	background-color: #f0f0f0; /* Background color of the input field */
 	border: none;
 	outline: none;
-	padding: 2px 10px 2px 30px; /* Extra padding on the left for the icon */
+	padding: 2px 10px 2px 20px; /* Extra padding on the left for the icon */
 	font-size: 16px;
 	border-radius: 10px;
 	width: 100%; /* Ensure input takes full width of the container */
@@ -423,34 +423,36 @@ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the values as needed */
 
 
   .buttons {
-	margin-top: 20px;
-	margin-bottom: 10px;
-
+	margin-top: 10px;
   }
   .button {
-	background-color: #F0F2F5;
+	background-color: #f0f2f5 !important;
+	color: #687780;
 	padding: 5px 22px 5px 22px;
 	border-radius: 50px;
-	border: 1px solid #F0F2F5;
 	cursor: pointer;
 	font-size: 16px;
 	font-weight: 400;
 	font-family: 'Open Sans', sans-serif;
   }
   .button.active {
-	background-color: #E7FCE3;
+	background-color: #E7FCE3 !important;
+	border:none;
+	color: #000;
   }
 
 
-  .username-container {
-
+.username-container {
+padding-top:8px;
+display: flex;
 flex-direction: column;
-align-items: center;
+align-items: start;
 }
 
 .username-container small {
-font-size: 0.8em;
-color: #666; /* adjust the color to your liking */
+padding: 0;
+font-size: 16px;
+color: #666; 
 }
 .username-container .font-weight-bold{
   color: #463C3C;
@@ -721,6 +723,7 @@ body{
 
 #navbar {
 	background: #F0F2F5;
+	height: 77px;
 }
 
 .dropdown-toggle::after {
@@ -1005,3 +1008,16 @@ body{
   .cursor{
 	cursor: pointer;
   }
+.profile_img{
+	margin-left:10px;
+	margin-right:25px;	
+	height:51px;
+	width:51px;
+	cursor:pointer;
+}
+#logout{
+	background-color:#1DAB61;
+	color:white; 
+	border-radius: 10px;
+	padding-inline:20px;
+}
