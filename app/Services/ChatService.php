@@ -130,6 +130,7 @@ class ChatService implements ChatRepository
 
     public function searchGroupMessages($searchQuery, $groupId)
     {
+//        return $searchQuery;
         // $messages = GroupMessage::where("msg", "LIKE", "%$query%")
         //     ->orWhere("media_name", "LIKE", "%$query%")
         //     ->where("group_id", $groupId)
@@ -142,7 +143,12 @@ class ChatService implements ChatRepository
                 ->orWhere("media_name", "LIKE", "%$searchQuery%");
         })
             ->where("group_id", $groupId)
-            ->whereIn("type", ["File", "Message"])
+//            ->whereIn("type", ["File", "Message",])
+            ->where(function ($query) {
+                $query->whereIn("type", ["File", "Message"])
+                    ->orWhereNull("type") // Include messages with null type
+                    ->orWhere("type", ""); // Include messages with empty string type
+            })
             ->where('is_deleted', false)
             ->with("user")
             ->get();

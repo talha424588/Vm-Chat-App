@@ -396,7 +396,8 @@ socket.on('moveMessage', () => {
 });
 
 let addMessageToMessageArea = (message) => {
-
+    console.log("Incoming message:", message);
+    console.log("Reply structure:", message.reply);
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -593,7 +594,7 @@ let addMessageToMessageArea = (message) => {
             }
 
             // Message content (modify the img to match your use case)
-            var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:54;">`;
+            var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:54px;">`;
 
             // Set messageContent and include an onclick that scrolls to the replied message
             messageContent = `
@@ -611,7 +612,7 @@ let addMessageToMessageArea = (message) => {
         else {
 
             messageContent = `
-            <img src="${message.message ?? message.msg}" style="height:222px; width:54;">
+            <img src="${message.message ?? message.msg}" style="height:222px; width:54px;">
         `;
         }
     } else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
@@ -1548,6 +1549,7 @@ DOM.messages.addEventListener('scroll', async () => {
 
 // Function to add a new message to the message area
 let addNewMessageToArea = (message) => {
+    // console.log("message area to dislpay messages",message);
     let msgDate = new Date(message.time * 1000).getDate();
 
     if (lastDate !== msgDate) {
@@ -1593,7 +1595,7 @@ let addNewMessageToArea = (message) => {
             `;
             break;
         default:
-            messageContent = '';
+            messageContent = message.message ?? message.msg;
     }
 
     // Create the message element as a DOM element
@@ -1686,9 +1688,11 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         }
 
         nextPageMessages.data.forEach((msg) => {
-            const newMessage = addNewMessageToArea(msg);
-            DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
-
+            //const newMessage = addNewMessageToArea(msg);
+            const newMessage = addMessageToMessageArea(msg);
+            // Issue start from here view message through addNewMessageArea instead of Add Message To Message Area
+            // DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
+            //
             if (msg.id === message_id) {
 
                 const messageElement = DOM.messages.querySelector(`[data-message-id="${msg.id}"]`);
@@ -2422,6 +2426,18 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                             }
                                             break;
                                         default:
+                                            const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
+                                            if (nullTypemessageTextElement) {
+                                                const nullTypeMessageText = nullTypemessageTextElement.textContent.toLowerCase();
+                                                const nullTypeindex = nullTypeMessageText.indexOf(searchQuery);
+                                                if (nullTypeindex !== -1) {
+                                                    const highlightedText = nullTypeMessageText.substring(0, nullTypeindex) + `<span class="highlight">${nullTypeMessageText.substring(nullTypeindex, nullTypeindex + searchQuery.length)}</span>` + nullTypeMessageText.substring(nullTypeindex + searchQuery.length);
+                                                    nullTypemessageTextElement.innerHTML = highlightedText;
+                                                }
+                                            } else {
+                                                console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
+                                            }
+                                            break;
                                             console.log("Unknown message type:", message.type);
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
@@ -2432,7 +2448,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                         });
                     })
                     .catch(error => {
-                        console.error('Error:', error);
+                        console.error('Error:', "Not Found");
                     });
             } catch (error) {
 
