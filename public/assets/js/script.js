@@ -396,8 +396,7 @@ socket.on('moveMessage', () => {
 });
 
 let addMessageToMessageArea = (message) => {
-    console.log("Incoming message:", message);
-    console.log("Reply structure:", message.reply);
+
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -419,7 +418,6 @@ let addMessageToMessageArea = (message) => {
     // }
 
     if (message.type === 'File') {
-        console.log("file:type", message);
         if (message.reply) {
             if (message.reply.type === 'Image') {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
@@ -1548,18 +1546,169 @@ DOM.messages.addEventListener('scroll', async () => {
 });
 
 // Function to add a new message to the message area
+// let addNewMessageToArea = (message) => {
+//     // console.log("message area to dislpay messages",message);
+//     let msgDate = new Date(message.time * 1000).getDate();
+//
+//     if (lastDate !== msgDate) {
+//         addDateToMessageArea(msgDate);
+//         lastDate = msgDate;
+//     }
+//     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+//     let senderName = message.user.name;
+//
+//     let messageContent;
+//     switch (message.type) {
+//         case 'File':
+//             messageContent = `
+//                 <div class="file-message">
+//                     <div class="file-icon">
+//                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+//                             <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+//                             <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+//                         </svg>
+//                     </div>
+//                     <div class="file-details">
+//                         <p class="file-name">${message.media_name}</p>
+//                     </div>
+//                     <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
+//                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+//                             <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+//                         </svg>
+//                     </a>
+//                 </div>
+//             `;
+//             break;
+//         case 'Image':
+//             messageContent = `<img src="${message.message ?? message.msg}" style="height:222px; width:54px;">`;
+//             break;
+//         case 'Message':
+//         case null:
+//             messageContent = message.message ?? message.msg;
+//             break;
+//         case 'Audio':
+//             messageContent = `
+//                 <p>${message.media_name}</p>
+//                 <p>${message.message ?? message.msg}</p>
+//             `;
+//             break;
+//         default:
+//             messageContent = message.message ?? message.msg;
+//     }
+//
+//     // Create the message element as a DOM element
+//     let messageElement = document.createElement('div');
+//     messageElement.className = 'ml-3';
+//
+//     messageElement.innerHTML = `
+//         ${message.user.id == user.id ? '' : profileImage}
+//         <div class="">
+//             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
+//                 <div style="margin-top:-4px">
+//                     <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; ">
+//                         ${messageContent.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}
+//                     </div>
+//                     <div>
+//                         <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+//                             <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
+//                             <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span> |
+//                             <span>
+//                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
+//                             </span> |
+//                             <!---|
+//                             <span>
+//                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
+//                             </span>
+//                             <span>
+//                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+//                             </span>--->
+//                         </div>
+//                         ${message.sender === user.unique_id ? `
+//                         <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
+//                             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+//                                 <i class="fas fa-angle-down text-muted px-2"></i>
+//                             </a>
+//                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+//                                 ${!['Audio', 'Image', 'File'].includes(message.type) ? `
+//         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
+//       ` : ''}
+//                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+//                                 <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+//                             </div>
+//                         </div>` : ''}
+//                     </div>
+//                 </div>
+//             </div>
+//         </div>
+//     `;
+//
+//     return messageElement;
+// };
+
+
+// New Updated new message area
 let addNewMessageToArea = (message) => {
-    // console.log("message area to dislpay messages",message);
     let msgDate = new Date(message.time * 1000).getDate();
 
     if (lastDate !== msgDate) {
         addDateToMessageArea(msgDate);
         lastDate = msgDate;
     }
+
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
 
     let messageContent;
+    let replyContent = '';
+
+    // Handle replies
+    if (message.reply) {
+        let replyBody;
+        if (message.reply.type === 'Image') {
+            replyBody = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+        } else if (message.reply.type === 'File') {
+            replyBody = `<div class="file-message">
+                <div class="file-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <p class="file-name">File</p>
+                </div>
+                <a href="#" class="download-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                    </svg>
+                </a>
+            </div>`;
+        } else if (message.reply.type === 'Audio') {
+            replyBody = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
+                <div class="audio-content">
+                    <div class="audio-controls">
+                        <button class="playbutton">
+                            <img src="assets/img/play-icon.svg" alt="Play" />
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        } else {
+            replyBody = message.reply.msg;
+        }
+
+        replyContent = `
+            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                    ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                </div>
+                <div class="reply-details">
+                    <p class="file-name">${replyBody}</p>
+                </div>
+            </div>
+        `;
+    }
+
     switch (message.type) {
         case 'File':
             messageContent = `
@@ -1607,6 +1756,7 @@ let addNewMessageToArea = (message) => {
         <div class="">
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
                 <div style="margin-top:-4px">
+                    ${replyContent}
                     <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; ">
                         ${messageContent.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}
                     </div>
@@ -1617,13 +1767,9 @@ let addNewMessageToArea = (message) => {
                             <span>
                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
                             </span> |
-                            <!---|
                             <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
+                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
                             </span>
-                            <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                            </span>--->
                         </div>
                         ${message.sender === user.unique_id ? `
                         <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
@@ -1632,7 +1778,7 @@ let addNewMessageToArea = (message) => {
                             </a>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 ${!['Audio', 'Image', 'File'].includes(message.type) ? `
-        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
+        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
       ` : ''}
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                 <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
@@ -1648,6 +1794,8 @@ let addNewMessageToArea = (message) => {
 };
 
 const fetchNextPageMessages = async (message_id = null, current_Page = null) => {
+    let nextPageMessages = [];
+    console.log("next page messages",pagnicateChatList);
     if (!message_id) {
         currentPage++;
     }
@@ -1661,8 +1809,13 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
                 'content-type': 'application/json'
             }
         });
-        const nextPageMessages = await response.json();
+        nextPageMessages = await response.json();
         unread_settings(nextPageMessages);
+        pagnicateChatList.data.push(...nextPageMessages.data);
+
+        // const sortedMessages = pagnicateChatList.data.reverse().sort((a, b) => a.id - b.id);
+
+        // console.log("Sorted Messages by ID Ascending:", sortedMessages);
 
         const ids = nextPageMessages.data.map(item => item.id);
 
@@ -1688,10 +1841,9 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         }
 
         nextPageMessages.data.forEach((msg) => {
-            //const newMessage = addNewMessageToArea(msg);
-            const newMessage = addMessageToMessageArea(msg);
+            const newMessage = addNewMessageToArea(msg);
             // Issue start from here view message through addNewMessageArea instead of Add Message To Message Area
-            // DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
+            DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
             //
             if (msg.id === message_id) {
 
@@ -1757,7 +1909,7 @@ function unread_settings(query_set) {
 let currentlyPlayingAudio = null;
 
 let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
-    pagnicateChatList = [];
+    // pagnicateChatList = [];
     chat = chatList[chatIndex];
 
     DOM.activeChatIndex = chatIndex;
