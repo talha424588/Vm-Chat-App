@@ -538,7 +538,6 @@ let addMessageToMessageArea = (message) => {
         const mediaName = fileLink.split('uploads/')[1];
         const displayMediaName = message.media_name || mediaName;
         const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
-        console.log("Media Type",mediaType);
         if (mediaType == "document") {
             messageContent = `
                 <div class="file-message">
@@ -787,8 +786,12 @@ let addMessageToMessageArea = (message) => {
               <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
             ` : ''}
             ${user.role === '0' || user.role === '2' ? `
+            ${message.is_compose === 1 && message.type === "Message" ? `
               <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+               ` : ''}
+              ${message.is_compose === 1 && message.type === "Message" ? `
               <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+              ` : ''}
               ${message.is_compose === 1 && message.type === "Message" ? `
               <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
               ` : ''}
@@ -2050,62 +2053,85 @@ let showChatList = () => {
 };
 
 let sendMessage = (type = 'Message', mediaName = null) => {
-    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    if (socket.connected) {
+        let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        if (type == 'Message') {
+            const numberPattern = /\b\d{7,}\b/;
+            const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
 
-    if (type == 'Message') {
-        const numberPattern = /\b\d{7,}\b/;
-        const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
+            const fileIcon = document.querySelector('#file-icon');
+            const chaticon = document.querySelector('#captureid');
+            fileIcon.style.visibility = 'visible';
+            chaticon.style.visibility = 'visible';
+            let value = DOM.messageInput.value;
+            if (value === "") return;
+            let reason = '';
+            if (value.match(numberPattern)) {
+                reason = 'Contact Number';
+            } else if (value.match(emailPattern)) {
+                reason = 'Email Address';
+            }
+            if (reason !== '') {
+                // Send "Alert!!!" as the message
+                let alertMessage = "Alert!!!";
+                // Send email to dev3@visamtion.org with details
+                fetch('/alert-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        name: user.name,
+                        email: user.email,
+                        reason: reason,
+                        message: value,
+                    })
+                })
+                    .then(response => {
+                        console.log(response);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
 
-        const fileIcon = document.querySelector('#file-icon');
-        const chaticon = document.querySelector('#captureid');
-        fileIcon.style.visibility = 'visible';
-        chaticon.style.visibility = 'visible';
-        let value = DOM.messageInput.value;
-        if (value === "") return;
-        let reason = '';
-        if (value.match(numberPattern)) {
-            reason = 'Contact Number';
-        } else if (value.match(emailPattern)) {
-            reason = 'Email Address';
-        }
-        if (reason !== '') {
-            // Send "Alert!!!" as the message
-            let alertMessage = "Alert!!!";
-            // Send email to dev3@visamtion.org with details
-            fetch('/alert-email', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({
-                    name: user.name,
-                    email: user.email,
-                    reason: reason,
+                // Send "Alert!!!" to the backend to save in DB
+                let msg = {
+                    user: user.fcm_token ? user : user.fcm_token = DOM.fcmToken,
+                    message: alertMessage,
+                    reply_id: DOM.replyId ?? "",
+                    group_id: DOM.groupId,
+                    type: type,
+                    mediaName: mediaName,
+                    time: Math.floor(Date.now() / 1000),
+                    csrf_token: csrfToken,
+                };
+                socket.emit('sendChatToServer', msg);
+            } else {
+                // Send original message to the backend to save in DB
+                let msg = {
+                    user: user,
                     message: value,
-                })
-            })
-                .then(response => {
-                    console.log(response);
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-
-            // Send "Alert!!!" to the backend to save in DB
-            let msg = {
-                user: user.fcm_token ? user : user.fcm_token = DOM.fcmToken,
-                message: alertMessage,
-                reply_id: DOM.replyId ?? "",
-                group_id: DOM.groupId,
-                type: type,
-                mediaName: mediaName,
-                time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken,
-            };
-            socket.emit('sendChatToServer', msg);
-        } else {
-            // Send original message to the backend to save in DB
+                    reply_id: DOM.replyId ?? "",
+                    group_id: DOM.groupId,
+                    type: type,
+                    mediaName: mediaName,
+                    time: Math.floor(Date.now() / 1000),
+                    csrf_token: csrfToken
+                };
+                socket.emit('sendChatToServer', msg);
+            }
+            DOM.messageInput.value = "";
+            DOM.replyId = null;
+        }
+        else {
+            const fileIcon = document.querySelector('#file-icon');
+            const chaticon = document.querySelector('#captureid');
+            fileIcon.style.visibility = 'visible';
+            chaticon.style.visibility = 'visible';
+            let value = DOM.messageInput.value;
+            if (value === "") return;
+            let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
             let msg = {
                 user: user,
                 message: value,
@@ -2117,31 +2143,12 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 csrf_token: csrfToken
             };
             socket.emit('sendChatToServer', msg);
+            DOM.messageInput.value = "";
+            DOM.replyId = null;
         }
-        DOM.messageInput.value = "";
-        DOM.replyId = null;
     }
     else {
-        const fileIcon = document.querySelector('#file-icon');
-        const chaticon = document.querySelector('#captureid');
-        fileIcon.style.visibility = 'visible';
-        chaticon.style.visibility = 'visible';
-        let value = DOM.messageInput.value;
-        if (value === "") return;
-        let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-        let msg = {
-            user: user,
-            message: value,
-            reply_id: DOM.replyId ?? "",
-            group_id: DOM.groupId,
-            type: type,
-            mediaName: mediaName,
-            time: Math.floor(Date.now() / 1000),
-            csrf_token: csrfToken
-        };
-        socket.emit('sendChatToServer', msg);
-        DOM.messageInput.value = "";
-        DOM.replyId = null;
+        alert("something went wrong")
     }
 
 };
