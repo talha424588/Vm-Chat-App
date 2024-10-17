@@ -1,6 +1,6 @@
-$(document).ready(function() {
+$(document).ready(function () {
     // Toggle sidebar on search icon click
-    $("#search-icon").on("click", function() {
+    $("#search-icon").on("click", function () {
         $("#sidebar").toggleClass("sidebar-open sidebar-closed");
         $(".container-fluid").toggleClass("sidebar-open");
         $("#search-icon").toggleClass("icon-move-left");
@@ -9,15 +9,22 @@ $(document).ready(function() {
     });
 
     // Close sidebar on close button click
-    $("#close-sidebar").on("click", function() {
+    $("#close-sidebar").on("click", function () {
         $("#sidebar").removeClass("sidebar-open").addClass("sidebar-closed");
         $(".container-fluid").removeClass("sidebar-open");
         $("#search-icon").removeClass("icon-move-left");
         $("#message-area").toggleClass("col-md-4 col-md-8");
+        document.getElementById("messsage_search_query").value = "";
+        const searchResultsDiv = document.querySelector(".search-results");
+        searchResultsDiv.innerHTML = "";
+        const highlightedMessages = DOM.messages.querySelectorAll(".highlight");
+        highlightedMessages.forEach((element) => {
+            element.classList.remove("highlight");
+        });
     });
 
     // Close sidebar on clicking outside of it
-    $(document).on("click", function(event) {
+    $(document).on("click", function (event) {
         if (!$(event.target).closest("#sidebar, #search-icon").length) {
             if ($("#sidebar").hasClass("sidebar-open")) {
                 $("#sidebar").removeClass("sidebar-open").addClass("sidebar-closed");
@@ -33,7 +40,7 @@ $(document).ready(function() {
 const searchInput = document.getElementById('searchInput');
 const clearIcon = document.querySelector('.clear-icon');
 
-searchInput.addEventListener('input', function() {
+searchInput.addEventListener('input', function () {
     if (searchInput.value) {
         clearIcon.style.display = 'block'; // Show icon when there is input
     } else {
@@ -41,7 +48,7 @@ searchInput.addEventListener('input', function() {
     }
 });
 
-clearIcon.addEventListener('click', function() {
+clearIcon.addEventListener('click', function () {
     searchInput.value = ''; // Clear the input field
     clearIcon.style.display = 'none'; // Hide the icon
     searchInput.focus(); // Optionally refocus the input field
