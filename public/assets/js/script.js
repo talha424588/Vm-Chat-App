@@ -396,7 +396,8 @@ socket.on('moveMessage', () => {
 });
 
 let addMessageToMessageArea = (message) => {
-
+    console.log("Incoming message:", message);
+    console.log("Reply structure:", message.reply);
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -417,8 +418,8 @@ let addMessageToMessageArea = (message) => {
     //     }
     // }
 
-    if (message.type === 'File' || oldMessageType == "File") {
-        console.log("file:type",message);
+    if (message.type === 'File') {
+        console.log("file:type", message);
         if (message.reply) {
             if (message.reply.type === 'Image') {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
@@ -459,7 +460,7 @@ let addMessageToMessageArea = (message) => {
                     <span class="audio-time">12:27 PM</span>
                 </div>
             </div>
-        </div>`;
+            </div>`;
             } else {
                 var message_body = message.reply.msg;
             }
@@ -481,7 +482,7 @@ let addMessageToMessageArea = (message) => {
                     </svg>
                 </a>
             </div>
-        `;
+            `;
 
             messageContent = `
             <div class="file-message">
@@ -503,7 +504,9 @@ let addMessageToMessageArea = (message) => {
             </div>
 
             `;
-        } else {
+        }
+
+        else {
             messageContent = `
 
             <div class="file-message">
@@ -525,7 +528,59 @@ let addMessageToMessageArea = (message) => {
             </div>
         `;
         }
-    } else if (message.type === 'Image') {
+    }
+    // else if (/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) && !message.reply) {
+    //     let fileLink;
+    //     if (/<a[^>]+>/g.test(message.msg)) {
+    //         const linkTag = message.msg.match(/<a[^>]+>/g)[0];
+    //         fileLink = linkTag.match(/href="([^"]+)"/)[1];
+    //         const mediaName = fileLink.split('uploads/')[1];
+    //         const displayMediaName = message.media_name || mediaName;
+    //         messageContent = `
+    //     <div class="file-message">
+    //         <div class="file-icon">
+    //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    //                 <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+    //                 <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+    //             </svg>
+    //         </div>
+    //         <div class="file-details">
+    //             <p class="file-name">${displayMediaName}</p>
+
+    //         </div>
+    //         <a href="${fileLink}" target="_blank" download="${displayMediaName}" class="download-icon">
+    //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    //                 <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+    //             </svg>
+    //         </a>
+    //     </div>
+    // `;
+    //     } else {
+    //         // If the message is a Firebase link, use it as the file link
+    //         fileLink = message.msg;
+    //         messageContent = `
+    //     <div class="file-message">
+    //         <div class="file-icon">
+    //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    //                 <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+    //                 <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+    //             </svg>
+    //         </div>
+    //         <div class="file-details">
+    //             <p class="file-name">${message.media_name}</p>
+
+    //         </div>
+    //         <a href="${fileLink}" target="_blank" download="${message.media_name}" class="download-icon">
+    //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    //                 <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+    //             </svg>
+    //         </a>
+    //     </div>
+    // `;
+    //     }
+    // }
+
+    else if (message.type === 'Image') {
         if (message.reply) {
             // Determine the type of reply and set the message_body accordingly
             if (message.reply.type === 'Image') {
@@ -539,7 +594,7 @@ let addMessageToMessageArea = (message) => {
             }
 
             // Message content (modify the img to match your use case)
-            var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:54;">`;
+            var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:54px;">`;
 
             // Set messageContent and include an onclick that scrolls to the replied message
             messageContent = `
@@ -557,10 +612,10 @@ let addMessageToMessageArea = (message) => {
         else {
 
             messageContent = `
-            <img src="${message.message ?? message.msg}" style="height:222px; width:54;">
+            <img src="${message.message ?? message.msg}" style="height:222px; width:54px;">
         `;
         }
-    } else if (message.type === 'Message' || message.type === null) {
+    } else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
 
         if (message.reply) {
 
@@ -627,12 +682,18 @@ let addMessageToMessageArea = (message) => {
         }
 
     }
-    else if (message.type === 'Audio' || oldMessageType == "Audio") {
-        const audioSrc = message.msg;
+    else if (message.type === 'Audio' || /<audio[^>]+>/g.test(message.msg)) {
+        let audioSrc;
+        if (/<audio[^>]+>/g.test(message.msg)) {
+            const audioTag = message.msg.match(/<audio[^>]+>/g)[0];
+            audioSrc = audioTag.match(/src="([^"]+)"/)[1];
+        } else {
+            audioSrc = message.msg;
+        }
 
         messageContent = `
 
-<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+        <div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
@@ -653,6 +714,32 @@ let addMessageToMessageArea = (message) => {
         </div>
     `;
     }
+    //     else if (message.type === 'Audio' || oldMessageType == "Audio") {
+    //         const audioSrc = message.msg;
+
+    //         messageContent = `
+
+    // <div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+    //             <div class="avatar">
+    //                 <!-- Avatar image here -->
+    //             </div>
+    //             <div class="audio-content">
+    //                 <div class="audio-controls">
+    //                     <button class="play-button">
+    //                         <img src="assets/img/play-icon.svg" alt="Play" />
+    //                     </button>
+    //                     <div class="audio-progress">
+    //                         <div class="progress-filled"></div>
+    //                     </div>
+    //                 </div>
+    //                 <div class="audio-time-container">
+    //                     <span class="audio-duration">0:00</span>
+    //                     <span class="audio-time">12:27 PM</span>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     `;
+    //     }
     DOM.messages.innerHTML += `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
@@ -1462,6 +1549,7 @@ DOM.messages.addEventListener('scroll', async () => {
 
 // Function to add a new message to the message area
 let addNewMessageToArea = (message) => {
+    // console.log("message area to dislpay messages",message);
     let msgDate = new Date(message.time * 1000).getDate();
 
     if (lastDate !== msgDate) {
@@ -1507,7 +1595,7 @@ let addNewMessageToArea = (message) => {
             `;
             break;
         default:
-            messageContent = '';
+            messageContent = message.message ?? message.msg;
     }
 
     // Create the message element as a DOM element
@@ -1600,9 +1688,11 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         }
 
         nextPageMessages.data.forEach((msg) => {
-            const newMessage = addNewMessageToArea(msg);
-            DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
-
+            //const newMessage = addNewMessageToArea(msg);
+            const newMessage = addMessageToMessageArea(msg);
+            // Issue start from here view message through addNewMessageArea instead of Add Message To Message Area
+            // DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
+            //
             if (msg.id === message_id) {
 
                 const messageElement = DOM.messages.querySelector(`[data-message-id="${msg.id}"]`);
@@ -2281,7 +2371,13 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultDateDiv.textContent = new Date(message.time * 1000).toLocaleDateString();
                             const resultTextDiv = document.createElement("div");
                             resultTextDiv.className = "result-text";
-                            resultTextDiv.textContent = message.msg;
+
+                            // resultTextDiv.textContent = message.msg;
+                            if (message.msg.startsWith("https://")) {
+                                resultTextDiv.textContent = message.media_name;
+                            } else {
+                                resultTextDiv.textContent = message.msg;
+                            }
                             resultItemDiv.appendChild(resultDateDiv);
                             resultItemDiv.appendChild(resultTextDiv);
                             searchResultsDiv.appendChild(resultItemDiv);
@@ -2290,12 +2386,59 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 if (messageElement) {
-                                    const messageTextElement = messageElement.querySelector(".shadow-sm");
-                                    const messageText = messageTextElement.textContent.toLowerCase();
-                                    const index = messageText.indexOf(searchQuery);
-                                    if (index !== -1) {
-                                        const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
-                                        messageTextElement.innerHTML = highlightedText;
+                                    console.log("mesage element found", messageElement);
+                                    // const messageTextElement = messageElement.querySelector(".shadow-sm");
+                                    // console.log("message Text Element found",messageTextElement);
+
+                                    // const messageText = messageTextElement.textContent.toLowerCase();
+                                    // const index = messageText.indexOf(searchQuery);
+                                    // if (index !== -1) {
+                                    //     const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                                    //     messageTextElement.innerHTML = highlightedText;
+                                    // }
+                                    switch (message.type) {
+                                        case "Message":
+                                            const messageTextElement = messageElement.querySelector(".shadow-sm");
+                                            console.log("message Text Element found", messageTextElement);
+
+                                            const messageText = messageTextElement.textContent.toLowerCase();
+                                            const index = messageText.indexOf(searchQuery);
+                                            if (index !== -1) {
+                                                const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                                                messageTextElement.innerHTML = highlightedText;
+                                            }
+                                            break;
+                                        case "Image":
+                                            // Handle Image type
+                                            break;
+                                        case "Audio":
+                                            // Handle Audio type
+                                            break;
+                                        case "File":
+                                            const fileNameElement = messageElement.querySelector(".file-name");
+                                            if (fileNameElement) {
+                                                const fileName = fileNameElement.textContent;
+                                                const index = fileName.toLowerCase().indexOf(searchQuery);
+                                                if (index !== -1) {
+                                                    const highlightedFileName = fileName.substring(0, index) + `<span class="highlight">${fileName.substring(index, index + searchQuery.length)}</span>` + fileName.substring(index + searchQuery.length);
+                                                    fileNameElement.innerHTML = highlightedFileName;
+                                                }
+                                            }
+                                            break;
+                                        default:
+                                            const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
+                                            if (nullTypemessageTextElement) {
+                                                const nullTypeMessageText = nullTypemessageTextElement.textContent.toLowerCase();
+                                                const nullTypeindex = nullTypeMessageText.indexOf(searchQuery);
+                                                if (nullTypeindex !== -1) {
+                                                    const highlightedText = nullTypeMessageText.substring(0, nullTypeindex) + `<span class="highlight">${nullTypeMessageText.substring(nullTypeindex, nullTypeindex + searchQuery.length)}</span>` + nullTypeMessageText.substring(nullTypeindex + searchQuery.length);
+                                                    nullTypemessageTextElement.innerHTML = highlightedText;
+                                                }
+                                            } else {
+                                                console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
+                                            }
+                                            break;
+                                            console.log("Unknown message type:", message.type);
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
                                 } else {
@@ -2305,7 +2448,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                         });
                     })
                     .catch(error => {
-                        console.error('Error:', error);
+                        console.error('Error:', "Not Found");
                     });
             } catch (error) {
 
@@ -2320,12 +2463,12 @@ searchMessageInputFeild.addEventListener("input", function (e) {
     }
 })
 
-document.querySelector(".close-button").addEventListener("click", function () {
-    document.getElementById("messsage_search_query").value = "";
-    const searchResultsDiv = document.querySelector(".search-results");
-    searchResultsDiv.innerHTML = "";
-    removeHighlight();
-});
+// document.querySelector(".close-button").addEventListener("click", function () {
+//     document.getElementById("messsage_search_query").value = "";
+//     const searchResultsDiv = document.querySelector(".search-results");
+//     searchResultsDiv.innerHTML = "";
+//     removeHighlight();
+// });
 
 function removeHighlight() {
     const messageElements = DOM.messages.querySelectorAll(".shadow-sm");
