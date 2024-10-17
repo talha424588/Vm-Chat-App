@@ -279,25 +279,38 @@
                 <div class="w-100 h-100 overlay"></div>
 
                 <!-- Navbar -->
-                <div class="row d-flex flex-row align-items-center p-2 m-0 w-100" id="navbar">
-                    <div class="d-block d-sm-none">
-                        <i class="fas fa-arrow-left p-2 mr-2 text-dark" style="font-size: 1.5rem; cursor: pointer;"
-                            onclick="showChatList()"></i>
-                    </div>
-                    <a href="#"><img
-                            src="https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg"
-                            alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;"
-                            id="pic"></a>
-                    <div class="d-flex flex-column">
-                        <div class="text-dark font-weight-bold" id="name"></div>
-                        <div class=" small" id="details"></div>
-                    </div>
-                    <div class="d-flex flex-row align-items-center ml-auto" id="search-icon">
-                        <!-- <i class="fas fa-search mx-3 text-dark d-none d-md-block"></i>
-      <a href="#"><i class="fas fa-paperclip mx-3 text-dark d-none d-md-block"></i></a> -->
-                        <a href="#"><i class="fas fa-search mr-2 mx-sm-3 " style="color:#596A74;"></i></a>
-                    </div>
-                </div>
+                <div id="side_navbar">
+
+    <div class="back-arrow" onclick="showChatList()">
+        <i class="fas fa-arrow-left"></i>
+    </div>
+
+
+    <a href="#"><img src="https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg"
+        alt="Profile Photo" class="profile-pic" id="pic"></a>
+
+    <div class="profile-details">
+        <div class="name" id="name">User Name</div>
+        <div class="details" id="details">Details here</div>
+    </div>
+
+    <!-- Search Icon -->
+    <div class="search-icon" id="search-icon">
+        <a href="#"><i class="fas fa-search"></i></a>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
 
                 <div class="d-flex flex-column chat_list_messages" id="messages"></div>
 

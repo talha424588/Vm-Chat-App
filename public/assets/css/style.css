@@ -726,6 +726,7 @@ body{
 #navbar {
 	background: #F0F2F5;
 	height: 77px;
+	border-right: 1px solid #ddd ;
 }
 
 .dropdown-toggle::after {
@@ -758,6 +759,86 @@ body{
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+/* Navbar styling */
+#side_navbar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+	background: #F0F2F5;
+	height: 77px;
+}
+
+/* Back arrow styling */
+.back-arrow {
+    display: none;
+    margin-right: 10px;
+}
+
+.back-arrow i {
+    font-size: 1.5rem;
+    color: #333;
+    cursor: pointer;
+	margin-left:15px ;
+}
+
+/* Profile image styling */
+.profile-pic {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+	margin-left: 20px;
+}
+
+/* Profile details styling */
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Take up available space */
+    overflow: hidden;
+}
+
+.name {
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.details {
+    font-size: 0.9rem;
+    color: #666;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* Search icon styling */
+.search-icon {
+    margin-left: auto; 
+	margin-right: 35px;
+}
+
+.search-icon i {
+    font-size: 1.5rem;
+    color: #687780;
+}
+
+/* Responsive design for small screens */
+@media (max-width: 576px) {
+    .back-arrow {
+        display: block;
+    }
+	.profile-pic {
+		margin-left: 0px;
+	}
+	
+    .search-icon {
+		margin-right: 15px;
+    }
 }
 
 
