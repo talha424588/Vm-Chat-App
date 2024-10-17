@@ -32,7 +32,10 @@ const DOM = {
     replyId: null,
     moveMessageUser: null,
     messagesList: getById("messagesList"),
-    fcmToken: null
+    fcmToken: null,
+    // displayed_edit_div:false,
+    // displayed_correction_div:false,
+    displayed_message_div:false,
 };
 let user = {
 
@@ -938,7 +941,20 @@ function tinymce_init(callback) {
 }
 
 function CorrectionMessage(message_id, senderName) {
-
+    
+    if(DOM.displayed_message_div)
+    {
+                removeEditMessage();
+    }
+    else{
+        DOM.displayed_message_div=!DOM.displayed_message_div;
+    }
+ 
+    // console.log(DOM);
+    // const editDiv=document.getElementById('editMessageDiv');
+    // if (window.getComputedStyle(editDiv).display === 'block') {
+    //     removeEditMessage();
+    // }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
     console.log(messagebody);
@@ -1109,7 +1125,18 @@ edit_capture.style.visibility = 'hidden';
 
 
 function editMessage(messageId) {
+    if(DOM.displayed_message_div)
+    {
+        removecorrectionMessage();
+    }
+    else{
+        DOM.displayed_message_div=!DOM.displayed_message_div;
+    }
 
+    // const editDiv=document.getElementById('correction-div');
+    // if (window.getComputedStyle(editDiv).display === 'block') {
+    //     removecorrectionMessage();
+    // }
     let editMessage = null;
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));

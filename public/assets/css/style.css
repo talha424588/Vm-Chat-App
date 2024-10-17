@@ -424,6 +424,8 @@ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the values as needed */
 
   .buttons {
 	margin-top: 10px;
+	padding-bottom:10px ;
+	border-bottom: 1px solid #ddd;
   }
   .button {
 	background-color: #f0f2f5 !important;
