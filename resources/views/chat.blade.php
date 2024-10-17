@@ -99,10 +99,6 @@
 
             margin-left: 30px;
         }
-    </style>
-
-
-    <style>
         .selected-message {
             background-color: #E8E9EA;/ Change background color / padding: 2px;
             transition: background-color 0.3s ease;/ Smooth transition effect /
@@ -154,7 +150,7 @@
             justify-content: center;
         }
 
-        / General styling for chat list item / .chat-list-item {
+         .chat-list-item {
             cursor: pointer;
             display: flex;
             align-items: center;/ This will vertically center the radio button / transition: background-color 0.3s ease;
@@ -164,7 +160,7 @@
             background-color: #f0f0f0;
         }
 
-        / Centering the radio button vertically / .chat-radio {
+        .chat-radio {
             margin-right: 10px;/ Space between radio button and profile image / width: 18px;/ Adjust size of radio button / height: 18px;
         }
 
@@ -183,11 +179,10 @@
             transition: filter 0.3s ease;
             /* Optional: Smooth transition */
         }
-    </style>
-    <style>
         .auto-resize-textarea {
             overflow: hidden;
         }
+      
     </style>
 </head>
 
@@ -204,7 +199,7 @@
                 <!-- Navbar -->
 
                 <div class="row d-flex flex-row align-items-center p-2" id="navbar">
-                    <img alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; cursor:pointer;"
+                    <img alt="Profile Photo" class="img-fluid rounded-circle profile_img"
                         id="display-pic">
                     <div class="username-container">
                         <div class="text-dark font-weight-bold" id="username"></div>
@@ -214,19 +209,17 @@
                     <div class="nav-item dropdown ml-auto">
 
                         <button type="button" class="btn loginbutton btn-block" id="logout"
-                            style="background-color:#1DAB61; color:white; border-radius: 10px; padding-right:15px;padding-left: 15px;"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             Logout
                         </button>
 
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        <form id="logout-form d-none" action="{{ route('logout') }}" method="POST">
                             @csrf
                         </form>
                     </div>
                 </div>
                 <div>
-                    <div style="padding-top: 5px; border-bottom: 1px solid #C9CCD0;">
-
+               
                         <div class="search-bar">
                             <i class="fa fa-search"></i>
                             <input type="text" placeholder="Search" id="search_group">
@@ -240,8 +233,8 @@
                             <button class="button" id="unread">Unread</button>
                             {{-- <button class="button">Groups</button> --}}--->
                         </div>
-
-                    </div>
+                        
+                   
                 </div>
                 <!-- Chat List -->
                 <div class="row" id="chat-list" style="overflow:auto;"></div>
@@ -608,10 +601,8 @@
 
                 <div class="modal-body">
                     <img src="{{ asset('assets/svg/message-delete.gif') }}" alt="" height="78.32px">
-
                     <h5>Are you sure you want to delete?</h5>
                     <p class="not-recover">This action cannot be undone.</p>
-
                     <button type="button" class="btn btn-delete">Delete</button> &nbsp;&nbsp;&nbsp;
                     <button type="button" class="btn btn-cancel" id="btn-close"
                         data-dismiss="modal">Cancel</button>
@@ -873,7 +864,7 @@
 
 
     <!-- Include jQuery -->
-    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
+    <!-- {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} -->
     <!-- Include Bootstrap JS -->
 
 </body>
