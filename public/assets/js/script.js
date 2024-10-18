@@ -183,6 +183,8 @@ let viewChatList = () => {
                     messageText = "No messages";
                 }
 
+                messageText = removePTags(messageText);
+
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
 
@@ -217,6 +219,17 @@ let viewChatList = () => {
             }
         });
 };
+
+
+function removePTags(messageText) {
+    const pTagPattern = /<p>(.*?)<\/p>/g;
+    if (pTagPattern.test(messageText)) {
+        messageText = messageText.replace(/<\/?p>/g, '');
+    } else {
+        // console.log("No <p> tags found in the message.");
+    }
+    return messageText;
+}
 
 let viewMessageList = () => {
 
@@ -350,6 +363,9 @@ socket.on('sendChatToClient', (message) => {
         DOM.notificationDiv.innerHTML = DOM.counter;
         DOM.notificationDiv.style.display = 'block';
     }
+
+    pagnicateChatList.data.push(message);
+
     let unique_id = document.getElementById("login_user_unique_id").value;
     const groupId = message.group_id;
 
@@ -412,6 +428,7 @@ socket.on('moveMessage', () => {
 });
 
 let addMessageToMessageArea = (message) => {
+    console.log("message",message);
 
     let msgDate = mDate(message.time).getDate();
 
@@ -738,6 +755,8 @@ let addMessageToMessageArea = (message) => {
     //         </div>
     //     `;
     //     }
+    console.log("new message",message);
+    console.log("new message",message.is_compose === 0);
     DOM.messages.innerHTML += `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
@@ -799,10 +818,10 @@ let addMessageToMessageArea = (message) => {
               <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
             ` : ''}
             ${user.role === '0' || user.role === '2' ? `
-            ${message.is_compose === 1 && message.type === "Message" ? `
-              <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-               ` : ''}
-              ${message.is_compose === 1 && message.type === "Message" ? `
+                ${message.is_compose === 0 || message.is_compose == false && message.type === "Message" ? `
+                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                ` : ''}
+              ${message.is_compose === 0 || message.is_compose == false && message.type === "Message" ? `
               <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
               ` : ''}
               ${message.is_compose === 1 && message.type === "Message" ? `
@@ -1051,30 +1070,49 @@ function correction_send_handel() {
     chat_action.style.display = 'block';
     document.querySelector('.chat_action_file').style.display = 'block';
 
-    const messageElement = DOM.messages.querySelector(`[data-message-id="${correction_message_id}"]`);
-    const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    messageContentDiv.innerHTML = messageContent;
+    // const messageElement = DOM.messages.querySelector(`[data-message-id="${correction_message_id}"]`);
+    // const messageContentDiv = messageElement.querySelector('div.shadow-sm');
+    // messageContentDiv.innerHTML = messageContent;
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(correction_message_id));
     if (messageIndex !== -1) {
         pagnicateChatList.data[messageIndex].msg = messageContent;
     }
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    fetch('message/correction', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            id: correction_message_id,
-            message: messageContent,
-        }),
-    })
-        .then((response) => response.json())
-        .then((data) => console.log(data))
-        .catch((error) => console.error(error));
+    // fetch('message/correction', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'X-CSRF-TOKEN': csrfToken
+    //     },
+    //     body: JSON.stringify({
+    //         id: correction_message_id,
+    //         message: messageContent,
+    //     }),
+    // })
+    //     .then((response) => response.json())
+    //     .then((data) => console.log(data))
+    //     .catch((error) => console.error(error));
 
+
+    if (!checkPrivacyAndAlert(messageContent, correction_message_id)) {
+        // Create a new message entry with reply_id
+        let newMessage = {
+            user: user,
+            message: messageContent,
+            reply_id: correction_message_id,
+            group_id: DOM.groupId,
+            type: 'Message',
+            mediaName: null,
+            time: Math.floor(Date.now() / 1000),
+            csrf_token: document.querySelector('meta[name="csrf-token"]').content
+        };
+
+        console.log("new MEssage", newMessage);
+
+        // Emit the new message to the server
+        socket.emit('sendChatToServer', newMessage);
+    }
 }
 
 document.getElementById('correction-send-message-btn').addEventListener('click', correction_send_handel);
@@ -1198,32 +1236,48 @@ function editMessage(messageId) {
 
 // Edit message area
 function handleSendMessage() {
-
     document.getElementById('input').style.setProperty('height', '44px', 'important');
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px', 'important');
-
     const messageId = document.getElementById('edit_message_id').value;
     let messageContent = document.getElementById('input').value;
 
     if (messageContent !== '') {
-
-
         const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
-        console.log(messageIndex);
         if (messageIndex !== -1) {
-            console.log("insidec");
             console.log(pagnicateChatList.data[messageIndex].msg = messageContent);
             console.log(pagnicateChatList);
             pagnicateChatList.data[messageIndex].msg = messageContent;
         }
-
-        const editMessageDiv = document.getElementById('editMessageDiv');
-        const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
-        editMessageContentDiv.innerHTML = messageContent;
-
         const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
         const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-        messageContentDiv.innerHTML = messageContent;
+
+        const messageToUpdate = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
+        if (messageToUpdate.reply) {
+            let newMessageDisplay = `<div class="reply-message-area">${messageContent.replace(/[\r\n]+/g, '<br>')}</div>`; // Update with new content
+
+            const replyMessage = messageToUpdate.reply.msg;
+            newMessageDisplay = `
+                    <div class="reply-message-div" onclick="scrollToMessage('${messageToUpdate.reply.id}')">
+                        <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                            ${messageToUpdate.reply.type}
+                        </div>
+                        <div class="reply-details">
+                            <p class="file-name">${replyMessage}</p>
+                        </div>
+                    </div>
+                    ${newMessageDisplay}
+                `;
+
+            messageContentDiv.innerHTML = newMessageDisplay;
+        }
+        else
+        {
+            const editMessageDiv = document.getElementById('editMessageDiv');
+            const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
+            editMessageContentDiv.innerHTML = messageContent;
+            messageContentDiv.innerHTML = messageContent;
+        }
+
 
         document.getElementById('input').value = "";
         let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -1263,6 +1317,57 @@ function handleSendMessage() {
     } else {
         // alert('Error');
     }
+}
+
+function checkPrivacyAndAlert(messageContent, messageId) {
+    const numberPattern = /\b\d{7,}\b/;
+    const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
+
+    let reason = '';
+    if (numberPattern.test(messageContent)) {
+        reason = 'Contact Number';
+    } else if (emailPattern.test(messageContent)) {
+        reason = 'Email Address';
+    }
+
+    if (reason !== '') {
+        // Send alert message to the server
+        let alertMessage = "Alert!!!";
+        fetch('/alert-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                name: user.name,
+                email: user.email,
+                reason: reason,
+                message: messageContent,
+            })
+        })
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        // Send "Alert!!!" to the backend to save in DB
+        let msg = {
+            user: user.fcm_token ? user : user.fcm_token = DOM.fcmToken,
+            message: alertMessage,
+            reply_id: messageId,
+            group_id: DOM.groupId,
+            type: 'Message',
+            mediaName: null,
+            time: Math.floor(Date.now() / 1000),
+            csrf_token: document.querySelector('meta[name="csrf-token"]').content,
+        };
+        socket.emit('sendChatToServer', msg);
+        return true; // Indicate that an alert was sent
+    }
+    return false; // No alert needed
 }
 // Add event listener to the send message button
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
@@ -1590,106 +1695,6 @@ DOM.messages.addEventListener('scroll', async () => {
     }
 });
 
-// Function to add a new message to the message area
-// let addNewMessageToArea = (message) => {
-//     // console.log("message area to dislpay messages",message);
-//     let msgDate = new Date(message.time * 1000).getDate();
-//
-//     if (lastDate !== msgDate) {
-//         addDateToMessageArea(msgDate);
-//         lastDate = msgDate;
-//     }
-//     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
-//     let senderName = message.user.name;
-//
-//     let messageContent;
-//     switch (message.type) {
-//         case 'File':
-//             messageContent = `
-//                 <div class="file-message">
-//                     <div class="file-icon">
-//                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                             <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-//                             <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-//                         </svg>
-//                     </div>
-//                     <div class="file-details">
-//                         <p class="file-name">${message.media_name}</p>
-//                     </div>
-//                     <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
-//                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                             <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-//                         </svg>
-//                     </a>
-//                 </div>
-//             `;
-//             break;
-//         case 'Image':
-//             messageContent = `<img src="${message.message ?? message.msg}" style="height:222px; width:54px;">`;
-//             break;
-//         case 'Message':
-//         case null:
-//             messageContent = message.message ?? message.msg;
-//             break;
-//         case 'Audio':
-//             messageContent = `
-//                 <p>${message.media_name}</p>
-//                 <p>${message.message ?? message.msg}</p>
-//             `;
-//             break;
-//         default:
-//             messageContent = message.message ?? message.msg;
-//     }
-//
-//     // Create the message element as a DOM element
-//     let messageElement = document.createElement('div');
-//     messageElement.className = 'ml-3';
-//
-//     messageElement.innerHTML = `
-//         ${message.user.id == user.id ? '' : profileImage}
-//         <div class="">
-//             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
-//                 <div style="margin-top:-4px">
-//                     <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; ">
-//                         ${messageContent.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}
-//                     </div>
-//                     <div>
-//                         <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
-//                             <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-//                             <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span> |
-//                             <span>
-//                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
-//                             </span> |
-//                             <!---|
-//                             <span>
-//                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${message.msg}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
-//                             </span>
-//                             <span>
-//                                 <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-//                             </span>--->
-//                         </div>
-//                         ${message.sender === user.unique_id ? `
-//                         <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
-//                             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-//                                 <i class="fas fa-angle-down text-muted px-2"></i>
-//                             </a>
-//                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-//                                 ${!['Audio', 'Image', 'File'].includes(message.type) ? `
-//         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}','${message.msg}')">Edit</a>
-//       ` : ''}
-//                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-//                                 <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-//                             </div>
-//                         </div>` : ''}
-//                     </div>
-//                 </div>
-//             </div>
-//         </div>
-//     `;
-//
-//     return messageElement;
-// };
-
 
 // New Updated new message area
 let addNewMessageToArea = (message) => {
@@ -1867,7 +1872,7 @@ let addNewMessageToArea = (message) => {
 
     return messageElement;
 };
-
+// TWO
 const fetchNextPageMessages = async (message_id = null, current_Page = null) => {
     let nextPageMessages = [];
     if (!message_id) {
@@ -1886,10 +1891,6 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         nextPageMessages = await response.json();
         unread_settings(nextPageMessages);
         pagnicateChatList.data.push(...nextPageMessages.data);
-
-        // const sortedMessages = pagnicateChatList.data.reverse().sort((a, b) => a.id - b.id);
-
-        // console.log("Sorted Messages by ID Ascending:", sortedMessages);
 
         const ids = nextPageMessages.data.map(item => item.id);
 
@@ -1926,15 +1927,41 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
                     setTimeout(() => {
                         messageElement.scrollIntoView({ behavior: "smooth" });
                     }, 100);
+
                     const searchQuery = searchMessageInputFeild.value.toLowerCase();
                     const messageTextElement = messageElement.querySelector(".shadow-sm");
-                    const messageText = messageTextElement.textContent.toLowerCase();
-                    const index = messageText.indexOf(searchQuery);
+
+                    // Use innerHTML to preserve formatting
+                    const messageText = messageTextElement.innerHTML; // Use innerHTML to keep existing formatting
+                    const messageTextLower = messageText.toLowerCase(); // For case-insensitive search
+                    const index = messageTextLower.indexOf(searchQuery);
+
                     if (index !== -1) {
-                        const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                        // Highlight the search query within the original formatted message
+                        console.log("fetch next message");
+                        const highlightedText = messageText.substring(0, index) +
+                            `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` +
+                            messageText.substring(index + searchQuery.length);
+
+                        // Set the innerHTML back to the messageTextElement
                         messageTextElement.innerHTML = highlightedText;
                     }
                 }
+
+                // const messageElement = DOM.messages.querySelector(`[data-message-id="${msg.id}"]`);
+                // if (messageElement) {
+                //     setTimeout(() => {
+                //         messageElement.scrollIntoView({ behavior: "smooth" });
+                //     }, 100);
+                //     const searchQuery = searchMessageInputFeild.value.toLowerCase();
+                //     const messageTextElement = messageElement.querySelector(".shadow-sm");
+                //     const messageText = messageTextElement.textContent.toLowerCase();
+                //     const index = messageText.indexOf(searchQuery);
+                //     if (index !== -1) {
+                //         const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                //         messageTextElement.innerHTML = highlightedText;
+                //     }
+                // }
             }
         });
 
@@ -2580,7 +2607,7 @@ async function unreadGrouChat() {
 }
 
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
-
+// ONE
 searchMessageInputFeild.addEventListener("input", function (e) {
     if (e.target.value.length > 0) {
         clearTimeout(debounceTimeout);
@@ -2590,7 +2617,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                 fetch(url)
                     .then(response => response.json())
                     .then(messageResponse => {
-                        console.log("search message response", messageResponse);
                         const searchResultsDiv = document.querySelector(".search-results");
                         searchResultsDiv.innerHTML = "";
                         const searchQuery = e.target.value.toLowerCase();
@@ -2607,7 +2633,9 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             if (message.msg.startsWith("https://")) {
                                 resultTextDiv.textContent = message.media_name;
                             } else {
-                                resultTextDiv.textContent = message.msg;
+                                resultTextDiv.innerHTML = message.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
+
+                                // resultTextDiv.textContent = message.msg;
                             }
                             resultItemDiv.appendChild(resultDateDiv);
                             resultItemDiv.appendChild(resultTextDiv);
@@ -2616,61 +2644,72 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultItemDiv.addEventListener("click", function () {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-                                if (messageElement) {
-                                    console.log("mesage element found", messageElement);
-                                    // const messageTextElement = messageElement.querySelector(".shadow-sm");
-                                    // console.log("message Text Element found",messageTextElement);
 
-                                    // const messageText = messageTextElement.textContent.toLowerCase();
-                                    // const index = messageText.indexOf(searchQuery);
-                                    // if (index !== -1) {
-                                    //     const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
-                                    //     messageTextElement.innerHTML = highlightedText;
-                                    // }
+                                if (messageElement) {
+                                    console.log("first messages");;
+
                                     switch (message.type) {
                                         case "Message":
                                             const messageTextElement = messageElement.querySelector(".shadow-sm");
-                                            console.log("message Text Element found", messageTextElement);
+                                            console.log("Message Text Element found", messageTextElement);
 
-                                            const messageText = messageTextElement.textContent.toLowerCase();
-                                            const index = messageText.indexOf(searchQuery);
+                                            const messageText = messageTextElement.innerHTML;
+                                            const messageTextLower = messageText;
+                                            const index = messageTextLower.indexOf(searchQuery);
+
                                             if (index !== -1) {
-                                                const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                                                const highlightedText = messageText.substring(0, index) +
+                                                    `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` +
+                                                    messageText.substring(index + searchQuery.length);
                                                 messageTextElement.innerHTML = highlightedText;
                                             }
                                             break;
+
                                         case "Image":
                                             // Handle Image type
                                             break;
+
                                         case "Audio":
                                             // Handle Audio type
                                             break;
+
                                         case "File":
                                             const fileNameElement = messageElement.querySelector(".file-name");
                                             if (fileNameElement) {
                                                 const fileName = fileNameElement.textContent;
-                                                const index = fileName.toLowerCase().indexOf(searchQuery);
+                                                const index = fileName.toLowerCase().indexOf(searchQuery.toLowerCase());
+
                                                 if (index !== -1) {
-                                                    const highlightedFileName = fileName.substring(0, index) + `<span class="highlight">${fileName.substring(index, index + searchQuery.length)}</span>` + fileName.substring(index + searchQuery.length);
+                                                    const highlightedFileName = fileName.substring(0, index) +
+                                                        `<span class="highlight">${fileName.substring(index, index + searchQuery.length)}</span>` +
+                                                        fileName.substring(index + searchQuery.length);
                                                     fileNameElement.innerHTML = highlightedFileName;
                                                 }
                                             }
                                             break;
+
                                         default:
-                                            const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
-                                            if (nullTypemessageTextElement) {
-                                                const nullTypeMessageText = nullTypemessageTextElement.textContent.toLowerCase();
-                                                const nullTypeindex = nullTypeMessageText.indexOf(searchQuery);
-                                                if (nullTypeindex !== -1) {
-                                                    const highlightedText = nullTypeMessageText.substring(0, nullTypeindex) + `<span class="highlight">${nullTypeMessageText.substring(nullTypeindex, nullTypeindex + searchQuery.length)}</span>` + nullTypeMessageText.substring(nullTypeindex + searchQuery.length);
-                                                    nullTypemessageTextElement.innerHTML = highlightedText;
+                                            console.log("default stylionh");
+                                            const nullTypeMessageTextElement = messageElement.querySelector(".shadow-sm");
+                                            if (nullTypeMessageTextElement) {
+                                                const nullTypeMessageText = nullTypeMessageTextElement.innerHTML;
+                                                const nullTypeMessageTextLower = nullTypeMessageText.toLowerCase();
+                                                const searchQueryLower = searchQuery.toLowerCase();
+                                                const nullTypeIndex = nullTypeMessageTextLower.indexOf(searchQueryLower);
+
+                                                if (nullTypeIndex !== -1) {
+                                                    const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
+                                                        `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
+                                                        nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
+
+                                                    nullTypeMessageTextElement.innerHTML = highlightedText;
                                                 }
                                             } else {
                                                 console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                                             }
                                             break;
-                                            console.log("Unknown message type:", message.type);
                                     }
+
                                     messageElement.scrollIntoView({ behavior: "smooth" });
                                 } else {
                                     fetchNextPageMessages(messageId, currentPage);
