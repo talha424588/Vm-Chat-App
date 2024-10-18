@@ -804,7 +804,7 @@ let addMessageToMessageArea = (message) => {
             ` : ''}
             ${user.role === '0' || user.role === '2' ? `
                 ${message.is_compose === 0 || message.is_compose == false && message.type === "Message" ? `
-                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">asdasdasdasdasd</a>
+                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                 ` : ''}
               ${message.is_compose === 0 || message.is_compose == false && message.type === "Message" ? `
               <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
