@@ -106,7 +106,7 @@ class ChatController extends Controller
                 'token' => json_encode($request->user['fcm_token'])
             ]);
 
-            $this->sendNotification($request);
+            // $this->sendNotification($request);
             // dispatch(new SendNotificationJob(json_encode($request->user['fcm_token']), $user['name'],$message->msg, $this->firebaseService));
             return response()->json($message, 201);
         }
@@ -124,7 +124,7 @@ class ChatController extends Controller
             'message' => [
                 'token' => $token,
                 'notification' => [
-                    'title' => 'New Message',
+                    'title' => $request->senderName,
                     'body'  => $message
                 ]
             ]
