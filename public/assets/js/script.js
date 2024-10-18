@@ -428,7 +428,7 @@ socket.on('moveMessage', () => {
 });
 
 let addMessageToMessageArea = (message) => {
-    console.log("message",message);
+    console.log("message", message);
 
     let msgDate = mDate(message.time).getDate();
 
@@ -729,34 +729,6 @@ let addMessageToMessageArea = (message) => {
         </div>
     `;
     }
-    //     else if (message.type === 'Audio' || oldMessageType == "Audio") {
-    //         const audioSrc = message.msg;
-
-    //         messageContent = `
-
-    // <div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
-    //             <div class="avatar">
-    //                 <!-- Avatar image here -->
-    //             </div>
-    //             <div class="audio-content">
-    //                 <div class="audio-controls">
-    //                     <button class="play-button">
-    //                         <img src="assets/img/play-icon.svg" alt="Play" />
-    //                     </button>
-    //                     <div class="audio-progress">
-    //                         <div class="progress-filled"></div>
-    //                     </div>
-    //                 </div>
-    //                 <div class="audio-time-container">
-    //                     <span class="audio-duration">0:00</span>
-    //                     <span class="audio-time">12:27 PM</span>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     `;
-    //     }
-    console.log("new message",message);
-    console.log("new message",message.is_compose === 0);
     DOM.messages.innerHTML += `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
@@ -790,57 +762,57 @@ let addMessageToMessageArea = (message) => {
                             </div>
                                       <!-- Dropdown menu for actions -->
                                       <!---
-      ${message.sender === user.unique_id ? `
-        <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
-          <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-angle-down text-muted px-2"></i>
-          </a>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-         ${!['Audio', 'Image', 'File'].includes(message.type) ? `
-        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-          <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-      ` : ''}
+                            ${message.sender === user.unique_id ? `
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
+                                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-angle-down text-muted px-2"></i>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                ${!['Audio', 'Image', 'File'].includes(message.type) ? `
+                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                                <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+                            ` : ''}
 
-            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-            <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
 
-          </div>
-        </div>
-      ` : ''}---->
+                                </div>
+                                </div>
+                            ` : ''}---->
 
-      ${message.sender === user.unique_id ? `
-        <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
-          <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-angle-down text-muted px-2"></i>
-          </a>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            ${!(user.role === '0' || user.role === '2') ? `
-              <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-            ` : ''}
-            ${user.role === '0' || user.role === '2' ? `
-                ${message.is_compose === 0 || message.is_compose == false && message.type === "Message" ? `
-                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-                ` : ''}
-              ${message.is_compose === 0 || message.is_compose == false && message.type === "Message" ? `
-              <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-              ` : ''}
-              ${message.is_compose === 1 && message.type === "Message" ? `
-              <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-              ` : ''}
-            ` : ''}
-            <!---
-            ${user.role === '0' || user.role === '2' ? `
-              <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-            ` : ''}---->
-            ${user.role === '0' || user.role === '2' ? `
-              <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-            ` : ''}
-            ${user.role === '3' && message.sender === user.unique_id ? `
-              <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-            ` : ''}
-          </div>
-        </div>
-      ` : ''}
+                            ${message.sender === user.unique_id ? `
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
+                                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-angle-down text-muted px-2"></i>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    ${!(user.role === '0' || user.role === '2') ? `
+                                    <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                                    ` : ''}
+                                    ${user.role === '0' || user.role === '2' ? `
+                                        ${message.is_compose === 0 || message.is_compose == false && message.type === "Message" ? `
+                                        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                                        ` : ''}
+                                    ${message.is_compose === 0 || message.is_compose == false && message.type === "Message" ? `
+                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+                                    ` : ''}
+                                    ${message.is_compose === 1 && message.type === "Message" ? `
+                                    <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+                                    ` : ''}
+                                    ` : ''}
+                                    <!---
+                                    ${user.role === '0' || user.role === '2' ? `
+                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+                                    ` : ''}---->
+                                    ${user.role === '0' || user.role === '2' ? `
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    ` : ''}
+                                    ${user.role === '3' && message.sender === user.unique_id ? `
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    ` : ''}
+                                </div>
+                                </div>
+                            ` : ''}
 
                        </div>
                     </div>
@@ -1252,11 +1224,14 @@ function handleSendMessage() {
         const messageContentDiv = messageElement.querySelector('div.shadow-sm');
 
         const messageToUpdate = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
+        console.log("messageToUpdate", messageToUpdate);
+        let newMessageDisplay = '';
         if (messageToUpdate.reply) {
-            let newMessageDisplay = `<div class="reply-message-area">${messageContent.replace(/[\r\n]+/g, '<br>')}</div>`; // Update with new content
+            if (messageToUpdate.reply.type === "Message") {
+                newMessageDisplay = `<div class="reply-message-area">${messageContent.replace(/[\r\n]+/g, '<br>')}</div>`; // Update with new content
 
-            const replyMessage = messageToUpdate.reply.msg;
-            newMessageDisplay = `
+                const replyMessage = messageToUpdate.reply.msg;
+                newMessageDisplay = `
                     <div class="reply-message-div" onclick="scrollToMessage('${messageToUpdate.reply.id}')">
                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                             ${messageToUpdate.reply.type}
@@ -1268,10 +1243,94 @@ function handleSendMessage() {
                     ${newMessageDisplay}
                 `;
 
-            messageContentDiv.innerHTML = newMessageDisplay;
+                messageContentDiv.innerHTML = newMessageDisplay;
+            }
+            else if (messageToUpdate.reply.type === "Image") {
+                var message_body = `<img src="${messageToUpdate.reply.msg}" style="height:125px; width:125px;">`;
+
+                console.log("image");
+                newMessageDisplay = `
+                <div class="reply-message-div" onclick="scrollToMessage('${messageToUpdate.reply.id}')"> <!-- Add onclick here -->
+                    <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                        ${messageToUpdate.user?.id == user?.id ? messageToUpdate.user.name : messageToUpdate.user.name}
+                    </div>
+                    <div class="reply-details">
+                        <p class="file-name">${message_body}</p>
+                    </div>
+                </div>
+                <div class="reply-message-area">${messageToUpdate.msg}</div>
+            `;
+                messageContentDiv.innerHTML = newMessageDisplay;
+            }
+            else if (messageToUpdate.reply.type === "File") {
+                const add_file_view = `
+                <div class="file-message" onclick="scrollToMessage('${messageToUpdate.reply.id}')">
+                    <div class="file-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <p class="file-name">${messageToUpdate.reply.media_name}</p>
+                    </div>
+                    <a href="${messageToUpdate.reply.message ?? messageToUpdate.reply.msg}" target="_blank" download="${messageToUpdate.reply.media_name}" class="download-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                        </svg>
+                    </a>
+                </div>
+            `;
+
+                newMessageDisplay = `
+                <div class="">
+                    ${add_file_view}
+                </div>
+                <div class="reply-message-area">${messageToUpdate.msg.replace(/[\r\n]+/g, '<br>')}</div>
+            `;
+                messageContentDiv.innerHTML = newMessageDisplay;
+            }
+
+            else if (messageToUpdate.reply.type === "Audio") {
+                var message_body = `<div class="audio-message" style="background-color:${messageToUpdate.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${messageToUpdate.reply.msg}">
+                    <div class="avatar">
+                        <!-- Avatar image here -->
+                    </div>
+                    <div class="audio-content">
+                        <div class="audio-controls">
+                            <button class="playbutton">
+                                <img src="assets/img/play-icon.svg" alt="Play" />
+                            </button>
+                            <div class="audio-progress">
+                                <div class="progress-filled"></div>
+                            </div>
+                        </div>
+                        <div class="audio-time-container">
+                            <span class="audio-duration">0:00</span>
+                            <span class="audio-time">12:27 PM</span>
+                        </div>
+                    </div>
+                    </div>`;
+
+
+
+                    newMessageDisplay = `
+                    <div class="reply-message-div"  onclick="scrollToMessage('${messageToUpdate.reply.id}')">
+                        <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                        ${messageToUpdate.user?.id == user?.id ? messageToUpdate.user.name : messageToUpdate.user.name}
+
+                        </div>
+                        <div class="reply-details">
+                            <p class="file-name">${message_body}</p>
+                        </div>
+                    </div>
+                <div class="reply-message-area">${(messageToUpdate.msg || messageToUpdate.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
+                `;
+                messageContentDiv.innerHTML = newMessageDisplay;
+
+            }
         }
-        else
-        {
+        else {
             const editMessageDiv = document.getElementById('editMessageDiv');
             const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
             editMessageContentDiv.innerHTML = messageContent;
