@@ -170,42 +170,67 @@ z-index: 1; /* Ensure it is above other content */
 
 
 /*UnRead Message */
+/* Style for the icon container */
 .icon-container {
-	position: fixed;
-	right: 30px; /* Adjust as needed */
-	bottom: 90px; /* Adjust as needed */
-	width: 40px;
-	height: 40px;
-	background-color: white;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Optional: adds a shadow */
-	z-index: 5;
+    position: fixed;
+    bottom: 20px;
+    right: 40px;
+    background-color: #f1f1f1;
+    border-radius: 50%;
+    padding: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
+/* Hover effect for the icon container */
+.icon-container:hover {
+    background-color: #e0e0e0;
+}
+
+/* Style for the notification count badge */
 .notification-count {
-	position: absolute;
-	top: -5px;
-	left: -5px;
-	width: 20px;
-	height: 20px;
-	background-color: #25D366; /* WhatsApp green */
-	color: white;
-	font-size: 12px;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-weight: bold;
-	padding: 1px 1px 3px 5px;
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    background-color: #34c759;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 6px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	display: none;
 }
 
+/* Style for the icon (down arrow) */
 .icon {
-	font-size: 16px;
-	color: #707070; /* Adjust the color as needed */
+    font-size: 24px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+/* SVG style */
+.icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.icon svg path {
+    fill: #687780; /* Color for the down arrow */
+}
+
+/* When the icon container is hidden */
+.icon-container.hidden {
+    display: none;
+}
+
 .notification-wrapper {
 position: relative;
 display: flex;
@@ -282,6 +307,17 @@ background-color: rgba(255, 255, 255, 0.3);
 	.additional_style{
 		padding:7px !important;
 
+	}
+
+	.profile_img{
+		margin-left:6px !important;
+		margin-right:12px !important;	
+	}
+	.search-bar{
+		border-radius:35px !important;
+	}
+	.icon-container{
+		right:15px;
 	}
 
   }
@@ -823,12 +859,15 @@ body{
 }
 
 .search-icon i {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: #687780;
+}
+#search-icon-mobile{
+	display: none;
 }
 
 /* Responsive design for small screens */
-@media (max-width: 576px) {
+@media (max-width: 768px) {
     .back-arrow {
         display: block;
     }
@@ -839,6 +878,11 @@ body{
     .search-icon {
 		margin-right: 15px;
     }
+	#search-icon{
+		display: block;
+	}
+	
+	
 }
 
 
