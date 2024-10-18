@@ -79,19 +79,42 @@ class ChatService implements ChatRepository
             return $this->fetchMessagesUpToSearched($request);
         }
     }
+    // private function fetchMessagesUpToSearched($request)
+    // {
+    //     $pageNo = (int)($request->currentPage);
+    //     $messageId = $request->messageId;
+    //     $groupId = $request->groupId;
+
+    //     $messages = GroupMessage::where('group_id', $groupId)
+    //         ->where('id', '>=', $messageId)
+    //         ->where('is_deleted', false)
+    //         ->orderBy('id', 'desc')
+    //         ->take(PHP_INT_MAX)
+    //         ->skip($pageNo * 20)
+    //         ->get();
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Messages found',
+    //         'data' => new MessageResourceCollection($messages),
+    //     ]);
+    // }
+
+
     private function fetchMessagesUpToSearched($request)
     {
         $pageNo = (int)($request->currentPage);
         $messageId = $request->messageId;
         $groupId = $request->groupId;
 
+        // Fetch messages from the specified messageId onward
         $messages = GroupMessage::where('group_id', $groupId)
-            ->where('id', '>=', $messageId)
+            ->where('id', '<=', $messageId) // Change to '<=' to get messages up to the specified message
             ->where('is_deleted', false)
             ->orderBy('id', 'desc')
-            ->take(PHP_INT_MAX)
-            ->skip($pageNo * 20)
+            ->take(20) // Fetch only 20 messages at a time
+            ->skip($pageNo * 20) // Paginate based on the page number
             ->get();
+
         return response()->json([
             'status' => true,
             'message' => 'Messages found',
@@ -130,7 +153,6 @@ class ChatService implements ChatRepository
 
     public function searchGroupMessages($searchQuery, $groupId)
     {
-//        return $searchQuery;
         // $messages = GroupMessage::where("msg", "LIKE", "%$query%")
         //     ->orWhere("media_name", "LIKE", "%$query%")
         //     ->where("group_id", $groupId)
@@ -143,11 +165,10 @@ class ChatService implements ChatRepository
                 ->orWhere("media_name", "LIKE", "%$searchQuery%");
         })
             ->where("group_id", $groupId)
-//            ->whereIn("type", ["File", "Message",])
             ->where(function ($query) {
                 $query->whereIn("type", ["File", "Message"])
-                    ->orWhereNull("type") // Include messages with null type
-                    ->orWhere("type", ""); // Include messages with empty string type
+                    ->orWhereNull("type")
+                    ->orWhere("type", "");
             })
             ->where('is_deleted', false)
             ->with("user")

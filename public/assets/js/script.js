@@ -1834,7 +1834,7 @@ let addNewMessageToArea = (message) => {
 
     return messageElement;
 };
-
+// TWO
 const fetchNextPageMessages = async (message_id = null, current_Page = null) => {
     let nextPageMessages = [];
     if (!message_id) {
@@ -1853,11 +1853,6 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         nextPageMessages = await response.json();
         unread_settings(nextPageMessages);
         pagnicateChatList.data.push(...nextPageMessages.data);
-        console.log("after pagination",pagnicateChatList.data);
-
-        // const sortedMessages = pagnicateChatList.data.reverse().sort((a, b) => a.id - b.id);
-
-        // console.log("Sorted Messages by ID Ascending:", sortedMessages);
 
         const ids = nextPageMessages.data.map(item => item.id);
 
@@ -1894,15 +1889,41 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
                     setTimeout(() => {
                         messageElement.scrollIntoView({ behavior: "smooth" });
                     }, 100);
+
                     const searchQuery = searchMessageInputFeild.value.toLowerCase();
                     const messageTextElement = messageElement.querySelector(".shadow-sm");
-                    const messageText = messageTextElement.textContent.toLowerCase();
-                    const index = messageText.indexOf(searchQuery);
+
+                    // Use innerHTML to preserve formatting
+                    const messageText = messageTextElement.innerHTML; // Use innerHTML to keep existing formatting
+                    const messageTextLower = messageText.toLowerCase(); // For case-insensitive search
+                    const index = messageTextLower.indexOf(searchQuery);
+
                     if (index !== -1) {
-                        const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                        // Highlight the search query within the original formatted message
+                        console.log("fetch next message");
+                        const highlightedText = messageText.substring(0, index) +
+                            `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` +
+                            messageText.substring(index + searchQuery.length);
+
+                        // Set the innerHTML back to the messageTextElement
                         messageTextElement.innerHTML = highlightedText;
                     }
                 }
+
+                // const messageElement = DOM.messages.querySelector(`[data-message-id="${msg.id}"]`);
+                // if (messageElement) {
+                //     setTimeout(() => {
+                //         messageElement.scrollIntoView({ behavior: "smooth" });
+                //     }, 100);
+                //     const searchQuery = searchMessageInputFeild.value.toLowerCase();
+                //     const messageTextElement = messageElement.querySelector(".shadow-sm");
+                //     const messageText = messageTextElement.textContent.toLowerCase();
+                //     const index = messageText.indexOf(searchQuery);
+                //     if (index !== -1) {
+                //         const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                //         messageTextElement.innerHTML = highlightedText;
+                //     }
+                // }
             }
         });
 
@@ -2548,7 +2569,7 @@ async function unreadGrouChat() {
 }
 
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
-
+// ONE
 searchMessageInputFeild.addEventListener("input", function (e) {
     if (e.target.value.length > 0) {
         clearTimeout(debounceTimeout);
@@ -2558,7 +2579,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                 fetch(url)
                     .then(response => response.json())
                     .then(messageResponse => {
-                        console.log("search message response", messageResponse);
                         const searchResultsDiv = document.querySelector(".search-results");
                         searchResultsDiv.innerHTML = "";
                         const searchQuery = e.target.value.toLowerCase();
@@ -2575,7 +2595,9 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             if (message.msg.startsWith("https://")) {
                                 resultTextDiv.textContent = message.media_name;
                             } else {
-                                resultTextDiv.textContent = message.msg;
+                                resultTextDiv.innerHTML = message.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
+
+                                // resultTextDiv.textContent = message.msg;
                             }
                             resultItemDiv.appendChild(resultDateDiv);
                             resultItemDiv.appendChild(resultTextDiv);
@@ -2584,61 +2606,72 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultItemDiv.addEventListener("click", function () {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-                                if (messageElement) {
-                                    console.log("mesage element found", messageElement);
-                                    // const messageTextElement = messageElement.querySelector(".shadow-sm");
-                                    // console.log("message Text Element found",messageTextElement);
 
-                                    // const messageText = messageTextElement.textContent.toLowerCase();
-                                    // const index = messageText.indexOf(searchQuery);
-                                    // if (index !== -1) {
-                                    //     const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
-                                    //     messageTextElement.innerHTML = highlightedText;
-                                    // }
+                                if (messageElement) {
+                                    console.log("first messages");;
+
                                     switch (message.type) {
                                         case "Message":
                                             const messageTextElement = messageElement.querySelector(".shadow-sm");
-                                            console.log("message Text Element found", messageTextElement);
+                                            console.log("Message Text Element found", messageTextElement);
 
-                                            const messageText = messageTextElement.textContent.toLowerCase();
-                                            const index = messageText.indexOf(searchQuery);
+                                            const messageText = messageTextElement.innerHTML;
+                                            const messageTextLower = messageText;
+                                            const index = messageTextLower.indexOf(searchQuery);
+
                                             if (index !== -1) {
-                                                const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                                                const highlightedText = messageText.substring(0, index) +
+                                                    `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` +
+                                                    messageText.substring(index + searchQuery.length);
                                                 messageTextElement.innerHTML = highlightedText;
                                             }
                                             break;
+
                                         case "Image":
                                             // Handle Image type
                                             break;
+
                                         case "Audio":
                                             // Handle Audio type
                                             break;
+
                                         case "File":
                                             const fileNameElement = messageElement.querySelector(".file-name");
                                             if (fileNameElement) {
                                                 const fileName = fileNameElement.textContent;
-                                                const index = fileName.toLowerCase().indexOf(searchQuery);
+                                                const index = fileName.toLowerCase().indexOf(searchQuery.toLowerCase());
+
                                                 if (index !== -1) {
-                                                    const highlightedFileName = fileName.substring(0, index) + `<span class="highlight">${fileName.substring(index, index + searchQuery.length)}</span>` + fileName.substring(index + searchQuery.length);
+                                                    const highlightedFileName = fileName.substring(0, index) +
+                                                        `<span class="highlight">${fileName.substring(index, index + searchQuery.length)}</span>` +
+                                                        fileName.substring(index + searchQuery.length);
                                                     fileNameElement.innerHTML = highlightedFileName;
                                                 }
                                             }
                                             break;
+
                                         default:
-                                            const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
-                                            if (nullTypemessageTextElement) {
-                                                const nullTypeMessageText = nullTypemessageTextElement.textContent.toLowerCase();
-                                                const nullTypeindex = nullTypeMessageText.indexOf(searchQuery);
-                                                if (nullTypeindex !== -1) {
-                                                    const highlightedText = nullTypeMessageText.substring(0, nullTypeindex) + `<span class="highlight">${nullTypeMessageText.substring(nullTypeindex, nullTypeindex + searchQuery.length)}</span>` + nullTypeMessageText.substring(nullTypeindex + searchQuery.length);
-                                                    nullTypemessageTextElement.innerHTML = highlightedText;
+                                            console.log("default stylionh");
+                                            const nullTypeMessageTextElement = messageElement.querySelector(".shadow-sm");
+                                            if (nullTypeMessageTextElement) {
+                                                const nullTypeMessageText = nullTypeMessageTextElement.innerHTML;
+                                                const nullTypeMessageTextLower = nullTypeMessageText.toLowerCase();
+                                                const searchQueryLower = searchQuery.toLowerCase();
+                                                const nullTypeIndex = nullTypeMessageTextLower.indexOf(searchQueryLower);
+
+                                                if (nullTypeIndex !== -1) {
+                                                    const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
+                                                        `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
+                                                        nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
+
+                                                    nullTypeMessageTextElement.innerHTML = highlightedText;
                                                 }
                                             } else {
                                                 console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                                             }
                                             break;
-                                            console.log("Unknown message type:", message.type);
                                     }
+
                                     messageElement.scrollIntoView({ behavior: "smooth" });
                                 } else {
                                     fetchNextPageMessages(messageId, currentPage);

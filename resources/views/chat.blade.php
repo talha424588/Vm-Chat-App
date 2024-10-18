@@ -18,7 +18,7 @@
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-messaging.js"></script>
     <script src="https://cdn.tiny.cloud/1/6hun1luhhppu7pkwfe4vetbftca09vpcny2aoik7l4fmmlcf/tinymce/6/tinymce.min.js"
         referrerpolicy="origin"></script>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
     <style>
@@ -99,6 +99,7 @@
 
             margin-left: 30px;
         }
+
         .selected-message {
             background-color: #E8E9EA;/ Change background color / padding: 2px;
             transition: background-color 0.3s ease;/ Smooth transition effect /
@@ -150,7 +151,7 @@
             justify-content: center;
         }
 
-         .chat-list-item {
+        .chat-list-item {
             cursor: pointer;
             display: flex;
             align-items: center;/ This will vertically center the radio button / transition: background-color 0.3s ease;
@@ -179,10 +180,10 @@
             transition: filter 0.3s ease;
             /* Optional: Smooth transition */
         }
+
         .auto-resize-textarea {
             overflow: hidden;
         }
-      
     </style>
 </head>
 
@@ -199,42 +200,40 @@
                 <!-- Navbar -->
 
                 <div class="row d-flex flex-row align-items-center p-2" id="navbar">
-                    <img alt="Profile Photo" class="img-fluid rounded-circle profile_img"
-                        id="display-pic">
+                    <img alt="Profile Photo" class="img-fluid rounded-circle profile_img" id="display-pic">
                     <div class="username-container">
                         <div class="text-dark font-weight-bold" id="username"></div>
                         <small class="text-muted">Online</small>
                     </div>
 
                     <div class="nav-item dropdown ml-auto">
-
                         <button type="button" class="btn loginbutton btn-block" id="logout"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             Logout
                         </button>
 
-                        <form id="logout-form d-none" action="{{ route('logout') }}" method="POST">
+                        <form id="logout-form" class="d-none" action="{{ route('logout') }}" method="POST">
                             @csrf
                         </form>
                     </div>
                 </div>
                 <div>
-               
-                        <div class="search-bar">
-                            <i class="fa fa-search"></i>
-                            <input type="text" placeholder="Search" id="search_group">
-                        </div>
 
-                        <div class="buttons">
-                            <button class="button active" onclick="display_chat('all')">All</button>
-                            <button class="button" onclick="display_chat('unread')">Unread</button>
+                    <div class="search-bar">
+                        <i class="fa fa-search"></i>
+                        <input type="text" placeholder="Search" id="search_group">
+                    </div>
 
-                            <!--- <button class="button active">All</button>
+                    <div class="buttons">
+                        <button class="button active" onclick="display_chat('all')">All</button>
+                        <button class="button" onclick="display_chat('unread')">Unread</button>
+
+                        <!--- <button class="button active">All</button>
                             <button class="button" id="unread">Unread</button>
                             {{-- <button class="button">Groups</button> --}}--->
-                        </div>
-                        
-                   
+                    </div>
+
+
                 </div>
                 <!-- Chat List -->
                 <div class="row" id="chat-list" style="overflow:auto;"></div>
