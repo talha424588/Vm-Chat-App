@@ -337,6 +337,7 @@ socket.on('updateGroupMessages', (messageId) => {
 
 socket.on('sendChatToClient', (message) => {
 
+    pagnicateChatList.data.push(message);
     let unique_id = document.getElementById("login_user_unique_id").value;
     const groupId = message.group_id;
 
@@ -786,9 +787,9 @@ let addMessageToMessageArea = (message) => {
               <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
             ` : ''}
             ${user.role === '0' || user.role === '2' ? `
-            ${message.is_compose === 1 && message.type === "Message" ? `
-              <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-               ` : ''}
+           <!-- ${message.is_compose === 1 && message.type === "Message" ? `
+           ` : ''}-->
+           <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
               ${message.is_compose === 1 && message.type === "Message" ? `
               <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
               ` : ''}
@@ -1852,6 +1853,7 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         nextPageMessages = await response.json();
         unread_settings(nextPageMessages);
         pagnicateChatList.data.push(...nextPageMessages.data);
+        console.log("after pagination",pagnicateChatList.data);
 
         // const sortedMessages = pagnicateChatList.data.reverse().sort((a, b) => a.id - b.id);
 
