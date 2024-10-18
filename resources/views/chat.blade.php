@@ -278,25 +278,54 @@
                 <div class="w-100 h-100 overlay"></div>
 
                 <!-- Navbar -->
-                <div class="row d-flex flex-row align-items-center p-2 m-0 w-100" id="navbar">
-                    <div class="d-block d-sm-none">
-                        <i class="fas fa-arrow-left p-2 mr-2 text-dark" style="font-size: 1.5rem; cursor: pointer;"
-                            onclick="showChatList()"></i>
-                    </div>
-                    <a href="#"><img
-                            src="https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg"
-                            alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;"
-                            id="pic"></a>
-                    <div class="d-flex flex-column">
-                        <div class="text-dark font-weight-bold" id="name"></div>
-                        <div class=" small" id="details"></div>
-                    </div>
-                    <div class="d-flex flex-row align-items-center ml-auto" id="search-icon">
-                        <!-- <i class="fas fa-search mx-3 text-dark d-none d-md-block"></i>
-      <a href="#"><i class="fas fa-paperclip mx-3 text-dark d-none d-md-block"></i></a> -->
-                        <a href="#"><i class="fas fa-search mr-2 mx-sm-3 " style="color:#596A74;"></i></a>
-                    </div>
-                </div>
+                <div id="side_navbar">
+
+    <div class="back-arrow" onclick="showChatList()">
+        <i class="fas fa-arrow-left"></i>
+    </div>
+
+
+    <a href="#"><img src="https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg"
+        alt="Profile Photo" class="profile-pic" id="pic"></a>
+
+    <div class="profile-details">
+        <div class="name" id="name">User Name</div>
+        <div class="details" id="details">Details here</div>
+    </div>
+
+    <!-- Search Icon -->
+    <div class="search-icon" id="search-icon">
+       <i class="fas fa-search"></i>
+    </div>
+    <div class="search-icon" id="search-icon-mobile">
+       <i class="fas fa-search"></i>
+    </div>
+
+    <div class="d-none serach_div" id="serach_div">
+    <div class="row flex-row search-header">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M0 17C0 18.7 1.3 20 3 20H17C18.7 20 20 18.7 20 17V9H0V17ZM17 2H15V1C15 0.4 14.6 0 14 0C13.4 0 13 0.4 13 1V2H7V1C7 0.4 6.6 0 6 0C5.4 0 5 0.4 5 1V2H3C1.3 2 0 3.3 0 5V7H20V5C20 3.3 18.7 2 17 2Z"
+                                fill="#687780" />
+                        </svg>
+                        &nbsp;&nbsp;<input type="search" placeholder="Search messages" class="search-input"
+                            id="messsage_search_query">
+    </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
 
                 <div class="d-flex flex-column chat_list_messages" id="messages"></div>
 
@@ -463,7 +492,7 @@
                         </style>
 
                         <div class="icon-container" id="scrollBottomBtn" style="display: none;">
-                            <div class="notification-count" id="notification-count" style="display: none;"></div>
+                            <div class="notification-count" id="notification-count"></div>
                             <div class="icon" style="font-size: 24px !important;"><svg width="40"
                                     height="10" viewBox="0 0 16 9" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -472,7 +501,6 @@
                                         fill="#687780" />
                                 </svg></div> <!-- This is a down arrow symbol -->
                         </div>
-
 
 
                         <textarea id="input" class="chat-input auto-resize-textarea" rows="1" cols="62"
