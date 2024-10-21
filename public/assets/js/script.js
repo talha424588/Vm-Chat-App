@@ -36,7 +36,16 @@ const DOM = {
     // displayed_edit_div:false,
     // displayed_correction_div:false,
     displayed_message_div: false,
+    mobile_search_icon:getById("search-icon-mobile"),
+    counter:0,
+    showCounter:false,
+    notificationDiv:getById("notification-count"),
 };
+DOM.mobile_search_icon.addEventListener("click",()=>{
+    alert("i am clicked");
+    const search_div=getById('serach_div');
+    search_div.style.display="block";
+});
 let user = {
 
     id: parseInt(document.getElementById("login_user_id").value),
@@ -289,7 +298,7 @@ let addunreadToMessageArea = {
     addUnread: function () {
         const notificationValue = 5;
         const notificationDiv = document.getElementById('notification-count');
-        notificationDiv.textContent = notificationValue;
+        notificationDiv.innerHTML = notificationValue;
         notificationDiv.style.display = 'block';
         DOM.messages.innerHTML += `
         <div class="notification-wrapper">
@@ -358,11 +367,18 @@ socket.on('updateGroupMessages', (messageId) => {
 });
 
 socket.on('sendChatToClient', (message) => {
-    console.log(message);
+
     if(pagnicateChatList && pagnicateChatList.data)
     {
         pagnicateChatList.data.push(message);
     }
+
+    if(DOM.showCounter)
+    {   DOM.counter=DOM.counter+1;
+        DOM.notificationDiv.innerHTML = DOM.counter;
+        DOM.notificationDiv.style.display = 'block';
+    }
+
     let unique_id = document.getElementById("login_user_unique_id").value;
     const groupId = message.group_id;
 
@@ -945,14 +961,16 @@ let addMessageToMessageArea = (message) => {
     var messageDiv = document.getElementById("messages");
     var messageItems = messageDiv.getElementsByClassName("message-item");
     var count = messageItems.length;
+    // console.log(count);
     let exceededValue = 0;
     if (count > 20 && count % 20 !== 0) {
         exceededValue = count - 20;
         let unread = DOM.unreadMessagesPerGroup[DOM.groupId];
-        console.log("In the Group and messages Added:", exceededValue);
+        // console.log(unread);
+        // console.log("In the Group and messages Added:", exceededValue);
         document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
-        notificationDiv.textContent = unread;
+        // notificationDiv.textContent = unread;
         if (unread != 0) {
             notificationDiv.style.display = 'block';
         } else {
@@ -1002,8 +1020,13 @@ function scroll_function() {
     messageDiv.addEventListener('scroll', function () {
         if (messageDiv.scrollTop < messageDiv.scrollHeight - messageDiv.clientHeight - 50) {
             scrollBottomBtn.style.display = 'block';
+            DOM.showCounter=true;
         } else {
             scrollBottomBtn.style.display = 'none';
+            DOM.showCounter=false;
+            DOM.counter=0;
+            DOM.notificationDiv.style.display="none";
+            
         }
     });
 
@@ -1716,7 +1739,19 @@ let hasMoreMessages = true;
 
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
-
+    // console.log(DOM.messages.clientHeight);
+    // console.log(DOM.messages.scrollHeight);
+    // const scrollHeight = DOM.messages.scrollHeight;
+    // const scrollTop = DOM.messages.scrollTop;
+    // const clientHeight = DOM.messages.clientHeight;
+  
+    // if (scrollTop + clientHeight < scrollHeight) {
+    //   // User has scrolled up from the bottom
+    //   console.log('User has scrolled up from the bottom');
+    // } else {
+    //   // User is at the bottom of the chat
+    //   console.log('User is at the bottom of the chat');
+    // }
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
         await fetchNextPageMessages();
@@ -1864,10 +1899,12 @@ let addNewMessageToArea = (message) => {
         ${message.user.id == user.id ? '' : profileImage}
         <div class="">
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
-                <div style="margin-top:-4px">
-                    ${replyContent}
+                    <div style="margin-top:-4px">
                     <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; ">
-                        ${messageContent.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}
+                    ${replyContent}
+                    <div class="reply-message-area">
+                     ${messageContent.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}
+                    </div>
                     </div>
                     <div>
                         <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -2462,7 +2499,7 @@ document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
         const editReplyArea = document.getElementById('Editreply-area');
         if (window.getComputedStyle(editReplyArea).display === 'none') {
-            console.log('The div is hidden (display: none).');
+            // console.log('The div is hidden (display: none).');
             event.preventDefault();
             sendMessage();
             document.querySelector('.auto-resize-textarea').style.height = '44px';
