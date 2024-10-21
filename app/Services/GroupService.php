@@ -86,12 +86,6 @@ class GroupService implements GroupRepository
     // working
     public function getGroupByName($name)
     {
-        // $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])->where('name', 'LIKE', "%$name%")
-        //     ->with(['groupMessages' => function ($query) {
-        //         $query->latest('time');
-        //     }, 'groupMessages.user', 'users_with_access'])
-        //     ->get();
-
 
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
             ->where('name', 'LIKE', "%$name%")
@@ -100,10 +94,31 @@ class GroupService implements GroupRepository
                     ->where('is_deleted', false);
             }, 'groupMessages.user', 'users_with_access'])
             ->get();
-        $messages = GroupMessage::where("msg", "LIKE", "%$name%")
-            ->where('is_deleted', false)
-            ->with("user", "group")
-            ->get();
+        // $messages = GroupMessage::where("msg", "LIKE", "%$name%")
+        //     ->where('is_deleted', false)
+        //     ->where(function ($query) {
+        //         $query->whereIn("type", ["File", "Message"])
+        //             ->orWhereNull("type")
+        //             ->orWhere("type", "");
+        //     })
+        //     ->with("user", "group")
+        //     ->get();
+
+
+        $userGroups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
+    ->pluck('group_id');
+
+// Now, search for messages in those groups
+$messages = GroupMessage::where("msg", "LIKE", "%$name%")
+    ->where('is_deleted', false)
+    ->where(function ($query) {
+        $query->whereIn("type", ["File", "Message"])
+            ->orWhereNull("type")
+            ->orWhere("type", "");
+    })
+    ->whereIn('group_id', $userGroups) // Restrict to groups where the user is a member
+    ->with("user", "group")
+    ->get();
 
         $groupMessageSearchArray = [
             "groups" => $groups,

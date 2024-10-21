@@ -2061,7 +2061,8 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         });
         nextPageMessages = await response.json();
         unread_settings(nextPageMessages);
-        pagnicateChatList.data.push(...nextPageMessages.data);
+        if(nextPageMessages.data > 0)
+            pagnicateChatList.data.push(...nextPageMessages.data);
 
         // const sortedMessages = pagnicateChatList.data.reverse().sort((a, b) => a.id - b.id);
 
@@ -2191,6 +2192,7 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
     }
 
     if (searchMessage) {
+        // Need to be updated
         await fetchNextPageMessages(DOM.clickSearchMessageId, DOM.groupId);
     }
     else {
