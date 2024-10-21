@@ -348,15 +348,12 @@ socket.on('sendChatToClient', (message) => {
    
   
     let unique_id = document.getElementById("login_user_unique_id").value;
-    console.log(unique_id);
-    console.log(message);
+
     const groupId = message.group_id;
     if(message.sender !== unique_id){
         DOM.counter+=1;
     }
-    else{
-        scroll_function();
-    }
+ 
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
         groupToUpdate.group.group_messages.push(message);
@@ -416,7 +413,7 @@ socket.on('moveMessage', () => {
 });
 
 let addMessageToMessageArea = (message) => {
-
+    console.log(message);
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -839,7 +836,9 @@ let addMessageToMessageArea = (message) => {
     var count = messageItems.length;
     // console.log(count);
     let exceededValue = 0;
-
+    if(message.sender == user.unique_id){
+        scroll_function();
+    }
     // if (count > 20 && count % 20 !== 0) {
         if (DOM.showCounter) {
     //     exceededValue = count - 20;
