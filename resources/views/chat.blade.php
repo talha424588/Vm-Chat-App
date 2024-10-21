@@ -640,7 +640,7 @@
         </div>
     </div>
     <!--Seen Modal -->
-    <div class="modal fade" id="seenModal" tabindex="-1" role="dialog" aria-labelledby="seenModalLabel"
+    <!-- <div class="modal fade" id="seenModal" tabindex="-1" role="dialog" aria-labelledby="seenModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -650,13 +650,26 @@
                     <h5>Users who have seen this message:</h5>
                     {{-- <p class="not-recover" id="is_read">awais-designer, VM-UST-SA, Talha Dev</p> --}}
                     <p class="not-recover" id="is_read"></p>
+                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal" id="close-modal-btn">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <div class="modal fade" id="seenModal" tabindex="-1" role="dialog" aria-labelledby="seenModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
 
-                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Ok</button>
+                <div class="modal-body">
+                    <img src="{{ asset('assets/svg/message-seen.gif') }}" alt="" height="78.32px">
+                    <h5>Users who have seen this message:</h5>
+                    <p class="not-recover" id="is_read"></p>
+                    <button type="button" class="btn btn-cancel" 
+                        data-dismiss="modal">ok</button>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- File Size Modal -->
     <div class="modal fade" id="filesizealeart" tabindex="-1" role="dialog" aria-labelledby="fileModalLabel"
         aria-hidden="true">
@@ -890,7 +903,10 @@
         var csrfToken = '{{ csrf_token() }}';
         var broadcastChatRoute = '{{ route('broadcast.chat') }}';
     </script>
+<script>
 
+
+</script>
 
     <!-- Include jQuery -->
     <!-- {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} -->
