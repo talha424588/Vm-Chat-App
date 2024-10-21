@@ -236,10 +236,11 @@
 
                 </div>
                 <!-- Chat List -->
-                <div class="row" id="chat-list" style="overflow:auto;"></div>
-                <div class="row" id="chat-list-unread" style="overflow:auto; display:none;">Unread List </div>
-                <div class="row" id="messagesList" style="overflow:auto;"></div>
-
+                <div class="row chat-row">
+                <div class="col-md-12" id="chat-list" style="overflow:auto;"></div>
+                <div class="col-md-12" id="chat-list-unread" style="overflow:auto; display:none;">Unread List </div>
+                <div class="col-md-12" id="messagesList" style="overflow:auto;"></div>
+                </div>
 
 
                 <!-- Profile Settings -->

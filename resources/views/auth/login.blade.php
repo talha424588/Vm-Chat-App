@@ -1,6 +1,6 @@
 @extends('layouts.chat')
 @section('content')
-    <section class="h-100">
+    <section class="h-100 overflow-hidden">
 
 
         <div class="container">
