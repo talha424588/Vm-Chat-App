@@ -199,7 +199,7 @@ let viewChatList = () => {
                     <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index})">
                     <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
-                            <div class="name list-user-name">${elem.group.name.length > 15 ? elem.group.name.substring(0, 15) + "..." : elem.group.name}</div>
+                            <div class="name list-user-name">${elem.group.name.length > 23 ? elem.group.name.substring(0, 23) + "..." : elem.group.name}</div>
                             <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${messageText}</div>
                         </div>
 
@@ -358,8 +358,11 @@ socket.on('updateGroupMessages', (messageId) => {
 });
 
 socket.on('sendChatToClient', (message) => {
-
-    pagnicateChatList.data.push(message);
+    console.log(message);
+    if(pagnicateChatList && pagnicateChatList.data)
+    {
+        pagnicateChatList.data.push(message);
+    }
     let unique_id = document.getElementById("login_user_unique_id").value;
     const groupId = message.group_id;
 
@@ -428,7 +431,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
     let newMessageDisplay = '';
     if (messageElement) {
         if (editedMessage.reply) {
-            if (editedMessage.reply.type === "Message") {
+            if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null ) {
                 newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`; // Update with new content
 
                 const replyMessage = editedMessage.reply.msg;
@@ -2644,6 +2647,13 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                         const searchResultsDiv = document.querySelector(".search-results");
                         searchResultsDiv.innerHTML = "";
                         const searchQuery = e.target.value.toLowerCase();
+                        if (!messageResponse.messages || messageResponse.messages.length === 0) {
+                            const noResultsDiv = document.createElement("div");
+                            noResultsDiv.className = "no-results";
+                            noResultsDiv.textContent = "No results";
+                            searchResultsDiv.appendChild(noResultsDiv);
+                            return;
+                        }
                         messageResponse.messages.forEach((message) => {
                             const resultItemDiv = document.createElement("div");
                             resultItemDiv.className = "result-item";
@@ -2745,7 +2755,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                         console.error('Error:', "Not Found");
                     });
             } catch (error) {
-
                 console.log(error);
             }
         }, 500)
