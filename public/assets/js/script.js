@@ -789,7 +789,7 @@ let addMessageToMessageArea = (message) => {
                     </svg>
                 </div>
                 <div class="file-details">
-                    <p class="file-name">File</p>
+                    <p class="file-name">${message.reply.media_name}</p>
 
                 </div>
                 <a href="#"  class="download-icon">
@@ -893,90 +893,24 @@ let addMessageToMessageArea = (message) => {
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
                                             Seen
                                         </a>
-                                    </span> |` : ''}
+                                    </span> |` :
+                                    (user.role == 0 || user.role == 2 ? `
+                                    <span>
+                                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+                                            data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
+                                            Seen
+                                        </a>
+                                    </span> |` : '')}
 
-                                <span>
-                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
-                                </span>
+                                    <span>
+                                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
+                                    </span>
 
                                <!--- | <span>
                                     <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                 </span> ---->
 
                             </div>
-                                      <!-- Dropdown menu for actions -->
-                                      <!---
-
-       ${message.sender === user.unique_id ? `
-         <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
-           <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-             <i class="fas fa-angle-down text-muted px-2"></i>
-           </a>
-           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          ${!['Audio', 'Image', 'File'].includes(message.type) ? `
-         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-           <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-       ` : ''}
-
-             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-             <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-
-           </div>
-         </div>
-       ` : ''}---->
-
-       ${message.sender === user.unique_id ? `
-         <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
-           <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-             <i class="fas fa-angle-down text-muted px-2"></i>
-           </a>
-           <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-             ${!(user.role === '0' || user.role === '2') ? `
-               <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-             ` : ''}
-             ${user.role === '0' || user.role === '2' ? `
-             ${message.is_compose === 1 && message.type === "Message" ? `
-               <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-                ` : ''}
-               ${message.is_compose === 1 && message.type === "Message" ? `
-               <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-               ` : ''}
-               ${message.is_compose === 1 && message.type === "Message" ? `
-               <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-               ` : ''}
-             ` : ''}
-             <!---
-             ${user.role === '0' || user.role === '2' ? `
-               <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-             ` : ''}---->
-             ${user.role === '0' || user.role === '2' ? `
-               <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-             ` : ''}
-             ${user.role === '3' && message.sender === user.unique_id ? `
-               <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-             ` : ''}
-           </div>
-         </div>
-       ` : ''}
-<!---
-                            ${message.sender === user.unique_id ? `
-                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
-                                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-angle-down text-muted px-2"></i>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                ${!['Audio', 'Image', 'File'].includes(message.type) ? `
-                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-                                <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-                            ` : ''}
-
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                                    <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-
-                                </div>
-                                </div>
-                            ` : ''}---->
-
                             ${message.sender === user.unique_id ? `
                                 <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -987,10 +921,45 @@ let addMessageToMessageArea = (message) => {
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
-                                        ${message.is_compose === 0 || message.is_compose == false && message.type === "Message" ? `
+                                        ${message.type == "Message" || message.is_compose === 1 || message.is_compose == true  ? `
                                         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         ` : ''}
-                                    ${message.is_compose === 0 || message.is_compose == false && message.type === "Message" ? `
+                                    ${message.is_compose === 1 || message.is_compose == true && message.type === "Message" ? `
+                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+                                    ` : ''}
+                                    ${message.is_compose === 1 && message.type === "Message" ? `
+                                    <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+                                    ` : ''}
+                                    ` : ''}
+                                    <!---
+                                    ${user.role === '0' || user.role === '2' ? `
+                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+                                    ` : ''}---->
+                                    ${user.role === '0' || user.role === '2' ? `
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    ` : ''}
+                                    ${user.role === '3' && message.sender === user.unique_id ? `
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    ` : ''}
+                                </div>
+                                </div>
+                            ` : ``}
+
+
+                            ${ user.role != '1' && user.role != '3' ? `
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
+                                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-angle-down text-muted px-2"></i>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    ${!(user.role === '0' || user.role === '2')  && message.sender != user.unique_id? `
+                                    <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                                    ` : ''}
+                                    ${user.role === '0' || user.role === '2' ? `
+                                        ${message.type == "Message" || message.is_compose === 1 || message.is_compose == true ? `
+                                        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                                        ` : ''}
+                                    ${message.is_compose === 1 || message.is_compose == true && message.type === "Message" ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}
                                     ${message.is_compose === 1 && message.type === "Message" ? `
@@ -1010,8 +979,6 @@ let addMessageToMessageArea = (message) => {
                                 </div>
                                 </div>
                             ` : ''}
-
-
                        </div>
                     </div>
                 </div>
@@ -1252,7 +1219,6 @@ function correction_send_handel() {
     }
 
     if (!checkPrivacyAndAlert(messageContent, correction_message_id)) {
-        // Create a new message entry with reply_id
         let newMessage = {
             user: user,
             message: messageContent,
@@ -1441,9 +1407,6 @@ function handleSendMessage() {
         const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
         console.log(messageIndex);
         if (messageIndex !== -1) {
-            console.log("insidec");
-            console.log(pagnicateChatList.data[messageIndex].msg = messageContent);
-            console.log(pagnicateChatList);
             pagnicateChatList.data[messageIndex].msg = messageContent;
         }
 
@@ -1548,7 +1511,7 @@ function showReply(message_id, senderName, type) {
                     </svg>
                 </div>
                 <div class="file-details">
-                    <p class="file-name">File</p>
+                    <p class="file-name">${message.media_name}</p>
 
                 </div>
                 <a href="#"  class="download-icon">
