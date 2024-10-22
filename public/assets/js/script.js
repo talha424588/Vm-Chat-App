@@ -935,7 +935,7 @@ let addMessageToMessageArea = (message) => {
                                         ${(message.type == "Message" && message.is_compose === 1 || message.is_compose == true) ? `
                                         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         ` : ''}
-                                    ${message.is_compose === 1 || message.is_compose == true && message.type === "Message" && message.status != "Correction" ? `
+                                    ${(message.type === "Message" && message.status !== "Correction" && (message.is_compose === 1 || message.is_compose === true)) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}
                                     ${message.is_compose === 1 && message.type === "Message" ? `
@@ -963,14 +963,14 @@ let addMessageToMessageArea = (message) => {
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id ? `
+                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id  ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
                                         ${(message.type == "Message" || message.is_compose === 1 || message.is_compose == true) && (oldMessageType !== 'document' && oldMessageType !== 'image') ? `
                                         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         ` : ''}
-                                    ${message.is_compose === 1 || message.is_compose == true && message.type === "Message" ? `
+                                    ${((oldMessageType !== 'document' && oldMessageType !== 'image') && message.type === "Message" && message.is_compose === 1) || (message.is_compose == true && (oldMessageType !== 'document' && oldMessageType !== 'image')) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}
                                     ${message.is_compose === 1 && message.type === "Message" ? `
