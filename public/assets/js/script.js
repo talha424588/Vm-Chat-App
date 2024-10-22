@@ -1226,6 +1226,7 @@ function correction_call(message_id, messagebody, senderName) {
     }
 }
 
+
 function correction_send_handel() {
 
     const messageContent = tinymce.get('input').getContent();
@@ -1244,32 +1245,80 @@ function correction_send_handel() {
     chat_action.style.display = 'block';
     document.querySelector('.chat_action_file').style.display = 'block';
 
-    const messageElement = DOM.messages.querySelector(`[data-message-id="${correction_message_id}"]`);
-    const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    messageContentDiv.innerHTML = messageContent;
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(correction_message_id));
     if (messageIndex !== -1) {
         pagnicateChatList.data[messageIndex].msg = messageContent;
     }
-    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    fetch('message/correction', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            id: correction_message_id,
-            message: messageContent,
-        }),
-    })
-        .then((response) => response.json())
-        .then((data) => console.log(data))
-        .catch((error) => console.error(error));
 
+    if (!checkPrivacyAndAlert(messageContent, correction_message_id)) {
+        // Create a new message entry with reply_id
+        let newMessage = {
+            user: user,
+            message: messageContent,
+            reply_id: correction_message_id,
+            group_id: DOM.groupId,
+            type: 'Message',
+            mediaName: null,
+            time: Math.floor(Date.now() / 1000),
+            csrf_token: document.querySelector('meta[name="csrf-token"]').content
+        };
+
+        socket.emit('sendChatToServer', newMessage);
+    }
 }
 
+
+function checkPrivacyAndAlert(messageContent, messageId) {
+    const numberPattern = /\b\d{7,}\b/;
+    const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
+
+    let reason = '';
+    if (numberPattern.test(messageContent)) {
+        reason = 'Contact Number';
+    } else if (emailPattern.test(messageContent)) {
+        reason = 'Email Address';
+    }
+
+    if (reason !== '') {
+        // Send alert message to the server
+        let alertMessage = "Alert!!!";
+        fetch('/alert-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                name: user.name,
+                email: user.email,
+                reason: reason,
+                message: messageContent,
+            })
+        })
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        // Send "Alert!!!" to the backend to save in DB
+        let msg = {
+            user: user.fcm_token ? user : user.fcm_token = DOM.fcmToken,
+            message: alertMessage,
+            reply_id: messageId,
+            group_id: DOM.groupId,
+            type: 'Message',
+            mediaName: null,
+            time: Math.floor(Date.now() / 1000),
+            csrf_token: document.querySelector('meta[name="csrf-token"]').content,
+        };
+        socket.emit('sendChatToServer', msg);
+        return true; // Indicate that an alert was sent
+    }
+    return false; // No alert needed
+}
 document.getElementById('correction-send-message-btn').addEventListener('click', correction_send_handel);
 
 function removecorrectionMessage() {
@@ -2061,8 +2110,10 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         });
         nextPageMessages = await response.json();
         unread_settings(nextPageMessages);
-        if(nextPageMessages.data > 0)
+        if(nextPageMessages.data.length > 0)
+        {
             pagnicateChatList.data.push(...nextPageMessages.data);
+        }
 
         // const sortedMessages = pagnicateChatList.data.reverse().sort((a, b) => a.id - b.id);
 
