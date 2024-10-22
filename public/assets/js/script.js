@@ -36,15 +36,15 @@ const DOM = {
     // displayed_edit_div:false,
     // displayed_correction_div:false,
     displayed_message_div: false,
-    mobile_search_icon:getById("search-icon-mobile"),
-    counter:0,
-    showCounter:false,
-    notificationDiv:getById("notification-count"),
+    mobile_search_icon: getById("search-icon-mobile"),
+    counter: 0,
+    showCounter: false,
+    notificationDiv: getById("notification-count"),
 };
-DOM.mobile_search_icon.addEventListener("click",()=>{
+DOM.mobile_search_icon.addEventListener("click", () => {
     alert("i am clicked");
-    const search_div=getById('serach_div');
-    search_div.style.display="block";
+    const search_div = getById('serach_div');
+    search_div.style.display = "block";
 });
 let user = {
 
@@ -167,7 +167,6 @@ let viewChatList = () => {
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
 
-
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
                 let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
@@ -178,15 +177,16 @@ let viewChatList = () => {
                         messageText = getOldMessageMediaName(latestMessage);
                     }
                     else {
+                        console.log("message", latestMessage.msg);
                         messageText = latestMessage.msg;
+                        console.log("message", messageText);
+
                     }
                 }
                 else {
                     messageText = "No messages";
                 }
-
-                messageText = removePTags(messageText);
-                messageText = messageText.slice(0, 30) + (messageText.length > 30 ? "..." : "")
+                latestMessage.status == "Correction" ? messageText = removeTags(messageText) : messageText = messageText.slice(0, 30) + (messageText.length > 30 ? "..." : "")
 
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
@@ -230,14 +230,21 @@ function getOldMessageMediaName(message) {
     return mediaName
 }
 
-function removePTags(messageText) {
-    const pTagPattern = /<p>(.*?)<\/p>/g;
-    if (pTagPattern.test(messageText)) {
-        messageText = messageText.replace(/<\/?p>/g, '');
-    } else {
-        // console.log("No <p> tags found in the message.");
-    }
-    return messageText;
+function getOldMessageType(message) {
+    console.log("message detail", message);
+    const linkTag = message.msg.match(/<a[^>]+>/g)[0];
+    fileLink = linkTag.match(/href="([^"]+)"/)[1];
+    const mediaName = fileLink.split('uploads/')[1];
+    const displayMediaName = message.media_name || mediaName;
+    const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
+    return mediaType
+}
+
+function removeTags(messageText) {
+    // const pTagPattern = /<p>(.*?)<\/p>/g;
+    return messageText.replace(/<\/?p>/g, '')
+    // .replace(/<\/?s>/g, '');
+
 }
 
 let viewMessageList = () => {
@@ -368,13 +375,12 @@ socket.on('updateGroupMessages', (messageId) => {
 
 socket.on('sendChatToClient', (message) => {
 
-    if(pagnicateChatList && pagnicateChatList.data)
-    {
+    if (pagnicateChatList && pagnicateChatList.data) {
         pagnicateChatList.data.push(message);
     }
 
-    if(DOM.showCounter)
-    {   DOM.counter=DOM.counter+1;
+    if (DOM.showCounter) {
+        DOM.counter = DOM.counter + 1;
         DOM.notificationDiv.innerHTML = DOM.counter;
         DOM.notificationDiv.style.display = 'block';
     }
@@ -382,10 +388,14 @@ socket.on('sendChatToClient', (message) => {
     let unique_id = document.getElementById("login_user_unique_id").value;
 
     const groupId = message.group_id;
-    if(message.sender !== unique_id){
-        DOM.counter+=1;
+    if (message.sender !== unique_id) {
+        DOM.counter += 1;
     }
- 
+
+    else {
+        scroll_function();
+    }
+
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
         groupToUpdate.group.group_messages.push(message);
@@ -451,7 +461,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
     let newMessageDisplay = '';
     if (messageElement) {
         if (editedMessage.reply) {
-            if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null ) {
+            if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null) {
                 newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`; // Update with new content
 
                 const replyMessage = editedMessage.reply.msg;
@@ -581,7 +591,12 @@ let addMessageToMessageArea = (message) => {
     let senderName = message.user.name;
 
     let messageContent;
-    let oldMessageType;
+    let oldMessageType = null;
+
+    if (/<a[^>]+>/g.test(message.msg) || /<audio[^>]+>/g.test(message.msg)) {
+        oldMessageType = getOldMessageType(message);
+        console.log("oldMessage type", oldMessageType);
+    }
     // if (!message.type) {
     //     if (/<audio[^>]+>/g.test(message.msg)) {
     //         oldMessageType = "Audio";
@@ -891,7 +906,7 @@ let addMessageToMessageArea = (message) => {
                                             Seen
                                         </a>
                                     </span> |` :
-                                    (user.role == 0 || user.role == 2 ? `
+            (user.role == 0 || user.role == 2 ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
@@ -918,10 +933,10 @@ let addMessageToMessageArea = (message) => {
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
-                                        ${message.type == "Message" || message.is_compose === 1 || message.is_compose == true  ? `
+                                        ${(message.type == "Message" && message.is_compose === 1 || message.is_compose == true) ? `
                                         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         ` : ''}
-                                    ${message.is_compose === 1 || message.is_compose == true && message.type === "Message" ? `
+                                    ${(message.type === "Message" && message.status !== "Correction" && (message.is_compose === 1 || message.is_compose === true)) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}
                                     ${message.is_compose === 1 && message.type === "Message" ? `
@@ -943,20 +958,20 @@ let addMessageToMessageArea = (message) => {
                             ` : ``}
 
 
-                            ${ user.role != '1' && user.role != '3' ? `
+                            ${user.role != '1' && user.role != '3'  && message.sender != user.unique_id? `
                                 <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    ${!(user.role === '0' || user.role === '2')  && message.sender != user.unique_id? `
+                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id  ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
-                                        ${message.type == "Message" || message.is_compose === 1 || message.is_compose == true ? `
+                                        ${(message.type == "Message" || message.is_compose === 1 || message.is_compose == true) && (oldMessageType !== 'document' && oldMessageType !== 'image') ? `
                                         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         ` : ''}
-                                    ${message.is_compose === 1 || message.is_compose == true && message.type === "Message" ? `
+                                    ${((oldMessageType !== 'document' && oldMessageType !== 'image') && message.type === "Message" && message.is_compose === 1) || (message.is_compose == true && (oldMessageType !== 'document' && oldMessageType !== 'image')) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}
                                     ${message.is_compose === 1 && message.type === "Message" ? `
@@ -992,27 +1007,26 @@ let addMessageToMessageArea = (message) => {
         scroll_function();
     }
     // if (count > 20 && count % 20 !== 0) {
-        if (DOM.showCounter) {
-    //     exceededValue = count - 20;
-    //     // console.log("this is the ex")
-    // //     // let unread = DOM.unreadMessagesPerGroup[DOM.groupId];
-    // //     // console.log(unread);
-    //     // console.log("In the Group and messages Added:", exceededValue);
+    if (DOM.showCounter) {
+        //     exceededValue = count - 20;
+        //     // console.log("this is the ex")
+        // //     // let unread = DOM.unreadMessagesPerGroup[DOM.groupId];
+        // //     // console.log(unread);
+        //     // console.log("In the Group and messages Added:", exceededValue);
 
         document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
 
-        if(DOM.counter > 0)
-        {
+        if (DOM.counter > 0) {
             DOM.notificationDiv.innerHTML = DOM.counter;
             notificationDiv.style.display = 'block';
         }
-    // //     if (unread == 0) {
-    // //         notificationDiv.style.display = 'block';
-    // //     } else {
-    // //         alert("u dont have unread messages");
-    // //         scroll_function();
-    // //     }
+        // //     if (unread == 0) {
+        // //         notificationDiv.style.display = 'block';
+        // //     } else {
+        // //         alert("u dont have unread messages");
+        // //         scroll_function();
+        // //     }
 
     }
     else {
@@ -1055,12 +1069,12 @@ function scroll_function() {
     messageDiv.addEventListener('scroll', function () {
         if (messageDiv.scrollTop < messageDiv.scrollHeight - messageDiv.clientHeight - 50) {
             scrollBottomBtn.style.display = 'block';
-            DOM.showCounter=true;
+            DOM.showCounter = true;
         } else {
             scrollBottomBtn.style.display = 'none';
-            DOM.showCounter=false;
-            DOM.counter=0;
-            DOM.notificationDiv.style.display="none";
+            DOM.showCounter = false;
+            DOM.counter = 0;
+            DOM.notificationDiv.style.display = "none";
 
         }
     });
@@ -1224,6 +1238,7 @@ function correction_send_handel() {
             reply_id: correction_message_id,
             group_id: DOM.groupId,
             type: 'Message',
+            status: 'Correction',
             mediaName: null,
             time: Math.floor(Date.now() / 1000),
             csrf_token: document.querySelector('meta[name="csrf-token"]').content
@@ -2072,8 +2087,7 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         });
         nextPageMessages = await response.json();
         unread_settings(nextPageMessages);
-        if(nextPageMessages.data.length > 0)
-        {
+        if (nextPageMessages.data.length > 0) {
             pagnicateChatList.data.push(...nextPageMessages.data);
         }
 
