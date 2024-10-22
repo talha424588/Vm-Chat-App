@@ -167,7 +167,6 @@ let viewChatList = () => {
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
 
-
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
                 let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
@@ -178,15 +177,16 @@ let viewChatList = () => {
                         messageText = getOldMessageMediaName(latestMessage);
                     }
                     else {
+                        console.log("message",latestMessage.msg);
                         messageText = latestMessage.msg;
+                        console.log("message",messageText);
+
                     }
                 }
                 else {
                     messageText = "No messages";
                 }
-
-                messageText = removePTags(messageText);
-                messageText = messageText.slice(0, 30) + (messageText.length > 30 ? "..." : "")
+                latestMessage.status == "Correction" ? messageText = removeTags(messageText):messageText = messageText.slice(0, 30) + (messageText.length > 30 ? "..." : "")
 
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
@@ -230,14 +230,11 @@ function getOldMessageMediaName(message) {
     return mediaName
 }
 
-function removePTags(messageText) {
-    const pTagPattern = /<p>(.*?)<\/p>/g;
-    if (pTagPattern.test(messageText)) {
-        messageText = messageText.replace(/<\/?p>/g, '');
-    } else {
-        // console.log("No <p> tags found in the message.");
-    }
-    return messageText;
+function removeTags(messageText) {
+    // const pTagPattern = /<p>(.*?)<\/p>/g;
+    return messageText.replace(/<\/?p>/g, '')
+    // .replace(/<\/?s>/g, '');
+
 }
 
 let viewMessageList = () => {
@@ -1225,6 +1222,7 @@ function correction_send_handel() {
             reply_id: correction_message_id,
             group_id: DOM.groupId,
             type: 'Message',
+            status: 'Correction',
             mediaName: null,
             time: Math.floor(Date.now() / 1000),
             csrf_token: document.querySelector('meta[name="csrf-token"]').content
