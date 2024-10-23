@@ -4,12 +4,13 @@ $(document).ready(function () {
         $("#sidebar").toggleClass("sidebar-open sidebar-closed");
         $(".container-fluid").toggleClass("sidebar-open");
         $("#search-icon").toggleClass("icon-move-left");
-
+        $("#search-icon").addClass("d-none");
         $("#message-area").toggleClass("col-md-8 col-md-4");
     });
 
     // Close sidebar on close button click
     $("#close-sidebar").on("click", function () {
+        $("#search-icon").hasClass("d-none") ? $("#search-icon").removeClass("d-none") : '';
         $("#sidebar").removeClass("sidebar-open").addClass("sidebar-closed");
         $(".container-fluid").removeClass("sidebar-open");
         $("#search-icon").removeClass("icon-move-left");
@@ -26,6 +27,7 @@ $(document).ready(function () {
     // Close sidebar on clicking outside of it
     $(document).on("click", function (event) {
         if (!$(event.target).closest("#sidebar, #search-icon").length) {
+            $("#search-icon").hasClass("d-none") ? $("#search-icon").removeClass("d-none") : '';
             if ($("#sidebar").hasClass("sidebar-open")) {
                 $("#sidebar").removeClass("sidebar-open").addClass("sidebar-closed");
                 $(".container-fluid").removeClass("sidebar-open");

@@ -173,7 +173,7 @@ z-index: 1; /* Ensure it is above other content */
 /* Style for the icon container */
 .icon-container {
     position: fixed;
-    bottom:100px !important;
+    /* bottom:90px; */
     right: 40px;
     background-color: #f1f1f1;
     border-radius: 50%;
@@ -237,7 +237,9 @@ position: relative;
 display: flex;
 align-items: center;
 justify-content: center;
-height: 52px; /* Height of the SVG */
+height: 52px; 
+margin-bottom: 30px;
+padding: 10px;
 }
 
 .notification-wrapper svg {
@@ -253,18 +255,18 @@ z-index: 1;
 position: relative;
 z-index: 2;
 display: inline-block;
-padding: 8px 16px;
+padding: 10px 16px;
 background-color: white;
 border-radius: 20px;
 font-size: 13px;
 font-weight: bold;
 color: #463C3C;
-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+/* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); */
 text-align: center;
 font-family: 'Open Sans', sans-serif;
 }
 .notification-wrapper{
-background-color: rgba(255, 255, 255, 0.3);
+background-color: rgba(255, 255, 255, 0.5);
 
 }
 
@@ -1178,4 +1180,8 @@ body{
 	color:white;
 	border-radius: 10px;
 	padding-inline:20px;
+}
+.blur{
+	filter: brightness(0.6) !important;
+	pointer-events: none;
 }

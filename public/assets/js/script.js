@@ -44,7 +44,7 @@ const DOM = {
     unreadCounter:0,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
-    alert("i am clicked");
+    
     const search_div = getById('serach_div');
     search_div.style.display = "block";
 });
@@ -391,6 +391,11 @@ socket.on('sendChatToClient', (message) => {
     else {
         scroll_function();
     }
+    const notificationWrapper = document.querySelector('.notification-wrapper');
+    if (notificationWrapper && notificationWrapper.style.display !== 'none') {
+    notificationWrapper.style.display = 'none';
+    }
+
 
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
@@ -579,10 +584,10 @@ let addMessageToMessageArea = (message) => {
 
     let msgDate = mDate(message.time).getDate();
 
-    if (lastDate !== msgDate) {
-        addDateToMessageArea(msgDate);
-        lastDate = msgDate;
-    }
+    // if (lastDate !== msgDate) {
+    //     addDateToMessageArea(msgDate);
+    //     lastDate = msgDate;
+    // }
 
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
@@ -1368,7 +1373,8 @@ function editMessage(messageId) {
 
     if (editMessage) {
         document.getElementById('editMessageDiv').style.display = 'block';
-
+        var iconContainer = document.querySelector('.icon-container');
+        iconContainer.style.bottom = '145px';
         const editMessageIdField = document.getElementById('edit_message_id');
         if (editMessageIdField) {
             editMessageIdField.value = messageId;
@@ -1481,8 +1487,8 @@ function removeEditMessage() {
     Editreplyarea.style.display = 'none';
     const correctionarea = document.getElementById('correction-div');
     correctionarea.style.display = 'none';
-
-
+    var iconContainer = document.querySelector('.icon-container');
+    iconContainer.style.bottom = '90px';
     const fileicon = document.querySelector('.chat_action_file');
     fileicon.style.visibility = 'visible';
     const chat_action_capture = document.querySelector('.chat_action_capture');
@@ -1498,6 +1504,7 @@ function removeEditMessage() {
     const textarea = document.getElementById('input');
     textarea.value = '';
     document.querySelector('.auto-resize-textarea').style.height = '44px';
+
 }
 
 //Show Reply Message
@@ -1505,7 +1512,6 @@ function showReply(message_id, senderName, type) {
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
-
     DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
@@ -1564,7 +1570,7 @@ function showReply(message_id, senderName, type) {
 
     replyDiv.style.display = 'block';
 
-    iconContainer.style.bottom = '145px';
+    iconContainer.style.bottom = '160px';
 }
 
 function removeQuotedMessage() {
@@ -1572,6 +1578,7 @@ function removeQuotedMessage() {
     var iconContainer = document.querySelector('.icon-container');
     replyDiv.style.display = 'none';
     iconContainer.style.bottom = '90px';
+    DOM.replyId=null;
 }
 
 // Array to store selected message IDs
@@ -2416,7 +2423,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
         }
     }
     else {
-        alert("something went wrong")
+        // alert("something went wrong");
+        $('#wentWrong').modal('show');
     }
 
 };
