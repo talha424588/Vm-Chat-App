@@ -40,6 +40,8 @@ const DOM = {
     counter:0,
     showCounter:false,
     notificationDiv:getById("notification-count"),
+    unreadDividerAdded:false,
+    unreadCounter:0,
 };
 DOM.mobile_search_icon.addEventListener("click",()=>{
     alert("i am clicked");
@@ -169,6 +171,7 @@ let viewChatList = () => {
 
 
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
+
                 let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
                     if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
@@ -272,21 +275,22 @@ let addDateToMessageArea = (date) => {
 	</div>
 	`;
 };
-let addunreadToMessageArea = {
-    addUnread: function () {
-        const notificationValue = 5;
-        const notificationDiv = document.getElementById('notification-count');
-        notificationDiv.innerHTML = notificationValue;
-        notificationDiv.style.display = 'block';
+
+    let addUnread =()=> {
+        // const notificationValue = 5;
+        // const notificationDiv = document.getElementById('notification-count');
+        // notificationDiv.innerHTML = notificationValue;
+        // notificationDiv.style.display = 'block';
         DOM.messages.innerHTML += `
         <div class="notification-wrapper">
             <div class="unread-messages">
-                ${notificationValue} UNREAD MESSAGES
+                <span id="unread-counter-div"></span> UNREAD MESSAGES
             </div>
         </div>
         `;
+        DOM.unreadDividerAdded = true; 
     }
-};
+
 
 function makeformatDate(dateString) {
     const date = new Date(dateString);
@@ -390,7 +394,6 @@ socket.on('sendChatToClient', (message) => {
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
         if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
             groupToUpdate.unread += 1;
-
             DOM.unreadMessagesPerGroup[groupId] += 1;
         }
         chatList.sort((a, b) => {
@@ -413,7 +416,9 @@ socket.on('moveMessage', () => {
 });
 
 let addMessageToMessageArea = (message) => {
-    console.log(message);
+    
+
+
     let msgDate = mDate(message.time).getDate();
 
     if (lastDate !== msgDate) {
@@ -747,7 +752,7 @@ let addMessageToMessageArea = (message) => {
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                            ${messageContent}
+                          ${messageContent}
                         </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -1972,7 +1977,7 @@ function unread_settings(query_set) {
             }
         }
     });
-
+    
     var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
@@ -1986,7 +1991,9 @@ function unread_settings(query_set) {
         if (groupToUpdate) {
             groupToUpdate.unread = left_count;
         }
+    
         DOM.unreadMessagesPerGroup[DOM.groupId] = left_count;
+        
 
     }
 }
@@ -1995,6 +2002,7 @@ let currentlyPlayingAudio = null;
 
 let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
     // pagnicateChatList = [];
+    
     chat = chatList[chatIndex];
 
     DOM.activeChatIndex = chatIndex;
@@ -2040,7 +2048,7 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
         unread_settings(pagnicateChatList);
 
         const ids = pagnicateChatList.data.map(item => item.id);
-
+            
         try {
             const response = await fetch("message/seen-by/update", {
                 method: "POST",
@@ -2060,12 +2068,37 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
 
 
         lastDate = "";
-        pagnicateChatList.data.reverse()
-            .forEach((msg) => addMessageToMessageArea(msg));
-
+        console.log(pagnicateChatList);
+        pagnicateChatList.data.reverse().forEach((msg) => { 
+            const u_id = user.unique_id;
+            const seenBy = msg.seen_by ? msg.seen_by.split(',').map(id => id.trim()) : [];
+            if (!seenBy.includes(u_id) && !DOM.unreadDividerAdded) {
+                addUnread();    
+            }
+            if (!seenBy.includes(u_id)) {
+                DOM.unreadCounter += 1;
+            }
+            addMessageToMessageArea(msg);
+        });
+        
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
+        DOM.unreadDividerAdded=false;
+        var unreadCountDiv=document.getElementById('unread-counter-div');
+        if(unreadCountDiv)
+        {
+             unreadCountDiv.innerHTML=DOM.unreadCounter;
+             unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+             DOM.notificationDiv.innerHTML = DOM.counter;
+             DOM.showCounter=true;
+             DOM.notificationDiv.style.display = 'block';
+
+        }
+        DOM.unreadCounter=0;
+        
+
+        
     }
 
 
