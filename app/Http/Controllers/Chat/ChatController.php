@@ -79,7 +79,6 @@ class ChatController extends Controller
 
     public function store(Request $request)
     {
-
         $user = $request->input('user');
         $uniqueId = $user['unique_id'];
 
@@ -92,7 +91,7 @@ class ChatController extends Controller
         $message->type = $request->type;
         $message->media_name = $request->mediaName;
         $message->time = $request->time;
-        $message->status = EnumMessageEnum::NEW;
+        $message->status = $request->status ?? EnumMessageEnum::NEW;
         $message->is_compose = false;
         if ($message->save()) {
             $message->user = User::where("unique_id", $uniqueId)->first();

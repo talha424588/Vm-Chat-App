@@ -433,7 +433,7 @@ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the values as needed */
 .search-bar {
 	display: flex;
 	margin-top: 8px;
-	background-color: #f0f0f0; 
+	background-color: #f0f0f0;
 	padding: 8px;
 	border-radius: 10px;
 	max-width: 500px;
@@ -491,7 +491,7 @@ align-items: start;
 .username-container small {
 padding: 0;
 font-size: 16px;
-color: #666; 
+color: #666;
 }
 .username-container .font-weight-bold{
   color: #463C3C;
@@ -1131,7 +1131,7 @@ body{
 }
 
 /* No Group Found */
-.no-groups-found,.heading {
+.no-groups-found,.heading,.no-results {
     text-align: center;
     padding: 20px;
 }
@@ -1165,14 +1165,14 @@ body{
   }
 .profile_img{
 	margin-left:10px;
-	margin-right:25px;	
+	margin-right:25px;
 	height:51px;
 	width:51px;
 	cursor:pointer;
 }
 #logout{
 	background-color:#1DAB61;
-	color:white; 
+	color:white;
 	border-radius: 10px;
 	padding-inline:20px;
 }
