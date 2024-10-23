@@ -382,20 +382,12 @@ socket.on('sendChatToClient', (message) => {
     if (pagnicateChatList && pagnicateChatList.data) {
         pagnicateChatList.data.push(message);
     }
-
-    if (DOM.showCounter) {
-        DOM.counter = DOM.counter + 1;
-        DOM.notificationDiv.innerHTML = DOM.counter;
-        DOM.notificationDiv.style.display = 'block';
-    }
-
     let unique_id = document.getElementById("login_user_unique_id").value;
 
     const groupId = message.group_id;
     if (message.sender !== unique_id) {
         DOM.counter += 1;
     }
-
     else {
         scroll_function();
     }
@@ -1019,7 +1011,7 @@ let addMessageToMessageArea = (message) => {
         // //     // console.log(unread);
         //     // console.log("In the Group and messages Added:", exceededValue);
 
-        document.getElementById('scrollBottomBtn').style.display = 'block';
+        // document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
 
         if (DOM.counter > 0) {
@@ -1075,12 +1067,18 @@ function scroll_function() {
         if (messageDiv.scrollTop < messageDiv.scrollHeight - messageDiv.clientHeight - 50) {
             scrollBottomBtn.style.display = 'block';
             DOM.showCounter = true;
+            if(DOM.unreadCounter>0)
+            {
+                DOM.notificationDiv.innerHTML = DOM.unreadCounter;
+                DOM.notificationDiv.style.display = "block";
+                DOM.unreadCounter=0;
+            }
         } else {
             scrollBottomBtn.style.display = 'none';
             DOM.showCounter = false;
             DOM.counter = 0;
+            DOM.notificationDiv.innerHTML = "";
             DOM.notificationDiv.style.display = "none";
-
         }
     });
 
@@ -2282,14 +2280,12 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
         var unreadCountDiv=document.getElementById('unread-counter-div');
         if(unreadCountDiv)
         {
+          
+             unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
              unreadCountDiv.innerHTML=DOM.unreadCounter;
-             unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-             DOM.notificationDiv.innerHTML = DOM.counter;
-             DOM.showCounter=true;
-             DOM.notificationDiv.style.display = 'block';
-
+   
         }
-        DOM.unreadCounter=0;
+        
         
 
         
