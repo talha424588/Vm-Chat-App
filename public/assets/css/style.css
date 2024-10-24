@@ -173,11 +173,11 @@ z-index: 1; /* Ensure it is above other content */
 /* Style for the icon container */
 .icon-container {
     position: fixed;
-    bottom: 20px;
+    /* bottom:90px; */
     right: 40px;
     background-color: #f1f1f1;
     border-radius: 50%;
-    padding: 14px;
+    padding: 14px 14px 12px 14px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -194,19 +194,20 @@ z-index: 1; /* Ensure it is above other content */
 /* Style for the notification count badge */
 .notification-count {
     position: absolute;
-    top: -10px;
-    left: -3px;
-    background-color: #34c759;
+    top: -9px;
+    left: -6px;
+    background-color: #34c759; 
     color: white;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
-    padding: 4px 6px;
     border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-	display: none;
+    /* display: none; */
+    height: 25px;
+    width: 25px;
+    text-align: center;
+    line-height: 25px; 
 }
+
 
 /* Style for the icon (down arrow) */
 .icon {
@@ -218,8 +219,8 @@ z-index: 1; /* Ensure it is above other content */
 
 /* SVG style */
 .icon svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
 .icon svg path {
@@ -236,7 +237,9 @@ position: relative;
 display: flex;
 align-items: center;
 justify-content: center;
-height: 52px; /* Height of the SVG */
+height: 52px; 
+margin-bottom: 30px;
+padding: 10px;
 }
 
 .notification-wrapper svg {
@@ -252,18 +255,18 @@ z-index: 1;
 position: relative;
 z-index: 2;
 display: inline-block;
-padding: 8px 16px;
+padding: 10px 16px;
 background-color: white;
 border-radius: 20px;
 font-size: 13px;
 font-weight: bold;
 color: #463C3C;
-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+/* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); */
 text-align: center;
 font-family: 'Open Sans', sans-serif;
 }
 .notification-wrapper{
-background-color: rgba(255, 255, 255, 0.3);
+background-color: rgba(255, 255, 255, 0.5);
 
 }
 
@@ -318,6 +321,9 @@ background-color: rgba(255, 255, 255, 0.3);
 	}
 	.icon-container{
 		right:15px;
+	}
+	.chat_list_view{
+		padding: 0px;
 	}
 
   }
@@ -415,7 +421,7 @@ border: none;
 font-size: 36px;
 cursor: pointer;
 position: absolute;
-top: 6px;
+top: 10px;
 left: 10px;
 color:#687780;
 }
@@ -770,10 +776,28 @@ body{
 }
 .chat-row {
 	overflow-y:auto;
-	height: 500px;
+	height: 340px;
     box-sizing: border-box;
+	scrollbar-width: thin; 
+    scrollbar-color: #ccc transparent; 
 }
 
+.chat-row::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-row::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
+.chat-row::-webkit-scrollbar-thumb {
+    background-color: #ccc; 
+    border-radius: 10px; 
+}
+
+.chat-row::-webkit-scrollbar-thumb:hover {
+    background-color: #888; 
+}
 
 
 
@@ -1156,4 +1180,8 @@ body{
 	color:white;
 	border-radius: 10px;
 	padding-inline:20px;
+}
+.blur{
+	filter: brightness(0.6) !important;
+	pointer-events: none;
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Whatsapp</title>
+    <title>VM Chat</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
         integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css"
@@ -237,9 +237,9 @@
                 </div>
                 <!-- Chat List -->
                 <div class="row chat-row">
-                    <div class="col-md-12" id="chat-list" style="overflow:auto;"></div>
-                    <div class="col-md-12" id="chat-list-unread" style="overflow:auto; display:none;">Unread List </div>
-                    <div class="col-md-12" id="messagesList" style="overflow:auto;"></div>
+                    <div class="col-md-12 chat_list_view" id="chat-list" style="overflow:auto;"></div>
+                    <div class="col-md-12 chat_list_view" id="chat-list-unread" style="overflow:auto; display:none;">Unread List </div>
+                    <div class="col-md-12 chat_list_view" id="messagesList" style="overflow:auto;"></div>
                 </div>
 
 
@@ -482,7 +482,7 @@
                     <!---Edit Message Area End-->
 
 
-
+                    
 
                     <div class="chat-input-container  justify-self-end align-items-center flex-row" id="reply-area">
 
@@ -494,7 +494,7 @@
                         </style>
 
                         <div class="icon-container" id="scrollBottomBtn" style="display: none;">
-                            <div class="notification-count" id="notification-count"></div>
+                            <div class=" notification-count" id="notification-count"></div>
                             <div class="icon" style="font-size: 24px !important;"><svg width="40"
                                     height="10" viewBox="0 0 16 9" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -636,6 +636,21 @@
                     <button type="button" class="btn btn-delete">Delete</button> &nbsp;&nbsp;&nbsp;
                     <button type="button" class="btn btn-cancel" id="btn-close"
                         data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- something went wrong modal -->
+    <div class="modal fade" id="wentWrong" tabindex="-1" role="dialog" aria-labelledby="wentWrontModal"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <img src="{{ asset('assets/svg/danger-5732_256.gif') }}" alt="" height="78.32px">
+                    <h5>Internet Connection Lost !!!</h5>
+                    <button type="button" class="btn btn-cancel" id="btn-close"
+                        data-bs-dismiss="modal">Ok</button>
                 </div>
             </div>
         </div>

@@ -36,13 +36,15 @@ const DOM = {
     // displayed_edit_div:false,
     // displayed_correction_div:false,
     displayed_message_div: false,
-    mobile_search_icon: getById("search-icon-mobile"),
-    counter: 0,
-    showCounter: false,
-    notificationDiv: getById("notification-count"),
+    mobile_search_icon:getById("search-icon-mobile"),
+    counter:0,
+    showCounter:false,
+    notificationDiv:getById("notification-count"),
+    unreadDividerAdded:false,
+    unreadCounter:0,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
-    alert("i am clicked");
+    
     const search_div = getById('serach_div');
     search_div.style.display = "block";
 });
@@ -168,6 +170,7 @@ let viewChatList = () => {
             if (elem.isGroup) {
 
                 const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
+
                 let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
                     if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
@@ -301,21 +304,22 @@ let addDateToMessageArea = (date) => {
 	</div>
 	`;
 };
-let addunreadToMessageArea = {
-    addUnread: function () {
-        const notificationValue = 5;
-        const notificationDiv = document.getElementById('notification-count');
-        notificationDiv.innerHTML = notificationValue;
-        notificationDiv.style.display = 'block';
+
+    let addUnread =()=> {
+        // const notificationValue = 5;
+        // const notificationDiv = document.getElementById('notification-count');
+        // notificationDiv.innerHTML = notificationValue;
+        // notificationDiv.style.display = 'block';
         DOM.messages.innerHTML += `
         <div class="notification-wrapper">
             <div class="unread-messages">
-                ${notificationValue} UNREAD MESSAGES
+                <span id="unread-counter-div"></span> UNREAD MESSAGES
             </div>
         </div>
         `;
+        DOM.unreadDividerAdded = true; 
     }
-};
+
 
 function makeformatDate(dateString) {
     const date = new Date(dateString);
@@ -378,23 +382,20 @@ socket.on('sendChatToClient', (message) => {
     if (pagnicateChatList && pagnicateChatList.data) {
         pagnicateChatList.data.push(message);
     }
-
-    if (DOM.showCounter) {
-        DOM.counter = DOM.counter + 1;
-        DOM.notificationDiv.innerHTML = DOM.counter;
-        DOM.notificationDiv.style.display = 'block';
-    }
-
     let unique_id = document.getElementById("login_user_unique_id").value;
 
     const groupId = message.group_id;
     if (message.sender !== unique_id) {
         DOM.counter += 1;
     }
-
     else {
         scroll_function();
     }
+    const notificationWrapper = document.querySelector('.notification-wrapper');
+    if (notificationWrapper && notificationWrapper.style.display !== 'none') {
+    notificationWrapper.style.display = 'none';
+    }
+
 
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
@@ -432,7 +433,6 @@ socket.on('sendChatToClient', (message) => {
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
         if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
             groupToUpdate.unread += 1;
-
             DOM.unreadMessagesPerGroup[groupId] += 1;
         }
         chatList.sort((a, b) => {
@@ -579,13 +579,15 @@ socket.on('updateEditedMessage', (editedMessage) => {
 });
 
 let addMessageToMessageArea = (message) => {
-    console.log(message);
+    
+
+
     let msgDate = mDate(message.time).getDate();
 
-    if (lastDate !== msgDate) {
-        addDateToMessageArea(msgDate);
-        lastDate = msgDate;
-    }
+    // if (lastDate !== msgDate) {
+    //     addDateToMessageArea(msgDate);
+    //     lastDate = msgDate;
+    // }
 
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
@@ -893,7 +895,7 @@ let addMessageToMessageArea = (message) => {
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                            ${messageContent}
+                          ${messageContent}
                         </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -1014,7 +1016,7 @@ let addMessageToMessageArea = (message) => {
         // //     // console.log(unread);
         //     // console.log("In the Group and messages Added:", exceededValue);
 
-        document.getElementById('scrollBottomBtn').style.display = 'block';
+        // document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
 
         if (DOM.counter > 0) {
@@ -1070,12 +1072,18 @@ function scroll_function() {
         if (messageDiv.scrollTop < messageDiv.scrollHeight - messageDiv.clientHeight - 50) {
             scrollBottomBtn.style.display = 'block';
             DOM.showCounter = true;
+            if(DOM.unreadCounter>0)
+            {
+                DOM.notificationDiv.innerHTML = DOM.unreadCounter;
+                DOM.notificationDiv.style.display = "block";
+                DOM.unreadCounter=0;
+            }
         } else {
             scrollBottomBtn.style.display = 'none';
             DOM.showCounter = false;
             DOM.counter = 0;
+            DOM.notificationDiv.innerHTML = "";
             DOM.notificationDiv.style.display = "none";
-
         }
     });
 
@@ -1365,7 +1373,8 @@ function editMessage(messageId) {
 
     if (editMessage) {
         document.getElementById('editMessageDiv').style.display = 'block';
-
+        var iconContainer = document.querySelector('.icon-container');
+        iconContainer.style.bottom = '145px';
         const editMessageIdField = document.getElementById('edit_message_id');
         if (editMessageIdField) {
             editMessageIdField.value = messageId;
@@ -1478,8 +1487,8 @@ function removeEditMessage() {
     Editreplyarea.style.display = 'none';
     const correctionarea = document.getElementById('correction-div');
     correctionarea.style.display = 'none';
-
-
+    var iconContainer = document.querySelector('.icon-container');
+    iconContainer.style.bottom = '90px';
     const fileicon = document.querySelector('.chat_action_file');
     fileicon.style.visibility = 'visible';
     const chat_action_capture = document.querySelector('.chat_action_capture');
@@ -1495,6 +1504,7 @@ function removeEditMessage() {
     const textarea = document.getElementById('input');
     textarea.value = '';
     document.querySelector('.auto-resize-textarea').style.height = '44px';
+
 }
 
 //Show Reply Message
@@ -1502,7 +1512,6 @@ function showReply(message_id, senderName, type) {
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
-
     DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
@@ -1561,7 +1570,7 @@ function showReply(message_id, senderName, type) {
 
     replyDiv.style.display = 'block';
 
-    iconContainer.style.bottom = '145px';
+    iconContainer.style.bottom = '160px';
 }
 
 function removeQuotedMessage() {
@@ -1569,6 +1578,7 @@ function removeQuotedMessage() {
     var iconContainer = document.querySelector('.icon-container');
     replyDiv.style.display = 'none';
     iconContainer.style.bottom = '90px';
+    DOM.replyId=null;
 }
 
 // Array to store selected message IDs
@@ -2165,7 +2175,7 @@ function unread_settings(query_set) {
             }
         }
     });
-
+    
     var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
@@ -2179,7 +2189,9 @@ function unread_settings(query_set) {
         if (groupToUpdate) {
             groupToUpdate.unread = left_count;
         }
+    
         DOM.unreadMessagesPerGroup[DOM.groupId] = left_count;
+        
 
     }
 }
@@ -2188,6 +2200,7 @@ let currentlyPlayingAudio = null;
 
 let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
     // pagnicateChatList = [];
+    
     chat = chatList[chatIndex];
 
     DOM.activeChatIndex = chatIndex;
@@ -2234,7 +2247,7 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
         unread_settings(pagnicateChatList);
 
         const ids = pagnicateChatList.data.map(item => item.id);
-
+            
         try {
             const response = await fetch("message/seen-by/update", {
                 method: "POST",
@@ -2254,12 +2267,35 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
 
 
         lastDate = "";
-        pagnicateChatList.data.reverse()
-            .forEach((msg) => addMessageToMessageArea(msg));
-
+        console.log(pagnicateChatList);
+        pagnicateChatList.data.reverse().forEach((msg) => { 
+            const u_id = user.unique_id;
+            const seenBy = msg.seen_by ? msg.seen_by.split(',').map(id => id.trim()) : [];
+            if (!seenBy.includes(u_id) && !DOM.unreadDividerAdded) {
+                addUnread();    
+            }
+            if (!seenBy.includes(u_id)) {
+                DOM.unreadCounter += 1;
+            }
+            addMessageToMessageArea(msg);
+        });
+        
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
+        DOM.unreadDividerAdded=false;
+        var unreadCountDiv=document.getElementById('unread-counter-div');
+        if(unreadCountDiv)
+        {
+          
+             unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+             unreadCountDiv.innerHTML=DOM.unreadCounter;
+   
+        }
+        
+        
+
+        
     }
 
 
@@ -2387,7 +2423,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
         }
     }
     else {
-        alert("something went wrong")
+        // alert("something went wrong");
+        $('#wentWrong').modal('show');
     }
 
 };
