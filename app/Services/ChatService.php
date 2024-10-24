@@ -108,12 +108,14 @@ class ChatService implements ChatRepository
 
         // Fetch messages from the specified messageId onward
         $messages = GroupMessage::where('group_id', $groupId)
-            ->where('id', '<=', $messageId) // Change to '<=' to get messages up to the specified message
+            ->where('id', '<=', $messageId)
             ->where('is_deleted', false)
             ->orderBy('id', 'desc')
-            ->take(20) // Fetch only 20 messages at a time
-            ->skip($pageNo * 20) // Paginate based on the page number
+            // ->take(20)
+            // ->skip($pageNo * 20)
             ->get();
+
+        // return count($messages);
 
         return response()->json([
             'status' => true,
@@ -172,6 +174,7 @@ class ChatService implements ChatRepository
             })
             ->where('is_deleted', false)
             ->with("user")
+            ->with('reply')
             ->get();
         if (count($messages) > 0) {
             return response()->json(["status" => true, "message" => "success", "messages" => $messages]);
