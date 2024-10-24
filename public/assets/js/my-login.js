@@ -7,10 +7,26 @@ $(function() {
 			id = 'eye-password-' + i,
 			el = $('#' + id);
 
-		$this.wrap($("<div/>", {
-			style: 'position:relative',
-			id: id
-		}));
+			$this.wrap($("<div/>", {
+				class: 'eye-div',
+				id: id
+			}));
+			
+			// Create the <i> element with the SVG inside
+			const iconElement = $("<i/>", {
+				class: 'login-icons',
+				html: `
+					<svg width="19" height="18" viewBox="0 0 19 18" fill="none" xmlns="http://www.w3.org/2000/svg"> 
+						<path d="M1 12.2C1 9.93759 1 8.80559 1.74715 8.10319C2.49345 7.39999 3.6962 7.39999 6.1 7.39999H12.9C15.3038 7.39999 16.5066 7.39999 17.2529 8.10319C18 8.80559 18 9.93759 18 12.2C18 14.4624 18 15.5944 17.2529 16.2968C16.5066 17 15.3038 17 12.9 17H6.1C3.6962 17 2.49345 17 1.74715 16.2968C1 15.5944 1 14.4624 1 12.2Z" stroke="#687780" stroke-width="1.5"></path>
+						<path d="M4.40039 7.4V5.8C4.40039 4.52696 4.93771 3.30606 5.89415 2.40589C6.85058 1.50571 8.14779 1 9.50039 1C10.853 1 12.1502 1.50571 13.1066 2.40589C14.0631 3.30606 14.6004 4.52696 14.6004 5.8V7.4" stroke="#687780" stroke-width="1.5" stroke-linecap="round"></path>
+						<path d="M6.09961 12.2H6.10726M9.49196 12.2H9.49961M12.892 12.2H12.8996" stroke="#687780" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+					</svg>
+				`
+			});
+			
+			// Append the icon to the wrapped element
+			$this.before(iconElement);
+			
 
 		$this.css({
 			paddingRight: 40

@@ -15,7 +15,7 @@
 <body class="my-login-page">
 
 
-    <div class="">
+    
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-bottom justify-content-between">
             <a class="navbar-brand logo_brand" href="#">VM Chatter</a>
 
@@ -29,7 +29,7 @@
                 </svg>&nbsp;&nbsp;Contact Us</button>
 
         </nav>
-    </div>
+    
 
     @yield('content')
 
@@ -37,24 +37,22 @@
 
 
     <footer class="text-center  bg-white fixed-bottom" style="box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);">
-
-        <!-- Copyright -->
-        <div class="text-center p-3 ">
-            <div class="d-flex justify-content-between">
-                <div class="Copyright-claim">
+    <div class="row p-3">
+        <div class="col-md-6 d-flex justify-content-start">
+        <div class="Copyright-claim">
                     © 2024 VMChatter All Right Reserved
-                </div>
-                <div class="Copyright-claim-right">
-                    <a class="text-body" style="padding-right: 50px;" href="https://mdbootstrap.com/">Privacy Policy</a>
-
-                    <a class="text-body" href="https://mdbootstrap.com/">Use of Terms</a>
-
-                </div>
-            </div>
-
-
-
         </div>
+        </div>
+        <div class="col-md-6 d-flex justify-content-between justify-content-md-end justify-content-lg-end ">
+    <div class="d-flex justify-content-between mx-auto">
+        <a class="text-body" style="padding-right: 50px;" href="https://mdbootstrap.com/">Privacy Policy</a>
+        <a class="text-body" href="https://mdbootstrap.com/">Use of Terms</a>
+    </div>
+</div>
+
+    </div>
+        <!-- Copyright -->
+    
         <!-- Copyright -->
     </footer>
     </section>

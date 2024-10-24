@@ -1135,6 +1135,12 @@ function CorrectionMessage(message_id, senderName) {
     else {
         DOM.displayed_message_div = !DOM.displayed_message_div;
     }
+    var replyDiv = document.getElementById('reply-div');
+
+if (window.getComputedStyle(replyDiv).display === 'block') {
+    removeQuotedMessage();
+}
+
 
     // console.log(DOM);
     // const editDiv=document.getElementById('editMessageDiv');
@@ -1143,6 +1149,8 @@ function CorrectionMessage(message_id, senderName) {
     // }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
+    var iconContainer = document.querySelector('.icon-container');
+    iconContainer.style.bottom = '240px';
     console.log(messagebody);
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
@@ -1359,6 +1367,12 @@ function editMessage(messageId) {
     else {
         DOM.displayed_message_div = !DOM.displayed_message_div;
     }
+    var replyDiv = document.getElementById('reply-div');
+
+    if (window.getComputedStyle(replyDiv).display === 'block') {
+        removeQuotedMessage();
+    }
+    
     let editMessage = null;
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
@@ -1510,9 +1524,18 @@ function removeEditMessage() {
 //Show Reply Message
 function showReply(message_id, senderName, type) {
 
+    var correctionDiv = document.getElementById('correction-div');
+
+    if (correctionDiv && window.getComputedStyle(correctionDiv).display === 'block') {
+        removecorrectionMessage();
+    }
+    
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
     DOM.replyId = message_id;
+
+
+
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
 
@@ -1777,7 +1800,17 @@ $(document).ready(function () {
 
 let isLoadingMessages = false;
 let hasMoreMessages = true;
+function showSpinner() {
+    spinner.classList.remove('hide-spinner');
+    spinner.classList.add('show-spinner');
+    // DOM.messages.classList.add("blur");
+}
 
+function hideSpinner() {
+    spinner.classList.remove('show-spinner');
+    spinner.classList.add('hide-spinner');
+    // DOM.messages.classList.remove("blur");
+}
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
     // console.log(DOM.messages.clientHeight);
@@ -1793,9 +1826,12 @@ DOM.messages.addEventListener('scroll', async () => {
     //   // User is at the bottom of the chat
     //   console.log('User is at the bottom of the chat');
     // }
+    const spinner = document.getElementById('spinner');
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
+        showSpinner();
         await fetchNextPageMessages();
+        hideSpinner();
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
         //console.log('User is not at the top yet'); // Log if not at the top
@@ -1907,10 +1943,10 @@ DOM.messages.addEventListener('scroll', async () => {
 let addNewMessageToArea = (message) => {
     let msgDate = new Date(message.time * 1000).getDate();
 
-    if (lastDate !== msgDate) {
-        addDateToMessageArea(msgDate);
-        lastDate = msgDate;
-    }
+    // if (lastDate !== msgDate) {
+    //     addDateToMessageArea(msgDate);
+    //     lastDate = msgDate;
+    // }
 
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
@@ -2767,9 +2803,13 @@ let searchGroups = async (searchQuery) => {
                         chatList.push(chat);
                     });
                     viewChatList();
+                    console.log("group messages are loading");
+                    console.log(chat);
                 }
 
                 if (messages.length > 0) {
+                    console.log("chat messages are loading");
+                    console.log(messages);
                     messageList.push(...messages);
                     viewMessageList();
                 }

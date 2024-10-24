@@ -328,8 +328,11 @@
 
 
 
-
-                <div class="d-flex flex-column chat_list_messages" id="messages"></div>
+                <div id="spinner" class="lazy_spinner"></div>
+          
+                <div class="d-flex flex-column chat_list_messages" id="messages">
+                  
+                </div>
 
 
                 <!-- New Code To Move Message -->

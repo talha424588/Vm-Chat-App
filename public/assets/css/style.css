@@ -836,6 +836,7 @@ body{
     box-sizing: border-box;
 	background: #F0F2F5;
 	height: 77px;
+	z-index: 2;
 }
 
 /* Back arrow styling */
@@ -1182,6 +1183,34 @@ body{
 	padding-inline:20px;
 }
 .blur{
-	filter: brightness(0.6) !important;
+	filter: brightness(0.8) !important;
 	pointer-events: none;
+}
+.lazy_spinner {
+    border: 6px solid rgba(0, 0, 0, 0.1); 
+    border-top: 6px solid #1DAB61; 
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: spin 1s linear infinite;
+    transition: top 0.4s ease-in-out;
+	z-index: 1;
+	
+}
+
+@keyframes spin {
+    0% { transform: translateX(-50%) rotate(0deg); }
+    100% { transform: translateX(-50%) rotate(360deg); }
+}
+
+.show-spinner {
+    top: 85px; 
+}
+
+.hide-spinner {
+    top: -50px; 
 }
