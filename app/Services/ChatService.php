@@ -115,7 +115,6 @@ class ChatService implements ChatRepository
             // ->skip($pageNo * 20)
             ->get();
 
-        // return count($messages);
 
         return response()->json([
             'status' => true,
