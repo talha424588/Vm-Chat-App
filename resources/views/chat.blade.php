@@ -195,7 +195,7 @@
 
     <div class="container-fluid" id="main-container">
         <div class="row h-100">
-            <div class="col-12 col-sm-5 col-md-4 d-flex flex-column" id="chat-list-area" style="position:relative;">
+            <div class="col-12 col-sm-5 col-md-4 d-flex flex-column h-100" id="chat-list-area" style="position:relative;">
 
                 <!-- Navbar -->
 
@@ -328,8 +328,11 @@
 
 
 
-
-                <div class="d-flex flex-column chat_list_messages" id="messages"></div>
+                <div id="spinner" class="lazy_spinner"></div>
+          
+                <div class="d-flex flex-column chat_list_messages" id="messages">
+                  
+                </div>
 
 
                 <!-- New Code To Move Message -->
@@ -349,11 +352,11 @@
                 <div class="modal fade" id="chatModal" tabindex="-1" role="dialog"
                     aria-labelledby="deleteModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content" style="width:100%; height:752px">
+                        <div class="modal-content" style="width:80%; height:630px">
                             <div class="modal-header"
                                 style="background-color: #1DAB61; font-size: 18px; font-weight: 400;">
                                 <h5 class="modal-title" style="color:white;">Move message to</h5>
-                                <button type="button" style="color:white;" class="close" data-dismiss="modal"
+                                <button type="button" style="color:white;" class="close" data-bs-dismiss="modal"
                                     aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>

@@ -579,6 +579,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
 
 let addMessageToMessageArea = (message) => {
 
+
     let msgDate = mDate(message.time).getDate();
 
     // if (lastDate !== msgDate) {
@@ -892,7 +893,10 @@ let addMessageToMessageArea = (message) => {
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                          ${messageContent}
+                        <div class="${message.type == "Message"?'w-90':''}">
+                           ${messageContent}
+                        </div> 
+                     
                         </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -923,11 +927,11 @@ let addMessageToMessageArea = (message) => {
 
                             </div>
                             ${message.sender === user.unique_id ? `
-                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '2px' : '10px')}; right: 8px;">
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <div class="dropdown-menu custom-shadow"  aria-labelledby="dropdownMenuButton">
                                     ${!(user.role === '0' || user.role === '2') ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
@@ -962,8 +966,9 @@ let addMessageToMessageArea = (message) => {
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id ? `
+                                <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id  ? `
+
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
@@ -1131,6 +1136,12 @@ function CorrectionMessage(message_id, senderName) {
     else {
         DOM.displayed_message_div = !DOM.displayed_message_div;
     }
+    var replyDiv = document.getElementById('reply-div');
+
+if (window.getComputedStyle(replyDiv).display === 'block') {
+    removeQuotedMessage();
+}
+
 
     // console.log(DOM);
     // const editDiv=document.getElementById('editMessageDiv');
@@ -1139,6 +1150,8 @@ function CorrectionMessage(message_id, senderName) {
     // }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
+    var iconContainer = document.querySelector('.icon-container');
+    iconContainer.style.bottom = '240px';
     console.log(messagebody);
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
@@ -1355,6 +1368,12 @@ function editMessage(messageId) {
     else {
         DOM.displayed_message_div = !DOM.displayed_message_div;
     }
+    var replyDiv = document.getElementById('reply-div');
+
+    if (window.getComputedStyle(replyDiv).display === 'block') {
+        removeQuotedMessage();
+    }
+    
     let editMessage = null;
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
@@ -1368,9 +1387,9 @@ function editMessage(messageId) {
     }
 
     if (editMessage) {
-        document.getElementById('editMessageDiv').style.display = 'block';
-        var iconContainer = document.querySelector('.icon-container');
-        iconContainer.style.bottom = '145px';
+        const element = document.getElementById('editMessageDiv');
+        element.style.display = 'block';
+      
         const editMessageIdField = document.getElementById('edit_message_id');
         if (editMessageIdField) {
             editMessageIdField.value = messageId;
@@ -1406,10 +1425,19 @@ function editMessage(messageId) {
             captureid.style.visibility = 'hidden';
         }
 
-
+       
+        DOM.messageInput.style.height=element.offsetHeight+"px";
+        change_icon_height(element);
     }
 }
 
+function change_icon_height(element){
+    var iconContainer = document.querySelector('.icon-container');
+    const viewportHeight = window.innerHeight;
+    const elementRect = element.getBoundingClientRect();
+    const dis = viewportHeight - elementRect.top + 10;
+    iconContainer.style.bottom = dis+'px';
+}
 
 // Edit message area
 function handleSendMessage() {
@@ -1506,11 +1534,20 @@ function removeEditMessage() {
 //Show Reply Message
 function showReply(message_id, senderName, type) {
 
+    var correctionDiv = document.getElementById('correction-div');
+
+    if (correctionDiv && window.getComputedStyle(correctionDiv).display === 'block') {
+        removecorrectionMessage();
+    }
+    
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
     DOM.replyId = message_id;
+
+
+
     var replyDiv = document.getElementById('reply-div');
-    var iconContainer = document.querySelector('.icon-container');
+ 
 
 
 
@@ -1565,8 +1602,8 @@ function showReply(message_id, senderName, type) {
     quotedNameElement.innerHTML = message_body;
 
     replyDiv.style.display = 'block';
-
-    iconContainer.style.bottom = '160px';
+    change_icon_height(replyDiv);
+   
 }
 
 function removeQuotedMessage() {
@@ -1773,7 +1810,17 @@ $(document).ready(function () {
 
 let isLoadingMessages = false;
 let hasMoreMessages = true;
+function showSpinner() {
+    spinner.classList.remove('hide-spinner');
+    spinner.classList.add('show-spinner');
+    DOM.messages.classList.add("over_lay_loader");
+}
 
+function hideSpinner() {
+    spinner.classList.remove('show-spinner');
+    spinner.classList.add('hide-spinner');
+    DOM.messages.classList.remove("over_lay_loader");
+}
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
     // console.log(DOM.messages.clientHeight);
@@ -1789,9 +1836,12 @@ DOM.messages.addEventListener('scroll', async () => {
     //   // User is at the bottom of the chat
     //   console.log('User is at the bottom of the chat');
     // }
+    const spinner = document.getElementById('spinner');
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
+        showSpinner();
         await fetchNextPageMessages();
+        hideSpinner();
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
         //console.log('User is not at the top yet'); // Log if not at the top
@@ -1803,10 +1853,10 @@ DOM.messages.addEventListener('scroll', async () => {
 let addNewMessageToArea = (message) => {
     let msgDate = new Date(message.time * 1000).getDate();
 
-    if (lastDate !== msgDate) {
-        addDateToMessageArea(msgDate);
-        lastDate = msgDate;
-    }
+    // if (lastDate !== msgDate) {
+    //     addDateToMessageArea(msgDate);
+    //     lastDate = msgDate;
+    // }
 
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
@@ -1959,7 +2009,7 @@ let addNewMessageToArea = (message) => {
                             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-angle-down text-muted px-2"></i>
                             </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
                                 ${!['Audio', 'Image', 'File'].includes(message.type) ? `
         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
       ` : ''}
@@ -2328,8 +2378,9 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
 
 
         lastDate = "";
-        console.log(pagnicateChatList);
+
         pagnicateChatList.data.reverse().forEach((msg) => {
+
             const u_id = user.unique_id;
             const seenBy = msg.seen_by ? msg.seen_by.split(',').map(id => id.trim()) : [];
             if (!seenBy.includes(u_id) && !DOM.unreadDividerAdded) {
@@ -2682,7 +2733,7 @@ fileIcon.addEventListener('click', () => {
 });
 
 fileInput.addEventListener('change', (event) => {
-
+    // console.log(event.target.files);
     if (event.target.files[0]) {
         const file = event.target.files[0];
         console.log("file", file);
@@ -2827,9 +2878,13 @@ let searchGroups = async (searchQuery) => {
                         chatList.push(chat);
                     });
                     viewChatList();
+                    // console.log("group messages are loading");
+                    // console.log(chat);
                 }
 
                 if (messages.length > 0) {
+                    // console.log("chat messages are loading");
+                    // console.log(messages);
                     messageList.push(...messages);
                     viewMessageList();
                 }
