@@ -1549,7 +1549,7 @@ function showReply(message_id, senderName, type) {
 
 
     var replyDiv = document.getElementById('reply-div');
-    var iconContainer = document.querySelector('.icon-container');
+ 
 
 
 
@@ -1604,8 +1604,8 @@ function showReply(message_id, senderName, type) {
     quotedNameElement.innerHTML = message_body;
 
     replyDiv.style.display = 'block';
-
-    iconContainer.style.bottom = '160px';
+    change_icon_height(replyDiv);
+   
 }
 
 function removeQuotedMessage() {
