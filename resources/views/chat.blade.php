@@ -195,7 +195,7 @@
 
     <div class="container-fluid" id="main-container">
         <div class="row h-100">
-            <div class="col-12 col-sm-5 col-md-4 d-flex flex-column" id="chat-list-area" style="position:relative;">
+            <div class="col-12 col-sm-5 col-md-4 d-flex flex-column h-100" id="chat-list-area" style="position:relative;">
 
                 <!-- Navbar -->
 

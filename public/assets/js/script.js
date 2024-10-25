@@ -1803,13 +1803,13 @@ let hasMoreMessages = true;
 function showSpinner() {
     spinner.classList.remove('hide-spinner');
     spinner.classList.add('show-spinner');
-    // DOM.messages.classList.add("blur");
+    DOM.messages.classList.add("over_lay_loader");
 }
 
 function hideSpinner() {
     spinner.classList.remove('show-spinner');
     spinner.classList.add('hide-spinner');
-    // DOM.messages.classList.remove("blur");
+    DOM.messages.classList.remove("over_lay_loader");
 }
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
@@ -2658,7 +2658,6 @@ fileIcon.addEventListener('click', () => {
 });
 
 fileInput.addEventListener('change', (event) => {
-
     if (event.target.files[0]) {
         const file = event.target.files[0];
         console.log("file", file);
@@ -2803,13 +2802,13 @@ let searchGroups = async (searchQuery) => {
                         chatList.push(chat);
                     });
                     viewChatList();
-                    console.log("group messages are loading");
-                    console.log(chat);
+                    // console.log("group messages are loading");
+                    // console.log(chat);
                 }
 
                 if (messages.length > 0) {
-                    console.log("chat messages are loading");
-                    console.log(messages);
+                    // console.log("chat messages are loading");
+                    // console.log(messages);
                     messageList.push(...messages);
                     viewMessageList();
                 }
