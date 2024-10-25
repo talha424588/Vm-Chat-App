@@ -352,11 +352,11 @@
                 <div class="modal fade" id="chatModal" tabindex="-1" role="dialog"
                     aria-labelledby="deleteModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content" style="width:100%; height:752px">
+                        <div class="modal-content" style="width:80%; height:630px">
                             <div class="modal-header"
                                 style="background-color: #1DAB61; font-size: 18px; font-weight: 400;">
                                 <h5 class="modal-title" style="color:white;">Move message to</h5>
-                                <button type="button" style="color:white;" class="close" data-dismiss="modal"
+                                <button type="button" style="color:white;" class="close" data-bs-dismiss="modal"
                                     aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>

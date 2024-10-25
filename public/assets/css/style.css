@@ -295,7 +295,7 @@ background-color: rgba(255, 255, 255, 0.5);
 }
 
 .additional_style{
-	padding:10px;
+	padding:12px 10px 10px 10px;
 	 border-radius:5px;
 }
 
@@ -548,8 +548,8 @@ color: #666;
 
 
 	  i#voice-icon {
-		margin-left: 6px;
-		margin-top: 13px;
+		margin-left: 10px;
+		margin-top: 8px;
 	}
 
 	#correction-div{
@@ -918,6 +918,9 @@ body{
 	{
 		height: 100%;
 	}
+	.right-nidle {
+		right: 0px;
+	}
 	
 }
 
@@ -1240,4 +1243,15 @@ body{
 #messages {
     scrollbar-width: thin;
     scrollbar-color: #888 #f1f1f1;
+}
+.w-90{
+	width: 90%;
+	margin: 0;
+	padding: 0;
+}
+.custom-shadow{
+	box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
+	border-radius: 8px;
+	border: none;
+	font-size: 14px;
 }

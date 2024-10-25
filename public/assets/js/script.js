@@ -579,7 +579,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
 });
 
 let addMessageToMessageArea = (message) => {
-    
+    console.log(message);
 
 
     let msgDate = mDate(message.time).getDate();
@@ -895,7 +895,10 @@ let addMessageToMessageArea = (message) => {
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                          ${messageContent}
+                        <div class="${message.type == "Message"?'w-90':''}">
+                           ${messageContent}
+                        </div> 
+                     
                         </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -926,11 +929,11 @@ let addMessageToMessageArea = (message) => {
 
                             </div>
                             ${message.sender === user.unique_id ? `
-                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '2px' : '10px')}; right: 8px;">
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <div class="dropdown-menu custom-shadow"  aria-labelledby="dropdownMenuButton">
                                     ${!(user.role === '0' || user.role === '2') ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
@@ -965,7 +968,7 @@ let addMessageToMessageArea = (message) => {
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
                                     ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id  ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
@@ -2099,7 +2102,7 @@ let addNewMessageToArea = (message) => {
                             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-angle-down text-muted px-2"></i>
                             </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
                                 ${!['Audio', 'Image', 'File'].includes(message.type) ? `
         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
       ` : ''}
@@ -2303,7 +2306,6 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
 
 
         lastDate = "";
-        console.log(pagnicateChatList);
         pagnicateChatList.data.reverse().forEach((msg) => { 
             const u_id = user.unique_id;
             const seenBy = msg.seen_by ? msg.seen_by.split(',').map(id => id.trim()) : [];
@@ -2658,6 +2660,7 @@ fileIcon.addEventListener('click', () => {
 });
 
 fileInput.addEventListener('change', (event) => {
+    // console.log(event.target.files);
     if (event.target.files[0]) {
         const file = event.target.files[0];
         console.log("file", file);
