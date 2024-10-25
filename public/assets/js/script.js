@@ -1389,9 +1389,9 @@ function editMessage(messageId) {
     }
 
     if (editMessage) {
-        document.getElementById('editMessageDiv').style.display = 'block';
-        var iconContainer = document.querySelector('.icon-container');
-        iconContainer.style.bottom = '145px';
+        const element = document.getElementById('editMessageDiv');
+        element.style.display = 'block';
+      
         const editMessageIdField = document.getElementById('edit_message_id');
         if (editMessageIdField) {
             editMessageIdField.value = messageId;
@@ -1427,10 +1427,19 @@ function editMessage(messageId) {
             captureid.style.visibility = 'hidden';
         }
 
-
+       
+        DOM.messageInput.style.height=element.offsetHeight+"px";
+        change_icon_height(element);
     }
 }
 
+function change_icon_height(element){
+    var iconContainer = document.querySelector('.icon-container');
+    const viewportHeight = window.innerHeight;
+    const elementRect = element.getBoundingClientRect();
+    const dis = viewportHeight - elementRect.top + 10;
+    iconContainer.style.bottom = dis+'px';
+}
 
 // Edit message area
 function handleSendMessage() {
