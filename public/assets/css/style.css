@@ -196,7 +196,7 @@ z-index: 1; /* Ensure it is above other content */
     position: absolute;
     top: -9px;
     left: -6px;
-    background-color: #34c759; 
+    background-color: #34c759;
     color: white;
     font-size: 11px;
     font-weight: bold;
@@ -205,7 +205,7 @@ z-index: 1; /* Ensure it is above other content */
     height: 25px;
     width: 25px;
     text-align: center;
-    line-height: 25px; 
+    line-height: 25px;
 }
 
 
@@ -237,7 +237,7 @@ position: relative;
 display: flex;
 align-items: center;
 justify-content: center;
-height: 52px; 
+height: 52px;
 margin-bottom: 30px;
 padding: 10px;
 }
@@ -314,7 +314,7 @@ background-color: rgba(255, 255, 255, 0.5);
 
 	.profile_img{
 		margin-left:6px !important;
-		margin-right:12px !important;	
+		margin-right:12px !important;
 	}
 	.search-bar{
 		border-radius:35px !important;
@@ -778,8 +778,8 @@ body{
 	overflow-y:auto;
 	height: 480px;
     box-sizing: border-box;
-	scrollbar-width: thin; 
-    scrollbar-color: #ccc transparent; 
+	scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
 }
 
 .chat-row::-webkit-scrollbar {
@@ -787,16 +787,16 @@ body{
 }
 
 .chat-row::-webkit-scrollbar-track {
-    background: transparent; 
+    background: transparent;
 }
 
 .chat-row::-webkit-scrollbar-thumb {
-    background-color: #ccc; 
-    border-radius: 10px; 
+    background-color: #ccc;
+    border-radius: 10px;
 }
 
 .chat-row::-webkit-scrollbar-thumb:hover {
-    background-color: #888; 
+    background-color: #888;
 }
 
 
@@ -887,7 +887,7 @@ body{
 
 /* Search icon styling */
 .search-icon {
-    margin-left: auto; 
+    margin-left: auto;
 	margin-right: 35px;
 }
 
@@ -907,7 +907,7 @@ body{
 	.profile-pic {
 		margin-left: 0px;
 	}
-	
+
     .search-icon {
 		margin-right: 15px;
     }
@@ -1136,7 +1136,7 @@ body{
   }
 
   .highlight {
-    background-color: yellow;
+    background-color: #E0F34A;
 }
 
 /* No Group Found */
@@ -1255,3 +1255,4 @@ body{
 	border: none;
 	font-size: 14px;
 }
+
