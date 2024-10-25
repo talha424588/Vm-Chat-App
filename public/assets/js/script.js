@@ -1982,7 +1982,6 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
     currentPage++;
     // }
     const currentScrollHeight = DOM.messages.scrollHeight;
-    console.log("details", chat.group.group_id, "page", currentPage, "message id", message_id, "currnt page", current_Page)
     try {
         const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}&currentPage=${encodeURIComponent(current_Page)}` : ''}`;
         const response = await fetch(url, {
@@ -2211,21 +2210,6 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
                 setTimeout(() => {
                     messageElement.scrollIntoView({ behavior: "smooth" });
                 }, 100);
-
-                // const messageElement = DOM.messages.querySelector(`[data-message-id="${msg.id}"]`);
-                // if (messageElement) {
-                //     setTimeout(() => {
-                //         messageElement.scrollIntoView({ behavior: "smooth" });
-                //     }, 100);
-                //     const searchQuery = searchMessageInputFeild.value.toLowerCase();
-                //     const messageTextElement = messageElement.querySelector(".shadow-sm");
-                //     const messageText = messageTextElement.textContent.toLowerCase();
-                //     const index = messageText.indexOf(searchQuery);
-                //     if (index !== -1) {
-                //         const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
-                //         messageTextElement.innerHTML = highlightedText;
-                //     }
-                // }
             }
         });
 
@@ -2927,7 +2911,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             const resultTextDiv = document.createElement("div");
                             resultTextDiv.className = "result-text";
 
-                            // resultTextDiv.textContent = message.msg;
                             if (message.msg.startsWith("https://")) {
                                 resultTextDiv.textContent = message.media_name;
                             } else {

@@ -79,38 +79,17 @@ class ChatService implements ChatRepository
             return $this->fetchMessagesUpToSearched($request);
         }
     }
-    // private function fetchMessagesUpToSearched($request)
-    // {
-    //     $pageNo = (int)($request->currentPage);
-    //     $messageId = $request->messageId;
-    //     $groupId = $request->groupId;
-
-    //     $messages = GroupMessage::where('group_id', $groupId)
-    //         ->where('id', '>=', $messageId)
-    //         ->where('is_deleted', false)
-    //         ->orderBy('id', 'desc')
-    //         ->take(PHP_INT_MAX)
-    //         ->skip($pageNo * 20)
-    //         ->get();
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Messages found',
-    //         'data' => new MessageResourceCollection($messages),
-    //     ]);
-    // }
-
-
     private function fetchMessagesUpToSearched($request)
     {
         $pageNo = (int)($request->currentPage);
         $messageId = $request->messageId;
         $groupId = $request->groupId;
         $messages = GroupMessage::where('group_id', $groupId)
-            ->where('id', '>=', $messageId) // Change here to >=
+            ->where('id', '>=', $messageId)
             ->where('is_deleted', false)
-            ->orderBy('id', 'desc') // Change to ascending order
-            ->take(20) // Limit to 20 messages
-            ->skip($pageNo * 20) // Skip messages based on the page number
+            ->orderBy('id', 'desc')
+            ->take(20)
+            ->skip($pageNo * 20)
             ->get();
 
 
