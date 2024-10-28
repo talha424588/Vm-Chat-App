@@ -40,11 +40,9 @@ class ChatService implements ChatRepository
         $perPage = 20;
         if (!$request->messageId) {
             $page = $request->get('page', 1);
-            // $paginator = GroupMessage::where('group_id', $request->groupId)->with('user','reply')->orderBy('id', 'desc')
-            //     ->paginate($perPage, ['*'], 'page', $page);
 
             $paginator = GroupMessage::where('group_id', $request->groupId)
-                ->where('is_deleted', false)
+                // ->where('is_deleted', false)
                 ->with('user', 'reply')
                 ->orderBy('id', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);
@@ -202,6 +200,22 @@ class ChatService implements ChatRepository
             $message->status = EnumMessageEnum::CORRECTION;
             if ($message->save()) {
                 return response()->json(["status" => true, "message" => "Correction saved successfully", "message" => new MessageResource($message)]);
+            } else {
+                return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+            }
+        } else {
+            return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+        }
+    }
+
+
+    public function restoreDeletedMessage($messageId)
+    {
+        $message = GroupMessage::where('id', $messageId)->first();
+        if ($message) {
+            $message->is_deleted = false;
+            if ($message->save()) {
+                return response()->json(["status" => true, "message" => "success", "message" => new MessageResource($message)]);
             } else {
                 return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
             }
