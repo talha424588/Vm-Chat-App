@@ -168,9 +168,21 @@ let viewChatList = () => {
             let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
+                let latestMessage = null;
+                if(user.role == 0 || user.role == 2)
+                {
+                     latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
+                }
+                else if (elem.group.group_messages && elem.group.group_messages.length > 0) {
+                    for (let i = elem.group.group_messages.length - 1; i >= 0; i--) {
+                        const message = elem.group.group_messages[i];
 
-                const latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
-
+                        if (!message.is_privacy_breach) {
+                            latestMessage = message;
+                            break;
+                        }
+                    }
+                }
                 let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
                     if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
@@ -579,11 +591,6 @@ let addMessageToMessageArea = (message) => {
 
     let msgDate = mDate(message.time).getDate();
 
-    // if (lastDate !== msgDate) {
-    //     addDateToMessageArea(msgDate);
-    //     lastDate = msgDate;
-    // }
-
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
 
@@ -593,13 +600,6 @@ let addMessageToMessageArea = (message) => {
     if (/<a[^>]+>/g.test(message.msg) || /<audio[^>]+>/g.test(message.msg)) {
         oldMessageType = getOldMessageType(message);
     }
-    // if (!message.type) {
-    //     if (/<audio[^>]+>/g.test(message.msg)) {
-    //         oldMessageType = "Audio";
-    //     } else if (/<[^>]+>/g.test(message.msg)) {
-    //         oldMessageType = "File";
-    //     }
-    // }
 
     if (message.type === 'File') {
         if (message.reply) {
@@ -881,6 +881,10 @@ let addMessageToMessageArea = (message) => {
     `;
     }
 
+    console.log("messageContent",messageContent);
+
+    if (!message.is_privacy_breach) {
+        console.log("message",message);
     DOM.messages.innerHTML += `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
@@ -905,7 +909,7 @@ let addMessageToMessageArea = (message) => {
                                             Seen
                                         </a>
                                     </span> |` :
-            (user.role == 0 || user.role == 2 ? `
+                                        (user.role == 0 || user.role == 2 ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
@@ -997,6 +1001,35 @@ let addMessageToMessageArea = (message) => {
             </div>
         </div>
     `;
+    }
+    else if(message.is_privacy_breach && user.role == 0 || user.role == 2)
+    {
+        console.log("message is_privacy_breach",message);
+
+        DOM.messages.innerHTML += `
+        <div class="ml-3">
+            ${message.user.id == user.id ? '' : profileImage}
+            <div class="" >
+                <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
+                    <div style="margin-top:-4px">
+                        <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
+                        <div class="${message.type == "Message"?'w-90':''}">
+                           ${messageContent}
+                        </div>
+                        </div>
+                        <div>
+                            <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
+                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span>
+                                <!-- Additional logic for seen and reply links -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    }
 
     var messageDiv = document.getElementById("messages");
     var messageItems = messageDiv.getElementsByClassName("message-item");
@@ -1299,11 +1332,12 @@ function checkPrivacyAndAlert(messageContent, messageId) {
             mediaName: null,
             time: Math.floor(Date.now() / 1000),
             csrf_token: document.querySelector('meta[name="csrf-token"]').content,
+            privacy_breach: true,
         };
         socket.emit('sendChatToServer', msg);
-        return true; // Indicate that an alert was sent
+        return true;
     }
-    return false; // No alert needed
+    return false;
 }
 document.getElementById('correction-send-message-btn').addEventListener('click', correction_send_handel);
 
@@ -2443,6 +2477,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                     mediaName: mediaName,
                     time: Math.floor(Date.now() / 1000),
                     csrf_token: csrfToken,
+                    privacy_breach: true,
                 };
                 socket.emit('sendChatToServer', msg);
             } else {
