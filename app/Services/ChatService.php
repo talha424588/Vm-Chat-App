@@ -86,7 +86,7 @@ class ChatService implements ChatRepository
             ->where('id', '>=', $messageId)
             ->where('is_deleted', false)
             ->orderBy('id', 'desc')
-            ->take(20)
+            ->take(1000)
             ->skip($pageNo * 20)
             ->get();
 
