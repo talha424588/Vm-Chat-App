@@ -93,6 +93,7 @@ class ChatController extends Controller
         $message->time = $request->time;
         $message->status = $request->status ?? EnumMessageEnum::NEW;
         $message->is_compose = false;
+        $message->is_privacy_breach = $request->privacy_breach ?? false;
         if ($message->save()) {
             $message->user = User::where("unique_id", $uniqueId)->first();
             if ($message->reply_id) {
@@ -245,4 +246,11 @@ class ChatController extends Controller
         $pdfPath = $request->input('doc');
         return view('pdf-viewer', compact('pdfPath'));
     }
+
+
+    public function restoreMessage($id)
+    {
+        return $this->chatRepository->restoreDeletedMessage($id);
+    }
+
 }

@@ -42,14 +42,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('updateEditedMessage', (editedMessage) => {
-        console.log("Edited message details", editedMessage);
-
-        // Optionally, save the edited message to your database here
-
-        // Broadcast the edited message to all connected clients
         io.emit('updateEditedMessage', editedMessage);
-
     });
+
+    socket.on('restoreMessage', (messageId) => {
+        console.log("Restore message event", messageId);
+        io.emit('restoreMessage', messageId);
+    })
 
     socket.on('disconnect', () => {
         console.log('Disconnect');

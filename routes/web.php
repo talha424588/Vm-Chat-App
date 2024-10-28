@@ -58,6 +58,7 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::post('/message/seen-by/update', [ChatController::class, 'updateMessageReadStatus']);
     Route::get('/message/seen-by/{id}', [ChatController::class, 'getMessageReadStatus']);
     Route::get('message/search/{query}/{groupId}', [ChatController::class, 'searchMessage']);
+    Route::get('message/restore/{id}/', [ChatController::class, 'restoreMessage']);
     Route::POST('/logout', [AuthController::class, 'logout'])->name("logout");
     Route::get("/message/detail/{id}" , [ChatController::class, 'getMessageDetails']);
     Route::post("/message/update" , [ChatController::class, 'updateGroupMessage']);
