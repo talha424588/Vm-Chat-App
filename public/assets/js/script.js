@@ -310,7 +310,7 @@ let addUnread = () => {
     // notificationDiv.innerHTML = notificationValue;
     // notificationDiv.style.display = 'block';
     DOM.messages.innerHTML += `
-        <div class="notification-wrapper">
+        <div id="unread-wrapper" class="notification-wrapper">
             <div class="unread-messages">
                 <span id="unread-counter-div"></span> UNREAD MESSAGES
             </div>
@@ -386,14 +386,22 @@ socket.on('sendChatToClient', (message) => {
     const groupId = message.group_id;
     if (message.sender !== unique_id) {
         DOM.counter += 1;
+        if(DOM.groupId == groupId){
+        const notificationWrapper = document.querySelector('.notification-wrapper');
+        if (notificationWrapper && notificationWrapper.style.display !== 'none') {
+            const previousCount = document.getElementById('unread-counter-div').innerHTML.trim();
+            document.getElementById('unread-counter-div').innerHTML=parseInt(previousCount)+1;
+        }
+        }
     }
     else {
+        const notificationWrapper = document.querySelector('.notification-wrapper');
+        if (notificationWrapper && notificationWrapper.style.display !== 'none') {
+            notificationWrapper.style.display = 'none';
+        }
         scroll_function();
     }
-    const notificationWrapper = document.querySelector('.notification-wrapper');
-    if (notificationWrapper && notificationWrapper.style.display !== 'none') {
-        notificationWrapper.style.display = 'none';
-    }
+   
 
 
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
@@ -791,7 +799,7 @@ let addMessageToMessageArea = (message) => {
 
 
             if (message.reply.type === 'Image' || oldMessageType == "File") {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:100%;">`;
             } else if (message.reply.type === 'File' || oldMessageType == "File") {
                 var message_body = ` <div class="file-message" >
                 <div class="file-icon">
@@ -1021,7 +1029,14 @@ let addMessageToMessageArea = (message) => {
         // document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
 
-        if (DOM.counter > 0) {
+        if (DOM.counter > 0) { 
+            // const notificationWrapper = document.querySelector('.notification-wrapper');
+            // var iconContainer = document.querySelector('.icon-container'); 
+            // if (notificationWrapper && notificationWrapper.style.display !== 'none' && getComputedStyle(iconContainer).display !== 'none') {
+            //     notificationWrapper.style.display = 'none';
+                
+            // }
+
             DOM.notificationDiv.innerHTML = DOM.counter;
             notificationDiv.style.display = 'block';
         }
@@ -1077,7 +1092,7 @@ function scroll_function() {
             if (DOM.unreadCounter > 0) {
                 DOM.notificationDiv.innerHTML = DOM.unreadCounter;
                 DOM.notificationDiv.style.display = "block";
-                DOM.unreadCounter = 0;
+                DOM.unreadCounter =0;
             }
         } else {
             scrollBottomBtn.style.display = 'none';
@@ -1362,6 +1377,10 @@ function removecorrectionMessage() {
 
 
 function editMessage(messageId) {
+if ($('#action-bar').is(':visible')) {
+    cancelMoveMessage();
+}
+
     if (DOM.displayed_message_div) {
         removecorrectionMessage();
     }
@@ -2320,6 +2339,16 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
 
     DOM.groupId = elem.dataset.groupId;
 
+    DOM.counter=0;
+    DOM.unreadCounter=0;
+    DOM.notificationDiv.style.display="none";
+    const unreadWrapper = document.getElementById('unread-wrapper');
+
+    if (unreadWrapper) {
+    unreadWrapper.remove();
+    }
+
+
     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
     mClassList(DOM.messageAreaOverlay).add("d-none");
 
@@ -2395,15 +2424,13 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
-        DOM.unreadDividerAdded = false;
-        var unreadCountDiv = document.getElementById('unread-counter-div');
-        if (unreadCountDiv) {
-
-            unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            unreadCountDiv.innerHTML = DOM.unreadCounter;
-
-        }
-
+        scroll_to_unread_div();
+        // var iconContainer = document.querySelector('.icon-container');
+        // if (iconContainer && getComputedStyle(iconContainer).display === 'none') {
+        //     DOM.notificationDiv.innerHTML = 0;
+        //     DOM.notificationDiv.style.display = "none";
+        //     DOM.unreadCounter=0;
+        // }
 
 
 
@@ -2411,6 +2438,17 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
 
 
 };
+function scroll_to_unread_div() {
+    DOM.unreadDividerAdded = false;
+    const unreadCountDiv = document.getElementById('unread-wrapper');
+
+    if (unreadCountDiv) {
+        setTimeout(() => {
+            unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById("unread-counter-div").innerHTML = DOM.unreadCounter;
+        }, 1000);
+    }
+}
 
 
 async function updateMessageSeenBy(ids) {
