@@ -148,7 +148,6 @@ let populateGroupList = async () => {
 
 let viewChatList = () => {
     if (chatList.length === 0) {
-        console.log("No chats to display.");
         return;
     }
 
@@ -234,7 +233,6 @@ function getOldMessageMediaName(message) {
 }
 
 function getOldMessageType(message) {
-    console.log("message detail", message);
     const linkTag = message.msg.match(/<a[^>]+>/g)[0];
     fileLink = linkTag.match(/href="([^"]+)"/)[1];
     const mediaName = fileLink.split('uploads/')[1];
@@ -275,7 +273,7 @@ let viewMessageList = () => {
             let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
             DOM.messagesList.innerHTML += `
             <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
-            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index},1)">
+            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,1)">
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
                 <div class="name list-user-name">${elem.group.name}</div>
@@ -481,7 +479,6 @@ socket.on('updateEditedMessage', (editedMessage) => {
             else if (editedMessage.reply.type === "Image") {
                 var message_body = `<img src="${editedMessage.reply.msg}" style="height:125px; width:125px;">`;
 
-                console.log("image");
                 newMessageDisplay = `
                 <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -595,7 +592,6 @@ let addMessageToMessageArea = (message) => {
 
     if (/<a[^>]+>/g.test(message.msg) || /<audio[^>]+>/g.test(message.msg)) {
         oldMessageType = getOldMessageType(message);
-        console.log("oldMessage type", oldMessageType);
     }
     // if (!message.type) {
     //     if (/<audio[^>]+>/g.test(message.msg)) {
@@ -895,8 +891,8 @@ let addMessageToMessageArea = (message) => {
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
                         <div class="${message.type == "Message"?'w-90':''}">
                            ${messageContent}
-                        </div> 
-                     
+                        </div>
+
                         </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -1005,7 +1001,6 @@ let addMessageToMessageArea = (message) => {
     var messageDiv = document.getElementById("messages");
     var messageItems = messageDiv.getElementsByClassName("message-item");
     var count = messageItems.length;
-    // console.log(count);
     let exceededValue = 0;
     if (message.sender == user.unique_id) {
         scroll_function();
@@ -1013,10 +1008,7 @@ let addMessageToMessageArea = (message) => {
     // if (count > 20 && count % 20 !== 0) {
     if (DOM.showCounter) {
         //     exceededValue = count - 20;
-        //     // console.log("this is the ex")
         // //     // let unread = DOM.unreadMessagesPerGroup[DOM.groupId];
-        // //     // console.log(unread);
-        //     // console.log("In the Group and messages Added:", exceededValue);
 
         // document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
@@ -1143,7 +1135,6 @@ if (window.getComputedStyle(replyDiv).display === 'block') {
 }
 
 
-    // console.log(DOM);
     // const editDiv=document.getElementById('editMessageDiv');
     // if (window.getComputedStyle(editDiv).display === 'block') {
     //     removeEditMessage();
@@ -1152,7 +1143,6 @@ if (window.getComputedStyle(replyDiv).display === 'block') {
     var messagebody = message.msg;
     var iconContainer = document.querySelector('.icon-container');
     iconContainer.style.bottom = '240px';
-    console.log(messagebody);
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
     });
@@ -1173,7 +1163,6 @@ function correction_call(message_id, messagebody, senderName) {
     const messageContent = tinymce.get('input').getContent();
 
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
-    console.log("messageElement", messageElement);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
     messageContentDiv.innerHTML = messageContent;
 
@@ -1373,7 +1362,7 @@ function editMessage(messageId) {
     if (window.getComputedStyle(replyDiv).display === 'block') {
         removeQuotedMessage();
     }
-    
+
     let editMessage = null;
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
@@ -1389,7 +1378,7 @@ function editMessage(messageId) {
     if (editMessage) {
         const element = document.getElementById('editMessageDiv');
         element.style.display = 'block';
-      
+
         const editMessageIdField = document.getElementById('edit_message_id');
         if (editMessageIdField) {
             editMessageIdField.value = messageId;
@@ -1425,7 +1414,7 @@ function editMessage(messageId) {
             captureid.style.visibility = 'hidden';
         }
 
-       
+
         DOM.messageInput.style.height=element.offsetHeight+"px";
         change_icon_height(element);
     }
@@ -1449,10 +1438,7 @@ function handleSendMessage() {
     let messageContent = document.getElementById('input').value;
 
     if (messageContent !== '') {
-
-
         const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
-        console.log(messageIndex);
         if (messageIndex !== -1) {
             pagnicateChatList.data[messageIndex].msg = messageContent;
         }
@@ -1539,7 +1525,7 @@ function showReply(message_id, senderName, type) {
     if (correctionDiv && window.getComputedStyle(correctionDiv).display === 'block') {
         removecorrectionMessage();
     }
-    
+
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
     DOM.replyId = message_id;
@@ -1547,7 +1533,7 @@ function showReply(message_id, senderName, type) {
 
 
     var replyDiv = document.getElementById('reply-div');
- 
+
 
 
 
@@ -1603,7 +1589,7 @@ function showReply(message_id, senderName, type) {
 
     replyDiv.style.display = 'block';
     change_icon_height(replyDiv);
-   
+
 }
 
 function removeQuotedMessage() {
@@ -1675,9 +1661,6 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-            // Update the UI to reflect the changes
-
             const previousGroupId = DOM.groupId;
             const previousGroupIndex = chatList.findIndex(group => group.group.group_id === previousGroupId);
             if (previousGroupIndex !== -1) {
@@ -1771,14 +1754,9 @@ function cancelMoveMessage() {
     document.querySelectorAll('.selected-message').forEach(function (element) {
         element.classList.remove('selected-message');
     });
-
     document.getElementById('action-bar').style.display = 'none';
-
     document.getElementById('input-area').style.display = 'block';
-
     document.getElementById('selected-count').textContent = 'Selected Messages: 0';
-
-    console.log('Selected messages have been cleared and input area is displayed.');
 }
 
 document.getElementById("openModalTrigger").addEventListener("click", function () {
@@ -1787,8 +1765,6 @@ document.getElementById("openModalTrigger").addEventListener("click", function (
 });
 
 function selectUsertosend(username, postgroup_id) {
-
-    console.log("selectUsertosend");
     document.getElementById('selected-username').textContent = username;
     document.getElementById('group_to_move_message').value = postgroup_id;
     document.getElementById('selected-usertosend').style.setProperty('display', 'flex', 'important');
@@ -1798,10 +1774,7 @@ $(document).ready(function () {
     $('#MoveMessagetoGroup').on('click', function () {
         var messagesIds = $('#messages_ids').val();
         var groupToMove = $('#group_to_move_message').val();
-
         var messageIdArray = messagesIds.split(',');
-
-        console.log(messageIdArray, groupToMove);
         moveSelectedMessagesToGroup(messageIdArray, groupToMove);
         document.getElementById('messages_ids').value = '';
         document.getElementById('group_to_move_message').value = '';
@@ -1823,19 +1796,6 @@ function hideSpinner() {
 }
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
-    // console.log(DOM.messages.clientHeight);
-    // console.log(DOM.messages.scrollHeight);
-    // const scrollHeight = DOM.messages.scrollHeight;
-    // const scrollTop = DOM.messages.scrollTop;
-    // const clientHeight = DOM.messages.clientHeight;
-
-    // if (scrollTop + clientHeight < scrollHeight) {
-    //   // User has scrolled up from the bottom
-    //   console.log('User has scrolled up from the bottom');
-    // } else {
-    //   // User is at the bottom of the chat
-    //   console.log('User is at the bottom of the chat');
-    // }
     const spinner = document.getElementById('spinner');
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
@@ -1844,7 +1804,7 @@ DOM.messages.addEventListener('scroll', async () => {
         hideSpinner();
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
-        //console.log('User is not at the top yet'); // Log if not at the top
+        //console.log('User is not at the top yet');
     }
 });
 
@@ -2033,7 +1993,7 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
     // }
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
-        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(chat.group.group_id)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}&currentPage=${encodeURIComponent(current_Page)}` : ''}`;
+        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}&currentPage=${encodeURIComponent(current_Page)}` : ''}`;
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -2042,7 +2002,8 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         });
         nextPageMessages = await response.json();
         unread_settings(nextPageMessages);
-        if (nextPageMessages.data.length > 0) {
+
+        if (pagnicateChatList && pagnicateChatList.data) {
             pagnicateChatList.data.push(...nextPageMessages.data);
         }
 
@@ -2183,8 +2144,6 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
                             }
                             else if (message.reply.type === "Image") {
                                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-
-                                console.log("image");
                                 replyDisplay = `
                                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -2210,7 +2169,6 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
                         }
                         else {
                             const messageText = messageTextElement.innerHTML;
-                            console.log(messageText);
                             const index = messageText.indexOf(searchQuery);
                             if (index !== -1) {
                                 const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
@@ -2220,16 +2178,11 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
                         break;
                         case "File":
                             const fileNameElement = messageElement.querySelector(".file-name");
-                            console.log("fileNameElement", fileNameElement);
                             if (fileNameElement) {
                                 const fileName = fileNameElement.textContent;
-                                console.log("searchQuery:", searchQuery);
 
                                 const trimmedSearchQuery = searchQuery;
                                 const index = fileName.toLowerCase().indexOf(trimmedSearchQuery.toLowerCase());
-                                console.log("fileName:", fileName);
-                                console.log("searchQuery:", trimmedSearchQuery);
-                                console.log("index:", index);
                                 if (index !== -1) {
                                     const highlightedFileName = fileName.substring(0, index) +
                                         `<span class="highlight">${fileName.substring(index, index + trimmedSearchQuery.length)}</span>` +
@@ -2309,11 +2262,10 @@ function unread_settings(query_set) {
 
 let currentlyPlayingAudio = null;
 
-let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
+let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) => {
     // pagnicateChatList = [];
 
     chat = chatList[chatIndex];
-
     DOM.activeChatIndex = chatIndex;
 
     DOM.messages.innerHTML = '';
@@ -2333,7 +2285,7 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
         mClassList(elem).add("active");
     }
 
-    DOM.messageAreaName.innerHTML = chat.name;
+    DOM.messageAreaName.innerHTML = chat.name || elem.group.name;
 
     // DOM.messageAreaPic.src = chat.isGroup ? chat.group.pic : chat.contact.pic;
 
@@ -2586,8 +2538,6 @@ const messaging = firebase.messaging();
 
 Notification.requestPermission().then(permission => {
     if (permission === 'granted') {
-        console.log('Notification permission granted.');
-
         // Get the FCM token
         messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
             if (token) {
@@ -2667,7 +2617,6 @@ const startRecording = () => {
                 task
                     .then(snapshot => snapshot.ref.getDownloadURL())
                     .then(url => {
-                        console.log(url);
                         DOM.messageInput.value = url;
                         sendMessage("Audio", mediaName);
                     })
@@ -2707,7 +2656,6 @@ document.getElementById('captureid').addEventListener('click', function () {
 });
 
 document.getElementById('hidden-file-input').addEventListener('change', function () {
-    console.log("asdfsdfsdfsdfsdfsdfsdfsdfsdf");
     const imageInput = this;
     if (imageInput.files.length > 0) {
         const image = imageInput.files[0];
@@ -2720,7 +2668,6 @@ document.getElementById('hidden-file-input').addEventListener('change', function
         task
             .then(snapshot => snapshot.ref.getDownloadURL())
             .then(url => {
-                console.log(url);
                 DOM.messageInput.value = url;
                 sendMessage("Image", mediaName);
             })
@@ -2733,10 +2680,8 @@ fileIcon.addEventListener('click', () => {
 });
 
 fileInput.addEventListener('change', (event) => {
-    // console.log(event.target.files);
     if (event.target.files[0]) {
         const file = event.target.files[0];
-        console.log("file", file);
 
         const ref = firebase.storage().ref("files/" + DOM.unique_id);
         const mediaName = file.name;
@@ -2747,7 +2692,6 @@ fileInput.addEventListener('change', (event) => {
         task
             .then(snapshot => snapshot.ref.getDownloadURL())
             .then(url => {
-                console.log(url);
                 DOM.messageInput.value = url;
                 sendMessage("File", mediaName);
             })
@@ -2759,7 +2703,6 @@ document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
         const editReplyArea = document.getElementById('Editreply-area');
         if (window.getComputedStyle(editReplyArea).display === 'none') {
-            // console.log('The div is hidden (display: none).');
             event.preventDefault();
             sendMessage();
             document.querySelector('.auto-resize-textarea').style.height = '44px';
@@ -2878,13 +2821,9 @@ let searchGroups = async (searchQuery) => {
                         chatList.push(chat);
                     });
                     viewChatList();
-                    // console.log("group messages are loading");
-                    // console.log(chat);
                 }
 
                 if (messages.length > 0) {
-                    // console.log("chat messages are loading");
-                    // console.log(messages);
                     messageList.push(...messages);
                     viewMessageList();
                 }
@@ -2927,7 +2866,6 @@ async function unreadGrouChat() {
         const url = `get-unread-chat-groups`;
         const unreadConversationGroupResponse = await fetch(url);
         const response = await unreadConversationGroupResponse.json();
-        console.log("response", response);
     }
     catch (error) {
         console.log(error);
@@ -2946,7 +2884,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                 fetch(url)
                     .then(response => response.json())
                     .then(messageResponse => {
-                        console.log("search message response", messageResponse);
                         const searchResultsDiv = document.querySelector(".search-results");
                         searchResultsDiv.innerHTML = "";
                         const searchQuery = e.target.value.toLowerCase();
@@ -2978,11 +2915,9 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultItemDiv.addEventListener("click", function () {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-                                console.log("messageElement", messageElement);
                                 let replyDisplay = '';
                                 if (messageElement) {
                                     const messageTextElement = messageElement.querySelector(".shadow-sm");
-                                    console.log("mesage element found", messageElement);
                                     switch (message.type) {
                                         case "Message":
                                             if (message.reply) {
@@ -3087,8 +3022,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                                 }
                                                 else if (message.reply.type === "Image") {
                                                     var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-
-                                                    console.log("image");
                                                     replyDisplay = `
                                                         <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                                                             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -3114,7 +3047,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                             }
                                             else {
                                                 const messageText = messageTextElement.innerHTML;
-                                                console.log(messageText);
                                                 const index = messageText.indexOf(searchQuery);
                                                 if (index !== -1) {
                                                     const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
@@ -3154,8 +3086,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
                                 } else {
-                                    console.log("else part", currentPage);;
-                                    console.log('pagniated array message count', pagnicateChatList.data.length)
                                     fetchNextPageMessages(messageId, currentPage);
                                 }
                             });
