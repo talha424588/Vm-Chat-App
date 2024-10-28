@@ -14,4 +14,5 @@ interface ChatRepository
     public function getMessageById($id);
     public function updateMessage($request);
     public function messageCorrection($request);
+    public function restoreDeletedMessage($id);
 }

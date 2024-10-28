@@ -31,8 +31,8 @@ class GroupService implements GroupRepository
 
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
             ->with(['groupMessages' => function ($query) {
-                $query->latest('time')
-                    ->where('is_deleted', false); // Add this line to filter out deleted messages
+                $query->latest('time');
+                // ->where('is_deleted', false)
             }, 'groupMessages.user'])
             ->get();
 

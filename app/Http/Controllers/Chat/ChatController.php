@@ -246,4 +246,11 @@ class ChatController extends Controller
         $pdfPath = $request->input('doc');
         return view('pdf-viewer', compact('pdfPath'));
     }
+
+
+    public function restoreMessage($id)
+    {
+        return $this->chatRepository->restoreDeletedMessage($id);
+    }
+
 }
