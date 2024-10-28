@@ -478,9 +478,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                             ${editedMessage.user.name}
                         </div>
                         <div class="reply-details">
-                            <p class="file-name">
-                            ${replyMessage}
-                            </p>
+                            <p class="file-name">${replyMessage}</p>
                         </div>
                     </div>
                     ${newMessageDisplay}
@@ -2797,6 +2795,7 @@ fileInput.addEventListener('change', (event) => {
 
 document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
+
         const editReplyArea = document.getElementById('Editreply-area');
         if (window.getComputedStyle(editReplyArea).display === 'none') {
             // console.log('The div is hidden (display: none).');
