@@ -478,7 +478,9 @@ socket.on('updateEditedMessage', (editedMessage) => {
                             ${editedMessage.user.name}
                         </div>
                         <div class="reply-details">
-                            <p class="file-name">${replyMessage}</p>
+                            <p class="file-name">
+                            ${replyMessage}
+                            </p>
                         </div>
                     </div>
                     ${newMessageDisplay}
