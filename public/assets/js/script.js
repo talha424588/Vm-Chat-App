@@ -151,7 +151,7 @@ let viewChatList = () => {
         console.log("No chats to display.");
         return;
     }
-
+    console.log(chatList);
     DOM.chatList.innerHTML = "";
     DOM.chatList2.innerHTML = "";
     chatList.sort((a, b) => {
@@ -193,17 +193,14 @@ let viewChatList = () => {
 
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
-
-
                 DOM.chatList2.innerHTML += `
-                    <div style="width:95%; margin-left:10px;" class="d-flex flex-row  p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
-                        <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
-                        <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
-                        <div class="w-50">
-                            <div class="name list-user-name">${elem.group.name}</div>
-
-                        </div>
-                    </div>`;
+                <div class="d-flex p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
+                    <input type="radio" name="chatSelection" class="chat-radio" style="margin-left: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
+                    <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:50px;">
+                    <div class="ml-1">
+                        <div class="name list-user-name">${elem.group.name}</div>
+                    </div>
+                </div>`;
 
                 DOM.chatList.innerHTML += `
                     <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
@@ -2441,11 +2438,10 @@ let generateMessageArea = async (elem, chatIndex, searchMessage = null) => {
 function scroll_to_unread_div() {
     DOM.unreadDividerAdded = false;
     const unreadCountDiv = document.getElementById('unread-wrapper');
-
+    document.getElementById("unread-counter-div").innerHTML = DOM.unreadCounter;
     if (unreadCountDiv) {
         setTimeout(() => {
             unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            document.getElementById("unread-counter-div").innerHTML = DOM.unreadCounter;
         }, 1000);
     }
 }

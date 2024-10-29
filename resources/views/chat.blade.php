@@ -350,9 +350,9 @@
                     </svg>
                 </div>
                 <div class="modal fade" id="chatModal" tabindex="-1" role="dialog"
-                    aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    aria-labelledby="ModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content" style="width:80%; height:630px">
+                        <div class="modal-content" style="height:630px" >
                             <div class="modal-header"
                                 style="background-color: #1DAB61; font-size: 18px; font-weight: 400;">
                                 <h5 class="modal-title" style="color:white;">Move message to</h5>
@@ -369,9 +369,11 @@
                                 <div class="recent-chat" style="padding: 0px 0px 0px 10px; text-align: left;">
                                     <span style="font-weight: bold; display: block; margin-bottom: 5px;">Recent
                                         Chat</span>
-
+                    </div>
                                     <!-- Chat list items -->
-                                    <div class="row" id="chat-list2" style="overflow:auto;"></div>
+                                    <div id="chat-list2" style="height:420px; overflow-y:scroll" >
+                                      
+                                    </div>
                                     <!-- <div class="d-flex flex-row w-100 p-2 border-bottom unread align-items-center">
                         <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('Programmers')">
                         <img src="images/0923102932_aPRkoW.jpg" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
@@ -389,7 +391,7 @@
                             <div class="small last-message">message or status is here </div>
                         </div>
                     </div> -->
-                                </div>
+                               
                             </div>
 
                             <!-- Bottom section for selected user display -->
