@@ -364,8 +364,6 @@ socket.on('deleteMessage', (messageId) => {
     }
 });
 
-
-
 socket.on('updateGroupMessages', (messageId) => {
     const groupId = DOM.groupId;
     if (DOM.groupId != null || DOM.groupId != undefined) {
@@ -404,12 +402,12 @@ socket.on('sendChatToClient', (message) => {
     const groupId = message.group_id;
     if (message.sender !== unique_id) {
         DOM.counter += 1;
-        if(DOM.groupId == groupId){
-        const notificationWrapper = document.querySelector('.notification-wrapper');
-        if (notificationWrapper && notificationWrapper.style.display !== 'none') {
-            const previousCount = document.getElementById('unread-counter-div').innerHTML.trim();
-            document.getElementById('unread-counter-div').innerHTML=parseInt(previousCount)+1;
-        }
+        if (DOM.groupId == groupId) {
+            const notificationWrapper = document.querySelector('.notification-wrapper');
+            if (notificationWrapper && notificationWrapper.style.display !== 'none') {
+                const previousCount = document.getElementById('unread-counter-div').innerHTML.trim();
+                document.getElementById('unread-counter-div').innerHTML = parseInt(previousCount) + 1;
+            }
         }
     }
     else {
@@ -419,7 +417,7 @@ socket.on('sendChatToClient', (message) => {
         }
         scroll_function();
     }
-   
+
 
 
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
@@ -603,8 +601,6 @@ socket.on('updateEditedMessage', (editedMessage) => {
 });
 
 let addMessageToMessageArea = (message) => {
-
-
     let msgDate = mDate(message.time).getDate();
 
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
@@ -859,7 +855,6 @@ let addMessageToMessageArea = (message) => {
         <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
         `;
         } else {
-            // messageContent = messageContent || (message.message ?? message.msg);
             messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');;
         }
 
@@ -922,7 +917,7 @@ let addMessageToMessageArea = (message) => {
                                             Seen
                                         </a>
                                     </span> |` :
-                                    (user.role == 0 || user.role == 2 ? `
+                                (user.role == 0 || user.role == 2 ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
@@ -949,8 +944,8 @@ let addMessageToMessageArea = (message) => {
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
-                                        ${(message.type == "Message" && message.is_compose === 1 || message.is_compose == true) ? `
-                                        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                                        ${message.type === "Message" ? `
+                                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         ` : ''}
                                     ${(message.type === "Message" && message.status !== "Correction" && (message.is_compose === 1 || message.is_compose === true)) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
@@ -1086,12 +1081,12 @@ let addMessageToMessageArea = (message) => {
         // document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
 
-        if (DOM.counter > 0) { 
+        if (DOM.counter > 0) {
             // const notificationWrapper = document.querySelector('.notification-wrapper');
-            // var iconContainer = document.querySelector('.icon-container'); 
+            // var iconContainer = document.querySelector('.icon-container');
             // if (notificationWrapper && notificationWrapper.style.display !== 'none' && getComputedStyle(iconContainer).display !== 'none') {
             //     notificationWrapper.style.display = 'none';
-                
+
             // }
 
             DOM.notificationDiv.innerHTML = DOM.counter;
@@ -1149,7 +1144,7 @@ function scroll_function() {
             if (DOM.unreadCounter > 0) {
                 DOM.notificationDiv.innerHTML = DOM.unreadCounter;
                 DOM.notificationDiv.style.display = "block";
-                DOM.unreadCounter =0;
+                DOM.unreadCounter = 0;
             }
         } else {
             scrollBottomBtn.style.display = 'none';
@@ -1432,9 +1427,9 @@ function removecorrectionMessage() {
 
 
 function editMessage(messageId) {
-if ($('#action-bar').is(':visible')) {
-    cancelMoveMessage();
-}
+    if ($('#action-bar').is(':visible')) {
+        cancelMoveMessage();
+    }
 
     if (DOM.displayed_message_div) {
         removecorrectionMessage();
@@ -2357,13 +2352,13 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
 
     DOM.groupId = elem.dataset.groupId;
 
-    DOM.counter=0;
-    DOM.unreadCounter=0;
-    DOM.notificationDiv.style.display="none";
+    DOM.counter = 0;
+    DOM.unreadCounter = 0;
+    DOM.notificationDiv.style.display = "none";
     const unreadWrapper = document.getElementById('unread-wrapper');
 
     if (unreadWrapper) {
-    unreadWrapper.remove();
+        unreadWrapper.remove();
     }
 
 
@@ -2402,9 +2397,13 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
         });
         pagnicateChatList = await response.json();
 
+        console.log("pagina",pagnicateChatList);
+
         unread_settings(pagnicateChatList);
 
         const ids = pagnicateChatList.data.map(item => item.id);
+        console.log("ids",ids);
+
 
         try {
             const response = await fetch("message/seen-by/update", {
@@ -2449,10 +2448,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
         //     DOM.notificationDiv.style.display = "none";
         //     DOM.unreadCounter=0;
         // }
-
-
-
-
     }
 };
 function scroll_to_unread_div() {
@@ -3309,13 +3304,13 @@ function restoreMessage(id) {
             socket.emit('restoreMessage', id);
 
             var messageElement = $(`[data-message-id="${id}"]`);
-        if (messageElement.length > 0) {
-            const restoreButton = $(`#restore-button-${id}`);
-            if (restoreButton.length > 0) {
-                restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
+            if (messageElement.length > 0) {
+                const restoreButton = $(`#restore-button-${id}`);
+                if (restoreButton.length > 0) {
+                    restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
+                }
+                messageElement.removeClass('deleted');
             }
-            messageElement.removeClass('deleted');
-        }
         })
     }
     catch (error) {
