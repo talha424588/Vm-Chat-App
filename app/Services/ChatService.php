@@ -129,13 +129,6 @@ class ChatService implements ChatRepository
 
     public function searchGroupMessages($searchQuery, $groupId)
     {
-        // $messages = GroupMessage::where("msg", "LIKE", "%$query%")
-        //     ->orWhere("media_name", "LIKE", "%$query%")
-        //     ->where("group_id", $groupId)
-        //     ->where('is_deleted', false)
-        //     ->with("user")
-        //     ->get();
-
         $messages = GroupMessage::where(function ($query) use ($searchQuery, $groupId) {
             $query->where("msg", "LIKE", "%$searchQuery%")
                 ->orWhere("media_name", "LIKE", "%$searchQuery%");
@@ -147,6 +140,8 @@ class ChatService implements ChatRepository
                     ->orWhere("type", "");
             })
             ->where('is_deleted', false)
+            // ->whereRaw("msg NOT REGEXP '<[^>]+>'")
+            ->whereRaw("NOT (msg REGEXP '<script[^>]*>|<iframe[^>]*>')") // Add any other tags you want to exclude here
             ->with("user")
             ->with('reply')
             ->get();
