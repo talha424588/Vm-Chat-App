@@ -233,7 +233,6 @@ let viewChatList = () => {
         });
 };
 
-
 function getOldMessageMediaName(message) {
     const linkTag = message.msg.match(/<a[^>]+>/g)[0];
     fileLink = linkTag.match(/href="([^"]+)"/)[1];
@@ -328,7 +327,6 @@ let addUnread = () => {
     DOM.unreadDividerAdded = true;
 }
 
-
 function makeformatDate(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -363,8 +361,6 @@ socket.on('deleteMessage', (messageId) => {
         generateChatList();
     }
 });
-
-
 
 socket.on('updateGroupMessages', (messageId) => {
     const groupId = DOM.groupId;
@@ -404,12 +400,12 @@ socket.on('sendChatToClient', (message) => {
     const groupId = message.group_id;
     if (message.sender !== unique_id) {
         DOM.counter += 1;
-        if(DOM.groupId == groupId){
-        const notificationWrapper = document.querySelector('.notification-wrapper');
-        if (notificationWrapper && notificationWrapper.style.display !== 'none') {
-            const previousCount = document.getElementById('unread-counter-div').innerHTML.trim();
-            document.getElementById('unread-counter-div').innerHTML=parseInt(previousCount)+1;
-        }
+        if (DOM.groupId == groupId) {
+            const notificationWrapper = document.querySelector('.notification-wrapper');
+            if (notificationWrapper && notificationWrapper.style.display !== 'none') {
+                const previousCount = document.getElementById('unread-counter-div').innerHTML.trim();
+                document.getElementById('unread-counter-div').innerHTML = parseInt(previousCount) + 1;
+            }
         }
     }
     else {
@@ -419,7 +415,7 @@ socket.on('sendChatToClient', (message) => {
         }
         scroll_function();
     }
-   
+
 
 
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
@@ -449,7 +445,7 @@ socket.on('sendChatToClient', (message) => {
             }
         });
         viewChatList();
-        addMessageToMessageArea(message);
+        addMessageToMessageArea(message, true);
         get_voice_list();
     } else {
         groupToUpdate.group.group_messages.push(message);
@@ -602,9 +598,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
 
 });
 
-let addMessageToMessageArea = (message) => {
-
-
+let addMessageToMessageArea = (message, flag = false) => {
     let msgDate = mDate(message.time).getDate();
 
     let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
@@ -859,7 +853,6 @@ let addMessageToMessageArea = (message) => {
         <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
         `;
         } else {
-            // messageContent = messageContent || (message.message ?? message.msg);
             messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');;
         }
 
@@ -898,7 +891,9 @@ let addMessageToMessageArea = (message) => {
     }
 
     if (!message.is_privacy_breach && !message.is_deleted) {
-        DOM.messages.innerHTML += `
+        let messageElement = document.createElement('div');
+        messageElement.className = 'ml-3';
+        messageElement.innerHTML = `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
 
@@ -922,7 +917,7 @@ let addMessageToMessageArea = (message) => {
                                             Seen
                                         </a>
                                     </span> |` :
-                                    (user.role == 0 || user.role == 2 ? `
+                (user.role == 0 || user.role == 2 ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
@@ -949,8 +944,8 @@ let addMessageToMessageArea = (message) => {
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
-                                        ${(message.type == "Message" && message.is_compose === 1 || message.is_compose == true) ? `
-                                        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                                        ${message.type === "Message" ? `
+                                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         ` : ''}
                                     ${(message.type === "Message" && message.status !== "Correction" && (message.is_compose === 1 || message.is_compose === true)) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
@@ -1014,10 +1009,19 @@ let addMessageToMessageArea = (message) => {
             </div>
         </div>
         `;
+        if (flag) {
+            DOM.messages.appendChild(messageElement);
+        }
+        else {
+            return messageElement;
+        }
+
     }
     else if (message.is_privacy_breach && user.role == 0 || user.role == 2) {
 
-        DOM.messages.innerHTML += `
+        let messageElement = document.createElement('div');
+        messageElement.className = 'ml-3';
+        messageElement.innerHTML = `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
             <div class="" >
@@ -1040,12 +1044,20 @@ let addMessageToMessageArea = (message) => {
             </div>
         </div>
     `;
+        if (flag) {
+            DOM.messages.appendChild(messageElement);
+        }
+        else {
+            return messageElement;
+        }
     }
 
 
     else if (message.is_deleted && user.role == 0 || user.role == 2) {
-        console.log("message is_privacy_breach", message);
-        DOM.messages.innerHTML += `
+        console.log("message is_deleted", message);
+        let messageElement = document.createElement('div');
+        messageElement.className = 'ml-3';
+        messageElement.innerHTML = `
             <div class="ml-3">
                 ${message.user.id == user.id ? '' : profileImage}
                 <div class="" >
@@ -1069,6 +1081,12 @@ let addMessageToMessageArea = (message) => {
                 </div>
             </div>
         `;
+        if (flag) {
+            DOM.messages.appendChild(messageElement);
+        }
+        else {
+            return messageElement;
+        }
     }
 
     var messageDiv = document.getElementById("messages");
@@ -1086,12 +1104,12 @@ let addMessageToMessageArea = (message) => {
         // document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
 
-        if (DOM.counter > 0) { 
+        if (DOM.counter > 0) {
             // const notificationWrapper = document.querySelector('.notification-wrapper');
-            // var iconContainer = document.querySelector('.icon-container'); 
+            // var iconContainer = document.querySelector('.icon-container');
             // if (notificationWrapper && notificationWrapper.style.display !== 'none' && getComputedStyle(iconContainer).display !== 'none') {
             //     notificationWrapper.style.display = 'none';
-                
+
             // }
 
             DOM.notificationDiv.innerHTML = DOM.counter;
@@ -1149,7 +1167,7 @@ function scroll_function() {
             if (DOM.unreadCounter > 0) {
                 DOM.notificationDiv.innerHTML = DOM.unreadCounter;
                 DOM.notificationDiv.style.display = "block";
-                DOM.unreadCounter =0;
+                DOM.unreadCounter = 0;
             }
         } else {
             scrollBottomBtn.style.display = 'none';
@@ -1292,7 +1310,6 @@ function correction_call(message_id, messagebody, senderName) {
     }
 }
 
-
 function correction_send_handel() {
 
     const messageContent = tinymce.get('input').getContent();
@@ -1333,7 +1350,6 @@ function correction_send_handel() {
         socket.emit('sendChatToServer', newMessage);
     }
 }
-
 
 function checkPrivacyAndAlert(messageContent, messageId) {
     const numberPattern = /\b\d{7,}\b/;
@@ -1430,11 +1446,10 @@ function removecorrectionMessage() {
     iconContainer.style.bottom = '90px';
 }
 
-
 function editMessage(messageId) {
-if ($('#action-bar').is(':visible')) {
-    cancelMoveMessage();
-}
+    if ($('#action-bar').is(':visible')) {
+        cancelMoveMessage();
+    }
 
     if (DOM.displayed_message_div) {
         removecorrectionMessage();
@@ -1885,7 +1900,7 @@ DOM.messages.addEventListener('scroll', async () => {
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
         showSpinner();
-        await fetchNextPageMessages();
+        await fetchPaginatedMessages();
         hideSpinner();
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
@@ -1895,205 +1910,29 @@ DOM.messages.addEventListener('scroll', async () => {
 
 
 // New Updated new message area
-let addNewMessageToArea = (message) => {
-    let msgDate = new Date(message.time * 1000).getDate();
 
-    // if (lastDate !== msgDate) {
-    //     addDateToMessageArea(msgDate);
-    //     lastDate = msgDate;
-    // }
-
-    let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
-    let senderName = message.user.name;
-
-    let messageContent;
-    let replyContent = '';
-
-    // Handle replies
-    if (message.reply) {
-        let replyBody;
-        if (message.reply.type === 'Image') {
-            replyBody = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-        } else if (message.reply.type === 'File') {
-            replyBody = `<div class="file-message">
-                <div class="file-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-                    </svg>
-                </div>
-                <div class="file-details">
-                    <p class="file-name">File</p>
-                </div>
-                <a href="#" class="download-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-                    </svg>
-                </a>
-            </div>`;
-        } else if (message.reply.type === 'Audio') {
-            replyBody = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
-                <div class="audio-content">
-                    <div class="audio-controls">
-                        <button class="playbutton">
-                            <img src="assets/img/play-icon.svg" alt="Play" />
-                        </button>
-                    </div>
-                </div>
-            </div>`;
-        } else {
-            replyBody = message.reply.msg;
-        }
-
-        replyContent = `
-            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
-                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                    ${message.user?.id == user?.id ? message.user.name : message.user.name}
-                </div>
-                <div class="reply-details">
-                    <p class="file-name">${replyBody}</p>
-                </div>
-            </div>
-        `;
-    }
-
-    switch (message.type) {
-        case 'File':
-            messageContent = `
-                <div class="file-message">
-                    <div class="file-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-                        </svg>
-                    </div>
-                    <div class="file-details">
-                        <p class="file-name">${message.media_name}</p>
-                    </div>
-                    <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-                        </svg>
-                    </a>
-                </div>
-            `;
-            break;
-        case 'Image':
-            messageContent = `<img src="${message.message ?? message.msg}" style="height:222px; width:100%;">`;
-            break;
-        case 'Message':
-        case null:
-            messageContent = message.message ?? message.msg;
-            break;
-        case 'Audio':
-            messageContent = `
-                <p>${message.media_name}</p>
-                <p>${message.message ?? message.msg}</p>
-            `;
-            break;
-        // case /<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) && !message.reply:
-        // let fileLink;
-        // // if (/<a[^>]+>/g.test(message.msg)) {
-        // const linkTag = message.msg.match(/<a[^>]+>/g)[0];
-        // fileLink = linkTag.match(/href="([^"]+)"/)[1];
-        // const mediaName = fileLink.split('uploads/')[1];
-        // const displayMediaName = message.media_name || mediaName;
-        // messageContent = `
-        //     <div class="file-message">
-        //         <div class="file-icon">
-        //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        //                 <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-        //                 <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-        //             </svg>
-        //         </div>
-        //         <div class="file-details">
-        //             <p class="file-name">${displayMediaName}</p>
-
-        //         </div>
-        //         <a href="${fileLink}" target="_blank" download="${displayMediaName}" class="download-icon">
-        //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        //                 <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-        //             </svg>
-        //         </a>
-        //     </div>
-        // `;
-        // break;
-
-        default:
-            messageContent = message.message ?? message.msg;
-    }
-
-    // Create the message element as a DOM element
-    let messageElement = document.createElement('div');
-    messageElement.className = 'ml-3';
-
-    messageElement.innerHTML = `
-        ${message.user.id == user.id ? '' : profileImage}
-        <div class="">
-            <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
-                    <div style="margin-top:-4px">
-                    <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; ">
-                    ${replyContent}
-                    <div class="reply-message-area">
-                     ${messageContent.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}
-                    </div>
-                    </div>
-                    <div>
-                        <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
-                            <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-                            <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span> |
-                            <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
-                            </span> |
-                            <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
-                            </span>
-                        </div>
-                        ${message.sender === user.unique_id ? `
-                        <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
-                            <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-angle-down text-muted px-2"></i>
-                            </a>
-                            <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                                ${!['Audio', 'Image', 'File'].includes(message.type) ? `
-        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-      ` : ''}
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                                <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-                            </div>
-                        </div>` : ''}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    return messageElement;
-};
-
-const fetchNextPageMessages = async (message_id = null, current_Page = null) => {
-    let nextPageMessages = [];
-    // if (!message_id) {
-    currentPage++;
-    // }
+const fetchPaginatedMessages = async (message_id = null, current_Page = null) => {
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
-        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}&currentPage=${encodeURIComponent(current_Page)}` : ''}`;
+        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}` : ''}`;
         const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json'
             }
         });
+        let nextPageMessages = [];
         nextPageMessages = await response.json();
+        if (currentPage == 1) {
+            pagnicateChatList = nextPageMessages;
+        }
         unread_settings(nextPageMessages);
 
-        if (pagnicateChatList && pagnicateChatList.data) {
+        if (pagnicateChatList && pagnicateChatList.data && currentPage != 1) {
             pagnicateChatList.data.push(...nextPageMessages.data);
         }
 
         const ids = nextPageMessages.data.map(item => item.id);
-
         try {
             const response = await fetch("message/seen-by/update", {
                 method: "POST",
@@ -2116,10 +1955,21 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
         }
 
         nextPageMessages.data.forEach((message) => {
-            const newMessage = addNewMessageToArea(message);
-            // Issue start from here view message through addNewMessageArea instead of Add Message To Message Area
+
+            const u_id = user.unique_id;
+            const seenBy = message.seen_by ? message.seen_by.split(',').map(id => id.trim()) : [];
+            if (!seenBy.includes(u_id) && !DOM.unreadDividerAdded) {
+                addUnread();
+            }
+            if (!seenBy.includes(u_id)) {
+                DOM.unreadCounter += 1;
+            }
+            const newMessage = addMessageToMessageArea(message);
             DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
-            //
+
+
+            DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
+
             if (message.id === message_id) {
                 const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                 const messageTextElement = messageElement.querySelector(".shadow-sm");
@@ -2307,6 +2157,7 @@ const fetchNextPageMessages = async (message_id = null, current_Page = null) => 
     } catch (error) {
         console.error('Error fetching messages:', error);
     }
+    currentPage++;
 };
 
 function unread_settings(query_set) {
@@ -2357,15 +2208,14 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
 
     DOM.groupId = elem.dataset.groupId;
 
-    DOM.counter=0;
-    DOM.unreadCounter=0;
-    DOM.notificationDiv.style.display="none";
+    DOM.counter = 0;
+    DOM.unreadCounter = 0;
+    DOM.notificationDiv.style.display = "none";
     const unreadWrapper = document.getElementById('unread-wrapper');
 
     if (unreadWrapper) {
-    unreadWrapper.remove();
+        unreadWrapper.remove();
     }
-
 
     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
     mClassList(DOM.messageAreaOverlay).add("d-none");
@@ -2381,78 +2231,20 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
     }
 
     DOM.messageAreaName.innerHTML = chat.name || elem.group.name;
-
-    // DOM.messageAreaPic.src = chat.isGroup ? chat.group.pic : chat.contact.pic;
-
     if (chat.isGroup) {
         let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
     if (searchMessage) {
-        // Need to be updated
-        await fetchNextPageMessages(DOM.clickSearchMessageId, DOM.groupId);
+        await fetchPaginatedMessages(DOM.clickSearchMessageId, DOM.groupId);
     }
     else {
-        const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
-            method: 'GET',
-            headers: {
-                'content-type': 'application/json'
-            }
-        });
-        pagnicateChatList = await response.json();
-
-        unread_settings(pagnicateChatList);
-
-        const ids = pagnicateChatList.data.map(item => item.id);
-
-        try {
-            const response = await fetch("message/seen-by/update", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-Token": csrfToken,
-                },
-                body: JSON.stringify({ ids }),
-            });
-
-            const readMessageResponse = await response.json();
-        } catch (error) {
-            console.log(error);
-        }
-
-        var g_id = DOM.groupId;
-
-
-        lastDate = "";
-
-        pagnicateChatList.data.reverse().forEach((msg) => {
-
-            const u_id = user.unique_id;
-            const seenBy = msg.seen_by ? msg.seen_by.split(',').map(id => id.trim()) : [];
-            if (!seenBy.includes(u_id) && !DOM.unreadDividerAdded) {
-                addUnread();
-            }
-            if (!seenBy.includes(u_id)) {
-                DOM.unreadCounter += 1;
-            }
-            addMessageToMessageArea(msg);
-        });
-
+        fetchPaginatedMessages();
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
         scroll_to_unread_div();
-        // var iconContainer = document.querySelector('.icon-container');
-        // if (iconContainer && getComputedStyle(iconContainer).display === 'none') {
-        //     DOM.notificationDiv.innerHTML = 0;
-        //     DOM.notificationDiv.style.display = "none";
-        //     DOM.unreadCounter=0;
-        // }
-
-
-
-
     }
 };
 function scroll_to_unread_div() {
@@ -2466,7 +2258,6 @@ function scroll_to_unread_div() {
         }, 1000);
     }
 }
-
 
 async function updateMessageSeenBy(ids) {
     try {
@@ -2595,7 +2386,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
     }
 
 };
-
 
 let showProfileSettings = () => {
     DOM.profileSettings.style.left = 0;
@@ -2888,7 +2678,6 @@ $("#seenModal").on("show.bs.modal", async function (event) {
 })
 
 //search groups
-
 let groupSearchField = document.getElementById("search_group");
 let debounceTimeout = null;
 
@@ -2977,7 +2766,6 @@ async function unreadGrouChat() {
 }
 
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
-///////////////////////////////////////////////////////////////////////////////////////////////////
 searchMessageInputFeild.addEventListener("input", function (e) {
     if (e.target.value.length > 0) {
         DOM.messageSearchQuery = e.target.value;
@@ -3009,7 +2797,16 @@ searchMessageInputFeild.addEventListener("input", function (e) {
 
                             if (message.msg.startsWith("https://")) {
                                 resultTextDiv.textContent = message.media_name;
-                            } else {
+                            } else if (/<a[^>]+>/g.test(message.msg)) {
+
+                                messageText = getOldMessageMediaName(message);
+                                resultTextDiv.textContent = messageText;
+                            }
+                            else if (message.msg.includes("<p>")) {
+                                // resultTextDiv.textContent = message.msg.replace(/<\/?(p|s|em|strong)[^>]*>/gi, '')
+                                resultTextDiv.innerHTML = message.msg
+                            }
+                            else {
                                 resultTextDiv.textContent = message.msg;
                             }
                             resultItemDiv.appendChild(resultDateDiv);
@@ -3148,6 +2945,34 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                                     }
                                                 }
 
+                                                else if (message.reply.type === "Message") {
+                                                    replyDisplay = `
+                                                        <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                                                            <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                                                                ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                                                            </div>
+                                                            <div class="reply-details">
+                                                                <p class="file-name">${message.reply.msg}</p>
+                                                            </div>
+                                                        </div>
+                                                    `;
+
+                                                    let messageDisplay = replyDisplay;
+
+                                                    const messageText = message.msg.toLowerCase();
+                                                    const index = messageText.indexOf(searchQuery);
+                                                    if (index !== -1) {
+                                                        const highlightedText = message.msg.substring(0, index) +
+                                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                                            message.msg.substring(index + searchQuery.length);
+
+                                                        messageDisplay += `<div class="reply-message-area">${highlightedText.replace(/[\r\n]+/g, '<br>')}</div>`;
+                                                    } else {
+                                                        messageDisplay += `<div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')}</div>`;
+                                                    }
+
+                                                    messageTextElement.innerHTML = messageDisplay;
+                                                }
                                             }
                                             else {
                                                 const messageText = messageTextElement.innerHTML;
@@ -3190,7 +3015,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                     }
                                     messageElement.scrollIntoView({ behavior: "smooth" });
                                 } else {
-                                    fetchNextPageMessages(messageId, currentPage);
+                                    fetchPaginatedMessages(messageId);
                                 }
                             });
                         });
@@ -3288,7 +3113,6 @@ function get_voice_list() {
     });
 }
 
-
 function restoreMessage(id) {
     try {
         fetch("message/restore/" + id, {
@@ -3309,13 +3133,13 @@ function restoreMessage(id) {
             socket.emit('restoreMessage', id);
 
             var messageElement = $(`[data-message-id="${id}"]`);
-        if (messageElement.length > 0) {
-            const restoreButton = $(`#restore-button-${id}`);
-            if (restoreButton.length > 0) {
-                restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
+            if (messageElement.length > 0) {
+                const restoreButton = $(`#restore-button-${id}`);
+                if (restoreButton.length > 0) {
+                    restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
+                }
+                messageElement.removeClass('deleted');
             }
-            messageElement.removeClass('deleted');
-        }
         })
     }
     catch (error) {
