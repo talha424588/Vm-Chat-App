@@ -233,7 +233,6 @@ let viewChatList = () => {
         });
 };
 
-
 function getOldMessageMediaName(message) {
     const linkTag = message.msg.match(/<a[^>]+>/g)[0];
     fileLink = linkTag.match(/href="([^"]+)"/)[1];
@@ -327,7 +326,6 @@ let addUnread = () => {
         `;
     DOM.unreadDividerAdded = true;
 }
-
 
 function makeformatDate(dateString) {
     const date = new Date(dateString);
@@ -1314,7 +1312,6 @@ function correction_call(message_id, messagebody, senderName) {
     }
 }
 
-
 function correction_send_handel() {
 
     const messageContent = tinymce.get('input').getContent();
@@ -1355,7 +1352,6 @@ function correction_send_handel() {
         socket.emit('sendChatToServer', newMessage);
     }
 }
-
 
 function checkPrivacyAndAlert(messageContent, messageId) {
     const numberPattern = /\b\d{7,}\b/;
@@ -1451,7 +1447,6 @@ function removecorrectionMessage() {
     replyDiv.style.display = 'none';
     iconContainer.style.bottom = '90px';
 }
-
 
 function editMessage(messageId) {
     if ($('#action-bar').is(':visible')) {
@@ -1917,181 +1912,6 @@ DOM.messages.addEventListener('scroll', async () => {
 
 
 // New Updated new message area
-let addNewMessageToArea = (message) => {
-    let msgDate = new Date(message.time * 1000).getDate();
-
-    // if (lastDate !== msgDate) {
-    //     addDateToMessageArea(msgDate);
-    //     lastDate = msgDate;
-    // }
-
-    let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
-    let senderName = message.user.name;
-
-    let messageContent;
-    let replyContent = '';
-
-    // Handle replies
-    if (message.reply) {
-        let replyBody;
-        if (message.reply.type === 'Image') {
-            replyBody = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-        } else if (message.reply.type === 'File') {
-            replyBody = `<div class="file-message">
-                <div class="file-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-                    </svg>
-                </div>
-                <div class="file-details">
-                    <p class="file-name">File</p>
-                </div>
-                <a href="#" class="download-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-                    </svg>
-                </a>
-            </div>`;
-        } else if (message.reply.type === 'Audio') {
-            replyBody = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
-                <div class="audio-content">
-                    <div class="audio-controls">
-                        <button class="playbutton">
-                            <img src="assets/img/play-icon.svg" alt="Play" />
-                        </button>
-                    </div>
-                </div>
-            </div>`;
-        } else {
-            replyBody = message.reply.msg;
-        }
-
-        replyContent = `
-            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
-                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                    ${message.user?.id == user?.id ? message.user.name : message.user.name}
-                </div>
-                <div class="reply-details">
-                    <p class="file-name">${replyBody}</p>
-                </div>
-            </div>
-        `;
-    }
-
-    switch (message.type) {
-        case 'File':
-            messageContent = `
-                <div class="file-message">
-                    <div class="file-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-                        </svg>
-                    </div>
-                    <div class="file-details">
-                        <p class="file-name">${message.media_name}</p>
-                    </div>
-                    <a href="${message.message ?? message.msg}" target="_blank" download="${message.media_name}" class="download-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-                        </svg>
-                    </a>
-                </div>
-            `;
-            break;
-        case 'Image':
-            messageContent = `<img src="${message.message ?? message.msg}" style="height:222px; width:100%;">`;
-            break;
-        case 'Message':
-        case null:
-            messageContent = message.message ?? message.msg;
-            break;
-        case 'Audio':
-            messageContent = `
-                <p>${message.media_name}</p>
-                <p>${message.message ?? message.msg}</p>
-            `;
-            break;
-        // case /<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) && !message.reply:
-        // let fileLink;
-        // // if (/<a[^>]+>/g.test(message.msg)) {
-        // const linkTag = message.msg.match(/<a[^>]+>/g)[0];
-        // fileLink = linkTag.match(/href="([^"]+)"/)[1];
-        // const mediaName = fileLink.split('uploads/')[1];
-        // const displayMediaName = message.media_name || mediaName;
-        // messageContent = `
-        //     <div class="file-message">
-        //         <div class="file-icon">
-        //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        //                 <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-        //                 <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-        //             </svg>
-        //         </div>
-        //         <div class="file-details">
-        //             <p class="file-name">${displayMediaName}</p>
-
-        //         </div>
-        //         <a href="${fileLink}" target="_blank" download="${displayMediaName}" class="download-icon">
-        //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        //                 <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-        //             </svg>
-        //         </a>
-        //     </div>
-        // `;
-        // break;
-
-        default:
-            messageContent = message.message ?? message.msg;
-    }
-
-    // Create the message element as a DOM element
-    let messageElement = document.createElement('div');
-    messageElement.className = 'ml-3';
-
-    messageElement.innerHTML = `
-        ${message.user.id == user.id ? '' : profileImage}
-        <div class="">
-            <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}">
-                    <div style="margin-top:-4px">
-                    <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'}; ">
-                    ${replyContent}
-                    <div class="reply-message-area">
-                     ${messageContent.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}
-                    </div>
-                    </div>
-                    <div>
-                        <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
-                            <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-                            <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span> |
-                            <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">Seen</a>
-                            </span> |
-                            <span>
-                                <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
-                            </span>
-                        </div>
-                        ${message.sender === user.unique_id ? `
-                        <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
-                            <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-angle-down text-muted px-2"></i>
-                            </a>
-                            <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                                ${!['Audio', 'Image', 'File'].includes(message.type) ? `
-        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-      ` : ''}
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                                <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-                            </div>
-                        </div>` : ''}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    return messageElement;
-};
 
 const fetchPaginatedMessages = async (message_id = null, current_Page = null) => {
     const currentScrollHeight = DOM.messages.scrollHeight;
@@ -2433,51 +2253,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
     }
     else {
         fetchPaginatedMessages();
-        // const response = await fetch(`get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=1`, {
-        //     method: 'GET',
-        //     headers: {
-        //         'content-type': 'application/json'
-        //     }
-        // });
-        // pagnicateChatList = await response.json();
-
-        // console.log("pagina",pagnicateChatList);
-
-        // unread_settings(pagnicateChatList);
-
-        // const ids = pagnicateChatList.data.map(item => item.id);
-        // try {
-        //     const response = await fetch("message/seen-by/update", {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //             "X-CSRF-Token": csrfToken,
-        //         },
-        //         body: JSON.stringify({ ids }),
-        //     });
-
-        //     const readMessageResponse = await response.json();
-        // } catch (error) {
-        //     console.log(error);
-        // }
-
-
-
-        //chat counter
-
-        // pagnicateChatList.data.reverse().forEach((msg) => {
-
-        //     const u_id = user.unique_id;
-        //     const seenBy = msg.seen_by ? msg.seen_by.split(',').map(id => id.trim()) : [];
-        //     if (!seenBy.includes(u_id) && !DOM.unreadDividerAdded) {
-        //         addUnread();
-        //     }
-        //     if (!seenBy.includes(u_id)) {
-        //         DOM.unreadCounter += 1;
-        //     }
-        //     addMessageToMessageArea(msg);
-        // });
-
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
@@ -2495,7 +2270,6 @@ function scroll_to_unread_div() {
         }, 1000);
     }
 }
-
 
 async function updateMessageSeenBy(ids) {
     try {
@@ -2624,7 +2398,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
     }
 
 };
-
 
 let showProfileSettings = () => {
     DOM.profileSettings.style.left = 0;
@@ -2917,7 +2690,6 @@ $("#seenModal").on("show.bs.modal", async function (event) {
 })
 
 //search groups
-
 let groupSearchField = document.getElementById("search_group");
 let debounceTimeout = null;
 
@@ -3006,7 +2778,6 @@ async function unreadGrouChat() {
 }
 
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
-///////////////////////////////////////////////////////////////////////////////////////////////////
 searchMessageInputFeild.addEventListener("input", function (e) {
     if (e.target.value.length > 0) {
         DOM.messageSearchQuery = e.target.value;
@@ -3316,7 +3087,6 @@ function get_voice_list() {
         audioPlayer.addEventListener('pause', () => console.log('Paused audio:', audioSrc));
     });
 }
-
 
 function restoreMessage(id) {
     try {
