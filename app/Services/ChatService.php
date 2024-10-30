@@ -20,6 +20,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 use function PHPUnit\Framework\returnSelf;
@@ -155,6 +156,7 @@ class ChatService implements ChatRepository
 
     public function searchGroupMessages($searchQuery, $groupId, $offset = 0, $limit = 40)
     {
+        Log::info('Search Query:', ['searchQuery' => $searchQuery, 'groupId' => $groupId, 'offset' => $offset, 'limit' => $limit]);
         $messages = GroupMessage::where(function ($query) use ($searchQuery, $groupId) {
             $query->where("msg", "LIKE", "%$searchQuery%")
                 ->orWhere("media_name", "LIKE", "%$searchQuery%");
