@@ -140,7 +140,6 @@ let populateGroupList = async () => {
                 present[chat.name] = chatList.length;
                 chatList.push(chat);
             }
-            //console.log("1st hit Updated unread messages count:",  DOM.unreadMessagesPerGroup[group.group_id]);
         });
     } catch (error) {
         console.log("Error fetching chat groups:", error);
@@ -151,7 +150,6 @@ let viewChatList = () => {
     if (chatList.length === 0) {
         return;
     }
-    console.log(chatList);
     DOM.chatList.innerHTML = "";
     DOM.chatList2.innerHTML = "";
     chatList.sort((a, b) => {
@@ -235,8 +233,6 @@ function getOldMessageMediaName(message) {
     const linkTag = message.msg.match(/<a[^>]+>/g)[0];
     fileLink = linkTag.match(/href="([^"]+)"/)[1];
     const mediaName = fileLink.split('uploads/')[1];
-    // const displayMediaName = message.media_name || mediaName;
-    // const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
     return mediaName
 }
 
@@ -251,8 +247,6 @@ function getOldMessageType(message) {
 
 function removeTags(messageText) {
     return messageText.replace(/<\/?p>/g, '')
-    // .replace(/<\/?s>/g, '');
-
 }
 
 let viewMessageList = () => {
@@ -306,15 +300,10 @@ let addDateToMessageArea = (date) => {
     DOM.messages.innerHTML += `
 	<div class="mx-auto my-2  text-dark small py-1 px-2 rounded"  style="visibility: hidden;">
 		//${date}
-	</div>
-	`;
+	</div>`;
 };
 
 let addUnread = () => {
-    // const notificationValue = 5;
-    // const notificationDiv = document.getElementById('notification-count');
-    // notificationDiv.innerHTML = notificationValue;
-    // notificationDiv.style.display = 'block';
     DOM.messages.innerHTML += `
         <div id="unread-wrapper" class="notification-wrapper">
             <div class="unread-messages">
@@ -493,8 +482,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                             <p class="file-name">${replyMessage}</p>
                         </div>
                     </div>
-                    ${newMessageDisplay}
-                `;
+                    ${newMessageDisplay}`;
 
                 messageContentDiv.innerHTML = newMessageDisplay;
             }
@@ -510,8 +498,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                         <p class="file-name">${message_body}</p>
                     </div>
                 </div>
-                <div class="reply-message-area">${editedMessage.msg}</div>
-            `;
+                <div class="reply-message-area">${editedMessage.msg}</div>`;
                 messageContentDiv.innerHTML = newMessageDisplay;
             }
             else if (editedMessage.reply.type === "File") {
@@ -531,15 +518,13 @@ socket.on('updateEditedMessage', (editedMessage) => {
                             <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
                         </svg>
                     </a>
-                </div>
-            `;
+                </div>`;
 
                 newMessageDisplay = `
                 <div class="">
                     ${add_file_view}
                 </div>
-                <div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>
-            `;
+                <div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
                 messageContentDiv.innerHTML = newMessageDisplay;
             }
 
@@ -756,7 +741,6 @@ let addMessageToMessageArea = (message, flag = false) => {
 
     else if (message.type === 'Image') {
         if (message.reply) {
-            // Determine the type of reply and set the message_body accordingly
             if (message.reply.type === 'Image') {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:100%">`;
             } else if (message.reply.type === 'File') {
@@ -767,10 +751,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 var message_body = message.reply.msg;
             }
 
-            // Message content (modify the img to match your use case)
             var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:100%;">`;
-
-            // Set messageContent and include an onclick that scrolls to the replied message
             messageContent = `
                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -915,7 +896,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                             Seen
                                         </a>
                                     </span> |` :
-                (user.role == 0 || user.role == 2 ? `
+                                        (user.role == 0 || user.role == 2 ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
@@ -1052,7 +1033,6 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
     else if (message.is_deleted && user.role == 0 || user.role == 2) {
-        console.log("message is_deleted", message);
         let messageElement = document.createElement('div');
         messageElement.className = 'ml-3';
         messageElement.innerHTML = `
@@ -2693,8 +2673,17 @@ let searchGroups = async (searchQuery) => {
             if (response) {
                 const groups = response.data.groups;
                 const messages = response.data.messages;
-                if (groups.length > 0) {
-                    chatList = [];
+
+                chatList = [];
+                messageList = [];
+                DOM.chatList.innerHTML = "";
+                DOM.chatList2.innerHTML = "";
+
+                DOM.chatList.innerHTML = `<h2>Groups</h2>`;
+                if (groups.length === 0) {
+                    DOM.chatList.innerHTML += `
+                        <div class="no-groups-found">No groups found.</div>`;
+                } else {
                     groups.forEach((group) => {
                         let chat = {};
                         chat.isGroup = true;
@@ -2718,29 +2707,91 @@ let searchGroups = async (searchQuery) => {
                     viewChatList();
                 }
 
-                if (messages.length > 0) {
+                DOM.chatList2.innerHTML = `<h2>Messages</h2>`;
+                if (messages.length === 0) {
+                    DOM.chatList2.innerHTML += `
+                        <div class="no-messages-found">No messages found.</div>
+                    `;
+                } else {
                     messageList.push(...messages);
                     viewMessageList();
                 }
 
-                else {
+                if (groups.length === 0 && messages.length === 0) {
                     DOM.chatList.innerHTML = `
-                        <div class="no-groups-found">
-                            <h2>No result</h2>
-                            <p>Try searching for a different group name or check your spelling.</p>
+                        <div class="no-results-found">
+                            <h2>No results found</h2>
+                            <p>Try searching for a different term or check your spelling.</p>
                         </div>
                     `;
-                    DOM.chatList2.innerHTML = "";
                 }
             }
         } catch (error) {
             console.log(error);
         }
-    }
-    else {
+    } else {
         generateChatList();
     }
 };
+
+// let searchGroups = async (searchQuery) => {
+//     if (searchQuery.length > 0) {
+//         const url = `search-group-by-name/${searchQuery}`;
+//         const unique_id = document.getElementById("login_user_unique_id").value;
+//         try {
+//             const groupResponse = await fetch(url);
+//             const response = await groupResponse.json();
+//             if (response) {
+//                 const groups = response.data.groups;
+//                 const messages = response.data.messages;
+//                 if (groups.length > 0) {
+//                     chatList = [];
+//                     groups.forEach((group) => {
+//                         let chat = {};
+//                         chat.isGroup = true;
+//                         chat.group = group;
+//                         chat.group.access = [group.access];
+//                         chat.name = group.name;
+//                         chat.unread = 0;
+
+//                         if (group.group_messages && group.group_messages.length > 0) {
+//                             group.group_messages.reverse().forEach((msg) => {
+//                                 chat.msg = msg;
+//                                 chat.time = new Date(msg.time * 1000);
+
+//                                 const seenBy = msg.seen_by ? msg.seen_by.split(",").map((s) => s.trim()) : [];
+//                                 chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
+//                             });
+//                         }
+
+//                         chatList.push(chat);
+//                     });
+//                     viewChatList();
+//                 }
+
+//                 if (messages.length > 0) {
+//                     messageList.push(...messages);
+//                     viewMessageList();
+//                 }
+
+//                 else {
+//                     DOM.chatList.innerHTML = `
+//                         <div class="no-groups-found">
+//                             <h2>No result</h2>
+//                             <p>Try searching for a different group name or check your spelling.</p>
+//                         </div>
+//                     `;
+//                     DOM.chatList2.innerHTML = "";
+//                 }
+//             }
+//         } catch (error) {
+//             console.log(error);
+//         }
+//     }
+//     else {
+//         generateChatList();
+//     }
+// };
 
 groupSearchField.addEventListener("input", function (event) {
     messageList = [];
@@ -2889,7 +2940,7 @@ messageSidebar.addEventListener('scroll', function () {
                             resultTextDiv.innerHTML = message.msg
                         }
                         else {
-                            resultTextDiv.textContent = message.msg;
+                              resultTextDiv.textContent = message.msg;
                         }
                         resultItemDiv.appendChild(resultDateDiv);
                         resultItemDiv.appendChild(resultTextDiv);
