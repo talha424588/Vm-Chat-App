@@ -369,6 +369,7 @@ background-color: rgba(255, 255, 255, 0.5);
 	overflow-y: auto;
 	height: calc(100% - 60px);
 	cursor: pointer;
+	height: 540px;
 }
 
 /* Result Item */
@@ -921,6 +922,9 @@ body{
 	}
 	.right-nidle {
 		right: 0px;
+	}
+	.search-results{
+		height: 80%;
 	}
 	
 }

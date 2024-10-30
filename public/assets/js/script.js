@@ -2234,14 +2234,14 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
 };
 function scroll_to_unread_div() {
             DOM.unreadDividerAdded = false;
-        // setTimeout(() => {
-            unreadDiv=document.getElementById("unread-counter-div");
             const unreadCountDiv = document.getElementById('unread-wrapper');
+            if(unreadCountDiv)
+            {
+            unreadDiv=document.getElementById("unread-counter-div");
             unreadDiv.innerHTML = DOM.unreadCounter;
             unreadDiv.focus();
             unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // }, 2000);
-   
+            }   
 }
 
 async function updateMessageSeenBy(ids) {
