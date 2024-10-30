@@ -92,6 +92,7 @@ let pagnicateChatList = [];
 let lastDate = "";
 let offset = 0;
 let isLoadingMore = false;
+let currentPage = 1;
 let loading = false;
 
 let populateGroupList = async () => {
@@ -150,7 +151,7 @@ let viewChatList = () => {
     if (chatList.length === 0) {
         return;
     }
-
+    console.log(chatList);
     DOM.chatList.innerHTML = "";
     DOM.chatList2.innerHTML = "";
     chatList.sort((a, b) => {
@@ -203,17 +204,14 @@ let viewChatList = () => {
 
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
                 const timeText = elem.time ? mDate(elem.time).chatListFormat() : "No messages";
-
-
                 DOM.chatList2.innerHTML += `
-                    <div style="width:95%; margin-left:10px;" class="d-flex flex-row  p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
-                        <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
-                        <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
-                        <div class="w-50">
-                            <div class="name list-user-name">${elem.group.name}</div>
-
-                        </div>
-                    </div>`;
+                <div class="d-flex p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
+                    <input type="radio" name="chatSelection" class="chat-radio" style="margin-left: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
+                    <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:50px;">
+                    <div class="ml-1">
+                        <div class="name list-user-name">${elem.group.name}</div>
+                    </div>
+                </div>`;
 
                 DOM.chatList.innerHTML += `
                     <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
@@ -1912,8 +1910,6 @@ DOM.messages.addEventListener('scroll', async () => {
 let isLoading = false;
 
 const fetchPaginatedMessages = async (message_id = null, current_Page = null) => {
-    if (isLoading) return;
-    isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
         const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}` : ''}`;
@@ -2255,11 +2251,10 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
 function scroll_to_unread_div() {
     DOM.unreadDividerAdded = false;
     const unreadCountDiv = document.getElementById('unread-wrapper');
-
+    document.getElementById("unread-counter-div").innerHTML = DOM.unreadCounter;
     if (unreadCountDiv) {
         setTimeout(() => {
             unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            document.getElementById("unread-counter-div").innerHTML = DOM.unreadCounter;
         }, 1000);
     }
 }
@@ -2600,6 +2595,7 @@ fileInput.addEventListener('change', (event) => {
 
 document.getElementById('input').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
+
         const editReplyArea = document.getElementById('Editreply-area');
         if (window.getComputedStyle(editReplyArea).display === 'none') {
             event.preventDefault();
