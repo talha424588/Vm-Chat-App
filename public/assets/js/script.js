@@ -1955,8 +1955,8 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null,gro
         nextPageMessages.data.forEach((message) => {
              addMessageToMessageArea(message);
             if(message.id == notSeenById)addUnread();
-           
-                       
+
+
 
 
             if (message.id === message_id) {
@@ -2248,7 +2248,7 @@ function scroll_to_unread_div() {
             unreadDiv.innerHTML = DOM.unreadCounter;
             unreadDiv.focus();
             unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }   
+            }
 }
 
 async function updateMessageSeenBy(ids) {
@@ -2831,13 +2831,23 @@ async function unreadGrouChat() {
 
 let searchMessageOffset = 0;
 const searchMessageLimit = 40;
+let previousSearchQuery = "";
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
 searchMessageInputFeild.addEventListener("input", function (e) {
     if (e.target.value.length > 0) {
         DOM.messageSearchQuery = e.target.value;
+        if (e.target.value.length > 0) {
+            DOM.messageSearchQuery = e.target.value;
+            if (e.target.value !== previousSearchQuery) {
+                searchMessageOffset = 0;
+                previousSearchQuery = e.target.value;
+                const searchResultsDiv = document.querySelector(".search-results");
+                searchResultsDiv.innerHTML = "";
+            }
+        }
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(async function () {
-            const url = `message/search/${e.target.value}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`; // Updated URL
+            const url = `message/search/${e.target.value}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`;
             try {
                 fetch(url)
                     .then(response => response.json())
@@ -2904,6 +2914,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
         searchResultsDiv.innerHTML = "";
         removeHighlight();
         searchMessageOffset = 0;
+        previousSearchQuery = "";
     }
 })
 
@@ -2912,7 +2923,6 @@ messageSidebar.addEventListener('scroll', function () {
     if (messageSidebar.scrollTop + messageSidebar.clientHeight >= messageSidebar.scrollHeight) {
         if (DOM.messageSearchQuery.length > 0) {
             const url = `message/search/${DOM.messageSearchQuery}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`;
-            console.log("url",url,searchMessageOffset);
             fetch(url)
                 .then(response => response.json())
                 .then(messageResponse => {
@@ -2920,7 +2930,6 @@ messageSidebar.addEventListener('scroll', function () {
                     if (searchMessageOffset === 0) {
                         searchResultsDiv.innerHTML = "";
                     }
-                    const searchQuery = e.target.value.toLowerCase();
                     if (!messageResponse.messages || messageResponse.messages.length === 0) {
                         if (searchMessageOffset === 0) {
                             const noResultsDiv = document.createElement("div");
@@ -2960,7 +2969,7 @@ messageSidebar.addEventListener('scroll', function () {
                         resultItemDiv.addEventListener("click", function () {
                             let messageId = message.id;
                             const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-                            handleMessageResponse(messageElement, message, messageId, searchQuery);
+                            handleMessageResponse(messageElement, message, messageId, DOM.messageSearchQuery);
                         });
                     });
                     searchMessageOffset += searchMessageLimit;
