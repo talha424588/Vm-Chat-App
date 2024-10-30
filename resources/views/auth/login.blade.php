@@ -28,7 +28,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="form-group">
+                                <div class="form-group mb-2">
                                     <label for="password">{{ __('Password') }}</label>
                                     <input id="password" type="password" class="login-form-control" name="password" required
                                         data-eye placeholder="Password">
@@ -37,21 +37,22 @@
                                     @enderror
                                 </div>
 
-                                <div class="form-group ">
-                                    <div class="custom-checkbox custom-control text-center mt-4">
-                                        @if (Route::has('password.request'))
-                                            <a href="{{ route('password.request') }}" class="forgot-password ">Forgot your
-                                                password?</a>
-                                        @endif
-                                    </div>
-                                </div>
 
-                                <div class="form-group m-0">
+                                <div class="form-group mt-5">
                                     <button type="submit" class="btn loginbutton btn-block">
                                         {{ __('Login') }}
                                     </button>
                                 </div>
 
+                                <div class="form-group mt-2">
+                                    <div class="custom-checkbox custom-control text-center mt-4">
+                                        <!-- @if (Route::has('password.request')) -->
+                                            <!-- <a href="{{ route('password.request') }}" class="forgot-password ">Forgot your
+                                                password?</a>
+                                        @endif -->
+                                        <a href="#" class="text-dark ">Contact Your Administrator</a>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                 </div>
