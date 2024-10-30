@@ -42,7 +42,8 @@ const DOM = {
     notificationDiv: getById("notification-count"),
     unreadDividerAdded: false,
     unreadCounter: 0,
-    messageSearchQuery: null
+    messageSearchQuery: null,
+    currentPage: 0,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -1908,13 +1909,14 @@ DOM.messages.addEventListener('scroll', async () => {
 });
 
 
-// New Updated new message area
+let isLoading = false;
 
 const fetchPaginatedMessages = async (message_id = null, current_Page = null) => {
-    let currentPage = 1;
+    if (isLoading) return;
+    isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
-        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}` : ''}`;
+        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}` : ''}`;
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -1923,12 +1925,12 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null) =>
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
-        if (currentPage == 1) {
+        if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
         unread_settings(nextPageMessages);
 
-        if (pagnicateChatList && pagnicateChatList.data && currentPage != 1) {
+        if (pagnicateChatList && pagnicateChatList.data && DOM.currentPage != 1) {
             pagnicateChatList.data.push(...nextPageMessages.data);
         }
 
@@ -2153,11 +2155,13 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null) =>
 
         const newScrollHeight = DOM.messages.scrollHeight;
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
-
+        DOM.currentPage += 1;
     } catch (error) {
         console.error('Error fetching messages:', error);
     }
-    currentPage++;
+    finally {
+        isLoading = false;
+    }
 };
 
 function unread_settings(query_set) {
@@ -2207,6 +2211,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
     DOM.messages.innerHTML = '';
 
     DOM.groupId = elem.dataset.groupId;
+    DOM.currentPage = 1;
 
     DOM.counter = 0;
     DOM.unreadCounter = 0;

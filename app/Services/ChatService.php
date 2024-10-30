@@ -141,7 +141,7 @@ class ChatService implements ChatRepository
             })
             ->where('is_deleted', false)
             // ->whereRaw("msg NOT REGEXP '<[^>]+>'")
-            ->whereRaw("NOT (msg REGEXP '<script[^>]*>|<iframe[^>]*>')") // Add any other tags you want to exclude here
+            ->whereRaw("NOT (msg REGEXP '<script[^>]*>|<iframe[^>]*>')")
             ->with("user")
             ->with('reply')
             ->get();
