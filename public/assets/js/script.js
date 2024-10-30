@@ -1908,8 +1908,9 @@ DOM.messages.addEventListener('scroll', async () => {
 
 
 let isLoading = false;
-
 const fetchPaginatedMessages = async (message_id = null, current_Page = null) => {
+    if (isLoading) return;
+    isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
         const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}` : ''}`;
