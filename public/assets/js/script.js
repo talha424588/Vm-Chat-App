@@ -140,7 +140,6 @@ let populateGroupList = async () => {
                 present[chat.name] = chatList.length;
                 chatList.push(chat);
             }
-            //console.log("1st hit Updated unread messages count:",  DOM.unreadMessagesPerGroup[group.group_id]);
         });
     } catch (error) {
         console.log("Error fetching chat groups:", error);
@@ -151,7 +150,6 @@ let viewChatList = () => {
     if (chatList.length === 0) {
         return;
     }
-    console.log(chatList);
     DOM.chatList.innerHTML = "";
     DOM.chatList2.innerHTML = "";
     chatList.sort((a, b) => {
@@ -235,8 +233,6 @@ function getOldMessageMediaName(message) {
     const linkTag = message.msg.match(/<a[^>]+>/g)[0];
     fileLink = linkTag.match(/href="([^"]+)"/)[1];
     const mediaName = fileLink.split('uploads/')[1];
-    // const displayMediaName = message.media_name || mediaName;
-    // const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
     return mediaName
 }
 
@@ -251,8 +247,6 @@ function getOldMessageType(message) {
 
 function removeTags(messageText) {
     return messageText.replace(/<\/?p>/g, '')
-    // .replace(/<\/?s>/g, '');
-
 }
 
 let viewMessageList = () => {
@@ -306,8 +300,7 @@ let addDateToMessageArea = (date) => {
     DOM.messages.innerHTML += `
 	<div class="mx-auto my-2  text-dark small py-1 px-2 rounded"  style="visibility: hidden;">
 		//${date}
-	</div>
-	`;
+	</div>`;
 };
 
 let addUnread = () => {
@@ -491,8 +484,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                             <p class="file-name">${replyMessage}</p>
                         </div>
                     </div>
-                    ${newMessageDisplay}
-                `;
+                    ${newMessageDisplay}`;
 
                 messageContentDiv.innerHTML = newMessageDisplay;
             }
@@ -508,8 +500,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                         <p class="file-name">${message_body}</p>
                     </div>
                 </div>
-                <div class="reply-message-area">${editedMessage.msg}</div>
-            `;
+                <div class="reply-message-area">${editedMessage.msg}</div>`;
                 messageContentDiv.innerHTML = newMessageDisplay;
             }
             else if (editedMessage.reply.type === "File") {
@@ -529,15 +520,13 @@ socket.on('updateEditedMessage', (editedMessage) => {
                             <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
                         </svg>
                     </a>
-                </div>
-            `;
+                </div>`;
 
                 newMessageDisplay = `
                 <div class="">
                     ${add_file_view}
                 </div>
-                <div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>
-            `;
+                <div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
                 messageContentDiv.innerHTML = newMessageDisplay;
             }
 
@@ -754,7 +743,6 @@ let addMessageToMessageArea = (message, flag = false) => {
 
     else if (message.type === 'Image') {
         if (message.reply) {
-            // Determine the type of reply and set the message_body accordingly
             if (message.reply.type === 'Image') {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:100%">`;
             } else if (message.reply.type === 'File') {
@@ -765,10 +753,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 var message_body = message.reply.msg;
             }
 
-            // Message content (modify the img to match your use case)
             var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:100%;">`;
-
-            // Set messageContent and include an onclick that scrolls to the replied message
             messageContent = `
                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -913,7 +898,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                             Seen
                                         </a>
                                     </span> |` :
-                (user.role == 0 || user.role == 2 ? `
+                                        (user.role == 0 || user.role == 2 ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
@@ -1050,7 +1035,6 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
     else if (message.is_deleted && user.role == 0 || user.role == 2) {
-        console.log("message is_deleted", message);
         let messageElement = document.createElement('div');
       messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
@@ -2693,8 +2677,17 @@ let searchGroups = async (searchQuery) => {
             if (response) {
                 const groups = response.data.groups;
                 const messages = response.data.messages;
-                if (groups.length > 0) {
-                    chatList = [];
+
+                chatList = [];
+                messageList = [];
+                DOM.chatList.innerHTML = "";
+                DOM.chatList2.innerHTML = "";
+
+                DOM.chatList.innerHTML = `<h2>Groups</h2>`;
+                if (groups.length === 0) {
+                    DOM.chatList.innerHTML += `
+                        <div class="no-groups-found">No groups found.</div>`;
+                } else {
                     groups.forEach((group) => {
                         let chat = {};
                         chat.isGroup = true;
@@ -2718,29 +2711,91 @@ let searchGroups = async (searchQuery) => {
                     viewChatList();
                 }
 
-                if (messages.length > 0) {
+                DOM.chatList2.innerHTML = `<h2>Messages</h2>`;
+                if (messages.length === 0) {
+                    DOM.chatList2.innerHTML += `
+                        <div class="no-messages-found">No messages found.</div>
+                    `;
+                } else {
                     messageList.push(...messages);
                     viewMessageList();
                 }
 
-                else {
+                if (groups.length === 0 && messages.length === 0) {
                     DOM.chatList.innerHTML = `
-                        <div class="no-groups-found">
-                            <h2>No result</h2>
-                            <p>Try searching for a different group name or check your spelling.</p>
+                        <div class="no-results-found">
+                            <h2>No results found</h2>
+                            <p>Try searching for a different term or check your spelling.</p>
                         </div>
                     `;
-                    DOM.chatList2.innerHTML = "";
                 }
             }
         } catch (error) {
             console.log(error);
         }
-    }
-    else {
+    } else {
         generateChatList();
     }
 };
+
+// let searchGroups = async (searchQuery) => {
+//     if (searchQuery.length > 0) {
+//         const url = `search-group-by-name/${searchQuery}`;
+//         const unique_id = document.getElementById("login_user_unique_id").value;
+//         try {
+//             const groupResponse = await fetch(url);
+//             const response = await groupResponse.json();
+//             if (response) {
+//                 const groups = response.data.groups;
+//                 const messages = response.data.messages;
+//                 if (groups.length > 0) {
+//                     chatList = [];
+//                     groups.forEach((group) => {
+//                         let chat = {};
+//                         chat.isGroup = true;
+//                         chat.group = group;
+//                         chat.group.access = [group.access];
+//                         chat.name = group.name;
+//                         chat.unread = 0;
+
+//                         if (group.group_messages && group.group_messages.length > 0) {
+//                             group.group_messages.reverse().forEach((msg) => {
+//                                 chat.msg = msg;
+//                                 chat.time = new Date(msg.time * 1000);
+
+//                                 const seenBy = msg.seen_by ? msg.seen_by.split(",").map((s) => s.trim()) : [];
+//                                 chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
+//                             });
+//                         }
+
+//                         chatList.push(chat);
+//                     });
+//                     viewChatList();
+//                 }
+
+//                 if (messages.length > 0) {
+//                     messageList.push(...messages);
+//                     viewMessageList();
+//                 }
+
+//                 else {
+//                     DOM.chatList.innerHTML = `
+//                         <div class="no-groups-found">
+//                             <h2>No result</h2>
+//                             <p>Try searching for a different group name or check your spelling.</p>
+//                         </div>
+//                     `;
+//                     DOM.chatList2.innerHTML = "";
+//                 }
+//             }
+//         } catch (error) {
+//             console.log(error);
+//         }
+//     }
+//     else {
+//         generateChatList();
+//     }
+// };
 
 groupSearchField.addEventListener("input", function (event) {
     messageList = [];
@@ -2767,25 +2822,31 @@ async function unreadGrouChat() {
     }
 }
 
+let searchMessageOffset = 0;
+const searchMessageLimit = 40;
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
 searchMessageInputFeild.addEventListener("input", function (e) {
     if (e.target.value.length > 0) {
         DOM.messageSearchQuery = e.target.value;
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(async function () {
-            const url = `message/search/${e.target.value}/${DOM.groupId}`;
+            const url = `message/search/${e.target.value}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`; // Updated URL
             try {
                 fetch(url)
                     .then(response => response.json())
                     .then(messageResponse => {
                         const searchResultsDiv = document.querySelector(".search-results");
-                        searchResultsDiv.innerHTML = "";
+                        if (searchMessageOffset === 0) {
+                            searchResultsDiv.innerHTML = "";
+                        }
                         const searchQuery = e.target.value.toLowerCase();
                         if (!messageResponse.messages || messageResponse.messages.length === 0) {
-                            const noResultsDiv = document.createElement("div");
-                            noResultsDiv.className = "no-results";
-                            noResultsDiv.textContent = "No results";
-                            searchResultsDiv.appendChild(noResultsDiv);
+                            if (searchMessageOffset === 0) {
+                                const noResultsDiv = document.createElement("div");
+                                noResultsDiv.className = "no-results";
+                                noResultsDiv.textContent = "No results";
+                                searchResultsDiv.appendChild(noResultsDiv);
+                            }
                             return;
                         }
                         messageResponse.messages.forEach((message) => {
@@ -2818,209 +2879,10 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultItemDiv.addEventListener("click", function () {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-                                let replyDisplay = '';
-                                if (messageElement) {
-                                    const messageTextElement = messageElement.querySelector(".shadow-sm");
-                                    switch (message.type) {
-                                        case "Message":
-                                            if (message.reply) {
-                                                messageTextElement.innerHTML = '';
-                                                if (message.reply.type === "Audio") {
-
-                                                    var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
-                                                        <div class="avatar">
-                                                            <!-- Avatar image here -->
-                                                        </div>
-                                                        <div class="audio-content">
-                                                            <div class="audio-controls">
-                                                                <button class="playbutton">
-                                                                    <img src="assets/img/play-icon.svg" alt="Play" />
-                                                                </button>
-                                                                <div class="audio-progress">
-                                                                    <div class="progress-filled"></div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="audio-time-container">
-                                                                <span class="audio-duration">0:00</span>
-                                                                <span class="audio-time">12:27 PM</span>
-                                                            </div>
-                                                        </div>
-                                                        </div>`;
-
-                                                    newMessageDisplay = `
-                                                        <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
-                                                            <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                                            ${message.user?.id == user?.id ? message.user.name : message.user.name}
-
-                                                            </div>
-                                                            <div class="reply-details">
-                                                                <p class="file-name">${message_body}</p>
-                                                            </div>
-                                                        </div>
-                                                    <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
-                                                    `;
-
-                                                    const searchQuery = e.target.value.toLowerCase();
-                                                    const messageText = message.msg.toLowerCase();
-                                                    const index = messageText.indexOf(searchQuery);
-
-                                                    if (index !== -1) {
-                                                        const highlightedText = message.msg.substring(0, index) +
-                                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                                            message.msg.substring(index + searchQuery.length);
-
-                                                        // Update the reply message area with highlighted text
-                                                        newMessageDisplay = `
-                                                        <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
-                                                            <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                                                ${message.user?.id == user?.id ? message.user.name : message.user.name}
-                                                            </div>
-                                                            <div class="reply-details">
-                                                                <p class="file-name">${message_body}</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="reply-message-area">${highlightedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
-                                                    `;
-                                                    }
-
-                                                    // Set the inner HTML to the newMessageDisplay
-                                                    messageTextElement.innerHTML = newMessageDisplay;
-
-                                                }
-                                                else if (message.reply.type === "File") {
-                                                    replyDisplay = `
-                                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
-                                                        <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                                            ${message.user.name}
-                                                        </div>
-                                                        <div class="reply-details">
-                                                            <div class="file-message">
-                                                                <div class="file-icon">
-                                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"></path>
-                                                                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"></path>
-                                                                    </svg>
-                                                                </div>
-                                                                <div class="file-details">
-                                                                    <p class="file-name">${message.reply.media_name}</p>
-                                                                </div>
-                                                                <a href="${message.reply.msg}" class="download-icon" download="${message.reply.media_name}">
-                                                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"></path>
-                                                                    </svg>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>`;
-                                                    messageTextElement.innerHTML = replyDisplay +
-                                                        `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`; const searchQuery = e.target.value.toLowerCase();
-                                                    const messageText = message.msg.toLowerCase();
-                                                    const index = messageText.indexOf(searchQuery);
-                                                    if (index !== -1) {
-                                                        const highlightedText = message.msg.substring(0, index) +
-                                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                                            message.msg.substring(index + searchQuery.length);
-                                                        messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
-                                                    }
-                                                }
-                                                else if (message.reply.type === "Image") {
-                                                    var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
-                                                    replyDisplay = `
-                                                        <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
-                                                            <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                                                ${message.user?.id == user?.id ? message.user.name : message.user.name}
-                                                            </div>
-                                                            <div class="reply-details">
-                                                                <p class="file-name">${message_body}</p>
-                                                            </div>
-                                                        </div>
-                                                    `;
-
-                                                    messageTextElement.innerHTML = replyDisplay;
-                                                    const messageText = message.msg.toLowerCase();
-                                                    const index = messageText.indexOf(searchQuery);
-                                                    if (index !== -1) {
-                                                        const highlightedText = message.msg.substring(0, index) +
-                                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                                            message.msg.substring(index + searchQuery.length);
-                                                        messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
-                                                    }
-                                                }
-
-                                                else if (message.reply.type === "Message") {
-                                                    replyDisplay = `
-                                                        <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
-                                                            <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                                                ${message.user?.id == user?.id ? message.user.name : message.user.name}
-                                                            </div>
-                                                            <div class="reply-details">
-                                                                <p class="file-name">${message.reply.msg}</p>
-                                                            </div>
-                                                        </div>
-                                                    `;
-
-                                                    let messageDisplay = replyDisplay;
-
-                                                    const messageText = message.msg.toLowerCase();
-                                                    const index = messageText.indexOf(searchQuery);
-                                                    if (index !== -1) {
-                                                        const highlightedText = message.msg.substring(0, index) +
-                                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                                            message.msg.substring(index + searchQuery.length);
-
-                                                        messageDisplay += `<div class="reply-message-area">${highlightedText.replace(/[\r\n]+/g, '<br>')}</div>`;
-                                                    } else {
-                                                        messageDisplay += `<div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')}</div>`;
-                                                    }
-
-                                                    messageTextElement.innerHTML = messageDisplay;
-                                                }
-                                            }
-                                            else {
-                                                const messageText = messageTextElement.innerHTML;
-                                                const index = messageText.indexOf(searchQuery);
-                                                if (index !== -1) {
-                                                    const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
-                                                    messageTextElement.innerHTML = highlightedText;
-                                                }
-                                            }
-                                            break;
-                                        case "File":
-                                            const fileNameElement = messageElement.querySelector(".file-name");
-                                            if (fileNameElement) {
-                                                const fileName = fileNameElement.textContent;
-                                                const index = fileName.toLowerCase().indexOf(searchQuery);
-                                                if (index !== -1) {
-                                                    const highlightedFileName = fileName.substring(0, index) + `<span class="highlight">${fileName.substring(index, index + searchQuery.length)}</span>` + fileName.substring(index + searchQuery.length);
-                                                    fileNameElement.innerHTML = highlightedFileName;
-                                                }
-                                            }
-                                            break;
-                                        default:
-                                            const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
-                                            if (nullTypemessageTextElement) {
-                                                const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
-
-                                                const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
-                                                if (nullTypeIndex !== -1) {
-                                                    const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
-                                                        `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
-                                                        nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
-
-                                                    nullTypemessageTextElement.innerHTML = highlightedText;
-                                                }
-                                            } else {
-                                                console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
-                                            }
-                                            break;
-                                            console.log("Unknown message type:", message.type);
-                                    }
-                                    messageElement.scrollIntoView({ behavior: "smooth" });
-                                } else {
-                                    fetchPaginatedMessages(messageId);
-                                }
+                                handleMessageResponse(messageElement, message, messageId, searchQuery);
                             });
                         });
+                        searchMessageOffset += searchMessageLimit;
                     })
                     .catch(error => {
                         console.error('Error:', "Not Found");
@@ -3034,8 +2896,278 @@ searchMessageInputFeild.addEventListener("input", function (e) {
         const searchResultsDiv = document.querySelector(".search-results");
         searchResultsDiv.innerHTML = "";
         removeHighlight();
+        searchMessageOffset = 0;
     }
 })
+
+var messageSidebar = document.getElementById('search-results');
+messageSidebar.addEventListener('scroll', function () {
+    if (messageSidebar.scrollTop + messageSidebar.clientHeight >= messageSidebar.scrollHeight) {
+        if (DOM.messageSearchQuery.length > 0) {
+            const url = `message/search/${DOM.messageSearchQuery}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`;
+            console.log("url",url,searchMessageOffset);
+            fetch(url)
+                .then(response => response.json())
+                .then(messageResponse => {
+                    const searchResultsDiv = document.querySelector(".search-results");
+                    if (searchMessageOffset === 0) {
+                        searchResultsDiv.innerHTML = "";
+                    }
+                    const searchQuery = e.target.value.toLowerCase();
+                    if (!messageResponse.messages || messageResponse.messages.length === 0) {
+                        if (searchMessageOffset === 0) {
+                            const noResultsDiv = document.createElement("div");
+                            noResultsDiv.className = "no-results";
+                            noResultsDiv.textContent = "No results";
+                            searchResultsDiv.appendChild(noResultsDiv);
+                        }
+                        return;
+                    }
+                    messageResponse.messages.forEach((message) => {
+                        const resultItemDiv = document.createElement("div");
+                        resultItemDiv.className = "result-item";
+                        const resultDateDiv = document.createElement("div");
+                        resultDateDiv.className = "result-date";
+                        resultDateDiv.textContent = new Date(message.time * 1000).toLocaleDateString();
+                        const resultTextDiv = document.createElement("div");
+                        resultTextDiv.className = "result-text";
+
+                        if (message.msg.startsWith("https://")) {
+                            resultTextDiv.textContent = message.media_name;
+                        } else if (/<a[^>]+>/g.test(message.msg)) {
+
+                            messageText = getOldMessageMediaName(message);
+                            resultTextDiv.textContent = messageText;
+                        }
+                        else if (message.msg.includes("<p>")) {
+                            // resultTextDiv.textContent = message.msg.replace(/<\/?(p|s|em|strong)[^>]*>/gi, '')
+                            resultTextDiv.innerHTML = message.msg
+                        }
+                        else {
+                              resultTextDiv.textContent = message.msg;
+                        }
+                        resultItemDiv.appendChild(resultDateDiv);
+                        resultItemDiv.appendChild(resultTextDiv);
+                        searchResultsDiv.appendChild(resultItemDiv);
+
+                        resultItemDiv.addEventListener("click", function () {
+                            let messageId = message.id;
+                            const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+                            handleMessageResponse(messageElement, message, messageId, searchQuery);
+                        });
+                    });
+                    searchMessageOffset += searchMessageLimit;
+                })
+                .catch(error => {
+                    console.error('Error:', "Not Found");
+                });
+        }
+    }
+});
+
+function handleMessageResponse(messageElement, message, messageId, searchQuery) {
+    let replyDisplay = '';
+    if (messageElement) {
+        const messageTextElement = messageElement.querySelector(".shadow-sm");
+        switch (message.type) {
+            case "Message":
+                if (message.reply) {
+                    messageTextElement.innerHTML = '';
+                    if (message.reply.type === "Audio") {
+
+                        var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
+                            <div class="avatar">
+                                <!-- Avatar image here -->
+                            </div>
+                            <div class="audio-content">
+                                <div class="audio-controls">
+                                    <button class="playbutton">
+                                        <img src="assets/img/play-icon.svg" alt="Play" />
+                                    </button>
+                                    <div class="audio-progress">
+                                        <div class="progress-filled"></div>
+                                    </div>
+                                </div>
+                                <div class="audio-time-container">
+                                    <span class="audio-duration">0:00</span>
+                                    <span class="audio-time">12:27 PM</span>
+                                </div>
+                            </div>
+                            </div>`;
+
+                        newMessageDisplay = `
+                            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
+                                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                                ${message.user?.id == user?.id ? message.user.name : message.user.name}
+
+                                </div>
+                                <div class="reply-details">
+                                    <p class="file-name">${message_body}</p>
+                                </div>
+                            </div>
+                        <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
+                        `;
+
+                        const searchQuery = e.target.value.toLowerCase();
+                        const messageText = message.msg.toLowerCase();
+                        const index = messageText.indexOf(searchQuery);
+
+                        if (index !== -1) {
+                            const highlightedText = message.msg.substring(0, index) +
+                                `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                message.msg.substring(index + searchQuery.length);
+
+                            // Update the reply message area with highlighted text
+                            newMessageDisplay = `
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                                    ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                                </div>
+                                <div class="reply-details">
+                                    <p class="file-name">${message_body}</p>
+                                </div>
+                            </div>
+                            <div class="reply-message-area">${highlightedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
+                        `;
+                        }
+
+                        // Set the inner HTML to the newMessageDisplay
+                        messageTextElement.innerHTML = newMessageDisplay;
+
+                    }
+                    else if (message.reply.type === "File") {
+                        replyDisplay = `
+                        <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                            <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                                ${message.user.name}
+                            </div>
+                            <div class="reply-details">
+                                <div class="file-message">
+                                    <div class="file-icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"></path>
+                                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="file-details">
+                                        <p class="file-name">${message.reply.media_name}</p>
+                                    </div>
+                                    <a href="${message.reply.msg}" class="download-icon" download="${message.reply.media_name}">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>`;
+                        messageTextElement.innerHTML = replyDisplay +
+                            `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`; const searchQuery = e.target.value.toLowerCase();
+                        const messageText = message.msg.toLowerCase();
+                        const index = messageText.indexOf(searchQuery);
+                        if (index !== -1) {
+                            const highlightedText = message.msg.substring(0, index) +
+                                `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                message.msg.substring(index + searchQuery.length);
+                            messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                        }
+                    }
+                    else if (message.reply.type === "Image") {
+                        var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                        replyDisplay = `
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
+                                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                                    ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                                </div>
+                                <div class="reply-details">
+                                    <p class="file-name">${message_body}</p>
+                                </div>
+                            </div>
+                        `;
+
+                        messageTextElement.innerHTML = replyDisplay;
+                        const messageText = message.msg.toLowerCase();
+                        const index = messageText.indexOf(searchQuery);
+                        if (index !== -1) {
+                            const highlightedText = message.msg.substring(0, index) +
+                                `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                message.msg.substring(index + searchQuery.length);
+                            messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                        }
+                    }
+
+                    else if (message.reply.type === "Message") {
+                        replyDisplay = `
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                                <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                                    ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                                </div>
+                                <div class="reply-details">
+                                    <p class="file-name">${message.reply.msg}</p>
+                                </div>
+                            </div>
+                        `;
+
+                        let messageDisplay = replyDisplay;
+
+                        const messageText = message.msg.toLowerCase();
+                        const index = messageText.indexOf(searchQuery);
+                        if (index !== -1) {
+                            const highlightedText = message.msg.substring(0, index) +
+                                `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                message.msg.substring(index + searchQuery.length);
+
+                            messageDisplay += `<div class="reply-message-area">${highlightedText.replace(/[\r\n]+/g, '<br>')}</div>`;
+                        } else {
+                            messageDisplay += `<div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>')}</div>`;
+                        }
+
+                        messageTextElement.innerHTML = messageDisplay;
+                    }
+                }
+                else {
+                    const messageText = messageTextElement.innerHTML;
+                    const index = messageText.indexOf(searchQuery);
+                    if (index !== -1) {
+                        const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                        messageTextElement.innerHTML = highlightedText;
+                    }
+                }
+                break;
+            case "File":
+                const fileNameElement = messageElement.querySelector(".file-name");
+                if (fileNameElement) {
+                    const fileName = fileNameElement.textContent;
+                    const index = fileName.toLowerCase().indexOf(searchQuery);
+                    if (index !== -1) {
+                        const highlightedFileName = fileName.substring(0, index) + `<span class="highlight">${fileName.substring(index, index + searchQuery.length)}</span>` + fileName.substring(index + searchQuery.length);
+                        fileNameElement.innerHTML = highlightedFileName;
+                    }
+                }
+                break;
+            default:
+                const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
+                if (nullTypemessageTextElement) {
+                    const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
+
+                    const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
+                    if (nullTypeIndex !== -1) {
+                        const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
+                            `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
+                            nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
+
+                        nullTypemessageTextElement.innerHTML = highlightedText;
+                    }
+                } else {
+                    console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
+                }
+                break;
+                console.log("Unknown message type:", message.type);
+        }
+        messageElement.scrollIntoView({ behavior: "smooth" });
+    } else {
+        fetchPaginatedMessages(messageId);
+    }
+}
 
 function removeHighlight() {
     const messageElements = DOM.messages.querySelectorAll(".shadow-sm");

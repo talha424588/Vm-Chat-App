@@ -10,7 +10,7 @@ interface ChatRepository
     public function fetchUserAllGroupsMessages($request);
     public function getMessageStatus($id);
     public function updateMessageIsReadStatus($request);
-    public function searchGroupMessages($query,$groupId);
+    public function searchGroupMessages($query, $groupId, $offset, $limit);
     public function getMessageById($id);
     public function updateMessage($request);
     public function messageCorrection($request);
