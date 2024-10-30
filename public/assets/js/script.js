@@ -311,19 +311,17 @@ let addDateToMessageArea = (date) => {
 };
 
 let addUnread = () => {
-    // const notificationValue = 5;
-    // const notificationDiv = document.getElementById('notification-count');
-    // notificationDiv.innerHTML = notificationValue;
-    // notificationDiv.style.display = 'block';
-    DOM.messages.innerHTML += `
+    const span = document.createElement('span');
+    span.innerHTML = `
         <div id="unread-wrapper" class="notification-wrapper">
             <div class="unread-messages">
-                <span id="unread-counter-div"></span> UNREAD MESSAGES
+                <span id="unread-counter-div">${DOM.unreadCounter}</span> UNREAD MESSAGES
             </div>
         </div>
-        `;
-    DOM.unreadDividerAdded = true;
-}
+    `;
+                DOM.unreadDividerAdded = true;
+                DOM.messages.insertBefore(span, DOM.messages.firstChild);
+                }
 
 function makeformatDate(dateString) {
     const date = new Date(dateString);
@@ -890,7 +888,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
     if (!message.is_privacy_breach && !message.is_deleted) {
         let messageElement = document.createElement('div');
-        messageElement.className = 'ml-3';
+      messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
@@ -1011,15 +1009,15 @@ let addMessageToMessageArea = (message, flag = false) => {
             DOM.messages.appendChild(messageElement);
         }
         else {
-            return messageElement;
+            DOM.messages.insertBefore(messageElement, DOM.messages.firstChild);
         }
 
     }
     else if (message.is_privacy_breach && user.role == 0 || user.role == 2) {
 
         let messageElement = document.createElement('div');
-        messageElement.className = 'ml-3';
-        messageElement.innerHTML = `
+      messageElement.id = "unread-" + message.id;
+               messageElement.innerHTML = `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
             <div class="" >
@@ -1046,7 +1044,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             DOM.messages.appendChild(messageElement);
         }
         else {
-            return messageElement;
+            DOM.messages.insertBefore(messageElement, DOM.messages.firstChild) ;
         }
     }
 
@@ -1054,7 +1052,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     else if (message.is_deleted && user.role == 0 || user.role == 2) {
         console.log("message is_deleted", message);
         let messageElement = document.createElement('div');
-        messageElement.className = 'ml-3';
+      messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
             <div class="ml-3">
                 ${message.user.id == user.id ? '' : profileImage}
@@ -1083,7 +1081,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             DOM.messages.appendChild(messageElement);
         }
         else {
-            return messageElement;
+            DOM.messages.insertBefore(messageElement, DOM.messages.firstChild) ;
         }
     }
 
@@ -1146,6 +1144,7 @@ function scrollToMessage(messageId) {
         }
     }
 }
+
 
 function scroll_function() {
     const messageDiv = document.getElementById('messages');
@@ -1931,7 +1930,17 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null) =>
             pagnicateChatList.data.push(...nextPageMessages.data);
         }
 
+        const u_id = user.unique_id;
         const ids = nextPageMessages.data.map(item => item.id);
+        const Notseenby = nextPageMessages.data
+            .filter(item => {
+                const seenBy = item.seen_by ? item.seen_by.split(',').map(id => id.trim()) : [];
+                return !seenBy.includes(u_id);
+            })
+            .map(item => item.id);
+        DOM.unreadCounter=Notseenby.length;
+        const notSeenById=Notseenby.at(-1);
+
         try {
             const response = await fetch("message/seen-by/update", {
                 method: "POST",
@@ -1952,22 +1961,12 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null) =>
             console.log('No more messages to load');
             return;
         }
-
         nextPageMessages.data.forEach((message) => {
+             addMessageToMessageArea(message);
+            if(message.id == notSeenById)addUnread();
+           
+                       
 
-            const u_id = user.unique_id;
-            const seenBy = message.seen_by ? message.seen_by.split(',').map(id => id.trim()) : [];
-            if (!seenBy.includes(u_id) && !DOM.unreadDividerAdded) {
-                addUnread();
-            }
-            if (!seenBy.includes(u_id)) {
-                DOM.unreadCounter += 1;
-            }
-            const newMessage = addMessageToMessageArea(message);
-            DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
-
-
-            DOM.messages.insertBefore(newMessage, DOM.messages.firstChild);
 
             if (message.id === message_id) {
                 const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
@@ -2242,7 +2241,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
         await fetchPaginatedMessages(DOM.clickSearchMessageId, DOM.groupId);
     }
     else {
-        fetchPaginatedMessages();
+       await fetchPaginatedMessages();
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
@@ -2250,14 +2249,15 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
     }
 };
 function scroll_to_unread_div() {
-    DOM.unreadDividerAdded = false;
-    const unreadCountDiv = document.getElementById('unread-wrapper');
-    document.getElementById("unread-counter-div").innerHTML = DOM.unreadCounter;
-    if (unreadCountDiv) {
-        setTimeout(() => {
+            DOM.unreadDividerAdded = false;
+        // setTimeout(() => {
+            unreadDiv=document.getElementById("unread-counter-div");
+            const unreadCountDiv = document.getElementById('unread-wrapper');
+            unreadDiv.innerHTML = DOM.unreadCounter;
+            unreadDiv.focus();
             unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 1000);
-    }
+        // }, 2000);
+   
 }
 
 async function updateMessageSeenBy(ids) {

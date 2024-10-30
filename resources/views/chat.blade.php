@@ -617,7 +617,7 @@
                     </div>
 
                 </div>
-                <div class="search-results">
+                <div class="search-results" id="search-results">
                     <!-- Sample results -->
                     <div class="result-item">
 
