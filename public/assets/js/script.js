@@ -213,7 +213,7 @@ let viewChatList = () => {
 
                 DOM.chatList.innerHTML += `
                     <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
-                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index})">
+                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index},false)">
                     <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
                             <div class="name list-user-name">${elem.group.name.length > 23 ? elem.group.name.substring(0, 23) + "..." : elem.group.name}</div>
@@ -275,7 +275,7 @@ let viewMessageList = () => {
             let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
             DOM.messagesList.innerHTML += `
             <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
-            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,1)">
+            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true)">
               <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
               <div class="w-50">
                 <div class="name list-user-name">${elem.group.name}</div>
@@ -402,7 +402,6 @@ socket.on('sendChatToClient', (message) => {
         }
         scroll_function();
     }
-
 
 
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
@@ -1808,7 +1807,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove) {
             socket.emit('moveMessage', selectedMessageIds, newGroupId, DOM.groupId);
 
             const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
-            generateMessageArea(newGroupChatListItem, newIndex);
+            generateMessageArea(newGroupChatListItem, newIndex,false);
             cancelMoveMessage();
             document.querySelector(".close").click();
         })
@@ -1888,12 +1887,20 @@ DOM.messages.addEventListener('scroll', async () => {
 
 
 let isLoading = false;
-const fetchPaginatedMessages = async (message_id = null, current_Page = null) => {
+const fetchPaginatedMessages = async (message_id = null, current_Page = null,group_id) => {
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
+        // let url = ''
+        // if(group_id)
+        // {
+        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${message_id ? `&group_id=${encodeURIComponent(group_id)}` : ''}`;
+        // }
+        // else
+        // {
         const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}` : ''}`;
+        // }
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -2179,7 +2186,7 @@ function unread_settings(query_set) {
 
 let currentlyPlayingAudio = null;
 
-let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) => {
+let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) => {
     // pagnicateChatList = [];
 
     chat = chatList[chatIndex];
@@ -2219,7 +2226,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = null) =
     }
 
     if (searchMessage) {
-        await fetchPaginatedMessages(DOM.clickSearchMessageId, DOM.groupId);
+        await fetchPaginatedMessages(DOM.clickSearchMessageId, null,DOM.groupId);
     }
     else {
         fetchPaginatedMessages();
