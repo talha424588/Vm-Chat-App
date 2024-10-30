@@ -329,9 +329,9 @@
 
 
                 <div id="spinner" class="lazy_spinner"></div>
-          
+
                 <div class="d-flex flex-column chat_list_messages" id="messages">
-                  
+
                 </div>
 
 
@@ -372,7 +372,7 @@
                     </div>
                                     <!-- Chat list items -->
                                     <div id="chat-list2" style="height:420px; overflow-y:scroll" >
-                                      
+
                                     </div>
                                     <!-- <div class="d-flex flex-row w-100 p-2 border-bottom unread align-items-center">
                         <input type="radio" name="chatSelection" class="chat-radio" style="margin-right: 10px;" onclick="selectUsertosend('Programmers')">
@@ -391,7 +391,7 @@
                             <div class="small last-message">message or status is here </div>
                         </div>
                     </div> -->
-                               
+
                             </div>
 
                             <!-- Bottom section for selected user display -->
@@ -487,7 +487,7 @@
                     <!---Edit Message Area End-->
 
 
-                    
+
 
                     <div class="chat-input-container  justify-self-end align-items-center flex-row" id="reply-area">
 
@@ -617,7 +617,7 @@
                     </div>
 
                 </div>
-                <div class="search-results">
+                <div class="search-results" id="search-results">
                     <!-- Sample results -->
                     <div class="result-item">
 
@@ -685,7 +685,7 @@
                     <img src="{{ asset('assets/svg/message-seen.gif') }}" alt="" height="78.32px">
                     <h5>Users who have seen this message:</h5>
                     <p class="not-recover" id="is_read"></p>
-                    <button type="button" class="btn btn-cancel" 
+                    <button type="button" class="btn btn-cancel"
                         data-dismiss="modal">ok</button>
                 </div>
             </div>

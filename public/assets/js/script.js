@@ -2767,25 +2767,31 @@ async function unreadGrouChat() {
     }
 }
 
+let searchMessageOffset = 0;
+const searchMessageLimit = 40;
 let searchMessageInputFeild = document.getElementById("messsage_search_query");
 searchMessageInputFeild.addEventListener("input", function (e) {
     if (e.target.value.length > 0) {
         DOM.messageSearchQuery = e.target.value;
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(async function () {
-            const url = `message/search/${e.target.value}/${DOM.groupId}`;
+            const url = `message/search/${e.target.value}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`; // Updated URL
             try {
                 fetch(url)
                     .then(response => response.json())
                     .then(messageResponse => {
                         const searchResultsDiv = document.querySelector(".search-results");
-                        searchResultsDiv.innerHTML = "";
+                        if (searchMessageOffset === 0) {
+                            searchResultsDiv.innerHTML = "";
+                        }
                         const searchQuery = e.target.value.toLowerCase();
                         if (!messageResponse.messages || messageResponse.messages.length === 0) {
-                            const noResultsDiv = document.createElement("div");
-                            noResultsDiv.className = "no-results";
-                            noResultsDiv.textContent = "No results";
-                            searchResultsDiv.appendChild(noResultsDiv);
+                            if (searchMessageOffset === 0) {
+                                const noResultsDiv = document.createElement("div");
+                                noResultsDiv.className = "no-results";
+                                noResultsDiv.textContent = "No results";
+                                searchResultsDiv.appendChild(noResultsDiv);
+                            }
                             return;
                         }
                         messageResponse.messages.forEach((message) => {
@@ -3021,6 +3027,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 }
                             });
                         });
+                        searchMessageOffset += searchMessageLimit;
                     })
                     .catch(error => {
                         console.error('Error:', "Not Found");
@@ -3034,8 +3041,28 @@ searchMessageInputFeild.addEventListener("input", function (e) {
         const searchResultsDiv = document.querySelector(".search-results");
         searchResultsDiv.innerHTML = "";
         removeHighlight();
+        searchMessageOffset = 0;
     }
 })
+
+var messageSidebar = document.getElementById('search-results');
+messageSidebar.addEventListener('scroll', function () {
+    if (messageSidebar.scrollTop + messageSidebar.clientHeight >= messageSidebar.scrollHeight) {
+        if (DOM.messageSearchQuery.length > 0) {
+            const url = `message/search/${DOM.messageSearchQuery}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(messageResponse => {
+                    const searchResultsDiv = document.querySelector(".search-results");
+
+                    searchMessageOffset += searchMessageLimit;
+                })
+                .catch(error => {
+                    console.error('Error:', "Not Found");
+                });
+        }
+    }
+});
 
 function removeHighlight() {
     const messageElements = DOM.messages.querySelectorAll(".shadow-sm");
