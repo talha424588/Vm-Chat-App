@@ -199,9 +199,9 @@ class ChatController extends Controller
         return $this->chatRepository->updateMessageIsReadStatus($request);
     }
 
-    public function searchMessage($query, $groupId)
+    public function searchMessage($query, $groupId,$offset = 0, $limit = 40)
     {
-        return $this->chatRepository->searchGroupMessages($query, $groupId);
+        return $this->chatRepository->searchGroupMessages($query, $groupId, $offset, $limit);
     }
 
     public function getMessageDetails($id)
