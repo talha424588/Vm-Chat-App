@@ -40,11 +40,9 @@ class ChatService implements ChatRepository
         $perPage = 20;
         if (!$request->messageId) {
             $page = $request->get('page', 1);
-            // $paginator = GroupMessage::where('group_id', $request->groupId)->with('user','reply')->orderBy('id', 'desc')
-            //     ->paginate($perPage, ['*'], 'page', $page);
 
             $paginator = GroupMessage::where('group_id', $request->groupId)
-                ->where('is_deleted', false)
+                // ->where('is_deleted', false)
                 ->with('user', 'reply')
                 ->orderBy('id', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);
@@ -88,7 +86,7 @@ class ChatService implements ChatRepository
             ->where('id', '>=', $messageId)
             ->where('is_deleted', false)
             ->orderBy('id', 'desc')
-            ->take(20)
+            ->take(1000)
             ->skip($pageNo * 20)
             ->get();
 
@@ -131,13 +129,6 @@ class ChatService implements ChatRepository
 
     public function searchGroupMessages($searchQuery, $groupId)
     {
-        // $messages = GroupMessage::where("msg", "LIKE", "%$query%")
-        //     ->orWhere("media_name", "LIKE", "%$query%")
-        //     ->where("group_id", $groupId)
-        //     ->where('is_deleted', false)
-        //     ->with("user")
-        //     ->get();
-
         $messages = GroupMessage::where(function ($query) use ($searchQuery, $groupId) {
             $query->where("msg", "LIKE", "%$searchQuery%")
                 ->orWhere("media_name", "LIKE", "%$searchQuery%");
@@ -149,6 +140,8 @@ class ChatService implements ChatRepository
                     ->orWhere("type", "");
             })
             ->where('is_deleted', false)
+            // ->whereRaw("msg NOT REGEXP '<[^>]+>'")
+            ->whereRaw("NOT (msg REGEXP '<script[^>]*>|<iframe[^>]*>')") // Add any other tags you want to exclude here
             ->with("user")
             ->with('reply')
             ->get();
@@ -202,6 +195,22 @@ class ChatService implements ChatRepository
             $message->status = EnumMessageEnum::CORRECTION;
             if ($message->save()) {
                 return response()->json(["status" => true, "message" => "Correction saved successfully", "message" => new MessageResource($message)]);
+            } else {
+                return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+            }
+        } else {
+            return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+        }
+    }
+
+
+    public function restoreDeletedMessage($messageId)
+    {
+        $message = GroupMessage::where('id', $messageId)->first();
+        if ($message) {
+            $message->is_deleted = false;
+            if ($message->save()) {
+                return response()->json(["status" => true, "message" => "success", "message" => new MessageResource($message)]);
             } else {
                 return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
             }

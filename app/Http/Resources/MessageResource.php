@@ -23,6 +23,7 @@ class MessageResource extends JsonResource
             'reply_id' => $this->reply_id,
             'seen_by' => $this->seen_by,
             'time' => $this->time,
+            'is_deleted' => $this->is_deleted,
             'user' => [
                     'id' => $this->user->id,
                     'unique_id' => $this->user->unique_id,
