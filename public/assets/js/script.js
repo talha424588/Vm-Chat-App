@@ -91,7 +91,6 @@ let pagnicateChatList = [];
 let lastDate = "";
 let offset = 0;
 let isLoadingMore = false;
-let currentPage = 1;
 let loading = false;
 
 let populateGroupList = async () => {
@@ -1912,6 +1911,7 @@ DOM.messages.addEventListener('scroll', async () => {
 // New Updated new message area
 
 const fetchPaginatedMessages = async (message_id = null, current_Page = null) => {
+    let currentPage = 1;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
         const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}` : ''}`;
