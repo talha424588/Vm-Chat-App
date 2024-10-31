@@ -41,17 +41,22 @@ $(document).ready(function () {
 
 const searchInput = document.getElementById('searchInput');
 const clearIcon = document.querySelector('.clear-icon');
+if(searchInput)
+{
+    searchInput.addEventListener('input', function () {
+        if (searchInput.value) {
+            clearIcon.style.display = 'block';
+        } else {
+            clearIcon.style.display = 'none';
+        }
+    });
+}
 
-searchInput.addEventListener('input', function () {
-    if (searchInput.value) {
-        clearIcon.style.display = 'block'; // Show icon when there is input
-    } else {
-        clearIcon.style.display = 'none'; // Hide icon when input is empty
-    }
-});
-
-clearIcon.addEventListener('click', function () {
-    searchInput.value = ''; // Clear the input field
-    clearIcon.style.display = 'none'; // Hide the icon
-    searchInput.focus(); // Optionally refocus the input field
-});
+if(clearIcon)
+{
+    clearIcon.addEventListener('click', function () {
+        searchInput.value = '';
+        clearIcon.style.display = 'none';
+        searchInput.focus();
+    });
+}
