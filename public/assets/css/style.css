@@ -325,6 +325,9 @@ background-color: rgba(255, 255, 255, 0.5);
 	.chat_list_view{
 		padding: 0px;
 	}
+	#input-area{
+		width: 100%;
+	}
 
   }
 
@@ -843,7 +846,7 @@ body{
 	background: #F0F2F5;
 	height: 77px;
 	z-index: 2;
-	position: sticky;
+	position: fixed;
 }
 
 /* Back arrow styling */
@@ -940,7 +943,10 @@ body{
 
 #input-area {
 	background: hsl(0, 0%, 95%);
-	position: sticky;
+    position: fixed;
+    bottom: 0px;
+	width: 1120px;
+   
 }
 
 #input-area #input {
@@ -948,6 +954,7 @@ body{
 }
 #input{
 	overflow-y: auto;
+
 }
 .message-item {
 	position:relative;
@@ -978,6 +985,8 @@ body{
 	background-image: url('../img/messages-background.png');
 	background-size: cover;
 	background-repeat: no-repeat;
+	margin-bottom: 75px;
+    margin-top: 77px;
 }
 
 #profile-settings {
