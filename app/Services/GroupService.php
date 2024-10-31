@@ -77,20 +77,67 @@ class GroupService implements GroupRepository
     }
 
     // working
-    public function getGroupByName($name)
+    // public function getGroupByName($name)
+    // {
+    //     $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
+    //         ->where('name', 'LIKE', "%$name%")
+    //         ->with(['groupMessages' => function ($query) {
+    //             $query->latest('time')
+    //                 ->where('is_deleted', false);
+    //         }, 'groupMessages.user', 'users_with_access'])
+    //         ->get();
+
+    //     $userGroups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
+    //         ->pluck('group_id');
+
+    //     // Now, search for messages in those groups
+    //     $messages = GroupMessage::where("msg", "LIKE", "%$name%")
+    //         ->where('is_deleted', false)
+    //         ->where(function ($query) {
+    //             $query->whereIn("type", ["File", "Message"])
+    //                 ->orWhereNull("type")
+    //                 ->orWhere("type", "");
+    //         })
+    //         ->whereIn('group_id', $userGroups)
+    //         ->with("user", "group")
+    //         ->get();
+
+    //     $groupMessageSearchArray = [
+    //         "groups" => $groups,
+    //         "messages" => $messages
+    //     ];
+    //     if ($groupMessageSearchArray) {
+    //         return response()->json([
+    //             "status" => true,
+    //             "message" => "success",
+    //             "data" => $groupMessageSearchArray
+    //         ]);
+    //     } else {
+    //         return response()->json([
+    //             "status" => false,
+    //             "message" => "Not Found",
+    //             "groups" => null
+    //         ]);
+    //     }
+    // }
+
+    public function getGroupByName($name, $request)
     {
+        $perPageGroups = 20; // Set number of groups per page
+        $perPageMessages = 40; // Set number of messages per page
+        $pageGroups = $request->input('page_groups', 1);
+        $pageMessages = $request->input('page_messages', 1);
+
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
             ->where('name', 'LIKE', "%$name%")
             ->with(['groupMessages' => function ($query) {
-                $query->latest('time')
-                    ->where('is_deleted', false);
+                $query->latest('time')->where('is_deleted', false);
             }, 'groupMessages.user', 'users_with_access'])
-            ->get();
+            ->paginate($perPageGroups, ['*'], 'page', $pageGroups);
 
         $userGroups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
             ->pluck('group_id');
 
-        // Now, search for messages in those groups
         $messages = GroupMessage::where("msg", "LIKE", "%$name%")
             ->where('is_deleted', false)
             ->where(function ($query) {
@@ -100,24 +147,15 @@ class GroupService implements GroupRepository
             })
             ->whereIn('group_id', $userGroups)
             ->with("user", "group")
-            ->get();
+            ->paginate($perPageMessages, ['*'], 'page', $pageMessages);
 
-        $groupMessageSearchArray = [
-            "groups" => $groups,
-            "messages" => $messages
-        ];
-        if ($groupMessageSearchArray) {
-            return response()->json([
-                "status" => true,
-                "message" => "success",
-                "data" => $groupMessageSearchArray
-            ]);
-        } else {
-            return response()->json([
-                "status" => false,
-                "message" => "Not Found",
-                "groups" => null
-            ]);
-        }
+        return response()->json([
+            "status" => true,
+            "message" => "success",
+            "data" => [
+                "groups" => $groups,
+                "messages" => $messages
+            ]
+        ]);
     }
 }
