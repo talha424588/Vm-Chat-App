@@ -50,13 +50,6 @@ class GroupService implements GroupRepository
 
     public function fetchUnreadMessageGroups()
     {
-        // $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
-        //     ->with(['groupMessages' => function ($query) {
-        //         $query->latest('time');
-        //     }, 'groupMessages.user'])
-        //     ->get();
-
-
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
             ->with(['groupMessages' => function ($query) {
                 $query->latest('time')

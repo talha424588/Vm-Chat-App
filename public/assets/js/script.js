@@ -44,6 +44,8 @@ const DOM = {
     unreadCounter: 0,
     messageSearchQuery: null,
     currentPage: 0,
+    searchMessageClick: false,
+    lastMessageId: null,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -312,9 +314,9 @@ let addUnread = () => {
             </div>
         </div>
     `;
-                DOM.unreadDividerAdded = true;
-                DOM.messages.insertBefore(span, DOM.messages.firstChild);
-                }
+    DOM.unreadDividerAdded = true;
+    DOM.messages.insertBefore(span, DOM.messages.firstChild);
+}
 
 function makeformatDate(dateString) {
     const date = new Date(dateString);
@@ -869,10 +871,12 @@ let addMessageToMessageArea = (message, flag = false) => {
         </div>
     `;
     }
+    // <div class="${message.type == "Message" ? 'w-90' : ''}">
+    // </div>
 
     if (!message.is_privacy_breach && !message.is_deleted) {
         let messageElement = document.createElement('div');
-      messageElement.id = "unread-" + message.id;
+        messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
@@ -881,11 +885,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                        <div class="${message.type == "Message" ? 'w-90' : ''}">
                            ${messageContent}
-                        </div>
-
-                        </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
@@ -897,7 +897,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                             Seen
                                         </a>
                                     </span> |` :
-                                        (user.role == 0 || user.role == 2 ? `
+                (user.role == 0 || user.role == 2 ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
@@ -1000,8 +1000,8 @@ let addMessageToMessageArea = (message, flag = false) => {
     else if (message.is_privacy_breach && user.role == 0 || user.role == 2) {
 
         let messageElement = document.createElement('div');
-      messageElement.id = "unread-" + message.id;
-               messageElement.innerHTML = `
+        messageElement.id = "unread-" + message.id;
+        messageElement.innerHTML = `
         <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
             <div class="" >
@@ -1028,14 +1028,14 @@ let addMessageToMessageArea = (message, flag = false) => {
             DOM.messages.appendChild(messageElement);
         }
         else {
-            DOM.messages.insertBefore(messageElement, DOM.messages.firstChild) ;
+            DOM.messages.insertBefore(messageElement, DOM.messages.firstChild);
         }
     }
 
 
     else if (message.is_deleted && user.role == 0 || user.role == 2) {
         let messageElement = document.createElement('div');
-      messageElement.id = "unread-" + message.id;
+        messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
             <div class="ml-3">
                 ${message.user.id == user.id ? '' : profileImage}
@@ -1064,7 +1064,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             DOM.messages.appendChild(messageElement);
         }
         else {
-            DOM.messages.insertBefore(messageElement, DOM.messages.firstChild) ;
+            DOM.messages.insertBefore(messageElement, DOM.messages.firstChild);
         }
     }
 
@@ -1810,7 +1810,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove) {
             socket.emit('moveMessage', selectedMessageIds, newGroupId, DOM.groupId);
 
             const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
-            generateMessageArea(newGroupChatListItem, newIndex,false);
+            generateMessageArea(newGroupChatListItem, newIndex, false);
             cancelMoveMessage();
             document.querySelector(".close").click();
         })
@@ -1888,22 +1888,25 @@ DOM.messages.addEventListener('scroll', async () => {
     }
 });
 
+const displayedMessageIds = new Set();
 
 let isLoading = false;
-const fetchPaginatedMessages = async (message_id = null, current_Page = null,group_id) => {
+const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null) => {
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
-        // let url = ''
-        // if(group_id)
-        // {
-        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${message_id ? `&group_id=${encodeURIComponent(group_id)}` : ''}`;
-        // }
-        // else
-        // {
-        const url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${message_id ? `&messageId=${encodeURIComponent(message_id)}` : ''}`;
-        // }
+        let url = ''
+        if (DOM.searchMessageClick && DOM.lastMessageId) {
+            url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${DOM.searchMessageClick && DOM.lastMessageId ? `&lastMessageId=${encodeURIComponent(DOM.lastMessageId)}` : ''}`;
+        }
+        else if (message_id) {
+            // DOM.lastMessageId = message_id;
+            url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&messageId=${encodeURIComponent(message_id)}`;
+        }
+        else {
+            url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}`;
+        }
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -1914,6 +1917,9 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null,gro
         nextPageMessages = await response.json();
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
+        }
+        if (message_id) {
+            DOM.lastMessageId = nextPageMessages.data.at(-1).id;
         }
         unread_settings(nextPageMessages);
 
@@ -1929,8 +1935,8 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null,gro
                 return !seenBy.includes(u_id);
             })
             .map(item => item.id);
-        DOM.unreadCounter=Notseenby.length;
-        const notSeenById=Notseenby.at(-1);
+        DOM.unreadCounter = Notseenby.length;
+        const notSeenById = Notseenby.at(-1);
 
         try {
             const response = await fetch("message/seen-by/update", {
@@ -1953,12 +1959,11 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null,gro
             return;
         }
         nextPageMessages.data.forEach((message) => {
-             addMessageToMessageArea(message);
-            if(message.id == notSeenById)addUnread();
-
-
-
-
+            if (!displayedMessageIds.has(message.id)) {
+                addMessageToMessageArea(message);
+                displayedMessageIds.add(message.id);
+            }
+            if (message.id == notSeenById) addUnread();
             if (message.id === message_id) {
                 const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                 const messageTextElement = messageElement.querySelector(".shadow-sm");
@@ -2142,7 +2147,9 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null,gro
 
         const newScrollHeight = DOM.messages.scrollHeight;
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
-        DOM.currentPage += 1;
+        if (!message_id) {
+            DOM.currentPage += 1;
+        }
     } catch (error) {
         console.error('Error fetching messages:', error);
     }
@@ -2229,10 +2236,10 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     }
 
     if (searchMessage) {
-        await fetchPaginatedMessages(DOM.clickSearchMessageId, null,DOM.groupId);
+        await fetchPaginatedMessages(DOM.clickSearchMessageId, null, DOM.groupId);
     }
     else {
-       await fetchPaginatedMessages();
+        await fetchPaginatedMessages();
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
@@ -2240,15 +2247,14 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     }
 };
 function scroll_to_unread_div() {
-            DOM.unreadDividerAdded = false;
-            const unreadCountDiv = document.getElementById('unread-wrapper');
-            if(unreadCountDiv)
-            {
-            unreadDiv=document.getElementById("unread-counter-div");
-            unreadDiv.innerHTML = DOM.unreadCounter;
-            unreadDiv.focus();
-            unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+    DOM.unreadDividerAdded = false;
+    const unreadCountDiv = document.getElementById('unread-wrapper');
+    if (unreadCountDiv) {
+        unreadDiv = document.getElementById("unread-counter-div");
+        unreadDiv.innerHTML = DOM.unreadCounter;
+        unreadDiv.focus();
+        unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 }
 
 async function updateMessageSeenBy(ids) {
@@ -2874,6 +2880,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultDateDiv.textContent = new Date(message.time * 1000).toLocaleDateString();
                             const resultTextDiv = document.createElement("div");
                             resultTextDiv.className = "result-text";
+                            DOM.searchMessageClick = true;
 
                             if (message.msg.startsWith("https://")) {
                                 resultTextDiv.textContent = message.media_name;
@@ -2948,6 +2955,8 @@ messageSidebar.addEventListener('scroll', function () {
                         const resultTextDiv = document.createElement("div");
                         resultTextDiv.className = "result-text";
 
+                        DOM.searchMessageClick = true;
+
                         if (message.msg.startsWith("https://")) {
                             resultTextDiv.textContent = message.media_name;
                         } else if (/<a[^>]+>/g.test(message.msg)) {
@@ -2960,7 +2969,7 @@ messageSidebar.addEventListener('scroll', function () {
                             resultTextDiv.innerHTML = message.msg
                         }
                         else {
-                              resultTextDiv.textContent = message.msg;
+                            resultTextDiv.textContent = message.msg;
                         }
                         resultItemDiv.appendChild(resultDateDiv);
                         resultItemDiv.appendChild(resultTextDiv);
@@ -2984,6 +2993,7 @@ messageSidebar.addEventListener('scroll', function () {
 function handleMessageResponse(messageElement, message, messageId, searchQuery) {
     let replyDisplay = '';
     if (messageElement) {
+        DOM.searchMessageClick = true;
         const messageTextElement = messageElement.querySelector(".shadow-sm");
         switch (message.type) {
             case "Message":
@@ -3024,11 +3034,11 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                         <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
                         `;
 
-                        const searchQuery = e.target.value.toLowerCase();
+                        const searchQuery = DOM.messageSearchQuery;
                         const messageText = message.msg.toLowerCase();
                         const index = messageText.indexOf(searchQuery);
-
-                        if (index !== -1) {
+                        const isAlreadyHighlighted = messageTextElement.querySelector('.highlight');
+                        if (index !== -1 && !isAlreadyHighlighted) {
                             const highlightedText = message.msg.substring(0, index) +
                                 `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
                                 message.msg.substring(index + searchQuery.length);
@@ -3077,10 +3087,13 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                             </div>
                         </div>`;
                         messageTextElement.innerHTML = replyDisplay +
-                            `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`; const searchQuery = e.target.value.toLowerCase();
+                            `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+                        const searchQuery = DOM.messageSearchQuery;
                         const messageText = message.msg.toLowerCase();
                         const index = messageText.indexOf(searchQuery);
-                        if (index !== -1) {
+                        const isAlreadyHighlighted = messageTextElement.querySelector('.highlight');
+
+                        if (index !== -1 && !isAlreadyHighlighted) {
                             const highlightedText = message.msg.substring(0, index) +
                                 `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
                                 message.msg.substring(index + searchQuery.length);
@@ -3103,7 +3116,8 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                         messageTextElement.innerHTML = replyDisplay;
                         const messageText = message.msg.toLowerCase();
                         const index = messageText.indexOf(searchQuery);
-                        if (index !== -1) {
+                        const isAlreadyHighlighted = messageTextElement.querySelector('.highlight');
+                        if (index !== -1 && !isAlreadyHighlighted) {
                             const highlightedText = message.msg.substring(0, index) +
                                 `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
                                 message.msg.substring(index + searchQuery.length);
@@ -3127,7 +3141,8 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
 
                         const messageText = message.msg.toLowerCase();
                         const index = messageText.indexOf(searchQuery);
-                        if (index !== -1) {
+                        const isAlreadyHighlighted = messageTextElement.querySelector('.highlight');
+                        if (index !== -1 && !isAlreadyHighlighted) {
                             const highlightedText = message.msg.substring(0, index) +
                                 `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
                                 message.msg.substring(index + searchQuery.length);
@@ -3141,17 +3156,26 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                     }
                 }
                 else {
+                    console.log("current section");
                     const messageText = messageTextElement.innerHTML;
                     const index = messageText.indexOf(searchQuery);
-                    if (index !== -1) {
-                        const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+
+                    const isAlreadyHighlighted = messageTextElement.querySelector('.highlight');
+
+                    if (index !== -1 && !isAlreadyHighlighted) {
+                        const highlightedText = messageText.substring(0, index) +
+                            `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` +
+                            messageText.substring(index + searchQuery.length);
+
                         messageTextElement.innerHTML = highlightedText;
                     }
                 }
                 break;
             case "File":
                 const fileNameElement = messageElement.querySelector(".file-name");
-                if (fileNameElement) {
+                const isAlreadyHighlighted = messageTextElement.querySelector('.highlight');
+
+                if (fileNameElement && !isAlreadyHighlighted) {
                     const fileName = fileNameElement.textContent;
                     const index = fileName.toLowerCase().indexOf(searchQuery);
                     if (index !== -1) {
@@ -3166,7 +3190,9 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                     const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
 
                     const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
-                    if (nullTypeIndex !== -1) {
+                    const isAlreadyHighlighted = messageTextElement.querySelector('.highlight');
+
+                    if (nullTypeIndex !== -1 && !isAlreadyHighlighted) {
                         const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
                             `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
                             nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
@@ -3181,7 +3207,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
     } else {
-        fetchPaginatedMessages(messageId);
+        fetchPaginatedMessages(messageId, null, null);
     }
 }
 
