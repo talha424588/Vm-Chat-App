@@ -2699,77 +2699,6 @@ $("#seenModal").on("show.bs.modal", async function (event) {
 let groupSearchField = document.getElementById("search_group");
 let debounceTimeout = null;
 
-let searchGroups = async (searchQuery) => {
-    if (searchQuery.length > 0) {
-        const url = `search-group-by-name/${searchQuery}`;
-        const unique_id = document.getElementById("login_user_unique_id").value;
-        try {
-            const groupResponse = await fetch(url);
-            const response = await groupResponse.json();
-            if (response) {
-                const groups = response.data.groups;
-                const messages = response.data.messages;
-
-                chatList = [];
-                messageList = [];
-                DOM.chatList.innerHTML = "";
-                DOM.chatList2.innerHTML = "";
-
-                DOM.chatList.innerHTML = `<h2>Groups</h2>`;
-                if (groups.length === 0) {
-                    DOM.chatList.innerHTML += `
-                        <div class="no-groups-found">No groups found.</div>`;
-                } else {
-                    groups.forEach((group) => {
-                        let chat = {};
-                        chat.isGroup = true;
-                        chat.group = group;
-                        chat.group.access = [group.access];
-                        chat.name = group.name;
-                        chat.unread = 0;
-
-                        if (group.group_messages && group.group_messages.length > 0) {
-                            group.group_messages.reverse().forEach((msg) => {
-                                chat.msg = msg;
-                                chat.time = new Date(msg.time * 1000);
-
-                                const seenBy = msg.seen_by ? msg.seen_by.split(",").map((s) => s.trim()) : [];
-                                chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
-                            });
-                        }
-
-                        chatList.push(chat);
-                    });
-                    viewChatList();
-                }
-
-                DOM.chatList2.innerHTML = `<h2>Messages</h2>`;
-                if (messages.length === 0) {
-                    DOM.chatList2.innerHTML += `
-                        <div class="no-messages-found">No messages found.</div>
-                    `;
-                } else {
-                    messageList.push(...messages);
-                    viewMessageList();
-                }
-
-                if (groups.length === 0 && messages.length === 0) {
-                    DOM.chatList.innerHTML = `
-                        <div class="no-results-found">
-                            <h2>No results found</h2>
-                            <p>Try searching for a different term or check your spelling.</p>
-                        </div>
-                    `;
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    } else {
-        generateChatList();
-    }
-};
-
 // let searchGroups = async (searchQuery) => {
 //     if (searchQuery.length > 0) {
 //         const url = `search-group-by-name/${searchQuery}`;
@@ -2780,8 +2709,17 @@ let searchGroups = async (searchQuery) => {
 //             if (response) {
 //                 const groups = response.data.groups;
 //                 const messages = response.data.messages;
-//                 if (groups.length > 0) {
-//                     chatList = [];
+
+//                 chatList = [];
+//                 messageList = [];
+//                 DOM.chatList.innerHTML = "";
+//                 DOM.chatList2.innerHTML = "";
+
+//                 DOM.chatList.innerHTML = `<h2>Groups</h2>`;
+//                 if (groups.length === 0) {
+//                     DOM.chatList.innerHTML += `
+//                         <div class="no-groups-found">No groups found.</div>`;
+//                 } else {
 //                     groups.forEach((group) => {
 //                         let chat = {};
 //                         chat.isGroup = true;
@@ -2805,43 +2743,147 @@ let searchGroups = async (searchQuery) => {
 //                     viewChatList();
 //                 }
 
-//                 if (messages.length > 0) {
+//                 DOM.chatList2.innerHTML = `<h2>Messages</h2>`;
+//                 if (messages.length === 0) {
+//                     DOM.chatList2.innerHTML += `
+//                         <div class="no-messages-found">No messages found.</div>
+//                     `;
+//                 } else {
 //                     messageList.push(...messages);
 //                     viewMessageList();
 //                 }
 
-//                 else {
+//                 if (groups.length === 0 && messages.length === 0) {
 //                     DOM.chatList.innerHTML = `
-//                         <div class="no-groups-found">
-//                             <h2>No result</h2>
-//                             <p>Try searching for a different group name or check your spelling.</p>
+//                         <div class="no-results-found">
+//                             <h2>No results found</h2>
+//                             <p>Try searching for a different term or check your spelling.</p>
 //                         </div>
 //                     `;
-//                     DOM.chatList2.innerHTML = "";
 //                 }
 //             }
 //         } catch (error) {
 //             console.log(error);
 //         }
-//     }
-//     else {
+//     } else {
 //         generateChatList();
 //     }
 // };
 
-groupSearchField.addEventListener("input", function (event) {
-    messageList = [];
-    DOM.messagesList.innerHTML = "";
-    if (event.target.value.length > 0) {
-        clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(async function () {
-            await searchGroups(event.target.value);
-        }, 500);
+// groupSearchField.addEventListener("input", function (event) {
+//     messageList = [];
+//     DOM.messagesList.innerHTML = "";
+//     if (event.target.value.length > 0) {
+//         clearTimeout(debounceTimeout);
+//         debounceTimeout = setTimeout(async function () {
+//             await searchGroups(event.target.value);
+//         }, 500);
+//     }
+//     else {
+//         generateChatList();
+//     }
+// });
+let currentPageGroups = 1;
+let currentPageMessages = 1;
+let isFetchingGroups = false;
+let isFetchingMessages = false;
+
+
+let searchGroups = async (searchQuery, loadMore = false) => {
+    if (loadMore) {
+        currentPageGroups++;
+        currentPageMessages++;
+    } else {
+        currentPageGroups = 1;
+        currentPageMessages = 1;
+        DOM.chatList.innerHTML = `<h2>Groups</h2>`;
+        DOM.chatList2.innerHTML = `<h2>Messages</h2>`;
     }
-    else {
+
+    if (searchQuery.length > 0) {
+        const url = `search-group-by-name/${searchQuery}?page_groups=${currentPageGroups}&page_messages=${currentPageMessages}`;
+        const unique_id = document.getElementById("login_user_unique_id").value;
+
+        try {
+            const groupResponse = await fetch(url);
+            const response = await groupResponse.json();
+            if (response) {
+                const groups = response.data.groups.data; // Paginated groups
+                const messages = response.data.messages.data; // Paginated messages
+
+                if (groups.length === 0) {
+                    if (!loadMore) {
+                        DOM.chatList.innerHTML += `<div class="no-groups-found">No groups found.</div>`;
+                    }
+                } else {
+                    groups.forEach((group) => {
+                        let chat = {
+                            isGroup: true,
+                            group: group,
+                            name: group.name,
+                            unread: 0
+                        };
+
+                        if (group.group_messages && group.group_messages.length > 0) {
+                            group.group_messages.reverse().forEach((msg) => {
+                                chat.unread += (msg.sender !== unique_id && !msg.seen_by.split(",").map(s => s.trim()).includes(unique_id)) ? 1 : 0;
+                            });
+                        }
+
+                        chatList.push(chat);
+                    });
+                    viewChatList();
+                }
+
+                if (messages.length === 0) {
+                    if (!loadMore) {
+                        DOM.chatList2.innerHTML += `<div class="no-messages-found">No messages found.</div>`;
+                    }
+                } else {
+                    messages.forEach((msg) => {
+                        messageList.push(msg);
+                    });
+                    viewMessageList();
+                }
+
+                if (loadMore && groups.length === 0 && messages.length === 0) {
+                    // Handle no more data case if needed
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    } else {
         generateChatList();
     }
+};
+
+let searchInputFeild = document.querySelector(".chat-row");
+
+searchInputFeild.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+        if (!isFetchingGroups && !isFetchingMessages) {
+            isFetchingGroups = true;
+            isFetchingMessages = true;
+            searchGroups(groupSearchField.value, true);
+            isFetchingGroups = false;
+            isFetchingMessages = false;
+        }
+    }
 });
+
+// Debounce search input
+groupSearchField.addEventListener('input', () => {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+        currentPageGroups = 1;
+        currentPageMessages = 1;
+        chatList = [];
+        messageList = [];
+        searchGroups(groupSearchField.value);
+    }, 300);
+});
+
 
 async function unreadGrouChat() {
     try {
@@ -2948,9 +2990,6 @@ let isFetching = false;
 var messageSidebar = document.getElementById('search-results');
 messageSidebar.addEventListener('scroll', function () {
     if (isFetching) return;
-
-    console.log("messageSidebar", messageSidebar);
-
     if (messageSidebar.scrollTop + messageSidebar.clientHeight >= messageSidebar.scrollHeight) {
         if (DOM.messageSearchQuery.length > 0) {
             const url = `message/search/${DOM.messageSearchQuery}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`;
