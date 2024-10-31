@@ -1163,6 +1163,8 @@ body{
 .no-groups-found,.heading,.no-results {
     text-align: center;
     padding: 20px;
+	font-size: 14px;
+	color:#666;
 }
 
 .no-groups-found h2 {
@@ -1282,6 +1284,9 @@ body{
     #input-area {
         width: 100%; 
     }
+	#side_navbar{
+		width: 100%;
+	}
 }
 
 
@@ -1290,6 +1295,9 @@ body{
     #input-area {
         width: 58%; 
     }
+	#side_navbar{
+		width: 58%;
+	}
 }
 
 /* Medium devices (desktops, 768px and up) */
@@ -1298,6 +1306,9 @@ body{
     #input-area {
         width: 68%; /* 80% width for medium screens */
     }
+	#side_navbar{
+		width: 68%;
+	}
 }
 
 /* Large devices (large desktops, 992px and up) */
@@ -1306,6 +1317,9 @@ body{
     #input-area {
         width: 67%; 
     }
+	#side_navbar{
+		width: 67%;
+	}
 }
 
 /* Extra large devices (larger desktops, 1200px and up) */
@@ -1314,6 +1328,9 @@ body{
     #input-area {
         width: 67%;/* Fixed width for extra large devices */
     }
+	#side_navbar{
+		width: 67%;
+	}
 }
 
 /* For very large screens (over 1600px) */
@@ -1321,5 +1338,8 @@ body{
   
     #input-area {
         width: 67%;
+	}
+	#side_navbar{
+		width: 67%;
 	}
 }

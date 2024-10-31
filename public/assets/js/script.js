@@ -2719,10 +2719,12 @@ let searchGroups = async (searchQuery) => {
                 DOM.chatList.innerHTML = "";
                 DOM.chatList2.innerHTML = "";
 
-                DOM.chatList.innerHTML = `<h2>Groups</h2>`;
+                DOM.chatList.innerHTML = `<div class="heading">
+        <h2>Groups</h2>
+    </div>`;
                 if (groups.length === 0) {
                     DOM.chatList.innerHTML += `
-                        <div class="no-groups-found">No groups found.</div>`;
+                        <div class="no-groups-found">No Groups Found.</div>`;
                 } else {
                     groups.forEach((group) => {
                         let chat = {};
@@ -2924,6 +2926,8 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             searchResultsDiv.appendChild(resultItemDiv);
 
                             resultItemDiv.addEventListener("click", function () {
+                                console.log(message);
+
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
@@ -3005,6 +3009,7 @@ messageSidebar.addEventListener('scroll', function () {
 
                         resultItemDiv.addEventListener("click", function () {
                             let messageId = message.id;
+                            console.log(message);
                             const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                             handleMessageResponse(messageElement, message, messageId, DOM.messageSearchQuery);
                         });
