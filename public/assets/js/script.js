@@ -467,7 +467,7 @@ socket.on('moveMessage', () => {
 socket.on('updateEditedMessage', (editedMessage) => {
     const messageElement = document.querySelector(`[data-message-id="${editedMessage.id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    
+    console.log(editedMessage);
 
     let newMessageDisplay = '';
     if (messageElement) {
@@ -574,6 +574,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
         else {
             const editMessageDiv = document.getElementById('editMessageDiv');
             const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
+            console.log(editMessageContentDiv);
             editMessageContentDiv.innerHTML = editedMessage.msg;
             if(editedMessage.type == "Message")
             {
@@ -591,6 +592,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
     }
 
 });
+
 
 let addMessageToMessageArea = (message, flag = false) => {
     let msgDate = mDate(message.time).getDate();
@@ -1463,7 +1465,7 @@ function editMessage(messageId) {
         const messageContentDiv = messageElement.querySelector('div.shadow-sm');
         editMessage = messageContentDiv.innerHTML;
     }
-
+   
     if (editMessage) {
         const element = document.getElementById('editMessageDiv');
         element.style.display = 'block';
@@ -1513,7 +1515,6 @@ function change_icon_height(element) {
     var iconContainer = document.querySelector('.icon-container');
     const viewportHeight = window.innerHeight;
     const elementRect = element.getBoundingClientRect();
-    console.log("Element Top",elementRect.top);
     const dis = viewportHeight - elementRect.top + 10;
     iconContainer.style.bottom = dis + 'px';
 }
@@ -2801,7 +2802,9 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     } else {
         currentPageGroups = 1;
         currentPageMessages = 1;
-        DOM.chatList.innerHTML = `<h2>Groups</h2>`;
+        DOM.chatList.innerHTML = `<div class="heading">
+        <h2>Groups</h2>
+    </div>`;
         DOM.chatList2.innerHTML = `<h2>Messages</h2>`;
     }
 
@@ -2818,7 +2821,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
 
                 if (groups.length === 0) {
                     if (!loadMore) {
-                        DOM.chatList.innerHTML += `<div class="no-groups-found">No groups found.</div>`;
+                        DOM.chatList.innerHTML += ` <div class="no-groups-found">No Groups Found.</div>`;
                     }
                 } else {
                     groups.forEach((group) => {
@@ -2863,16 +2866,18 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     }
 };
 
-let searchInputFeild = document.querySelector(".chat-row");
+let searchInputField = document.querySelector(".chat-row");
 
-searchInputFeild.addEventListener('scroll', () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
-        if (!isFetchingGroups && !isFetchingMessages) {
-            isFetchingGroups = true;
-            isFetchingMessages = true;
-            searchGroups(groupSearchField.value, true);
-            isFetchingGroups = false;
-            isFetchingMessages = false;
+searchInputField.addEventListener('scroll', () => {  
+    if (groupSearchField.value) {
+       if (searchInputField.scrollTop + searchInputField.clientHeight >= searchInputField.scrollHeight) {
+            if (!isFetchingGroups && !isFetchingMessages) {
+                isFetchingGroups = true;
+                isFetchingMessages = true;
+                searchGroups(groupSearchField.value, true);
+                isFetchingGroups = false;
+                isFetchingMessages = false;
+            }
         }
     }
 });
