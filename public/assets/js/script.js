@@ -2259,6 +2259,10 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     }
     else {
         await fetchPaginatedMessages();
+        // const parentElement=document.getElementById("message-area")
+        // const parentWidth = parentElement.offsetWidth;
+        // document.getElementById("input-area").style.width=parentWidth+"px";
+        
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
@@ -2699,6 +2703,7 @@ $("#seenModal").on("show.bs.modal", async function (event) {
 let groupSearchField = document.getElementById("search_group");
 let debounceTimeout = null;
 
+
 // let searchGroups = async (searchQuery) => {
 //     if (searchQuery.length > 0) {
 //         const url = `search-group-by-name/${searchQuery}`;
@@ -2962,6 +2967,8 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             searchResultsDiv.appendChild(resultItemDiv);
 
                             resultItemDiv.addEventListener("click", function () {
+                                console.log(message);
+
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
@@ -3040,6 +3047,7 @@ messageSidebar.addEventListener('scroll', function () {
 
                         resultItemDiv.addEventListener("click", function () {
                             let messageId = message.id;
+                            console.log(message);
                             const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                             handleMessageResponse(messageElement, message, messageId, DOM.messageSearchQuery);
                         });
@@ -3431,3 +3439,8 @@ const resizeObserver = new ResizeObserver(entries => {
 resizeObserver.observe(InputBar);
 
 
+window.addEventListener("resize", () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    console.log(`Width: ${width}, Height: ${height}`);
+});
