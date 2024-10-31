@@ -336,6 +336,7 @@
 
 
                 <!-- New Code To Move Message -->
+               
                 <div class="chat-input-container" id="action-bar" style="display:none;">
                     &nbsp;&nbsp;&nbsp;
                     <svg width="14" height="14" id="cancel-icon" viewBox="0 0 14 14" fill="none"
@@ -349,6 +350,7 @@
                         <path d="M15.5 12V8L23.5 16L15.5 24V20H7.5V12H15.5Z" fill="white" />
                     </svg>
                 </div>
+                    
                 <div class="modal fade" id="chatModal" tabindex="-1" role="dialog"
                     aria-labelledby="ModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -488,7 +490,7 @@
 
 
 
-
+                    <!-- <div id="action-bar-parent" style="overflow-y:auto;overflow-x:hidden"> -->
                     <div class="chat-input-container  justify-self-end align-items-center flex-row" id="reply-area">
 
 
@@ -585,7 +587,7 @@
                         </div>
 
                     </div>
-
+                    <!-- </div> -->
                     <input type="hidden" class="number" id="correction_message_id">
                     <input type="hidden" class="number" id="edit_message_id">
                     <input type="file" id="hidden-file-input" name="photo" accept=".jpg, .jpeg, .png" />

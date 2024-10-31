@@ -467,6 +467,7 @@ socket.on('moveMessage', () => {
 socket.on('updateEditedMessage', (editedMessage) => {
     const messageElement = document.querySelector(`[data-message-id="${editedMessage.id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
+    
 
     let newMessageDisplay = '';
     if (messageElement) {
@@ -573,7 +574,14 @@ socket.on('updateEditedMessage', (editedMessage) => {
             const editMessageDiv = document.getElementById('editMessageDiv');
             const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
             editMessageContentDiv.innerHTML = editedMessage.msg;
-            messageContentDiv.innerHTML = editedMessage.msg;
+            if(editedMessage.type == "Message")
+            {
+                messageContentDiv.innerHTML = `<div class="w-90">${editedMessage.msg}</div>`;
+            }
+            else{
+                messageContentDiv.innerHTML = editedMessage.msg;
+            }
+            
         }
         // const messageContentDiv = messageElement.querySelector('div.shadow-sm');
         // messageContentDiv.innerHTML = editedMessage.message.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
@@ -1220,8 +1228,8 @@ function CorrectionMessage(message_id, senderName) {
     // }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
-    var iconContainer = document.querySelector('.icon-container');
-    iconContainer.style.bottom = '240px';
+    // var iconContainer = document.querySelector('.icon-container');
+    // iconContainer.style.bottom = '240px';
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
     });
@@ -1269,6 +1277,7 @@ function correction_call(message_id, messagebody, senderName) {
 
     if (replyDiv) {
         replyDiv.style.display = 'block';
+        change_icon_height(replyDiv);
     } else {
         console.error("Element 'correction-div' not found");
     }
@@ -1505,6 +1514,7 @@ function change_icon_height(element) {
     var iconContainer = document.querySelector('.icon-container');
     const viewportHeight = window.innerHeight;
     const elementRect = element.getBoundingClientRect();
+    console.log("Element Top",elementRect.top);
     const dis = viewportHeight - elementRect.top + 10;
     iconContainer.style.bottom = dis + 'px';
 }
@@ -1595,7 +1605,7 @@ function removeEditMessage() {
     const textarea = document.getElementById('input');
     textarea.value = '';
     document.querySelector('.auto-resize-textarea').style.height = '44px';
-
+    
 }
 
 //Show Reply Message
@@ -1606,6 +1616,10 @@ function showReply(message_id, senderName, type) {
     if (correctionDiv && window.getComputedStyle(correctionDiv).display === 'block') {
         removecorrectionMessage();
     }
+        if(selectedMessageIds > 0)
+        {
+            return;
+        }
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
@@ -1685,6 +1699,10 @@ function removeQuotedMessage() {
 let selectedMessageIds = [];
 
 function moveMessage(messageId) {
+    var replyDiv = document.getElementById('reply-div');
+    if (replyDiv && window.getComputedStyle(replyDiv).display === 'block') {
+        return;
+    }
     const index = selectedMessageIds.indexOf(messageId);
 
     if (index > -1) {
@@ -1692,7 +1710,7 @@ function moveMessage(messageId) {
     } else {
         selectedMessageIds.push(messageId);
     }
-
+    console.log(selectedMessageIds);
     const messageElement = document.querySelector(`[data-message-id='${messageId}']`);
 
     if (messageElement) {
@@ -1838,6 +1856,7 @@ function cancelMoveMessage() {
     document.getElementById('action-bar').style.display = 'none';
     document.getElementById('input-area').style.display = 'block';
     document.getElementById('selected-count').textContent = 'Selected Messages: 0';
+    selectedMessageIds=[];
 }
 
 document.getElementById("openModalTrigger").addEventListener("click", function () {
@@ -3280,3 +3299,46 @@ function restoreMessage(id) {
         console.log("Error Restoring Message:", error);
     }
 }
+// Select the #reply-area element
+const actionBarParent = document.querySelector('#reply-area');
+const InputBar = document.querySelector('#input');
+const iconnContainer = document.querySelector('.icon-container');
+const editDiv = document.querySelector('#editMessageDiv');
+// Create a ResizeObserver instance
+const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+        // Check if the height has changed
+        const newHeight = entry.contentRect.height;
+        // var iconContainer = document.querySelector('.icon-container');
+        // iconContainer.style.bottom = (parseInt(newHeight)+parseInt(100))+'px';
+        // console.log(`New height: ${newHeight}`);
+        // console.log('chat input height',getComputedStyle(InputBar).height)
+        // console.log('chat container height',getComputedStyle(actionBarParent).height)
+        if(newHeight > 200)
+        {
+            actionBarParent.style.height="200px";
+            InputBar.style.height="180px"; 
+            
+        }
+        if(newHeight < 200)
+            {
+                actionBarParent.style.height="auto";
+                
+            }
+        if(getComputedStyle(editDiv).display == "block")
+        { 
+            change_icon_height(editDiv);
+
+        }else{
+            change_icon_height(actionBarParent);
+        }
+          
+        // You can add your custom code here
+        // Example: Call a function or log a message
+        // customFunction(newHeight);
+    }
+});
+
+resizeObserver.observe(InputBar);
+
+

@@ -486,6 +486,9 @@ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the values as needed */
 	border:none;
 	color: #000;
   }
+  .button:focus {
+    outline: none;
+}
 
 
 .username-container {
@@ -519,10 +522,11 @@ color: #666;
 		  display: flex;
 		  align-items: center;
 		  background-color: #F0F2F5;
-
-		  padding: 10px 10px 5px;
+		  /* padding: 10px 10px 5px; */
+		  padding: 10px;
 		  width: 100%;
 		  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+		  overflow-y: auto;
 	  }
 
 	  .chat-input {
@@ -839,6 +843,7 @@ body{
 	background: #F0F2F5;
 	height: 77px;
 	z-index: 2;
+	position: sticky;
 }
 
 /* Back arrow styling */
@@ -935,12 +940,15 @@ body{
 
 #input-area {
 	background: hsl(0, 0%, 95%);
+	position: sticky;
 }
 
 #input-area #input {
 	outline: none;
 }
-
+#input{
+	overflow-y: auto;
+}
 .message-item {
 	position:relative;
 	max-width: 75%;
@@ -1253,6 +1261,7 @@ body{
 	width: 95%;
 	margin: 0;
 	padding: 0;
+	/* white-space: pre-line; */
 }
 .custom-shadow{
 	box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
