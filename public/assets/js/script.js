@@ -2925,8 +2925,13 @@ searchMessageInputFeild.addEventListener("input", function (e) {
     }
 })
 
+let isFetching = false;
 var messageSidebar = document.getElementById('search-results');
 messageSidebar.addEventListener('scroll', function () {
+    if (isFetching) return;
+
+console.log("messageSidebar",messageSidebar);
+
     if (messageSidebar.scrollTop + messageSidebar.clientHeight >= messageSidebar.scrollHeight) {
         if (DOM.messageSearchQuery.length > 0) {
             const url = `message/search/${DOM.messageSearchQuery}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`;
@@ -2982,9 +2987,11 @@ messageSidebar.addEventListener('scroll', function () {
                         });
                     });
                     searchMessageOffset += searchMessageLimit;
+                    isFetching = false;
                 })
                 .catch(error => {
                     console.error('Error:', "Not Found");
+                    isFetching = false; // Reset on error as well
                 });
         }
     }
