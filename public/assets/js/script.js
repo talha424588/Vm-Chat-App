@@ -336,7 +336,6 @@ function makeformatDate(dateString) {
 }
 
 socket.on('deleteMessage', (messageId) => {
-    console.log(user.role)
     var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
     if (parseInt(user.role) != 0 && parseInt(user.role) != 2) {
         console.log("delete event", user);
@@ -533,7 +532,8 @@ socket.on('updateEditedMessage', (editedMessage) => {
             }
 
             else if (editedMessage.reply.type === "Audio") {
-                var message_body = `<div class="audio-message" style="background-color:${editedMessage.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${editedMessage.reply.msg}">
+                var audioSrc = editedMessage.reply.msg.replace(/\/\//g, '/'); // Replace double slashes with a single slash
+                var message_body = `<div class="audio-message" style="background-color:${editedMessage.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
                     <div class="avatar">
                         <!-- Avatar image here -->
                     </div>
@@ -1920,7 +1920,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${DOM.searchMessageClick && DOM.lastMessageId ? `&lastMessageId=${encodeURIComponent(DOM.lastMessageId)}` : ''}`;
         }
         else if (message_id) {
-            // DOM.lastMessageId = message_id;
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&messageId=${encodeURIComponent(message_id)}`;
         }
         else {
@@ -2225,6 +2224,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
 
     DOM.groupId = elem.dataset.groupId;
     DOM.currentPage = 1;
+    displayedMessageIds.clear();
 
     DOM.counter = 0;
     DOM.unreadCounter = 0;
@@ -2953,7 +2953,7 @@ var messageSidebar = document.getElementById('search-results');
 messageSidebar.addEventListener('scroll', function () {
     if (isFetching) return;
 
-console.log("messageSidebar",messageSidebar);
+    console.log("messageSidebar", messageSidebar);
 
     if (messageSidebar.scrollTop + messageSidebar.clientHeight >= messageSidebar.scrollHeight) {
         if (DOM.messageSearchQuery.length > 0) {
@@ -3258,27 +3258,28 @@ function get_voice_list() {
         const audioDuration = message.querySelector('.audio-duration');
         const audioSrc = message.getAttribute('data-audio-src');
         const audioPlayer = new Audio(audioSrc);
-
-        playButton.addEventListener('click', function () {
-            if (audioPlayer.paused) {
-                if (currentlyPlayingAudio && currentlyPlayingAudio !== audioPlayer) {
-                    currentlyPlayingAudio.pause();
-                    currentlyPlayingAudio.currentTime = 0;
-                    const currentlyPlayingButton = document.querySelector('.play-button img[src*="Pause-icon.svg"]');
-                    if (currentlyPlayingButton) {
-                        currentlyPlayingButton.src = 'assets/img/Play-icon.svg';
+        if (playButton) {
+            playButton.addEventListener('click', function () {
+                if (audioPlayer.paused) {
+                    if (currentlyPlayingAudio && currentlyPlayingAudio !== audioPlayer) {
+                        currentlyPlayingAudio.pause();
+                        currentlyPlayingAudio.currentTime = 0;
+                        const currentlyPlayingButton = document.querySelector('.play-button img[src*="Pause-icon.svg"]');
+                        if (currentlyPlayingButton) {
+                            currentlyPlayingButton.src = 'assets/img/Play-icon.svg';
+                        }
                     }
-                }
 
-                audioPlayer.play();
-                playButton.innerHTML = '<img src="assets/img/Pause-icon.svg" alt="Pause" />';
-                currentlyPlayingAudio = audioPlayer;
-            } else {
-                audioPlayer.pause();
-                playButton.innerHTML = '<img src="assets/img/Play-icon.svg" alt="Play" />';
-                currentlyPlayingAudio = null;
-            }
-        });
+                    audioPlayer.play();
+                    playButton.innerHTML = '<img src="assets/img/Pause-icon.svg" alt="Pause" />';
+                    currentlyPlayingAudio = audioPlayer;
+                } else {
+                    audioPlayer.pause();
+                    playButton.innerHTML = '<img src="assets/img/Play-icon.svg" alt="Play" />';
+                    currentlyPlayingAudio = null;
+                }
+            });
+        }
 
         // Update the progress bar as the audio plays
         audioPlayer.addEventListener('timeupdate', function () {
