@@ -325,9 +325,7 @@ background-color: rgba(255, 255, 255, 0.5);
 	.chat_list_view{
 		padding: 0px;
 	}
-	#input-area{
-		width: 100%;
-	}
+	
 
   }
 
@@ -945,7 +943,7 @@ body{
 	background: hsl(0, 0%, 95%);
     position: fixed;
     bottom: 0px;
-	width: 1120px;
+	/* width: 100%; */
    
 }
 
@@ -1279,3 +1277,49 @@ body{
 	font-size: 14px;
 }
 
+@media (max-width: 575.98px) {
+  
+    #input-area {
+        width: 100%; 
+    }
+}
+
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+ 
+    #input-area {
+        width: 58%; 
+    }
+}
+
+/* Medium devices (desktops, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  
+    #input-area {
+        width: 68%; /* 80% width for medium screens */
+    }
+}
+
+/* Large devices (large desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+
+    #input-area {
+        width: 67%; 
+    }
+}
+
+/* Extra large devices (larger desktops, 1200px and up) */
+@media (min-width: 1200px) {
+   
+    #input-area {
+        width: 67%;/* Fixed width for extra large devices */
+    }
+}
+
+/* For very large screens (over 1600px) */
+@media (min-width: 1600px) {
+  
+    #input-area {
+        width: 67%;
+	}
+}

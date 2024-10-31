@@ -2259,6 +2259,10 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     }
     else {
         await fetchPaginatedMessages();
+        // const parentElement=document.getElementById("message-area")
+        // const parentWidth = parentElement.offsetWidth;
+        // document.getElementById("input-area").style.width=parentWidth+"px";
+        
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
@@ -3391,3 +3395,8 @@ const resizeObserver = new ResizeObserver(entries => {
 resizeObserver.observe(InputBar);
 
 
+window.addEventListener("resize", () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    console.log(`Width: ${width}, Height: ${height}`);
+});
