@@ -1354,7 +1354,6 @@ function correction_call(message_id, messagebody, senderName) {
         console.error("TinyMCE editor not initialized for #input");
     }
 
-
     const correction_message_id = document.getElementById('correction_message_id');
     correction_message_id.value = message_id;
 
@@ -1362,7 +1361,15 @@ function correction_call(message_id, messagebody, senderName) {
 
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    messageContentDiv.innerHTML = messageContent;
+    // messageContentDiv.innerHTML = messageContent;
+
+    const existingReplyDiv = messageContentDiv.querySelector('.reply-message-area');
+
+    if (existingReplyDiv) {
+        existingReplyDiv.innerHTML = messagebody;
+    } else {
+        messageContentDiv.innerHTML = messagebody;
+    }
 
     // Check and log voiceIcon and Editreplyarea
     const chat_actionss = document.getElementById('chat_action');
@@ -2883,6 +2890,8 @@ let searchGroups = async (searchQuery, loadMore = false) => {
             console.log(error);
         }
     } else {
+        messageList = [];
+        DOM.messagesList.innerHTML= '';
         generateChatList();
     }
 };
