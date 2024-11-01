@@ -207,7 +207,7 @@ let viewChatList = () => {
                 DOM.chatList2.innerHTML += `
                 <div class="d-flex p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
                     <input type="radio" name="chatSelection" class="chat-radio" style="margin-left: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
-                    <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:50px;">
+                    <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle pointerr" style="height:50px;">
                     <div class="ml-1">
                         <div class="name list-user-name">${elem.group.name}</div>
                     </div>
@@ -1779,10 +1779,11 @@ function moveMessage(messageId) {
         } else {
             // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
         }
-
-        $('#input-area').hide();
-
         $('#action-bar').show();
+        $('#input-area').hide();
+        document.getElementById("messages").style.marginBottom = "0px";
+
+      
 
         document.getElementById('selected-count').textContent = `${selectedMessageIds.length} message${selectedMessageIds.length > 1 ? 's' : ''} selected`;
 
@@ -1911,6 +1912,7 @@ function cancelMoveMessage() {
     document.querySelectorAll('.selected-message').forEach(function (element) {
         element.classList.remove('selected-message');
     });
+    document.getElementById("messages").style.marginBottom = "77px";
     document.getElementById('action-bar').style.display = 'none';
     document.getElementById('input-area').style.display = 'block';
     document.getElementById('selected-count').textContent = 'Selected Messages: 0';
@@ -3410,4 +3412,3 @@ const resizeObserver = new ResizeObserver(entries => {
 });
 
 resizeObserver.observe(InputBar);
-
