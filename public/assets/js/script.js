@@ -314,7 +314,7 @@ let addUnread = () => {
             unreadDiv.remove();
             DOM.notificationDiv.innerHTML=DOM.unreadCounter + parseInt(oldCount);
     }
-  
+
         const span = document.createElement('span');
         span.innerHTML = `
             <div id="unread-wrapper" class="notification-wrapper">
@@ -325,8 +325,8 @@ let addUnread = () => {
         `;
         // DOM.unreadDividerAdded = true;
         DOM.messages.insertBefore(span, DOM.messages.firstChild);
-    
- 
+
+
 }
 
 function makeformatDate(dateString) {
@@ -607,7 +607,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     <div class="audio-content">
                         <div class="audio-controls">
                             <button class="playbutton">
-                                <img src="assets/img/play-icon.svg" alt="Play" />
+                                <img src="assets/img/play-icon.svg" alt="play" />
                             </button>
                             <div class="audio-progress">
                                 <div class="progress-filled"></div>
@@ -752,7 +752,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             <div class="audio-content">
                 <div class="audio-controls">
                     <button class="playbutton">
-                        <img src="assets/img/play-icon.svg" alt="Play" />
+                        <img src="assets/img/play-icon.svg" alt="play" />
                     </button>
                     <div class="audio-progress">
                         <div class="progress-filled"></div>
@@ -931,7 +931,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             <div class="audio-content">
                 <div class="audio-controls">
                     <button class="playbutton">
-                        <img src="assets/img/play-icon.svg" alt="Play" />
+                        <img src="assets/img/play-icon.svg" alt="play" />
                     </button>
                     <div class="audio-progress">
                         <div class="progress-filled"></div>
@@ -982,7 +982,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             <div class="audio-content">
                 <div class="audio-controls">
                     <button class="play-button">
-                        <img src="assets/img/play-icon.svg" alt="Play" />
+                        <img src="assets/img/play-icon.svg" alt="play" />
                     </button>
                     <div class="audio-progress">
                         <div class="progress-filled"></div>
@@ -1774,7 +1774,7 @@ function showReply(message_id, senderName, type) {
             <div class="audio-content">
                 <div class="audio-controls">
                     <button class="playbutton">
-                        <img src="assets/img/play-icon.svg" alt="Play" />
+                        <img src="assets/img/play-icon.svg" alt="play" />
                     </button>
                     <div class="audio-progress">
                         <div class="progress-filled"></div>
@@ -2110,7 +2110,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     <div class="audio-content">
                                         <div class="audio-controls">
                                             <button class="playbutton">
-                                                <img src="assets/img/play-icon.svg" alt="Play" />
+                                                <img src="assets/img/play-icon.svg" alt="play" />
                                             </button>
                                             <div class="audio-progress">
                                                 <div class="progress-filled"></div>
@@ -2376,7 +2376,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     }
 };
 function scroll_to_unread_div() {
-   
+
     const unreadCountDiv = document.getElementById('unread-wrapper');
     if (unreadCountDiv) {
         unreadDiv = document.getElementById("unread-counter-div");
@@ -3104,7 +3104,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                             <div class="audio-content">
                                 <div class="audio-controls">
                                     <button class="playbutton">
-                                        <img src="assets/img/play-icon.svg" alt="Play" />
+                                        <img src="assets/img/play-icon.svg" alt="play" />
                                     </button>
                                     <div class="audio-progress">
                                         <div class="progress-filled"></div>
