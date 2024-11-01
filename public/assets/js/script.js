@@ -1047,10 +1047,10 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     ${user.role === '0' || user.role === '2' ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}---->
-                                    ${user.role === '0' || user.role === '2' ? `
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    ${(message.is_compose !== 1 && message.is_compose !== true) && (user.role === '0' || user.role === '2') ? `
+                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     ` : ''}
-                                    ${user.role === '3' && message.sender === user.unique_id ? `
+                                    ${(message.is_compose !== 1 && message.is_compose !== true) && (user.role === '3' && message.sender === user.unique_id) ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     ` : ''}
                                 </div>
