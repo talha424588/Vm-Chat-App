@@ -306,16 +306,27 @@ let addDateToMessageArea = (date) => {
 };
 
 let addUnread = () => {
-    const span = document.createElement('span');
-    span.innerHTML = `
-        <div id="unread-wrapper" class="notification-wrapper">
-            <div class="unread-messages">
-                <span id="unread-counter-div">${DOM.unreadCounter}</span> UNREAD MESSAGES
+    var unreadDiv=document.getElementById("unread-wrapper");
+    var oldCount=null;
+    if(unreadDiv)
+    {
+         oldCount=document.getElementById("unread-counter-div").innerHTML.trim();
+            unreadDiv.remove();
+            DOM.notificationDiv.innerHTML=DOM.unreadCounter + parseInt(oldCount);
+    }
+  
+        const span = document.createElement('span');
+        span.innerHTML = `
+            <div id="unread-wrapper" class="notification-wrapper">
+                <div class="unread-messages">
+                    <span id="unread-counter-div">${oldCount ? DOM.unreadCounter + parseInt(oldCount) : DOM.unreadCounter}</span> UNREAD MESSAGES
+                </div>
             </div>
-        </div>
-    `;
-    DOM.unreadDividerAdded = true;
-    DOM.messages.insertBefore(span, DOM.messages.firstChild);
+        `;
+        // DOM.unreadDividerAdded = true;
+        DOM.messages.insertBefore(span, DOM.messages.firstChild);
+    
+ 
 }
 
 function makeformatDate(dateString) {
@@ -491,7 +502,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 messageContentDiv.innerHTML = newMessageDisplay;
             }
             else if (editedMessage.reply.type === "Image") {
-                var message_body = `<img src="${editedMessage.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<img src="${editedMessage.reply.msg}" style="height:125px; width:100%;">`;
 
                 newMessageDisplay = `
                 <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')"> <!-- Add onclick here -->
@@ -507,7 +518,11 @@ socket.on('updateEditedMessage', (editedMessage) => {
             }
             else if (editedMessage.reply.type === "File") {
                 const add_file_view = `
-                <div class="file-message" onclick="scrollToMessage('${editedMessage.reply.id}')">
+                 <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')">
+                   <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                            ${editedMessage.user.name}
+                        </div>
+                <div class="file-message">
                     <div class="file-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
@@ -522,7 +537,9 @@ socket.on('updateEditedMessage', (editedMessage) => {
                             <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
                         </svg>
                     </a>
-                </div>`;
+                </div>
+                </div>`
+                ;
 
                 newMessageDisplay = `
                 <div class="">
@@ -1993,6 +2010,7 @@ DOM.messages.addEventListener('scroll', async () => {
         showSpinner();
         await fetchPaginatedMessages();
         hideSpinner();
+        // scroll_to_unread_div(true);
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
         //console.log('User is not at the top yet');
@@ -2073,7 +2091,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 addMessageToMessageArea(message);
                 displayedMessageIds.add(message.id);
             }
-            if (message.id == notSeenById) addUnread();
+            if (message.id == notSeenById && !DOM.unreadDividerAdded) addUnread();
             if (message.id === message_id) {
                 const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                 const messageTextElement = messageElement.querySelector(".shadow-sm");
@@ -2358,13 +2376,15 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     }
 };
 function scroll_to_unread_div() {
-    DOM.unreadDividerAdded = false;
+   
     const unreadCountDiv = document.getElementById('unread-wrapper');
     if (unreadCountDiv) {
         unreadDiv = document.getElementById("unread-counter-div");
+        // if(!flag)
         unreadDiv.innerHTML = DOM.unreadCounter;
         unreadDiv.focus();
         unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        DOM.unreadDividerAdded = false;
     }
 }
 
@@ -3001,7 +3021,7 @@ let isFetching = false;
 var messageSidebar = document.getElementById('search-results');
 messageSidebar.addEventListener('scroll', function () {
     if (isFetching) return;
-    if (messageSidebar.scrollTop + messageSidebar.clientHeight >= messageSidebar.scrollHeight) {
+    if (messageSidebar.scrollTop + messageSidebar.clientHeight >= messageSidebar.scrollHeight-2) {
         if (DOM.messageSearchQuery.length > 0) {
             const url = `message/search/${DOM.messageSearchQuery}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`;
             fetch(url)
