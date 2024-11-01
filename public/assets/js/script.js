@@ -482,7 +482,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                             ${editedMessage.user.name}
                         </div>
                         <div class="reply-details">
-                            <p class="file-name">${replyMessage}</p>
+                            <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</p>
                         </div>
                     </div>
                     ${newMessageDisplay}`;
@@ -580,7 +580,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 messageContentDiv.innerHTML = `<div class="w-90">${editedMessage.msg}</div>`;
             }
             else {
-                messageContentDiv.innerHTML = editedMessage.msg;
+                messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
             }
 
         }
@@ -1541,7 +1541,8 @@ function handleSendMessage() {
                 'Content-Type': 'application/json',
                 "X-CSRF-Token": csrfToken,
             },
-            body: JSON.stringify({ id: messageId, message: messageContent.replace(/[\r\n]+/g, ' ') }),
+            // body: JSON.stringify({ id: messageId, message: messageContent.replace(/[\r\n]+/g, ' ') }),
+            body: JSON.stringify({ id: messageId, message: messageContent }),
         })
             .then((response) => response.json())
             .then((data) => console.log(data))
