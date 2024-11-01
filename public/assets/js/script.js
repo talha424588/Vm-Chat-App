@@ -467,13 +467,14 @@ socket.on('moveMessage', () => {
 socket.on('updateEditedMessage', (editedMessage) => {
     const messageElement = document.querySelector(`[data-message-id="${editedMessage.id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    console.log(editedMessage);
 
     let newMessageDisplay = '';
     if (messageElement) {
+        console.log(editedMessage);
         if (editedMessage.reply) {
             if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null) {
-                newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`; // Update with new content
+                console.log("eidt here");
+                newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
 
                 const replyMessage = editedMessage.reply.msg;
                 newMessageDisplay = `
@@ -530,7 +531,56 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 <div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
                 messageContentDiv.innerHTML = newMessageDisplay;
             }
+            else if (/<a[^>]+>/g.test(editedMessage.reply.msg)) {
+                console.log("file link");
+                let fileLink;
+                const linkTag = editedMessage.reply.msg.match(/<a[^>]+>/g)[0];
+                fileLink = linkTag.match(/href="([^"]+)"/)[1];
+                const mediaName = fileLink.split('uploads/')[1];
+                const displayMediaName = mediaName;
+                const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
+                if (mediaType == "document") {
+                    newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
 
+                    // const replyMessage = editedMessage.reply.msg;
+                    // newMessageDisplay = `
+                    //     <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')">
+                    //         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                    //             ${editedMessage.user.name}
+                    //         </div>
+                    //         <div class="reply-details">
+                    //             <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</p>
+                    //         </div>
+                    //     </div>
+                    //     ${newMessageDisplay}`;
+
+
+
+                    newMessageDisplay = `
+                    <div class="file-message">
+                        <div class="file-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                                <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                            </svg>
+                        </div>
+                        <div class="file-details">
+                            <p class="file-name">${displayMediaName}</p>
+
+                        </div>
+                        <a href="${fileLink}" target="_blank" download="${displayMediaName}" class="download-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                            </svg>
+                        </a>
+                    </div>
+                     ${newMessageDisplay}
+                `;
+
+                    messageContentDiv.innerHTML = newMessageDisplay;
+                }
+
+            }
             else if (editedMessage.reply.type === "Audio") {
                 var audioSrc = editedMessage.reply.msg.replace(/\/\//g, '/'); // Replace double slashes with a single slash
                 var message_body = `<div class="audio-message" style="background-color:${editedMessage.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
@@ -584,56 +634,57 @@ socket.on('updateEditedMessage', (editedMessage) => {
             }
         }
 
-        messageContentDiv.innerHTML = newMessageDisplay;
+        if (editedMessage.type != null) {
+            messageContentDiv.innerHTML = newMessageDisplay;
 
-        const additionalFeatures = `
-            <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
-                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${editedMessage.user.name}</span> |
-                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(editedMessage.time * 1000))})</span> |
-                  <span>
-                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${editedMessage.id}">Seen</a> |
-                </span>
-                <span>
-                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${editedMessage.id}','${editedMessage.user.name}','${editedMessage.type}')" data-message-id="${editedMessage.id}">Reply</a>
-                </span>
+            const additionalFeatures = `
+                <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${editedMessage.user.name}</span> |
+                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(editedMessage.time * 1000))})</span> |
+                      <span>
+                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${editedMessage.id}">Seen</a> |
+                    </span>
+                    <span>
+                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${editedMessage.id}','${editedMessage.user.name}','${editedMessage.type}')" data-message-id="${editedMessage.id}">Reply</a>
+                    </span>
 
-            </div>
-        `;
-
-        const dropdown = `
-            <div class="dropdown" style="position: absolute; top: 10px; right: 8px;">
-                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-angle-down text-muted px-2"></i>
-                </a>
-                <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                    ${user.role === '0' || user.role === '2' ? `
-                        <a class="dropdown-item" href="#" onclick="editMessage('${editedMessage.id}')">Edit</a>
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
-                    ` : ''}
-                    ${user.role === '3' && editedMessage.sender === user.unique_id ? `
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
-                    ` : ''}
                 </div>
-            </div>
-        `;
+            `;
 
-        if (editedMessage.type == "Message") {
-            newMessageDisplay = `<div class="w-90">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
-        }
-        else {
-            messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
-        }
+            const dropdown = `
+                <div class="dropdown" style="position: absolute; top: 10px; right: 8px;">
+                    <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-angle-down text-muted px-2"></i>
+                    </a>
+                    <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                        ${user.role === '0' || user.role === '2' ? `
+                            <a class="dropdown-item" href="#" onclick="editMessage('${editedMessage.id}')">Edit</a>
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
+                        ` : ''}
+                        ${user.role === '3' && editedMessage.sender === user.unique_id ? `
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
 
-        if (messageContentDiv) {
-
-            const hasDropdown = messageContentDiv.querySelector('.dropdown') !== null;
-            if (hasDropdown) {
-                messageContentDiv.innerHTML += dropdown;
-                messageContentDiv.parentNode.innerHTML += additionalFeatures;
+            if (editedMessage.type == "Message") {
+                newMessageDisplay = `<div class="w-90">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+            }
+            else {
+                messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
             }
 
+            if (messageContentDiv) {
 
+                const hasDropdown = messageContentDiv.querySelector('.dropdown') !== null;
+                if (hasDropdown) {
+                    messageContentDiv.innerHTML += dropdown;
+                    messageContentDiv.parentNode.innerHTML += additionalFeatures;
+                }
+            }
         }
+
     } else {
         console.error('Message element not found for ID:', editedMessage.id);
     }
@@ -1751,7 +1802,6 @@ function moveMessage(messageId) {
     } else {
         selectedMessageIds.push(messageId);
     }
-    console.log(selectedMessageIds);
     const messageElement = document.querySelector(`[data-message-id='${messageId}']`);
 
     if (messageElement) {
@@ -2923,8 +2973,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             searchResultsDiv.appendChild(resultItemDiv);
 
                             resultItemDiv.addEventListener("click", function () {
-                                console.log(message);
-
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
@@ -3003,7 +3051,6 @@ messageSidebar.addEventListener('scroll', function () {
 
                         resultItemDiv.addEventListener("click", function () {
                             let messageId = message.id;
-                            console.log(message);
                             const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                             handleMessageResponse(messageElement, message, messageId, DOM.messageSearchQuery);
                         });
@@ -3185,7 +3232,6 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                     }
                 }
                 else {
-                    console.log("current section");
                     const messageText = messageTextElement.innerHTML;
                     const index = messageText.indexOf(searchQuery);
 
@@ -3335,9 +3381,7 @@ function restoreMessage(id) {
 
             }
         }).then(message => {
-            console.log("Message restored:", message);
             socket.emit('restoreMessage', id);
-
             var messageElement = $(`[data-message-id="${id}"]`);
             if (messageElement.length > 0) {
                 const restoreButton = $(`#restore-button-${id}`);
@@ -3362,11 +3406,6 @@ const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
         // Check if the height has changed
         const newHeight = entry.contentRect.height;
-        // var iconContainer = document.querySelector('.icon-container');
-        // iconContainer.style.bottom = (parseInt(newHeight)+parseInt(100))+'px';
-        // console.log(`New height: ${newHeight}`);
-        // console.log('chat input height',getComputedStyle(InputBar).height)
-        // console.log('chat container height',getComputedStyle(actionBarParent).height)
         if (newHeight > 200) {
             actionBarParent.style.height = "200px";
             InputBar.style.height = "180px";
@@ -3382,10 +3421,6 @@ const resizeObserver = new ResizeObserver(entries => {
         } else {
             change_icon_height(actionBarParent);
         }
-
-        // You can add your custom code here
-        // Example: Call a function or log a message
-        // customFunction(newHeight);
     }
 });
 
