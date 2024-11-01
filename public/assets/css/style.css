@@ -444,7 +444,7 @@ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the values as needed */
 	background-color: #f0f0f0;
 	padding: 8px;
 	border-radius: 10px;
-	max-width: 500px;
+	max-width: 530px;
   }
 
   .search-bar i {
@@ -1286,6 +1286,9 @@ body{
     }
 	#side_navbar{
 		width: 100%;
+	}
+	#messages{
+		height: 100%;
 	}
 }
 

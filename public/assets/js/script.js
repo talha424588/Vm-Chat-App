@@ -577,15 +577,63 @@ socket.on('updateEditedMessage', (editedMessage) => {
             console.log(editMessageContentDiv);
             editMessageContentDiv.innerHTML = editedMessage.msg;
             if (editedMessage.type == "Message") {
-                messageContentDiv.innerHTML = `<div class="w-90">${editedMessage.msg}</div>`;
+                newMessageDisplay = `<div class="w-90">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
             }
             else {
                 messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
             }
+        }
+
+        messageContentDiv.innerHTML = newMessageDisplay;
+
+        const additionalFeatures = `
+            <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${editedMessage.user.name}</span> |
+                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(editedMessage.time * 1000))})</span> |
+                  <span>
+                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${editedMessage.id}">Seen</a> |
+                </span>
+                <span>
+                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${editedMessage.id}','${editedMessage.user.name}','${editedMessage.type}')" data-message-id="${editedMessage.id}">Reply</a>
+                </span>
+
+            </div>
+        `;
+
+        const dropdown = `
+            <div class="dropdown" style="position: absolute; top: 10px; right: 8px;">
+                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-angle-down text-muted px-2"></i>
+                </a>
+                <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                    ${user.role === '0' || user.role === '2' ? `
+                        <a class="dropdown-item" href="#" onclick="editMessage('${editedMessage.id}')">Edit</a>
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
+                    ` : ''}
+                    ${user.role === '3' && editedMessage.sender === user.unique_id ? `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+
+        if (editedMessage.type == "Message") {
+            newMessageDisplay = `<div class="w-90">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+        }
+        else {
+            messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
+        }
+
+        if (messageContentDiv) {
+
+            const hasDropdown = messageContentDiv.querySelector('.dropdown') !== null;
+            if (hasDropdown) {
+                messageContentDiv.innerHTML += dropdown;
+                messageContentDiv.parentNode.innerHTML += additionalFeatures;
+            }
+
 
         }
-        // const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-        // messageContentDiv.innerHTML = editedMessage.message.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
     } else {
         console.error('Message element not found for ID:', editedMessage.id);
     }
@@ -895,6 +943,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
                            ${messageContent}
+                           </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
@@ -995,7 +1044,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                        </div>
                     </div>
                 </div>
-            </div>
+
         </div>
         `;
         if (flag) {
@@ -3342,8 +3391,3 @@ const resizeObserver = new ResizeObserver(entries => {
 
 resizeObserver.observe(InputBar);
 
-
-window.addEventListener("resize", () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-});
