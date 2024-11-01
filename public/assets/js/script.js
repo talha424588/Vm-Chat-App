@@ -2953,7 +2953,7 @@ let isFetching = false;
 var messageSidebar = document.getElementById('search-results');
 messageSidebar.addEventListener('scroll', function () {
     if (isFetching) return;
-    if (messageSidebar.scrollTop + messageSidebar.clientHeight >= messageSidebar.scrollHeight) {
+    if (messageSidebar.scrollTop + messageSidebar.clientHeight >= messageSidebar.scrollHeight-2) {
         if (DOM.messageSearchQuery.length > 0) {
             const url = `message/search/${DOM.messageSearchQuery}/${DOM.groupId}/${searchMessageOffset}/${searchMessageLimit}`;
             fetch(url)
