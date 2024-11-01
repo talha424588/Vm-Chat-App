@@ -980,6 +980,7 @@ body{
 #messages {
 	flex: 1!important;
 	overflow: auto;
+	overflow-x: hidden;
 	background-image: url('../img/messages-background.png');
 	background-size: cover;
 	background-repeat: no-repeat;
