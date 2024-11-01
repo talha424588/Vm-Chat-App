@@ -175,11 +175,11 @@
             font-size: 14px;
         }
 
-        .blur {
+        /* .blur {
             filter: blur(1px);
             transition: filter 0.3s ease;
             /* Optional: Smooth transition */
-        }
+        /* } */ 
 
         .auto-resize-textarea {
             overflow: hidden;
@@ -363,7 +363,7 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body" style="padding: 0px !important;">
+                            <div class="modal-body" style="padding: 0px !important;" id="moveModal">
                                 <div class="search-header" style="padding: 10px 9px 12px 0px; border-bottom: 0px;">
                                     <input type="search" placeholder="Search messages" class="search-input"
                                         style="width: 100%;">
