@@ -2296,6 +2296,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     if (unreadWrapper) {
         unreadWrapper.remove();
     }
+    cancelMoveMessage();
 
     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
     mClassList(DOM.messageAreaOverlay).add("d-none");
