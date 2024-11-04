@@ -494,11 +494,7 @@
                     <div class="chat-input-container  justify-self-end align-items-center flex-row" id="reply-area">
 
 
-                        <style>
-                            .auto-resize-textarea {
-                                overflow: hidden;
-                            }
-                        </style>
+                      
 
                         <div class="icon-container" id="scrollBottomBtn" style="display: none;">
                             <div class=" notification-count" id="notification-count"></div>
@@ -512,7 +508,7 @@
                         </div>
 
 
-                        <textarea id="input" class="chat-input auto-resize-textarea" rows="1" cols="62"
+                        <textarea id="input" class="chat-input auto-resize-textarea"  rows="1" cols="62"
                             placeholder="Type a message"></textarea>
 
 
