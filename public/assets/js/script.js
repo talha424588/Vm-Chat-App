@@ -481,12 +481,9 @@ socket.on('updateEditedMessage', (editedMessage) => {
 
     let newMessageDisplay = '';
     if (messageElement) {
-        console.log(editedMessage);
         if (editedMessage.reply) {
             if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null) {
-                console.log("eidt here");
-                newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
-
+                        newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
                 const replyMessage = editedMessage.reply.msg;
                 newMessageDisplay = `
                     <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')">
@@ -1426,7 +1423,7 @@ function correction_send_handel() {
     tinymce.remove('#input');
     isTinyMCEInitialized = false;
     removecorrectionMessage();
-    document.getElementById('input').style.height = '44px';
+    document.getElementById('input').style.height = '28px';
     const textarea = document.getElementById('input');
     textarea.value = '';
 
@@ -1590,11 +1587,12 @@ function editMessage(messageId) {
         if (editMessageIdField) {
             editMessageIdField.value = messageId;
         }
-
+        
         const editMessageContents = document.querySelectorAll('.EditmessageContent');
+        
         editMessageContents.forEach((content) => {
-            const sanitizedMessage = editMessage;
-            content.innerHTML = sanitizedMessage;
+            const sanitizedMessage = editMessage.replace(/\n/g, "<br>").trim();
+            content.innerHTML =sanitizedMessage.length>100 ? sanitizedMessage.substring(0,100) + "...":sanitizedMessage;
         });
 
         const textarea = document.getElementById('input');
@@ -1614,13 +1612,12 @@ function editMessage(messageId) {
 
         if (chat_action) {
             voiceIcon.style.display = 'none';
-
             Editreplyarea.style.display = 'block';
             voiceIcon.style.visibility = 'hidden';
             fileicon.style.visibility = 'hidden';
             captureid.style.visibility = 'hidden';
         }
-
+  
 
         DOM.messageInput.style.height = element.offsetHeight + "px";
         change_icon_height(element);
@@ -1638,16 +1635,15 @@ function change_icon_height(element) {
 // Edit message area
 function handleSendMessage() {
 
-    document.getElementById('input').style.setProperty('height', '44px', 'important');
-    document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px', 'important');
 
+    document.querySelector('.auto-resize-textarea').style.setProperty('height', '26px');
+    document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
     const messageId = document.getElementById('edit_message_id').value;
     let messageContent = document.getElementById('input').value;
-
     if (messageContent !== '') {
         const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(messageId));
         if (messageIndex !== -1) {
-            pagnicateChatList.data[messageIndex].msg = messageContent;
+            pagnicateChatList.data[messageIndex].msg = messageContent.replace(/\n/g, "<br>");
         }
 
         // const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
@@ -1692,9 +1688,11 @@ function handleSendMessage() {
         chat_action_voice.style.display = 'block';
         const correctionarea = document.getElementById('correction-div');
         correctionarea.style.display = 'none';
+        
     } else {
         // alert('Error');
     }
+    change_icon_height(document.getElementById('reply-area'));
 }
 // Add event listener to the send message button
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
@@ -1721,7 +1719,8 @@ function removeEditMessage() {
     messageDiv.classList.remove('blur');
     const textarea = document.getElementById('input');
     textarea.value = '';
-    document.querySelector('.auto-resize-textarea').style.height = '44px';
+    document.querySelector('.auto-resize-textarea').style.setProperty('height', '28px');
+    document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
 
 }
 
@@ -1740,6 +1739,7 @@ function showReply(message_id, senderName, type) {
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
     DOM.replyId = message_id;
+    console.log("This is the message that you want to reply",message);
 
 
 
@@ -1794,7 +1794,7 @@ function showReply(message_id, senderName, type) {
             </div>
         </div>`;
     } else {
-        var message_body = messagebody;
+        var message_body = messagebody.replace(/\r\n/g, '<br>').substring(0,200)+"....";
     }
     quotedNameElement.innerHTML = message_body;
 
@@ -1809,6 +1809,8 @@ function removeQuotedMessage() {
     replyDiv.style.display = 'none';
     iconContainer.style.bottom = '90px';
     DOM.replyId = null;
+    document.querySelector('.auto-resize-textarea').style.setProperty('height', '28px');
+    document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
 }
 
 // Array to store selected message IDs
@@ -1969,7 +1971,7 @@ function cancelMoveMessage() {
     document.querySelectorAll('.selected-message').forEach(function (element) {
         element.classList.remove('selected-message');
     });
-    document.getElementById("messages").style.marginBottom = "77px";
+    document.getElementById("messages").style.marginBottom = "74px";
     document.getElementById('action-bar').style.display = 'none';
     document.getElementById('input-area').style.display = 'block';
     document.getElementById('selected-count').textContent = 'Selected Messages: 0';
@@ -1988,7 +1990,7 @@ function selectUsertosend(username, postgroup_id) {
 }
 
 $(document).ready(function () {
-    $('#MoveMessagetoGroup').on('click', function () {
+       	$('#MoveMessagetoGroup').on('click', function () {
         var messagesIds = $('#messages_ids').val();
         var groupToMove = $('#group_to_move_message').val();
         var messageIdArray = messagesIds.split(',');
@@ -2345,14 +2347,8 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     DOM.currentPage = 1;
     displayedMessageIds.clear();
 
-    DOM.counter = 0;
-    DOM.unreadCounter = 0;
-    DOM.notificationDiv.style.display = "none";
-    const unreadWrapper = document.getElementById('unread-wrapper');
 
-    if (unreadWrapper) {
-        unreadWrapper.remove();
-    }
+    resetChatArea();
     cancelMoveMessage();
 
     mClassList(DOM.inputArea).contains("d-none", (elem) => elem.remove("d-none").add("d-flex"));
@@ -2420,6 +2416,9 @@ let showChatList = () => {
         mClassList(DOM.chatListArea).remove("d-none").add("d-flex");
         mClassList(DOM.messageArea).remove("d-flex").add("d-none");
         areaSwapped = false;
+        DOM.groupId=null;
+        DOM.currentPage = 0;
+        DOM.activeChatIndex=null;
     }
 };
 
@@ -2732,25 +2731,71 @@ fileInput.addEventListener('change', (event) => {
     }
 });
 
-document.getElementById('input').addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') {
 
+
+const textarea = document.getElementById('input');
+const maxHeight = 200;
+function autoResize() {
+    if (!textarea.value.trim()) {
+        textarea.style.height = '28px';
+        textarea.style.overflowY = 'hidden';
+        return;
+    }
+    const scrollTop = textarea.scrollTop;
+    textarea.style.overflowY = 'hidden';
+    textarea.style.height = 'auto';
+    const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+    requestAnimationFrame(() => {
+        textarea.style.height = newHeight + 'px';
+        textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
+        if (newHeight >= maxHeight) {
+            textarea.scrollTop = scrollTop;
+        }
+    });
+    var iconContainer = document.querySelector('.icon-container');
+    var editDiv=document.getElementById("editMessageDiv");
+    var repDiv=document.getElementById("reply-div");
+    if(getComputedStyle(editDiv).display== "block")
+    {
+        var combinedHeight = parseInt(editDiv.offsetHeight) + parseInt(newHeight);
+    }
+    if(getComputedStyle(repDiv).display== "block")
+    {
+        var combinedHeight = parseInt(repDiv.offsetHeight) + parseInt(newHeight);
+    }
+
+    iconContainer.style.bottom=(combinedHeight+50)+"px";
+}
+textarea.addEventListener('input', autoResize);
+textarea.addEventListener('paste', autoResize);
+textarea.addEventListener('keydown', function (event) {
+    if ((event.key === 'Backspace' || event.key === 'Delete') && !textarea.value.trim()) {
+        textarea.style.height = '28px';
+        textarea.style.overflowY = 'hidden';
+    }
+});
+
+textarea.addEventListener('keydown', function (event) {
+    
+    if (event.key === 'Enter') {
         const editReplyArea = document.getElementById('Editreply-area');
         if (window.getComputedStyle(editReplyArea).display === 'none') {
             event.preventDefault();
             sendMessage();
-            document.querySelector('.auto-resize-textarea').style.height = '44px';
+            textarea.style.height = '28px'; 
+            textarea.style.overflowY = 'hidden';
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
-
             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
-            document.querySelector('.auto-resize-textarea').style.height = '44px';
-
+            textarea.style.height = '28px'; 
+            textarea.style.overflowY = 'hidden';
         } else {
             console.log('The div has a different display property.');
         }
         removeQuotedMessage();
     }
 });
+
+
 
 // delete model
 $('#deleteModal').on('show.bs.modal', function (event) {
@@ -3456,4 +3501,25 @@ const resizeObserver = new ResizeObserver(entries => {
     }
 });
 
-resizeObserver.observe(InputBar);
+// resizeObserver.observe(InputBar);
+
+   
+
+
+const resetChatArea=()=>{
+ const MessageInput=document.getElementById("messsage_search_query");
+ const SerachResults=document.getElementById("search-results");
+ const unreadWrapper = document.getElementById('unread-wrapper');
+ DOM.notificationDiv.style.display = "none";
+ DOM.counter = 0;
+ DOM.unreadCounter = 0;
+ MessageInput.value="";
+ SerachResults.innerHTML='';
+ 
+
+
+ if (unreadWrapper) {
+    unreadWrapper.remove();
+    }   
+
+}
