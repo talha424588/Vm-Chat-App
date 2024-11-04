@@ -31,9 +31,9 @@ io.on('connection', (socket) => {
     });
 
     // Server-side code
-    socket.on('deleteMessage', (messageId) => {
+    socket.on('deleteMessage', (messageId,isMove) => {
         console.log("delete message event", messageId);
-        io.emit('deleteMessage', messageId);
+        io.emit('deleteMessage', messageId,isMove);
         io.emit('updateGroupMessages', messageId);
     });
 
