@@ -199,7 +199,7 @@ class ChatController extends Controller
         return $this->chatRepository->updateMessageIsReadStatus($request);
     }
 
-    public function searchMessage($query, $groupId,$offset = 0, $limit = 40)
+    public function searchMessage($query, $groupId, $offset = 0, $limit = 40)
     {
         return $this->chatRepository->searchGroupMessages($query, $groupId, $offset, $limit);
     }
@@ -219,25 +219,62 @@ class ChatController extends Controller
         return $this->chatRepository->messageCorrection($request);
     }
 
+    // public function moveMessages(Request $request)
+    // {
+    //     $messages = $request->input('messages');
+    //     $newGroupId = $request->input('newGroupId');
+    //     $messages = $request->input('messageList');
+
+    //     $messageIds = [];
+
+    //     foreach ($messages as $message) {
+    //         $messageIds[] = $message['id'];
+    //         DB::table('group_messages')
+    //             ->where('id', $message['id'])
+    //             ->update(['group_id' => $newGroupId]);
+    //     }
+
+    //     $updatedMessages = GroupMessage::whereIn('id', $messageIds)
+    //         ->with("user")
+    //         ->get();
+
+    //     return response()->json($updatedMessages);
+    // }
+
+
+
     public function moveMessages(Request $request)
     {
         $messages = $request->input('messages');
         $newGroupId = $request->input('newGroupId');
+        $messages = $request->input('messageList');
 
-        $messageIds = [];
+        $moveMessages = [];
 
         foreach ($messages as $message) {
-            $messageIds[] = $message['id'];
-            DB::table('group_messages')
-                ->where('id', $message['id'])
-                ->update(['group_id' => $newGroupId]);
+
+            $moveMessageClone = new GroupMessage;
+            $moveMessageClone->msg = $message["msg"];
+            $moveMessageClone->sender = $message['user']['unique_id'];
+            $moveMessageClone->seen_by = $message['user']['unique_id'];
+            $moveMessageClone->reply_id = $message['reply_id'];
+            $moveMessageClone->group_id = $newGroupId;
+            $moveMessageClone->type = $message['type'];
+            $moveMessageClone->media_name = $message['mediaName'] ?? null;
+            $moveMessageClone->time = now()->timestamp;
+            $moveMessageClone->status = EnumMessageEnum::NEW;
+            $moveMessageClone->is_compose = true;
+            $moveMessageClone->is_privacy_breach = false;
+            if ($moveMessageClone->save()) {
+                $moveMessageClone->user = User::where("unique_id", $message['user']['unique_id'])->first();
+                DB::table('group_messages')
+                    ->where('id', $message['id'])
+                    ->where('group_id', $message['group_id'])
+                    ->update(['is_deleted' => true, 'status' => EnumMessageEnum::MOVE]);
+                $moveMessages[] = $moveMessageClone;
+            }
         }
-
-        $updatedMessages = GroupMessage::whereIn('id', $messageIds)
-            ->with("user")
-            ->get();
-
-        return response()->json($updatedMessages);
+        return response()->json(['status' => true, "message" => "success", "messages" => $moveMessages], 200);
     }
 
     public function viewDocument(Request $request)
@@ -252,5 +289,4 @@ class ChatController extends Controller
     {
         return $this->chatRepository->restoreDeletedMessage($id);
     }
-
 }

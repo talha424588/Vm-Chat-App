@@ -10,29 +10,20 @@ use App\Repositories\GroupRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Enum\MessageEnum as EnumMessageEnum;
+
 
 class GroupService implements GroupRepository
 {
     public function fetchUserChatGroups(Request $request)
     {
 
-        // $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
-        // ->with(['groupMessages' => function ($query) use ($request) {
-        //     // $query->orderByRaw("FROM_UNIXTIME(time) desc")
-        //     $query->orderBy("id", "desc")->limit(40)->offset($request->input('offset', 0));
-        // }, 'groupMessages.user'])
-        // ->get();
-
-        // $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
-        //     ->with(['groupMessages' => function ($query) {
-        //         $query->latest('time');
-        //     }, 'groupMessages.user'])
-        //     ->get();
 
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
             ->with(['groupMessages' => function ($query) {
-                $query->latest('time');
+                $query->latest('time')
                 // ->where('is_deleted', false)
+                ->whereNot('status', EnumMessageEnum::MOVE);
             }, 'groupMessages.user'])
             ->get();
 

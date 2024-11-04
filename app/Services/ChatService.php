@@ -44,6 +44,7 @@ class ChatService implements ChatRepository
 
             $paginator = GroupMessage::where('group_id', $request->groupId)
                 // ->where('is_deleted', false)
+                ->whereNot('status', EnumMessageEnum::MOVE)
                 ->with('user', 'reply')
                 ->orderBy('id', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);
@@ -96,8 +97,8 @@ class ChatService implements ChatRepository
         ->take(1000)
         // ->skip($pageNo * 20)
         ->get();
-    
-    
+
+
 
         return response()->json([
             'status' => true,
