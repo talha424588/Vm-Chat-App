@@ -1072,7 +1072,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     ${(message.type === "Message" && message.status !== "Correction" && (message.is_compose === 1 || message.is_compose === true)) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}
-                                    ${message.is_compose === 1 && message.type === "Message" ? `
+                                    ${message.is_compose === 1 && message.type === "Message" && !message.reply  ? `
                                     <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                                     ` : ''}
                                     ` : ''}
@@ -1108,7 +1108,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     ${((oldMessageType !== 'document' && oldMessageType !== 'image') && message.type === "Message" && message.is_compose === 1) || (message.is_compose == true && (oldMessageType !== 'document' && oldMessageType !== 'image')) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}
-                                    ${message.is_compose === 1 && message.type === "Message" ? `
+                                    ${message.is_compose === 1 && message.type === "Message" && !message.reply ? `
                                     <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                                     ` : ''}
                                     ` : ''}
@@ -3527,9 +3527,6 @@ const resizeObserver = new ResizeObserver(entries => {
 
 // resizeObserver.observe(InputBar);
 
-
-
-
 const resetChatArea=()=>{
  const MessageInput=document.getElementById("messsage_search_query");
  const SerachResults=document.getElementById("search-results");
@@ -3540,10 +3537,7 @@ const resetChatArea=()=>{
  MessageInput.value="";
  SerachResults.innerHTML='';
 
-
-
  if (unreadWrapper) {
     unreadWrapper.remove();
     }
-
 }
