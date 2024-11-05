@@ -1812,7 +1812,9 @@ function showReply(message_id, senderName, type) {
             </div>
         </div>`;
     } else {
-        var message_body = messagebody.replace(/\r\n/g, '<br>').substring(0,200)+"....";
+       
+        var message_body = messagebody.substring(0,100).replace(/\r\n|\n/g, '<br>')+".....";
+     
     }
     quotedNameElement.innerHTML = message_body;
 
