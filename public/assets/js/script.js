@@ -1,4 +1,3 @@
-
 let getById = (id, parent) => parent ? parent.getElementById(id) : getById(id, document);
 let getByClass = (className, parent) => parent ? parent.getElementsByClassName(className) : getByClass(className, document);
 
@@ -90,6 +89,7 @@ let chatList = [];
 let chatList2 = [];
 let messageList = [];
 let pagnicateChatList = [];
+let results = [];
 
 let lastDate = "";
 let offset = 0;
@@ -112,9 +112,9 @@ let populateGroupList = async () => {
                 'content-type': 'application/json'
             }
         });
-        const result = await response.json();
+        results = await response.json();
 
-        result.forEach(group => {
+        results.forEach(group => {
             let chat = {};
             chat.isGroup = true;
             chat.group = group;
@@ -239,6 +239,10 @@ function getOldMessageMediaName(message) {
 }
 
 function getOldMessageType(message) {
+    console.log("message", message);
+    if (/<audio[^>]+>/g.test(message.msg)) {
+        return "Audio"
+    }
     const linkTag = message.msg.match(/<a[^>]+>/g)[0];
     fileLink = linkTag.match(/href="([^"]+)"/)[1];
     const mediaName = fileLink.split('uploads/')[1];
@@ -491,9 +495,9 @@ socket.on('updateEditedMessage', (editedMessage) => {
 
         let newMessageDisplay = '';
         if (messageElement) {
-                if (editedMessage.reply) {
+            if (editedMessage.reply) {
                 if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null) {
-                                newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+                    newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
                     const replyMessage = editedMessage.reply.msg;
                     newMessageDisplay = `
                         <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')">
@@ -983,8 +987,12 @@ let addMessageToMessageArea = (message, flag = false) => {
     else if (message.type === 'Audio' || /<audio[^>]+>/g.test(message.msg)) {
         let audioSrc;
         if (/<audio[^>]+>/g.test(message.msg)) {
+            console.log("audio message");
             const audioTag = message.msg.match(/<audio[^>]+>/g)[0];
+            console.log("audio audioTag", audioTag);
             audioSrc = audioTag.match(/src="([^"]+)"/)[1];
+            console.log("audio audioSrc", audioSrc);
+
         } else {
             audioSrc = message.msg;
         }
@@ -1072,7 +1080,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     ${(message.type === "Message" && message.status !== "Correction" && (message.is_compose === 1 || message.is_compose === true)) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}
-                                    ${message.is_compose === 1 && message.type === "Message" && !message.reply  ? `
+                                    ${message.is_compose === 1 && message.type === "Message" && !message.reply ? `
                                     <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                                     ` : ''}
                                     ` : ''}
@@ -1610,7 +1618,7 @@ function editMessage(messageId) {
 
         editMessageContents.forEach((content) => {
             const sanitizedMessage = editMessage.replace(/\n/g, "<br>").trim();
-            content.innerHTML =sanitizedMessage.length>100 ? sanitizedMessage.substring(0,100) + "...":sanitizedMessage;
+            content.innerHTML = sanitizedMessage.length > 100 ? sanitizedMessage.substring(0, 100) + "..." : sanitizedMessage;
         });
 
         const textarea = document.getElementById('input');
@@ -1757,7 +1765,7 @@ function showReply(message_id, senderName, type) {
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
     DOM.replyId = message_id;
-    console.log("This is the message that you want to reply",message);
+    console.log("This is the message that you want to reply", message);
 
 
 
@@ -1812,7 +1820,7 @@ function showReply(message_id, senderName, type) {
             </div>
         </div>`;
     } else {
-        var message_body = messagebody.replace(/\r\n/g, '<br>').substring(0,200)+"....";
+        var message_body = messagebody.replace(/\r\n/g, '<br>').substring(0, 200) + "....";
     }
     quotedNameElement.innerHTML = message_body;
 
@@ -2014,7 +2022,7 @@ function selectUsertosend(username, postgroup_id) {
 }
 
 $(document).ready(function () {
-       	$('#MoveMessagetoGroup').on('click', function () {
+    $('#MoveMessagetoGroup').on('click', function () {
         var messagesIds = $('#messages_ids').val();
         var groupToMove = $('#group_to_move_message').val();
         var messageIdArray = messagesIds.split(',');
@@ -2440,13 +2448,19 @@ let showChatList = () => {
         mClassList(DOM.chatListArea).remove("d-none").add("d-flex");
         mClassList(DOM.messageArea).remove("d-flex").add("d-none");
         areaSwapped = false;
-        DOM.groupId=null;
+        DOM.groupId = null;
         DOM.currentPage = 0;
-        DOM.activeChatIndex=null;
+        DOM.activeChatIndex = null;
     }
 };
-
+let subsIds = [];
 let sendMessage = (type = 'Message', mediaName = null) => {
+    const targetGroup = results.find(group => group.group_id === DOM.groupId);
+    // subsIds = targetGroup.users_with_access
+    // .map(user => user.fcm_token)
+    // .filter(token => token !== user.fcm_token);
+    subsIds = targetGroup.users_with_access.map(user => user.fcm_token);
+    console.log("subsIds",subsIds);
     if (socket.connected) {
         let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         if (type == 'Message') {
@@ -2466,9 +2480,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 reason = 'Email Address';
             }
             if (reason !== '') {
-                // Send "Alert!!!" as the message
                 let alertMessage = "Alert!!!";
-                // Send email to dev3@visamtion.org with details
                 fetch('/alert-email', {
                     method: 'POST',
                     headers: {
@@ -2512,7 +2524,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                     type: type,
                     mediaName: mediaName,
                     time: Math.floor(Date.now() / 1000),
-                    csrf_token: csrfToken
+                    csrf_token: csrfToken,
+                    subsIds:JSON.stringify(subsIds)
                 };
                 socket.emit('sendChatToServer', msg);
             }
@@ -2535,7 +2548,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 type: type,
                 mediaName: mediaName,
                 time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken
+                csrf_token: csrfToken,
+                subsIds:JSON.stringify(subsIds)
             };
             socket.emit('sendChatToServer', msg);
             DOM.messageInput.value = "";
@@ -2590,41 +2604,69 @@ let init = () => {
 
 init();
 
-const messaging = firebase.messaging();
-
-Notification.requestPermission().then(permission => {
-    if (permission === 'granted') {
-        // Get the FCM token
-        messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
-            if (token) {
-                let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                user.fcm_token = token;
-                DOM.fcmToken = token;
-                const updateUserFcmToken = fetch("user/update/" + token, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-Token": csrfToken,
-                    },
-                }).then(updateUserFcmToken => {
-                    if (!updateUserFcmToken.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    document.getElementById("login_user_fcm_token").value = token;
-                }).catch(error => {
-                    console.log(error);
-                }
-                )
-            } else {
-                console.log('No registration token available. Request permission to generate one.');
-            }
-        }).catch((err) => {
-            console.log('An error occurred while retrieving token. ', err);
+document.addEventListener('DOMContentLoaded', function () {
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+        await OneSignal.init({
+            appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
         });
-    } else {
-        console.log('Unable to get permission to notify.');
-    }
-});
+        user.fcm_token = OneSignal.User.PushSubscription.id;
+        DOM.fcmToken = OneSignal.User.PushSubscription.id;
+        const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+            },
+        }).then(updateUserFcmToken => {
+            if (!updateUserFcmToken.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
+        }).catch(error => {
+            console.log(error);
+        }
+        )
+        console.log("OneSignal", OneSignal.User.PushSubscription.id);
+    });
+}, false);
+
+
+
+// const messaging = firebase.messaging();
+// Notification.requestPermission().then(permission => {
+//     if (permission === 'granted') {
+//         // Get the FCM token
+//         messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
+//             if (token) {
+//                 let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+//                 user.fcm_token = token;
+//                 DOM.fcmToken = token;
+//                 const updateUserFcmToken = fetch("user/update/" + token, {
+//                     method: "POST",
+//                     headers: {
+//                         "Content-Type": "application/json",
+//                         "X-CSRF-Token": csrfToken,
+//                     },
+//                 }).then(updateUserFcmToken => {
+//                     if (!updateUserFcmToken.ok) {
+//                         throw new Error(`HTTP error! Status: ${response.status}`);
+//                     }
+//                     document.getElementById("login_user_fcm_token").value = token;
+//                 }).catch(error => {
+//                     console.log(error);
+//                 }
+//                 )
+//             } else {
+//                 console.log('No registration token available. Request permission to generate one.');
+//             }
+//         }).catch((err) => {
+//             console.log('An error occurred while retrieving token. ', err);
+//         });
+//     } else {
+//         console.log('Unable to get permission to notify.');
+//     }
+// });
 
 
 const voiceIcon = document.getElementById('voice-icon');
@@ -2777,18 +2819,16 @@ function autoResize() {
         }
     });
     var iconContainer = document.querySelector('.icon-container');
-    var editDiv=document.getElementById("editMessageDiv");
-    var repDiv=document.getElementById("reply-div");
-    if(getComputedStyle(editDiv).display== "block")
-    {
+    var editDiv = document.getElementById("editMessageDiv");
+    var repDiv = document.getElementById("reply-div");
+    if (getComputedStyle(editDiv).display == "block") {
         var combinedHeight = parseInt(editDiv.offsetHeight) + parseInt(newHeight);
     }
-    if(getComputedStyle(repDiv).display== "block")
-    {
+    if (getComputedStyle(repDiv).display == "block") {
         var combinedHeight = parseInt(repDiv.offsetHeight) + parseInt(newHeight);
     }
 
-    iconContainer.style.bottom=(combinedHeight+50)+"px";
+    iconContainer.style.bottom = (combinedHeight + 50) + "px";
 }
 textarea.addEventListener('input', autoResize);
 textarea.addEventListener('paste', autoResize);
@@ -3527,17 +3567,17 @@ const resizeObserver = new ResizeObserver(entries => {
 
 // resizeObserver.observe(InputBar);
 
-const resetChatArea=()=>{
- const MessageInput=document.getElementById("messsage_search_query");
- const SerachResults=document.getElementById("search-results");
- const unreadWrapper = document.getElementById('unread-wrapper');
- DOM.notificationDiv.style.display = "none";
- DOM.counter = 0;
- DOM.unreadCounter = 0;
- MessageInput.value="";
- SerachResults.innerHTML='';
+const resetChatArea = () => {
+    const MessageInput = document.getElementById("messsage_search_query");
+    const SerachResults = document.getElementById("search-results");
+    const unreadWrapper = document.getElementById('unread-wrapper');
+    DOM.notificationDiv.style.display = "none";
+    DOM.counter = 0;
+    DOM.unreadCounter = 0;
+    MessageInput.value = "";
+    SerachResults.innerHTML = '';
 
- if (unreadWrapper) {
-    unreadWrapper.remove();
+    if (unreadWrapper) {
+        unreadWrapper.remove();
     }
 }
