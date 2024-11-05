@@ -1637,10 +1637,10 @@ function editMessage(messageId) {
 
         const messageDiv = document.getElementById('messages');
         messageDiv.classList.add('blur');
-
+        const Editreplyarea = document.getElementById('Editreply-area');
         const chat_action = document.getElementById('chat_action');
 
-        const Editreplyarea = document.getElementById('Editreply-area');
+       
         const voiceIcon = document.getElementById('voice-icon');
         const fileicon = document.getElementById('file-icon');
         const captureid = document.getElementById('captureid');
@@ -1848,16 +1848,17 @@ fileicon.style.visibility = 'hidden';
 captureid.style.visibility = 'hidden';
 
 }
-document.getElementById('input').addEventListener('click',()=>{
-    var replyDiv = document.getElementById('reply-div');
-    if(getComputedStyle(replyDiv).display == "block")
-    {
-    const fileicon = document.getElementById('file-icon');
-    const captureid = document.getElementById('captureid');          
-    fileicon.style.visibility = 'hidden';
-    captureid.style.visibility = 'hidden';
-    }
-});
+// document.getElementById('input').addEventListener('click',()=>{
+//     var replyDiv = document.getElementById('reply-div');
+//     if(getComputedStyle(replyDiv).display == "block")
+//     {
+//     const fileicon = document.getElementById('file-icon');
+//     const captureid = document.getElementById('captureid');          
+//     fileicon.style.visibility = 'hidden';
+//     captureid.style.visibility = 'hidden';
+//     }
+// });
+
 function removeQuotedMessage() {
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
