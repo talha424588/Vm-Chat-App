@@ -658,7 +658,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
                 editMessageContentDiv.innerHTML = editedMessage.msg;
                 if (editedMessage.type == "Message") {
-                    newMessageDisplay = `<div class="w-90">${formatMessageForDisplay(editedMessage.msg)}</div>`;
+                    newMessageDisplay = formatMessageForDisplay(editedMessage.msg);
                 }
                 else {
                     messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
@@ -700,7 +700,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 `;
 
                 if (editedMessage.type == "Message") {
-                    newMessageDisplay = `<div class="w-90">${formatMessageForDisplay(editedMessage.msg)}</div>`;
+                    newMessageDisplay = formatMessageForDisplay(editedMessage.msg);
                 }
                 else {
                     messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
@@ -987,7 +987,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
         `;
         } else {
-            messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');;
+            messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
         }
 
     }
@@ -1068,7 +1068,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
                             </div>
                             ${message.sender === user.unique_id ? `
-                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '2px' : '10px')}; right: 8px;">
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '-2px' : '10px')}; right: 0px;">
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
@@ -1103,7 +1103,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
                             ${user.role != '1' && user.role != '3' && message.sender != user.unique_id ? `
-                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '0px' : '10px')}; right: 10px;">
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '-2px' : '10px')}; right: 2px;">
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
@@ -1160,9 +1160,9 @@ let addMessageToMessageArea = (message, flag = false) => {
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                        <div class="${message.type == "Message" ? 'w-90' : ''}">
+                       
                            ${messageContent}
-                        </div>
+                       
                         </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -1195,9 +1195,9 @@ let addMessageToMessageArea = (message, flag = false) => {
                     <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                         <div style="margin-top:-4px">
                             <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                            <div class="${message.type == "Message" ? 'w-90' : ''}">
+                          
                                ${messageContent}
-                            </div>
+                       
                             </div>
                             <div>
                                 <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -1653,7 +1653,10 @@ function editMessage(messageId) {
             captureid.style.visibility = 'hidden';
         }
 
-
+        if(editMessage.length>200)
+        {
+            DOM.messageInput.style.overflowY='scroll';
+        }
         DOM.messageInput.style.height = element.offsetHeight + "px";
         change_icon_height(element);
     }
@@ -1770,7 +1773,8 @@ function showReply(message_id, senderName, type) {
     if (selectedMessageIds > 0) {
         return;
     }
-
+     
+    
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
     DOM.replyId = message_id;
@@ -1837,9 +1841,23 @@ function showReply(message_id, senderName, type) {
 
     replyDiv.style.display = 'block';
     change_icon_height(replyDiv);
+    const fileicon = document.getElementById('file-icon');
+    const captureid = document.getElementById('captureid');
+          
+fileicon.style.visibility = 'hidden';
+captureid.style.visibility = 'hidden';
 
 }
-
+document.getElementById('input').addEventListener('click',()=>{
+    var replyDiv = document.getElementById('reply-div');
+    if(getComputedStyle(replyDiv).display == "block")
+    {
+    const fileicon = document.getElementById('file-icon');
+    const captureid = document.getElementById('captureid');          
+    fileicon.style.visibility = 'hidden';
+    captureid.style.visibility = 'hidden';
+    }
+});
 function removeQuotedMessage() {
     var replyDiv = document.getElementById('reply-div');
     var iconContainer = document.querySelector('.icon-container');
@@ -3408,7 +3426,9 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                 break;
                 console.log("Unknown message type:", message.type);
         }
+
         messageElement.scrollIntoView({ behavior: "smooth" });
+  
     } else {
         fetchPaginatedMessages(messageId, null, null);
     }

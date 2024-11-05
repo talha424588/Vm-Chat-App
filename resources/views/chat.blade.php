@@ -507,7 +507,7 @@
                                 </svg></div> <!-- This is a down arrow symbol -->
                         </div>
 
-
+                        
                         <textarea id="input" class="chat-input auto-resize-textarea"  rows="1" cols="62"
                             placeholder="Type a message"></textarea>
 
