@@ -1637,10 +1637,9 @@ function editMessage(messageId) {
 
         const messageDiv = document.getElementById('messages');
         messageDiv.classList.add('blur');
+
         const Editreplyarea = document.getElementById('Editreply-area');
         const chat_action = document.getElementById('chat_action');
-
-       
         const voiceIcon = document.getElementById('voice-icon');
         const fileicon = document.getElementById('file-icon');
         const captureid = document.getElementById('captureid');
@@ -1841,11 +1840,20 @@ function showReply(message_id, senderName, type) {
 
     replyDiv.style.display = 'block';
     change_icon_height(replyDiv);
+    const Editreplyarea = document.getElementById('message-reply-area');
+    const chat_action = document.getElementById('chat_action');
+    const voiceIcon = document.getElementById('voice-icon');
     const fileicon = document.getElementById('file-icon');
     const captureid = document.getElementById('captureid');
-          
-fileicon.style.visibility = 'hidden';
-captureid.style.visibility = 'hidden';
+
+    if (chat_action) {
+        voiceIcon.style.display = 'none';
+        chat_action.style.display="none";
+        Editreplyarea.style.display = 'block';
+        voiceIcon.style.visibility = 'hidden';
+        fileicon.style.visibility = 'hidden';
+        captureid.style.visibility = 'hidden';    
+    }
 
 }
 // document.getElementById('input').addEventListener('click',()=>{
@@ -1867,8 +1875,33 @@ function removeQuotedMessage() {
     DOM.replyId = null;
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '28px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
+  
+    const chat_action = document.getElementById('chat_action');
+    if(getComputedStyle(chat_action).display == "none")
+    {
+        const Editreplyarea = document.getElementById('message-reply-area');
+        Editreplyarea.style.display = 'none';
+        chat_action.style.display="";
+        const fileicon = document.querySelector('.chat_action_file');
+        fileicon.style.visibility = 'visible';
+        const chat_action_capture = document.querySelector('.chat_action_capture');
+        chat_action_capture.style.visibility = 'visible';
+        const chat_action_voice = document.querySelector('.chat_action_voice');
+        chat_action_voice.style.visibility = 'visible';
+        chat_action_voice.style.display = 'block';
+    }
+    
+    const correctionarea = document.getElementById('correction-div');
+    if(getComputedStyle(correctionarea).display == "block")
+    {
+        correctionarea.style.display = 'none';
+    }
+    
 }
-
+const sendMessageReply=()=>{
+    sendMessage();
+    removeQuotedMessage();
+}
 // Array to store selected message IDs
 let selectedMessageIds = [];
 let selectedMessages = [];
