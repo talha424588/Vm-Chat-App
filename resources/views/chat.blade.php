@@ -11,7 +11,6 @@
         integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
@@ -174,12 +173,6 @@
             color: #888;
             font-size: 14px;
         }
-
-        /* .blur {
-            filter: blur(1px);
-            transition: filter 0.3s ease;
-            /* Optional: Smooth transition */
-        /* } */
 
         .auto-resize-textarea {
             overflow: hidden;
@@ -400,11 +393,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
-
-
                 <!---new code is above that line --->
 
                 <div id="emoji-picker-wrapper"></div>
@@ -432,9 +420,6 @@
                             <span class="close-quoted" onclick="removecorrectionMessage()">✖</span>
                         </div>
                     </div>
-
-
-
 
                     <!---Edit Message Area Start-->
                     <div id="editMessageDiv"
@@ -473,8 +458,6 @@
 
                     <!---Edit Message Area End-->
 
-
-
                     <!-- <div id="action-bar-parent" style="overflow-y:auto;overflow-x:hidden"> -->
                     <div class="chat-input-container  justify-self-end align-items-center flex-row" id="reply-area">
 
@@ -492,13 +475,8 @@
                                 </svg></div> <!-- This is a down arrow symbol -->
                         </div>
 
-
                         <textarea id="input" class="chat-input auto-resize-textarea" rows="1" cols="62"
                             placeholder="Type a message"></textarea>
-
-
-
-
                         <div class="chat-action-icons" id="chat_action">
                             <i class="chat-icon chat_action_file" style="padding-left: 3px; ">
                                 <svg id="file-icon" width="23" height="20" viewBox="0 0 23 20"
@@ -527,18 +505,9 @@
                                         fill="white" />
                                 </svg>
                             </i>
-
-
-
                         </div>
-
-
-
                         <div class="chat-action-icons" id="Editreply-area" style="display:none; margin-left: 5px;">
-
-
                             <i id="send-message-btn" class="chat-icon">
-
                                 <svg width="31" height="30" viewBox="0 0 31 31" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
@@ -546,10 +515,8 @@
                                         d="M22.4355 8.33332L5.11261 12.4775C4.93818 12.5193 4.77916 12.6096 4.65403 12.7381C4.5289 12.8666 4.44279 13.028 4.40569 13.2035C4.3686 13.3789 4.38204 13.5613 4.44446 13.7295C4.50688 13.8976 4.61571 14.0446 4.75833 14.1534L8.52702 17.0255L15.9931 14.5851L11.9722 21.3327L13.9464 25.6403C14.0206 25.8039 14.1399 25.943 14.2903 26.0413C14.4407 26.1397 14.6159 26.1931 14.7956 26.1955C14.9753 26.1979 15.1519 26.149 15.3048 26.0547C15.4577 25.9603 15.5806 25.8244 15.6591 25.6628L23.5073 9.67331C23.5867 9.51179 23.6184 9.33102 23.5989 9.15212C23.5793 8.97323 23.5092 8.8036 23.3968 8.66306C23.2844 8.52252 23.1343 8.41689 22.9641 8.35849C22.7938 8.3001 22.6105 8.29137 22.4355 8.33332Z"
                                         fill="white" />
                                 </svg>
-
                             </i>
                         </div>
-
 
                         <div class="chat-action-icons" id="correctionreply-area"
                             style="display:none; margin-left:4px !important; ">
@@ -641,22 +608,6 @@
             </div>
         </div>
     </div>
-    <!--Seen Modal -->
-    <!-- <div class="modal fade" id="seenModal" tabindex="-1" role="dialog" aria-labelledby="seenModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-
-                <div class="modal-body">
-                    <img src="{{ asset('assets/svg/message-seen.gif') }}" alt="" height="78.32px">
-                    <h5>Users who have seen this message:</h5>
-                    {{-- <p class="not-recover" id="is_read">awais-designer, VM-UST-SA, Talha Dev</p> --}}
-                    <p class="not-recover" id="is_read"></p>
-                    <button type="button" class="btn btn-cancel" data-bs-dismiss="modal" id="close-modal-btn">Ok</button>
-                </div>
-            </div>
-        </div>
-    </div> -->
     <div class="modal fade" id="seenModal" tabindex="-1" role="dialog" aria-labelledby="seenModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -696,12 +647,10 @@
     <input type="hidden" value="{{ Auth::user()->fcm_token }}" id="login_user_fcm_token">
     <input type="hidden" value="{{ Auth::user()->seen_privacy }}" id="login_user_seen_privacy">
     <input type="hidden" value="{{ Auth::user()->role }}" id="login_user_role">
-    {{-- <script src="{{ asset('build/assets/app-BKYbeYMS.js') }}"></script> --}}
-    {{-- @vite(['resources/js/app.js']) --}}
+
     <style>
         .hidden {
             display: none !important;
-            /* Use !important to override any inline styles */
         }
 
         div#chat-list-unread {
@@ -716,58 +665,52 @@
         function display_chat(type) {
             const chatList = document.getElementById('chat-list');
             const chatItems = chatList.getElementsByClassName('chat-list-item');
-
-            // Get the alert div
             const alertDiv = document.getElementById('chat-list-unread');
-            // Get all buttons
             const buttons = document.querySelectorAll('.buttons .button');
-
-            // Remove 'active' class from all buttons
             buttons.forEach(button => {
                 button.classList.remove('active');
             });
 
-            // Set 'active' class on the clicked button
             if (type === 'unread') {
-                buttons[1].classList.add('active'); // Assuming the unread button is the second one
+                buttons[1].classList.add('active');
             } else {
-                buttons[0].classList.add('active'); // Assuming the all button is the first one
+                buttons[0].classList.add('active');
             }
 
-            let hasUnreadMessages = false; // Flag to check if any unread messages are present
+            let hasUnreadMessages = false;
 
             for (let i = 0; i < chatItems.length; i++) {
                 const unreadCountElement = chatItems[i].getElementsByClassName('badge-success')[0];
-                let unreadCount = 0; // Default to 0 if no badge found
+                let unreadCount = 0;
 
-                // Check if the unreadCountElement exists and parse its value if visible
+
                 if (unreadCountElement && unreadCountElement.style.display !== 'none') {
                     unreadCount = parseInt(unreadCountElement.innerText);
                 }
 
-                // If unreadCount is greater than 0, show the chat item and set the flag
+
                 if (unreadCount > 0) {
                     hasUnreadMessages = true;
-                    chatItems[i].style.setProperty('display', 'block'); // Show the chat item
+                    chatItems[i].style.setProperty('display', 'block');
                 }
-                // If type is 'unread', hide chat items with unreadCount 0
+
                 else if (type === 'unread') {
-                    chatItems[i].style.setProperty('display', 'none', 'important'); // Hide chat item
+                    chatItems[i].style.setProperty('display', 'none', 'important');
                 }
-                // If type is 'all', show all chat items
+
                 else {
                     chatItems[i].style.setProperty('display', 'block');
                 }
             }
 
-            // If type is 'unread' and there are no unread messages
+
             if (type === 'unread' && !hasUnreadMessages) {
-                chatList.style.display = 'none'; // Hide the chat list
-                alertDiv.style.display = 'block'; // Show the alert div
-                alertDiv.innerHTML = 'No unread messages are available.'; // Display the message inside the alert div
+                chatList.style.display = 'none';
+                alertDiv.style.display = 'block';
+                alertDiv.innerHTML = 'No unread messages are available.';
             } else {
-                alertDiv.style.display = 'none'; // Hide the alert if not applicable
-                chatList.style.display = 'block'; // Show the chat list if there are unread messages
+                alertDiv.style.display = 'none';
+                chatList.style.display = 'block';
             }
         }
     </script>
@@ -791,51 +734,37 @@
             let isPickerVisible = false;
 
             emojiBtn.addEventListener('click', () => {
-                // Toggle the visibility of the emoji picker
                 isPickerVisible = !isPickerVisible;
 
                 if (isPickerVisible) {
-                    // Position the emoji picker at the bottom of the viewport
                     emojiPickerWrapper.style.position =
-                        'fixed'; // Position it fixed relative to the viewport
-                    emojiPickerWrapper.style.top = 'auto'; // Reset the top position
+                        'fixed';
+                    emojiPickerWrapper.style.top = 'auto';
                     emojiPickerWrapper.style.bottom =
-                        '8%'; // Align the bottom of the picker with the bottom of the viewport
-                    emojiPickerWrapper.style.left = '34%'; // Adjust the left position if needed
+                        '8%';
+                    emojiPickerWrapper.style.left = '34%';
 
-                    emojiPickerWrapper.style.display = 'block'; // Show the picker
+                    emojiPickerWrapper.style.display = 'block';
                 } else {
-                    emojiPickerWrapper.style.display = 'none'; // Hide the picker
+                    emojiPickerWrapper.style.display = 'none';
                 }
             });
 
             picker.addEventListener('emoji-click', event => {
                 const emoji = event.detail.emoji.unicode;
-                const inputField = input;
-
-                // Get the current cursor position
+                const inputField = input
                 const start = inputField.selectionStart;
                 const end = inputField.selectionEnd;
-
-                // Insert emoji at cursor position
                 inputField.value = inputField.value.substring(0, start) + emoji + inputField.value
                     .substring(end);
-
-                // Move the cursor to the end of the inserted emoji
                 inputField.selectionStart = inputField.selectionEnd = start + emoji.length;
-
-                inputField.focus(); // Refocus the input field
-
-                // Removed the line that hides the picker
-                // emojiPickerWrapper.style.display = 'none'; // Hide the picker after selection
-                // isPickerVisible = false; // Update visibility state
+                inputField.focus();
             });
 
-            // Optional: Hide the picker if clicking outside
             $(document).click((event) => {
                 if (!emojiPickerWrapper.contains(event.target) && !emojiBtn.contains(event.target)) {
                     emojiPickerWrapper.style.display = 'none';
-                    isPickerVisible = false; // Update visibility state
+                    isPickerVisible = false;
                 }
             });
         });
@@ -847,35 +776,34 @@
             const textarea = document.querySelector('.chat-input');
             const fileIcon = document.querySelector('#file-icon');
             const chaticon = document.querySelector('#captureid');
-            // Function to update file icon visibility
+
             function updateFileIconVisibility() {
                 if (textarea.value.trim() === "") {
-                    fileIcon.style.visibility = 'visible'; // Show the file-icon when textarea is empty
-                    chaticon.style.visibility = 'visible'; // Show the file-icon when textarea is empty
+                    fileIcon.style.visibility = 'visible';
+                    chaticon.style.visibility = 'visible';
                 } else {
                     fileIcon.style.visibility = 'hidden'; // Hide the file-icon when textarea has text
-                    chaticon.style.visibility = 'hidden'; // Hide the file-icon when textarea has text
+                    chaticon.style.visibility = 'hidden';
                 }
             }
 
-            // Event listener for input changes
-            textarea.addEventListener('input', function() {
-                // Auto-resize the textarea
-                textarea.style.height = 'auto'; // Reset the height
-                textarea.style.height = (textarea.scrollHeight) + 'px'; // Set it to the scroll height
 
-                // Update file icon visibility
+            textarea.addEventListener('input', function() {
+
+                textarea.style.height = 'auto';
+                textarea.style.height = (textarea.scrollHeight) + 'px';
+
+
                 updateFileIconVisibility();
             });
 
             // Event listener for focus on textarea
             textarea.addEventListener('focus', function() {
-                updateFileIconVisibility(); // Check visibility when focused
+                updateFileIconVisibility();
             });
 
-            // Event listener for blur to check if empty
             textarea.addEventListener('blur', function() {
-                updateFileIconVisibility(); // Ensure correct visibility when focus is lost
+                updateFileIconVisibility();
             });
         });
     </script>
@@ -894,10 +822,6 @@
     <script src="{{ asset('assets/js/script.js') }}"></script>
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-
-    {{-- <script src="https://www.gstatic.com/firebasejs/8.2.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.2.2/firebase-storage.js"></script> --}}
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -906,39 +830,8 @@
     </script>
     <script></script>
 
-
-
-
     {{-- One Signal --}}
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"></script>
-    {{-- <script>
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
-        OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.init({
-                appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-            });
-                user.fcm_token = OneSignal.User.PushSubscription.id;
-                DOM.fcmToken = OneSignal.User.PushSubscription.id;
-                const updateUserFcmToken = fetch("user/update/" + token, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-                    },
-                }).then(updateUserFcmToken => {
-                    if (!updateUserFcmToken.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
-                }).catch(error => {
-                    console.log(error);
-                }
-                )
-            console.log("OneSignal",OneSignal.User.PushSubscription.id);
-        });
-    </script> --}}
-    {{-- One Signal --}}
-
     <!-- Include jQuery -->
     <!-- {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} -->
     <!-- Include Bootstrap JS -->
