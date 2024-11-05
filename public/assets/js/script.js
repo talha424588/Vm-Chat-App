@@ -570,20 +570,6 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     if (mediaType == "document") {
                         newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
 
-                        // const replyMessage = editedMessage.reply.msg;
-                        // newMessageDisplay = `
-                        //     <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')">
-                        //         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                        //             ${editedMessage.user.name}
-                        //         </div>
-                        //         <div class="reply-details">
-                        //             <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</p>
-                        //         </div>
-                        //     </div>
-                        //     ${newMessageDisplay}`;
-
-
-
                         newMessageDisplay = `
                         <div class="file-message">
                             <div class="file-icon">
@@ -1355,15 +1341,8 @@ function CorrectionMessage(message_id, senderName) {
         removeQuotedMessage();
     }
 
-
-    // const editDiv=document.getElementById('editMessageDiv');
-    // if (window.getComputedStyle(editDiv).display === 'block') {
-    //     removeEditMessage();
-    // }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
-    // var iconContainer = document.querySelector('.icon-container');
-    // iconContainer.style.bottom = '240px';
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
     });
@@ -1384,7 +1363,6 @@ function correction_call(message_id, messagebody, senderName) {
 
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    // messageContentDiv.innerHTML = messageContent;
 
     const existingReplyDiv = messageContentDiv.querySelector('.reply-message-area');
 
@@ -1394,7 +1372,7 @@ function correction_call(message_id, messagebody, senderName) {
         messageContentDiv.innerHTML = messagebody;
     }
 
-    // Check and log voiceIcon and Editreplyarea
+
     const chat_actionss = document.getElementById('chat_action');
     chat_actionss.style.display = 'none';
 
@@ -1561,7 +1539,7 @@ function removecorrectionMessage() {
         Editreplyarea.style.display = 'none';
         correctionreplyarea.style.display = 'none';
         const textarea = document.getElementById('input');
-        textarea.value = ''; // Append with a newline if there's already text
+        textarea.value = '';
     }
 
     // Select the element with the ID 'chat_action'
@@ -1644,7 +1622,6 @@ function editMessage(messageId) {
             captureid.style.visibility = 'hidden';
         }
 
-
         DOM.messageInput.style.height = element.offsetHeight + "px";
         change_icon_height(element);
     }
@@ -1658,9 +1635,8 @@ function change_icon_height(element) {
     iconContainer.style.bottom = dis + 'px';
 }
 
-// Edit message area
-function handleSendMessage() {
 
+function handleSendMessage() {
 
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '26px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
@@ -1671,9 +1647,6 @@ function handleSendMessage() {
         if (messageIndex !== -1) {
             pagnicateChatList.data[messageIndex].msg = messageContent.replace(/\n/g, "<br>");
         }
-
-        // const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-        // const messageContentDiv = messageElement.querySelector('div.shadow-sm');
 
         const messageToUpdate = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
         socket.emit('updateEditedMessage', messageToUpdate);
@@ -1687,7 +1660,6 @@ function handleSendMessage() {
                 'Content-Type': 'application/json',
                 "X-CSRF-Token": csrfToken,
             },
-            // body: JSON.stringify({ id: messageId, message: messageContent.replace(/[\r\n]+/g, ' ') }),
             body: JSON.stringify({ id: messageId, message: messageContent }),
         })
             .then((response) => response.json())
@@ -1720,7 +1692,7 @@ function handleSendMessage() {
     }
     change_icon_height(document.getElementById('reply-area'));
 }
-// Add event listener to the send message button
+
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
 
 function removeEditMessage() {
@@ -1750,7 +1722,6 @@ function removeEditMessage() {
 
 }
 
-//Show Reply Message
 function showReply(message_id, senderName, type) {
 
     var correctionDiv = document.getElementById('correction-div');
@@ -1839,7 +1810,6 @@ function removeQuotedMessage() {
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
 }
 
-// Array to store selected message IDs
 let selectedMessageIds = [];
 let selectedMessages = [];
 
@@ -1878,7 +1848,7 @@ function moveMessage(messageId) {
     }
 }
 
-//Multiple Select Messages End
+
 function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove) {
     console.log("moveSelectedMessagesToGroup", messagesToMove);
     const selectedMessages = moveMessageIds.map(id => {
@@ -1914,7 +1884,6 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
                         chatList[previousGroupIndex].group.group_messages.splice(messageIndex, 1);
                         chatList[previousGroupIndex].unread -= 1;
 
-                        // Update the time property of the group
                         if (chatList[previousGroupIndex].group.group_messages.length > 0) {
                             chatList[previousGroupIndex].time = new Date(chatList[previousGroupIndex].group.group_messages[chatList[previousGroupIndex].group.group_messages.length - 1].time * 1000);
                         } else {
@@ -1959,7 +1928,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
                 });
             }
 
-            // Update the chat list
+
             chatList.sort((a, b) => {
                 if (a.time && b.time) {
                     return new Date(b.time) - new Date(a.time);
@@ -1990,7 +1959,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
     document.getElementById('messages_ids').value = '';
     document.getElementById('group_to_move_message').value = '';
     selectedMessageIds = [];
-    selectedMessageIds.length = 0; // Clears the array
+    selectedMessageIds.length = 0;
 
 
 }
@@ -2200,8 +2169,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     <div class="reply-message-area">${highlightedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
                                 `;
                                 }
-
-                                // Set the inner HTML to the newMessageDisplay
                                 messageTextElement.innerHTML = newMessageDisplay;
 
                             }
@@ -2368,8 +2335,6 @@ function unread_settings(query_set) {
 let currentlyPlayingAudio = null;
 
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) => {
-    // pagnicateChatList = [];
-
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
 
@@ -2418,7 +2383,6 @@ function scroll_to_unread_div() {
     const unreadCountDiv = document.getElementById('unread-wrapper');
     if (unreadCountDiv) {
         unreadDiv = document.getElementById("unread-counter-div");
-        // if(!flag)
         unreadDiv.innerHTML = DOM.unreadCounter;
         unreadDiv.focus();
         unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
