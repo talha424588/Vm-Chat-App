@@ -101,64 +101,15 @@ class ChatController extends Controller
                 $message->reply->user ? User::where("unique_id", $message->sender)->first() : "null";
             }
             $request->merge([
-                'senderName' => $request->senderName,
+                'senderName' => $message->user->name,
                 'message' => $request->message,
                 'token' => json_encode($request->user['fcm_token'])
             ]);
 
-            // $this->sendNotification($request);
-            // dispatch(new SendNotificationJob(json_encode($request->user['fcm_token']), $user['name'],$message->msg, $this->firebaseService));
+            $this->firebaseService->sendNotification($request);
             return response()->json($message, 201);
         }
     }
-
-    public function sendNotification(Request $request)
-    {
-        $message = $request->message;
-
-        $token = trim($request->token, "\"");
-
-        $accessToken = $this->getAccessToken();
-
-        $payload = [
-            'message' => [
-                'token' => $token,
-                'notification' => [
-                    'title' => $request->senderName,
-                    'body'  => $message
-                ]
-            ]
-        ];
-
-        Log::info('Token: ' . $token);
-        Log::info('Payload: ' . json_encode($payload));
-
-        $fcmResponse = Http::withToken($accessToken)
-            ->post('https://fcm.googleapis.com/v1/projects/vm-chat-5c18d/messages:send', $payload);
-
-        Log::info('FCM Response: ' . $fcmResponse->body());
-
-        return response()->json(['status' => 'Notification Sent', 'fcm_response' => $fcmResponse->body()]);
-    }
-
-    public function getAccessToken()
-    {
-        $client = new Client();
-        $client->setAuthConfig(storage_path("app/json/vm-chat.json"));
-        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
-        $token = $client->fetchAccessTokenWithAssertion();
-        return $token['access_token'];
-    }
-
-
-    // public function broadcastChat(Request $request)
-    // {
-    //     $user = $request->user();
-    //     $message = $this->store($request);
-    //     $messageResposne = json_decode($message->getContent(),true);
-    //     event(new Chat($user,$request->body,$request->time, (int)($messageResposne['id'])));
-    //     return response()->json(['msg'=>"event fired !!"]);
-    // }
 
     public function delete($id)
     {
@@ -219,30 +170,6 @@ class ChatController extends Controller
         return $this->chatRepository->messageCorrection($request);
     }
 
-    // public function moveMessages(Request $request)
-    // {
-    //     $messages = $request->input('messages');
-    //     $newGroupId = $request->input('newGroupId');
-    //     $messages = $request->input('messageList');
-
-    //     $messageIds = [];
-
-    //     foreach ($messages as $message) {
-    //         $messageIds[] = $message['id'];
-    //         DB::table('group_messages')
-    //             ->where('id', $message['id'])
-    //             ->update(['group_id' => $newGroupId]);
-    //     }
-
-    //     $updatedMessages = GroupMessage::whereIn('id', $messageIds)
-    //         ->with("user")
-    //         ->get();
-
-    //     return response()->json($updatedMessages);
-    // }
-
-
-
     public function moveMessages(Request $request)
     {
         $messages = $request->input('messages');
@@ -283,7 +210,6 @@ class ChatController extends Controller
         $pdfPath = $request->input('doc');
         return view('pdf-viewer', compact('pdfPath'));
     }
-
 
     public function restoreMessage($id)
     {
