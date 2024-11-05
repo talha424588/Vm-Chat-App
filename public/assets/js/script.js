@@ -1847,25 +1847,13 @@ function showReply(message_id, senderName, type) {
     const captureid = document.getElementById('captureid');
 
     if (chat_action) {
-        voiceIcon.style.display = 'none';
+     
         chat_action.style.display="none";
         Editreplyarea.style.display = 'block';
-        voiceIcon.style.visibility = 'hidden';
-        fileicon.style.visibility = 'hidden';
-        captureid.style.visibility = 'hidden';    
+ 
     }
 
 }
-// document.getElementById('input').addEventListener('click',()=>{
-//     var replyDiv = document.getElementById('reply-div');
-//     if(getComputedStyle(replyDiv).display == "block")
-//     {
-//     const fileicon = document.getElementById('file-icon');
-//     const captureid = document.getElementById('captureid');          
-//     fileicon.style.visibility = 'hidden';
-//     captureid.style.visibility = 'hidden';
-//     }
-// });
 
 function removeQuotedMessage() {
     var replyDiv = document.getElementById('reply-div');
@@ -1883,12 +1871,6 @@ function removeQuotedMessage() {
         Editreplyarea.style.display = 'none';
         chat_action.style.display="";
         const fileicon = document.querySelector('.chat_action_file');
-        fileicon.style.visibility = 'visible';
-        const chat_action_capture = document.querySelector('.chat_action_capture');
-        chat_action_capture.style.visibility = 'visible';
-        const chat_action_voice = document.querySelector('.chat_action_voice');
-        chat_action_voice.style.visibility = 'visible';
-        chat_action_voice.style.display = 'block';
     }
     
     const correctionarea = document.getElementById('correction-div');

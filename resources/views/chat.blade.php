@@ -491,7 +491,7 @@
 
 
                     <!-- <div id="action-bar-parent" style="overflow-y:auto;overflow-x:hidden"> -->
-                    <div class="chat-input-container d-flex  justify-self-end align-items-center flex-row" id="reply-area">
+                    <div class="chat-input-container d-flex justify-self-end align-items-center flex-row" id="reply-area">
 
 
                       
