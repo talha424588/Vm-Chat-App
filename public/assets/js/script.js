@@ -719,9 +719,13 @@ socket.on('updateEditedMessage', (editedMessage) => {
 });
 
 function updateViewChatList(editedMessage) {
+
     const chatEntry = chatList.find(chat => chat.msg && chat.msg.id === editedMessage.id);
-    chatEntry.msg.msg = editedMessage.msg;
-    viewChatList();
+    if(chatEntry)
+    {
+        chatEntry.msg.msg = editedMessage.msg;
+        viewChatList();
+    }
 }
 
 
