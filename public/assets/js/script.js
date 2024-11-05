@@ -199,7 +199,7 @@ let viewChatList = () => {
                     messageText = "No messages";
                 }
                 if (elem.group.group_messages.length > 0 && latestMessage != null) {
-                    latestMessage.status == "Correction" ? messageText = removeTags(messageText) : messageText = messageText.slice(0, 30) + (messageText.length > 30 ? "..." : "")
+                    latestMessage.status == "Correction" ? messageText = removeTags(messageText) : messageText = getCleanedTextSnippet(messageText) + (messageText.length > 30 ? "..." : "")
                 }
 
                 const senderName = latestMessage && latestMessage.user ? latestMessage.user.name : "";
@@ -250,7 +250,13 @@ function getOldMessageType(message) {
 function removeTags(messageText) {
     return messageText.replace(/<\/?p>/g, '')
 }
-
+function getCleanedTextSnippet(text) {
+    return text
+        .replace(/<br\s*\/?>/gi, '') 
+        .replace(/<\/?p>/gi, '')      
+        .replace(/\n/g, ' ')          
+        .slice(0, 30);               
+}
 let viewMessageList = () => {
 
     DOM.messagesList.innerHTML = `
@@ -486,14 +492,16 @@ socket.on('updateEditedMessage', (editedMessage) => {
     const messageElement = document.querySelector(`[data-message-id="${editedMessage.id}"]`);
     if (messageElement) {
         updateViewChatList(editedMessage);
-
+        function formatMessageForDisplay(message) {
+            return message.replace(/(?:\r\n|\r|\n)/g, '<br>');
+        }
         const messageContentDiv = messageElement.querySelector('div.shadow-sm');
 
         let newMessageDisplay = '';
         if (messageElement) {
                 if (editedMessage.reply) {
                 if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null) {
-                                newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+                                newMessageDisplay = `<div class="reply-message-area">${formatMessageForDisplay(editedMessage.msg)}</div>`;
                     const replyMessage = editedMessage.reply.msg;
                     newMessageDisplay = `
                         <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')">
@@ -648,10 +656,9 @@ socket.on('updateEditedMessage', (editedMessage) => {
             else {
                 const editMessageDiv = document.getElementById('editMessageDiv');
                 const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
-                console.log(editMessageContentDiv);
                 editMessageContentDiv.innerHTML = editedMessage.msg;
                 if (editedMessage.type == "Message") {
-                    newMessageDisplay = `<div class="w-90">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+                    newMessageDisplay = `<div class="w-90">${formatMessageForDisplay(editedMessage.msg)}</div>`;
                 }
                 else {
                     messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
@@ -693,12 +700,12 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 `;
 
                 if (editedMessage.type == "Message") {
-                    newMessageDisplay = `<div class="w-90">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+                    newMessageDisplay = `<div class="w-90">${formatMessageForDisplay(editedMessage.msg)}</div>`;
                 }
                 else {
                     messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
                 }
-
+                    console.log("content of the message",editedMessage.msg);
                 if (messageContentDiv) {
 
                     const hasDropdown = messageContentDiv.querySelector('.dropdown') !== null;
@@ -1618,7 +1625,13 @@ function editMessage(messageId) {
         });
 
         const textarea = document.getElementById('input');
-        textarea.value = editMessage.replace(/<\/?[^>]+(>|$)/g, "").trim();
+     
+        if (editMessage.includes("<br>") || editMessage.includes("<br />")) {
+            textarea.value = editMessage.replace(/<br\s*\/?>/gi, '\n');
+        } else {
+            textarea.value = editMessage.replace(/<\/?[^>]+(>|$)/g, "").trim();
+        }
+      
 
         textarea.scrollTop = textarea.scrollHeight;
 
@@ -1761,7 +1774,7 @@ function showReply(message_id, senderName, type) {
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
     DOM.replyId = message_id;
-    console.log("This is the message that you want to reply",message);
+
 
 
 
@@ -1879,6 +1892,8 @@ function moveMessage(messageId) {
 //Multiple Select Messages End
 function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove) {
     console.log("moveSelectedMessagesToGroup", messagesToMove);
+
+
     const selectedMessages = moveMessageIds.map(id => {
         return {
             id: id,
@@ -2024,6 +2039,12 @@ $(document).ready(function () {
         var messagesIds = $('#messages_ids').val();
         var groupToMove = $('#group_to_move_message').val();
         var messageIdArray = messagesIds.split(',');
+        if(DOM.groupId == groupToMove)
+        {
+            $('#chatModal').modal('hide');
+            $('#notAllowed').modal('show');
+            return;
+        }
         moveSelectedMessagesToGroup(messageIdArray, groupToMove, selectedMessages);
         document.getElementById('messages_ids').value = '';
         document.getElementById('group_to_move_message').value = '';

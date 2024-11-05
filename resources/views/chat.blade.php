@@ -658,6 +658,20 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="notAllowed" tabindex="-1" role="dialog" aria-labelledby="notAllowed"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <img src="{{ asset('assets/svg/danger-5732_256.gif') }}" alt="" height="78.32px">
+                    <h5>Move Message To Same Group Not Allowed</h5>
+                    <button type="button" class="btn btn-cancel" id="btn-close"
+                        data-bs-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!--Seen Modal -->
     <!-- <div class="modal fade" id="seenModal" tabindex="-1" role="dialog" aria-labelledby="seenModalLabel"
         aria-hidden="true">
