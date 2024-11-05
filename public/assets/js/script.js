@@ -2557,7 +2557,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
         }
     }
     else {
-        // alert("something went wrong");
         $('#wentWrong').modal('show');
     }
 
