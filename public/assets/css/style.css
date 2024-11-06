@@ -634,6 +634,7 @@ color: #666;
 	  /* Hide the file input */
 	  #file-input {
 		  display: none;
+		  
 	  }
 	  .chat-action-icons {
   	margin-left: -80px;
@@ -652,13 +653,11 @@ color: #666;
 
 .right-nidle {
 	position: relative;
-
-
 	padding: 10px 15px;
 	border-radius: 6px;
-
 	float: right;
 	right: 20px;
+	
   }
 
   .right-nidle::before {
@@ -667,7 +666,6 @@ color: #666;
 	visibility: visible;
 	top: -1px;
 	right: -10px;
-
 	border-top: 10px solid #ccc;
   }
 
@@ -680,6 +678,7 @@ color: #666;
 	border: 10px solid transparent;
 	border-top: 10px solid #dcf8c6;
 	clear: both;
+
 
   }
 
@@ -1286,6 +1285,7 @@ body{
 	border-radius: 8px;
 	border: none;
 	font-size: 14px;
+	
 }
 
 @media (max-width: 575.98px) {
@@ -1354,4 +1354,10 @@ body{
 	#side_navbar{
 		width: 67%;
 	}
+}
+
+
+.right-nidle::before,
+.right-nidle::after {
+    pointer-events: none;
 }
