@@ -1555,10 +1555,10 @@ function removecorrectionMessage() {
         correctionarea.style.display = 'none';
         Editreplyarea.style.display = 'none';
         correctionreplyarea.style.display = 'none';
-        const textarea = document.getElementById('input');
-        textarea.value = ''; 
+        
     }
- 
+    const textarea = document.getElementById('input');
+    textarea.value = ''; 
     // Select the element with the ID 'chat_action'
     // document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
     //     element.style.visibility = 'visible';
