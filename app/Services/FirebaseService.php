@@ -2,137 +2,131 @@
 
 namespace App\Services;
 
-use Exception;
-use Google\Client;
+use App\Models\Group;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 
-
-use Kreait\Firebase\Factory;
-use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\Messaging\Notification;
-
 class FirebaseService
 {
-    public function getAccessToken()
-    {
-        $client = new Client();
-        $client->setAuthConfig(storage_path("app/json/vm-chat.json"));
-        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
-        $token = $client->fetchAccessTokenWithAssertion();
-        return $token['access_token'];
-    }
 
     // public function sendNotification(Request $request)
     // {
-    //     $message = $request->message;
-    //     $token = trim($request->token, "\"");
+    //     $senderName = $request->input('senderName', 'Default Sender');
+    //     $messageContent = $request->input('message', 'Default Message');
+    //     $subsIds = $request->input('subsIds');
+    //     $subsIdsArray = is_string($subsIds) ? json_decode($subsIds, true) : $subsIds;
 
+    //     $validSubscriptionIds = is_array($subsIdsArray) ? array_filter($subsIdsArray, function ($id) {
+    //         return !is_null($id);
+    //     }) : [];
+    //     $validSubscriptionIds = array_map('trim', $validSubscriptionIds);
+    //     Log::info('Valid Subscription IDs:', $validSubscriptionIds);
+    //     $fullMessage = "$senderName $messageContent";
 
-    //     Log::info('AccessToken: ' . $this->getAccessToken());
-    //     Log::info('Token: ' . $token);
-
-    //     $url = 'https://fcm.googleapis.com/v1/projects/vm-chat-5c18d/messages:send';
-    //     $headers = [
-    //         'Authorization: Bearer ' . $this->getAccessToken(),
-    //         'Content-Type: application/json',
-    //     ];
-
-    //     $payload = [
-    //         'message' => [
-    //             'notification' => [
-    //                 'title' => 'New Message',
-    //                 'body' => $message,
-    //             ],
-    //             'token' => $token,
-    //         ],
-    //     ];
-    //     Log::info('payload: ' . json_encode($payload));
-
-    //     $ch = curl_init();
-    //     curl_setopt($ch, CURLOPT_URL, $url);
-    //     curl_setopt($ch, CURLOPT_POST, true);
-    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    //     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-
-    //     $response = curl_exec($ch);
-    //     Log::info('response: ');
-
-    //     if ($response === false) {
-    //         Log::info('response false: ');
-
-    //         $error = 'Curl error: ' . curl_error($ch);
-    //         Log::error($error);
-    //         throw new Exception($error);
-    //     } else {
-    //         Log::info('FCM Response: ' . $response); // Log successful response
-    //     }
-
-    //     curl_close($ch);
-    //     return json_decode($response, true);
+    //     $response = Http::withHeaders([
+    //         'Authorization' => 'Basic MGZjOWMzNTctMzlmOS00ZjMxLWE4MmUtNzIxOTkyZjFmYjhm',
+    //         'Accept' => 'application/json',
+    //         'Content-Type' => 'application/json',
+    //     ])->post('https://api.onesignal.com/notifications', [
+    //         'app_id' => 'd9ec86fd-fc8c-4567-8573-0428916eb93e',
+    //         'target_channel' => 'push',
+    //         'headings' => ['en' => 'Vm Chat'],
+    //         'contents' => ['en' => $fullMessage],
+    //         'include_subscription_ids' => ["8e57cc49-8fa1-46ed-aa0f-36f59541f792","8e57cc49-8fa1-46ed-aa0f-36f59541f791","8e57cc49-8fa1-46ed-aa0f-36f59541f793"],
+    //     ]);
+    //     Log::info('Valid Subscription IDs:', $validSubscriptionIds);
+    //     Log::info('OneSignal Response:', $response->json());
+    //     return $response->json();
     // }
 
 
-    public function sendNotification(Request $request)
+
+    public function sendNotification($message)
     {
-        $message = $request->message;
 
-        // Get the token and remove any extra quotes
-        $token = trim($request->token, "\"");
+        $senderName = $message->user->name;
+        $messageContent = $message->msg;
+        $subsIdsArray = [];
+        $subsIdsArray =  $this->getGroupUsers($message->group_id);
+        Log::info('subsIdsArray: ' . json_encode($subsIdsArray));
 
-        // Get OAuth 2.0 access token from service account credentials
-        $accessToken = $this->getAccessToken();
+        // Decode if subsIdsArray is still a JSON-encoded string
+        $subsIdsArray = is_string($subsIdsArray) ? json_decode($subsIdsArray, true) : $subsIdsArray;
 
-        // Prepare the FCM payload
-        $payload = [
-            'message' => [
-                'token' => $token,
-                'notification' => [
-                    'title' => 'New Message',
-                    'body'  => $message
-                ]
-            ]
-        ];
+        // Convert collection to array if needed
+        if ($subsIdsArray instanceof \Illuminate\Support\Collection) {
+            $subsIdsArray = $subsIdsArray->toArray();
+        }
 
-        // Log the token and payload for debugging
-        \Log::info('Token: ' . $token);
-        \Log::info('Payload: ' . json_encode($payload));
+        // Check if decoding worked as expected
+        Log::info('Decoded subsIdsArray:', $subsIdsArray);
 
-        // Send the notification using Http client
-        $fcmResponse = Http::withToken($accessToken)
-            ->post('https://fcm.googleapis.com/v1/projects/vm-chat-5c18d/messages:send', $payload);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return response()->json(['error' => 'Invalid subscription IDs format'], 400);
+        }
 
-        // Log the response for debugging
-        \Log::info('FCM Response: ' . $fcmResponse->body());
+        // Filter out null and empty values
+        $validSubscriptionIds = is_array($subsIdsArray) ? array_filter($subsIdsArray, function ($id) {
+            return !is_null($id) && $id !== '';
+        }) : [];
 
-        // Return the response
-        return response()->json(['status' => 'Notification Sent', 'fcm_response' => $fcmResponse->body()]);
+        // Trim any whitespace from non-null values
+        $validSubscriptionIds = array_map('trim', $validSubscriptionIds);
+
+        Log::info('Valid Subscription IDs:', $validSubscriptionIds);
+
+
+        if (empty($validSubscriptionIds)) {
+            return response()->json(['error' => 'No valid subscription IDs provided'], 400);
+        }
+
+        $fullMessage = "$senderName\n$messageContent";
+
+        Log::info('Request Payload:', [
+            'app_id' => 'd9ec86fd-fc8c-4567-8573-0428916eb93e',
+            'headings' => ['en' => 'Vm Chat'],
+            'contents' => ['en' => $fullMessage],
+            'include_subscription_ids' => $validSubscriptionIds,
+        ]);
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Basic MGZjOWMzNTctMzlmOS00ZjMxLWE4MmUtNzIxOTkyZjFmYjhm',
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])->post('https://api.onesignal.com/notifications', [
+                'app_id' => 'd9ec86fd-fc8c-4567-8573-0428916eb93e',
+                'target_channel' => 'push',
+                'headings' => ['en' => 'Vm Chat'],
+                'contents' => ['en' => $fullMessage],
+                'include_subscription_ids' => array_values($validSubscriptionIds),
+            ]);
+
+            if ($response->failed()) {
+                Log::error('OneSignal Error:', $response->json());
+                return response()->json(['error' => 'Failed to send notification'], $response->status());
+            }
+
+            Log::info('OneSignal Response:', $response->json());
+            return $response->json();
+        } catch (\Exception $e) {
+            Log::error('Exception occurred:', ['message' => $e->getMessage()]);
+            return response()->json(['error' => 'An error occurred while sending notification'], 500);
+        }
     }
 
-    // public function sendNotification(Request $request)
-    // {
-    //     $factory = (new Factory)->withServiceAccount(base_path("vm-chat.json"));
-    //     $messaging = $factory->createMessaging();
+    public function getGroupUsers($groupId)
+    {
+        $userIds = Group::where('group_id', $groupId)
+            ->pluck('access')
+            ->flatMap(fn($item) => explode(',', $item))
+            ->map('trim')
+            ->unique()
+            ->toArray();
+        $users_with_access = User::whereIn('id', $userIds)->pluck('fcm_token');
 
-    //     $fcmToken = trim($request->token, '"');
-    //     Log::info('token: ' .($fcmToken));
-
-
-    //     $notification = Notification::create($request->senderName, $request->message);
-    //     Log::info('notification: ' .json_encode($notification));
-
-    //     $message = CloudMessage::withTarget('token', $fcmToken)
-    //         ->withNotification($notification);
-
-    //     try {
-    //         $messaging->send($message);
-    //         return response()->json(['status' => true, 'message' => 'Notification sent successfully']);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['status' => false, 'message' => $e->getMessage()]);
-    //     }
-    // }
-
+        return $users_with_access;
+    }
 }

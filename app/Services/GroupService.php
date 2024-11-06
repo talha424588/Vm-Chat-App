@@ -18,7 +18,6 @@ class GroupService implements GroupRepository
     public function fetchUserChatGroups(Request $request)
     {
 
-
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
             ->with(['groupMessages' => function ($query) {
                 $query->latest('time')
