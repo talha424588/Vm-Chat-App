@@ -2482,12 +2482,6 @@ let showChatList = () => {
 };
 let subsIds = [];
 let sendMessage = (type = 'Message', mediaName = null) => {
-    const targetGroup = results.find(group => group.group_id === DOM.groupId);
-    // subsIds = targetGroup.users_with_access
-    // .map(user => user.fcm_token)
-    // .filter(token => token !== user.fcm_token);
-    subsIds = targetGroup.users_with_access.map(user => user.fcm_token);
-    console.log("subsIds",subsIds);
     if (socket.connected) {
         let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         if (type == 'Message') {
@@ -2552,8 +2546,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                     mediaName: mediaName,
                     time: Math.floor(Date.now() / 1000),
                     csrf_token: csrfToken,
-                    subsIds:JSON.stringify(subsIds)
                 };
+                console.log("message obj",msg);
                 socket.emit('sendChatToServer', msg);
             }
             DOM.messageInput.value = "";
@@ -2576,7 +2570,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 mediaName: mediaName,
                 time: Math.floor(Date.now() / 1000),
                 csrf_token: csrfToken,
-                subsIds:JSON.stringify(subsIds)
             };
             socket.emit('sendChatToServer', msg);
             DOM.messageInput.value = "";
@@ -2626,11 +2619,7 @@ let init = () => {
     }
 
     console.log("Click the Image at top-left to open settings.");
-};
 
-init();
-
-document.addEventListener('DOMContentLoaded', function () {
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function (OneSignal) {
         await OneSignal.init({
@@ -2638,62 +2627,36 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         user.fcm_token = OneSignal.User.PushSubscription.id;
         DOM.fcmToken = OneSignal.User.PushSubscription.id;
-        const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-            },
-        }).then(updateUserFcmToken => {
-            if (!updateUserFcmToken.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
-        }).catch(error => {
-            console.log(error);
-        }
-        )
-        console.log("OneSignal", OneSignal.User.PushSubscription.id);
     });
-}, false);
+};
 
+init();
 
+function oneSignalSubcription()
+{
+    DOM.fcmToken = OneSignal.User.PushSubscription.id;
+    user.fcm_token = OneSignal.User.PushSubscription.id;
+    console.log("DOM.fcmToken",OneSignal.User.PushSubscription.id);
+    const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        },
+    }).then(updateUserFcmToken => {
+        console.log("user cubs cription response",updateUserFcmToken);
+        if (!updateUserFcmToken.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
+    }).catch(error => {
+        console.log(error);
+    }
+    )
+    console.log("OneSignal", OneSignal.User.PushSubscription.id);
+}
 
-// const messaging = firebase.messaging();
-// Notification.requestPermission().then(permission => {
-//     if (permission === 'granted') {
-//         // Get the FCM token
-//         messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
-//             if (token) {
-//                 let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-//                 user.fcm_token = token;
-//                 DOM.fcmToken = token;
-//                 const updateUserFcmToken = fetch("user/update/" + token, {
-//                     method: "POST",
-//                     headers: {
-//                         "Content-Type": "application/json",
-//                         "X-CSRF-Token": csrfToken,
-//                     },
-//                 }).then(updateUserFcmToken => {
-//                     if (!updateUserFcmToken.ok) {
-//                         throw new Error(`HTTP error! Status: ${response.status}`);
-//                     }
-//                     document.getElementById("login_user_fcm_token").value = token;
-//                 }).catch(error => {
-//                     console.log(error);
-//                 }
-//                 )
-//             } else {
-//                 console.log('No registration token available. Request permission to generate one.');
-//             }
-//         }).catch((err) => {
-//             console.log('An error occurred while retrieving token. ', err);
-//         });
-//     } else {
-//         console.log('Unable to get permission to notify.');
-//     }
-// });
-
+setTimeout(function() { oneSignalSubcription(); }, 20000);
 
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');

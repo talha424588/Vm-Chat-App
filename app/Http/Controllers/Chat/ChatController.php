@@ -100,13 +100,7 @@ class ChatController extends Controller
                 $message->reply ? GroupMessage::where("id", $message->reply_id)->first() : "null";
                 $message->reply->user ? User::where("unique_id", $message->sender)->first() : "null";
             }
-            $request->merge([
-                'senderName' => $message->user->name,
-                'message' => $request->message,
-                'token' => json_encode($request->user['fcm_token'])
-            ]);
-
-            $this->firebaseService->sendNotification($request);
+            $this->firebaseService->sendNotification($message);
             return response()->json($message, 201);
         }
     }
