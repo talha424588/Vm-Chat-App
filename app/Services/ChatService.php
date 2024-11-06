@@ -38,7 +38,7 @@ class ChatService implements ChatRepository
 
     public function fetchUserAllGroupsMessages($request)
     {
-        $perPage = 100;
+        $perPage = 50;
         if (!$request->messageId) {
             $page = (int)($request->get('page', 1));
 
@@ -80,7 +80,7 @@ class ChatService implements ChatRepository
         }
         else if($request->lastMessageId)
         {
-            return $this->fetchMessagesFromSpecificId($request,10);
+            return $this->fetchMessagesFromSpecificId($request,50);
         }
     }
     private function fetchMessagesUpToSearched($request)

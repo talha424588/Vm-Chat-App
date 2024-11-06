@@ -19,7 +19,7 @@ class UserService implements UserRepository
         if($user)
         {
             $user->fcm_token = $token;
-            if($user->save())
+            if($user->update())
                 return response()->json(["status"=>true,"message"=>"success"],200);
             else
                 return response()->json(["status"=>false,"message"=>"something went wrong"],500);

@@ -1,4 +1,3 @@
-
 let getById = (id, parent) => parent ? parent.getElementById(id) : getById(id, document);
 let getByClass = (className, parent) => parent ? parent.getElementsByClassName(className) : getByClass(className, document);
 
@@ -90,6 +89,7 @@ let chatList = [];
 let chatList2 = [];
 let messageList = [];
 let pagnicateChatList = [];
+let results = [];
 
 let lastDate = "";
 let offset = 0;
@@ -112,9 +112,9 @@ let populateGroupList = async () => {
                 'content-type': 'application/json'
             }
         });
-        const result = await response.json();
+        results = await response.json();
 
-        result.forEach(group => {
+        results.forEach(group => {
             let chat = {};
             chat.isGroup = true;
             chat.group = group;
@@ -239,6 +239,10 @@ function getOldMessageMediaName(message) {
 }
 
 function getOldMessageType(message) {
+    console.log("message", message);
+    if (/<audio[^>]+>/g.test(message.msg)) {
+        return "Audio"
+    }
     const linkTag = message.msg.match(/<a[^>]+>/g)[0];
     fileLink = linkTag.match(/href="([^"]+)"/)[1];
     const mediaName = fileLink.split('uploads/')[1];
@@ -252,10 +256,10 @@ function removeTags(messageText) {
 }
 function getCleanedTextSnippet(text) {
     return text
-        .replace(/<br\s*\/?>/gi, '') 
-        .replace(/<\/?p>/gi, '')      
-        .replace(/\n/g, ' ')          
-        .slice(0, 30);               
+        .replace(/<br\s*\/?>/gi, '')
+        .replace(/<\/?p>/gi, '')
+        .replace(/\n/g, ' ')
+        .slice(0, 30);
 }
 let viewMessageList = () => {
 
@@ -499,7 +503,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
 
         let newMessageDisplay = '';
         if (messageElement) {
-                if (editedMessage.reply) {
+            if (editedMessage.reply) {
                 if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null) {
                                 newMessageDisplay = `<div class="reply-message-area">${formatMessageForDisplay(editedMessage.msg)}</div>`;
                     const replyMessage = editedMessage.reply.msg;
@@ -573,20 +577,6 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
                     if (mediaType == "document") {
                         newMessageDisplay = `<div class="reply-message-area">${editedMessage.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
-
-                        // const replyMessage = editedMessage.reply.msg;
-                        // newMessageDisplay = `
-                        //     <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')">
-                        //         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                        //             ${editedMessage.user.name}
-                        //         </div>
-                        //         <div class="reply-details">
-                        //             <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</p>
-                        //         </div>
-                        //     </div>
-                        //     ${newMessageDisplay}`;
-
-
 
                         newMessageDisplay = `
                         <div class="file-message">
@@ -994,8 +984,12 @@ let addMessageToMessageArea = (message, flag = false) => {
     else if (message.type === 'Audio' || /<audio[^>]+>/g.test(message.msg)) {
         let audioSrc;
         if (/<audio[^>]+>/g.test(message.msg)) {
+            console.log("audio message");
             const audioTag = message.msg.match(/<audio[^>]+>/g)[0];
+            console.log("audio audioTag", audioTag);
             audioSrc = audioTag.match(/src="([^"]+)"/)[1];
+            console.log("audio audioSrc", audioSrc);
+
         } else {
             audioSrc = message.msg;
         }
@@ -1083,7 +1077,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     ${(message.type === "Message" && message.status !== "Correction" && (message.is_compose === 1 || message.is_compose === true)) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}
-                                    ${message.is_compose === 1 && message.type === "Message" && !message.reply  ? `
+                                    ${message.is_compose === 1 && message.type === "Message" && !message.reply ? `
                                     <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                                     ` : ''}
                                     ` : ''}
@@ -1160,9 +1154,9 @@ let addMessageToMessageArea = (message, flag = false) => {
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                       
+
                            ${messageContent}
-                       
+
                         </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -1195,9 +1189,9 @@ let addMessageToMessageArea = (message, flag = false) => {
                     <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                         <div style="margin-top:-4px">
                             <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                          
+
                                ${messageContent}
-                       
+
                             </div>
                             <div>
                                 <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -1358,15 +1352,8 @@ function CorrectionMessage(message_id, senderName) {
         removeQuotedMessage();
     }
 
-
-    // const editDiv=document.getElementById('editMessageDiv');
-    // if (window.getComputedStyle(editDiv).display === 'block') {
-    //     removeEditMessage();
-    // }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
-    // var iconContainer = document.querySelector('.icon-container');
-    // iconContainer.style.bottom = '240px';
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
     });
@@ -1387,7 +1374,6 @@ function correction_call(message_id, messagebody, senderName) {
 
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    // messageContentDiv.innerHTML = messageContent;
 
     const existingReplyDiv = messageContentDiv.querySelector('.reply-message-area');
 
@@ -1397,7 +1383,7 @@ function correction_call(message_id, messagebody, senderName) {
         messageContentDiv.innerHTML = messagebody;
     }
 
-    // Check and log voiceIcon and Editreplyarea
+
     const chat_actionss = document.getElementById('chat_action');
     chat_actionss.style.display = 'none';
     const Editreplyarea = document.getElementById('correctionreply-area');
@@ -1557,6 +1543,7 @@ function removecorrectionMessage() {
         correctionreplyarea.style.display = 'none';
         const textarea = document.getElementById('input');
         textarea.value = ''; 
+
     }
  
     // Select the element with the ID 'chat_action'
@@ -1613,17 +1600,17 @@ function editMessage(messageId) {
 
         editMessageContents.forEach((content) => {
             const sanitizedMessage = editMessage.replace(/\n/g, "<br>").trim();
-            content.innerHTML =sanitizedMessage.length>100 ? sanitizedMessage.substring(0,100) + "...":sanitizedMessage;
+            content.innerHTML = sanitizedMessage.length > 100 ? sanitizedMessage.substring(0, 100) + "..." : sanitizedMessage;
         });
 
         const textarea = document.getElementById('input');
-     
+
         if (editMessage.includes("<br>") || editMessage.includes("<br />")) {
             textarea.value = editMessage.replace(/<br\s*\/?>/gi, '\n');
         } else {
             textarea.value = editMessage.replace(/<\/?[^>]+(>|$)/g, "").trim();
         }
-      
+
 
         textarea.scrollTop = textarea.scrollHeight;
 
@@ -1665,9 +1652,8 @@ function change_icon_height(element) {
     iconContainer.style.bottom = dis + 'px';
 }
 
-// Edit message area
-function handleSendMessage() {
 
+function handleSendMessage() {
 
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '26px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
@@ -1678,9 +1664,6 @@ function handleSendMessage() {
         if (messageIndex !== -1) {
             pagnicateChatList.data[messageIndex].msg = messageContent.replace(/\n/g, "<br>");
         }
-
-        // const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-        // const messageContentDiv = messageElement.querySelector('div.shadow-sm');
 
         const messageToUpdate = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
         socket.emit('updateEditedMessage', messageToUpdate);
@@ -1694,7 +1677,6 @@ function handleSendMessage() {
                 'Content-Type': 'application/json',
                 "X-CSRF-Token": csrfToken,
             },
-            // body: JSON.stringify({ id: messageId, message: messageContent.replace(/[\r\n]+/g, ' ') }),
             body: JSON.stringify({ id: messageId, message: messageContent }),
         })
             .then((response) => response.json())
@@ -1726,7 +1708,7 @@ function handleSendMessage() {
     }
     change_icon_height(document.getElementById('reply-area'));
 }
-// Add event listener to the send message button
+
 document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
 
 function removeEditMessage() {
@@ -1759,7 +1741,6 @@ function removeEditMessage() {
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
 }
 
-//Show Reply Message
 function showReply(message_id, senderName, type) {
 
     var correctionDiv = document.getElementById('correction-div');
@@ -1770,8 +1751,8 @@ function showReply(message_id, senderName, type) {
     if (selectedMessageIds > 0) {
         return;
     }
-     
-    
+
+
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
     DOM.replyId = message_id;
@@ -1830,9 +1811,9 @@ function showReply(message_id, senderName, type) {
             </div>
         </div>`;
     } else {
-       
+
         var message_body = messagebody.substring(0,100).replace(/\r\n|\n/g, '<br>')+".....";
-     
+
     }
     quotedNameElement.innerHTML = message_body;
 
@@ -1851,6 +1832,7 @@ function showReply(message_id, senderName, type) {
         document.getElementById('chat_action').style.display="none";
         Editreplyarea.style.display = 'block';
 
+
     }
     change_icon_height(replyDiv);
 }
@@ -1863,11 +1845,24 @@ function removeQuotedMessage() {
     DOM.replyId = null;
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '28px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
+
+
+//     const chat_action = document.getElementById('chat_action');
+//     if(getComputedStyle(chat_action).display == "none")
+//     {
+//         const Editreplyarea = document.getElementById('message-reply-area');
+//         Editreplyarea.style.display = 'none';
+//         chat_action.style.display="";
+//         const fileicon = document.querySelector('.chat_action_file');
+//     }
+
+
     const correctionarea = document.getElementById('correction-div');
     if(getComputedStyle(correctionarea).display == "block")
     {
         correctionarea.style.display = 'none';
     }
+
     
     const chat_action = document.getElementById('chat_action');
     const Editreplyarea = document.getElementById('message-reply-area');
@@ -1881,6 +1876,7 @@ function removeQuotedMessage() {
     document.getElementById("messages").style.marginBottom = "74px";
     
    
+
 }
 const sendMessageReply=()=>{
     sendMessage();
@@ -1925,7 +1921,7 @@ function moveMessage(messageId) {
     }
 }
 
-//Multiple Select Messages End
+
 function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove) {
     console.log("moveSelectedMessagesToGroup", messagesToMove);
 
@@ -1963,7 +1959,6 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
                         chatList[previousGroupIndex].group.group_messages.splice(messageIndex, 1);
                         chatList[previousGroupIndex].unread -= 1;
 
-                        // Update the time property of the group
                         if (chatList[previousGroupIndex].group.group_messages.length > 0) {
                             chatList[previousGroupIndex].time = new Date(chatList[previousGroupIndex].group.group_messages[chatList[previousGroupIndex].group.group_messages.length - 1].time * 1000);
                         } else {
@@ -2008,7 +2003,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
                 });
             }
 
-            // Update the chat list
+
             chatList.sort((a, b) => {
                 if (a.time && b.time) {
                     return new Date(b.time) - new Date(a.time);
@@ -2039,7 +2034,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
     document.getElementById('messages_ids').value = '';
     document.getElementById('group_to_move_message').value = '';
     selectedMessageIds = [];
-    selectedMessageIds.length = 0; // Clears the array
+    selectedMessageIds.length = 0;
 
 
 }
@@ -2071,7 +2066,7 @@ function selectUsertosend(username, postgroup_id) {
 }
 
 $(document).ready(function () {
-       	$('#MoveMessagetoGroup').on('click', function () {
+    $('#MoveMessagetoGroup').on('click', function () {
         var messagesIds = $('#messages_ids').val();
         var groupToMove = $('#group_to_move_message').val();
         var messageIdArray = messagesIds.split(',');
@@ -2255,8 +2250,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     <div class="reply-message-area">${highlightedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
                                 `;
                                 }
-
-                                // Set the inner HTML to the newMessageDisplay
                                 messageTextElement.innerHTML = newMessageDisplay;
 
                             }
@@ -2423,8 +2416,6 @@ function unread_settings(query_set) {
 let currentlyPlayingAudio = null;
 
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) => {
-    // pagnicateChatList = [];
-
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
 
@@ -2473,7 +2464,6 @@ function scroll_to_unread_div() {
     const unreadCountDiv = document.getElementById('unread-wrapper');
     if (unreadCountDiv) {
         unreadDiv = document.getElementById("unread-counter-div");
-        // if(!flag)
         unreadDiv.innerHTML = DOM.unreadCounter;
         unreadDiv.focus();
         unreadCountDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2503,12 +2493,12 @@ let showChatList = () => {
         mClassList(DOM.chatListArea).remove("d-none").add("d-flex");
         mClassList(DOM.messageArea).remove("d-flex").add("d-none");
         areaSwapped = false;
-        DOM.groupId=null;
+        DOM.groupId = null;
         DOM.currentPage = 0;
-        DOM.activeChatIndex=null;
+        DOM.activeChatIndex = null;
     }
 };
-
+let subsIds = [];
 let sendMessage = (type = 'Message', mediaName = null) => {
     if (socket.connected) {
         let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -2529,9 +2519,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 reason = 'Email Address';
             }
             if (reason !== '') {
-                // Send "Alert!!!" as the message
                 let alertMessage = "Alert!!!";
-                // Send email to dev3@visamtion.org with details
                 fetch('/alert-email', {
                     method: 'POST',
                     headers: {
@@ -2575,8 +2563,9 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                     type: type,
                     mediaName: mediaName,
                     time: Math.floor(Date.now() / 1000),
-                    csrf_token: csrfToken
+                    csrf_token: csrfToken,
                 };
+                console.log("message obj",msg);
                 socket.emit('sendChatToServer', msg);
             }
             DOM.messageInput.value = "";
@@ -2598,7 +2587,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                 type: type,
                 mediaName: mediaName,
                 time: Math.floor(Date.now() / 1000),
-                csrf_token: csrfToken
+                csrf_token: csrfToken,
             };
             socket.emit('sendChatToServer', msg);
             DOM.messageInput.value = "";
@@ -2606,7 +2595,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
         }
     }
     else {
-        // alert("something went wrong");
         $('#wentWrong').modal('show');
     }
 
@@ -2649,46 +2637,44 @@ let init = () => {
     }
 
     console.log("Click the Image at top-left to open settings.");
+
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+        await OneSignal.init({
+            appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
+        });
+        user.fcm_token = OneSignal.User.PushSubscription.id;
+        DOM.fcmToken = OneSignal.User.PushSubscription.id;
+    });
 };
 
 init();
 
-const messaging = firebase.messaging();
-
-Notification.requestPermission().then(permission => {
-    if (permission === 'granted') {
-        // Get the FCM token
-        messaging.getToken({ vapidKey: 'BKE8nRpsTvAloWUKNG18bhYFU2ZtSnnopWNxhS7oU6GQW_4U7ODY2a-2eJVIfEl_BU2XKO_NHzgVpp1tG6QXZh0' }).then((token) => {
-            if (token) {
-                let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                user.fcm_token = token;
-                DOM.fcmToken = token;
-                const updateUserFcmToken = fetch("user/update/" + token, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-Token": csrfToken,
-                    },
-                }).then(updateUserFcmToken => {
-                    if (!updateUserFcmToken.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    document.getElementById("login_user_fcm_token").value = token;
-                }).catch(error => {
-                    console.log(error);
-                }
-                )
-            } else {
-                console.log('No registration token available. Request permission to generate one.');
-            }
-        }).catch((err) => {
-            console.log('An error occurred while retrieving token. ', err);
-        });
-    } else {
-        console.log('Unable to get permission to notify.');
+function oneSignalSubcription()
+{
+    DOM.fcmToken = OneSignal.User.PushSubscription.id;
+    user.fcm_token = OneSignal.User.PushSubscription.id;
+    console.log("DOM.fcmToken",OneSignal.User.PushSubscription.id);
+    const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        },
+    }).then(updateUserFcmToken => {
+        console.log("user cubs cription response",updateUserFcmToken);
+        if (!updateUserFcmToken.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
+    }).catch(error => {
+        console.log(error);
     }
-});
+    )
+    console.log("OneSignal", OneSignal.User.PushSubscription.id);
+}
 
+setTimeout(function() { oneSignalSubcription(); }, 20000);
 
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');
@@ -2840,18 +2826,16 @@ function autoResize() {
         }
     });
     var iconContainer = document.querySelector('.icon-container');
-    var editDiv=document.getElementById("editMessageDiv");
-    var repDiv=document.getElementById("reply-div");
-    if(getComputedStyle(editDiv).display== "block")
-    {
+    var editDiv = document.getElementById("editMessageDiv");
+    var repDiv = document.getElementById("reply-div");
+    if (getComputedStyle(editDiv).display == "block") {
         var combinedHeight = parseInt(editDiv.offsetHeight) + parseInt(newHeight);
     }
-    if(getComputedStyle(repDiv).display== "block")
-    {
+    if (getComputedStyle(repDiv).display == "block") {
         var combinedHeight = parseInt(repDiv.offsetHeight) + parseInt(newHeight);
     }
 
-    iconContainer.style.bottom=(combinedHeight+50)+"px";
+    iconContainer.style.bottom = (combinedHeight + 50) + "px";
 }
 textarea.addEventListener('input', autoResize);
 textarea.addEventListener('paste', autoResize);
@@ -3452,7 +3436,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
         }
 
         messageElement.scrollIntoView({ behavior: "smooth" });
-  
+
     } else {
         fetchPaginatedMessages(messageId, null, null);
     }
@@ -3598,17 +3582,17 @@ const resizeObserver = new ResizeObserver(entries => {
 
 // resizeObserver.observe(InputBar);
 
-const resetChatArea=()=>{
- const MessageInput=document.getElementById("messsage_search_query");
- const SerachResults=document.getElementById("search-results");
- const unreadWrapper = document.getElementById('unread-wrapper');
- DOM.notificationDiv.style.display = "none";
- DOM.counter = 0;
- DOM.unreadCounter = 0;
- MessageInput.value="";
- SerachResults.innerHTML='';
+const resetChatArea = () => {
+    const MessageInput = document.getElementById("messsage_search_query");
+    const SerachResults = document.getElementById("search-results");
+    const unreadWrapper = document.getElementById('unread-wrapper');
+    DOM.notificationDiv.style.display = "none";
+    DOM.counter = 0;
+    DOM.unreadCounter = 0;
+    MessageInput.value = "";
+    SerachResults.innerHTML = '';
 
- if (unreadWrapper) {
-    unreadWrapper.remove();
+    if (unreadWrapper) {
+        unreadWrapper.remove();
     }
 }
