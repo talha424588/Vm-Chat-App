@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Services;
+
+use App\Models\Group;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
@@ -40,24 +43,40 @@ class FirebaseService
 
 
 
-    public function sendNotification(Request $request)
+    public function sendNotification($message)
     {
-        $senderName = $request->input('senderName', 'Default Sender');
-        $messageContent = $request->input('message', 'Default Message');
-        $subsIds = $request->input('subsIds');
 
-        $subsIdsArray = is_string($subsIds) ? json_decode($subsIds, true) : $subsIds;
+        $senderName = $message->user->name;
+        $messageContent = $message->msg;
+        $subsIdsArray = [];
+        $subsIdsArray =  $this->getGroupUsers($message->group_id);
+        Log::info('subsIdsArray: ' . json_encode($subsIdsArray));
+
+        // Decode if subsIdsArray is still a JSON-encoded string
+        $subsIdsArray = is_string($subsIdsArray) ? json_decode($subsIdsArray, true) : $subsIdsArray;
+
+        // Convert collection to array if needed
+        if ($subsIdsArray instanceof \Illuminate\Support\Collection) {
+            $subsIdsArray = $subsIdsArray->toArray();
+        }
+
+        // Check if decoding worked as expected
+        Log::info('Decoded subsIdsArray:', $subsIdsArray);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return response()->json(['error' => 'Invalid subscription IDs format'], 400);
         }
 
+        // Filter out null and empty values
         $validSubscriptionIds = is_array($subsIdsArray) ? array_filter($subsIdsArray, function ($id) {
-            return !is_null($id);
+            return !is_null($id) && $id !== '';
         }) : [];
+
+        // Trim any whitespace from non-null values
         $validSubscriptionIds = array_map('trim', $validSubscriptionIds);
 
         Log::info('Valid Subscription IDs:', $validSubscriptionIds);
+
 
         if (empty($validSubscriptionIds)) {
             return response()->json(['error' => 'No valid subscription IDs provided'], 400);
@@ -98,5 +117,16 @@ class FirebaseService
         }
     }
 
+    public function getGroupUsers($groupId)
+    {
+        $userIds = Group::where('group_id', $groupId)
+            ->pluck('access')
+            ->flatMap(fn($item) => explode(',', $item))
+            ->map('trim')
+            ->unique()
+            ->toArray();
+        $users_with_access = User::whereIn('id', $userIds)->pluck('fcm_token');
 
+        return $users_with_access;
+    }
 }
