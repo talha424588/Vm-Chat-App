@@ -45,6 +45,7 @@ const DOM = {
     currentPage: 0,
     searchMessageClick: false,
     lastMessageId: null,
+    isSubscribed: false,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -505,7 +506,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
         if (messageElement) {
             if (editedMessage.reply) {
                 if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null) {
-                                newMessageDisplay = `<div class="reply-message-area">${formatMessageForDisplay(editedMessage.msg)}</div>`;
+                    newMessageDisplay = `<div class="reply-message-area">${formatMessageForDisplay(editedMessage.msg)}</div>`;
                     const replyMessage = editedMessage.reply.msg;
                     newMessageDisplay = `
                         <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')">
@@ -695,7 +696,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 else {
                     messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
                 }
-                    console.log("content of the message",editedMessage.msg);
+                console.log("content of the message", editedMessage.msg);
                 if (messageContentDiv) {
 
                     const hasDropdown = messageContentDiv.querySelector('.dropdown') !== null;
@@ -718,8 +719,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
 function updateViewChatList(editedMessage) {
 
     const chatEntry = chatList.find(chat => chat.msg && chat.msg.id === editedMessage.id);
-    if(chatEntry)
-    {
+    if (chatEntry) {
         chatEntry.msg.msg = editedMessage.msg;
         viewChatList();
     }
@@ -1638,9 +1638,8 @@ function editMessage(messageId) {
             captureid.style.visibility = 'hidden';
         }
 
-        if(editMessage.length>200)
-        {
-            DOM.messageInput.style.overflowY='scroll';
+        if (editMessage.length > 200) {
+            DOM.messageInput.style.overflowY = 'scroll';
         }
         DOM.messageInput.style.height = element.offsetHeight + "px";
         change_icon_height(element);
@@ -1813,7 +1812,7 @@ function showReply(message_id, senderName, type) {
         </div>`;
     } else {
 
-        var message_body = messagebody.substring(0,100).replace(/\r\n|\n/g, '<br>')+".....";
+        var message_body = messagebody.substring(0, 100).replace(/\r\n|\n/g, '<br>') + ".....";
 
     }
     quotedNameElement.innerHTML = message_body;
@@ -1828,7 +1827,7 @@ function showReply(message_id, senderName, type) {
 
     if (chat_action) {
 
-        chat_action.style.display="none";
+        chat_action.style.display = "none";
         Editreplyarea.style.display = 'block';
 
     }
@@ -1845,22 +1844,20 @@ function removeQuotedMessage() {
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
 
     const chat_action = document.getElementById('chat_action');
-    if(getComputedStyle(chat_action).display == "none")
-    {
+    if (getComputedStyle(chat_action).display == "none") {
         const Editreplyarea = document.getElementById('message-reply-area');
         Editreplyarea.style.display = 'none';
-        chat_action.style.display="";
+        chat_action.style.display = "";
         const fileicon = document.querySelector('.chat_action_file');
     }
 
     const correctionarea = document.getElementById('correction-div');
-    if(getComputedStyle(correctionarea).display == "block")
-    {
+    if (getComputedStyle(correctionarea).display == "block") {
         correctionarea.style.display = 'none';
     }
 
 }
-const sendMessageReply=()=>{
+const sendMessageReply = () => {
     sendMessage();
     removeQuotedMessage();
 }
@@ -2052,8 +2049,7 @@ $(document).ready(function () {
         var messagesIds = $('#messages_ids').val();
         var groupToMove = $('#group_to_move_message').val();
         var messageIdArray = messagesIds.split(',');
-        if(DOM.groupId == groupToMove)
-        {
+        if (DOM.groupId == groupToMove) {
             $('#chatModal').modal('hide');
             $('#notAllowed').modal('show');
             return;
@@ -2547,7 +2543,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                     time: Math.floor(Date.now() / 1000),
                     csrf_token: csrfToken,
                 };
-                console.log("message obj",msg);
+                console.log("message obj", msg);
                 socket.emit('sendChatToServer', msg);
             }
             DOM.messageInput.value = "";
@@ -2620,23 +2616,47 @@ let init = () => {
 
     console.log("Click the Image at top-left to open settings.");
 
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function (OneSignal) {
-        await OneSignal.init({
-            appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-        });
-        user.fcm_token = OneSignal.User.PushSubscription.id;
-        DOM.fcmToken = OneSignal.User.PushSubscription.id;
-    });
+    // window.OneSignalDeferred = window.OneSignalDeferred || [];
+    // OneSignalDeferred.push(async function (OneSignal) {
+    //     await OneSignal.init({
+    //         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
+    //     });
+    //     user.fcm_token = OneSignal.User.PushSubscription.id;
+    //     DOM.fcmToken = OneSignal.User.PushSubscription.id;
+    // });
+
+
 };
 
 init();
 
-function oneSignalSubcription()
-{
+
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function (OneSignal) {
+    await OneSignal.init({
+        appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
+        safari_web_id: "web.onesignal.auto.204803f7-478b-4564-9a97-0318e873c676",
+        notifyButton: {
+            enable: true,
+        },
+        allowLocalhostAsSecureOrigin: true,
+    });
+});
+
+const checkSubscription = setInterval(() => {
+    if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id) {
+        clearInterval(checkSubscription);
+        oneSignalSubscription();
+    }
+}, 5000);
+
+
+
+function oneSignalSubscription() {
+    console.log("OneSignal", OneSignal.User.PushSubscription.id);
     DOM.fcmToken = OneSignal.User.PushSubscription.id;
     user.fcm_token = OneSignal.User.PushSubscription.id;
-    console.log("DOM.fcmToken",OneSignal.User.PushSubscription.id);
+    console.log("DOM.fcmToken", OneSignal.User.PushSubscription.id);
     const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
         method: "POST",
         headers: {
@@ -2644,7 +2664,7 @@ function oneSignalSubcription()
             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
         },
     }).then(updateUserFcmToken => {
-        console.log("user cubs cription response",updateUserFcmToken);
+        console.log("user cubs cription response", updateUserFcmToken);
         if (!updateUserFcmToken.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -2653,10 +2673,9 @@ function oneSignalSubcription()
         console.log(error);
     }
     )
-    console.log("OneSignal", OneSignal.User.PushSubscription.id);
 }
 
-setTimeout(function() { oneSignalSubcription(); }, 20000);
+
 
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');
