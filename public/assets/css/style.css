@@ -524,7 +524,6 @@ color: #666;
 		  display: flex;
 		  align-items: center;
 		  background-color: #F0F2F5;
-		  /* padding: 10px 10px 5px; */
 		  padding: 10px;
 		  width: 100%;
 		  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -641,6 +640,9 @@ color: #666;
   	display: flex;
 
        }
+	   #chat_action:focus {
+		outline: none; /* Removes the default outline */
+	}
 
 
 	   .Editchat-action-icons {

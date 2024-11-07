@@ -696,7 +696,6 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 else {
                     messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
                 }
-                console.log("content of the message", editedMessage.msg);
                 if (messageContentDiv) {
 
                     const hasDropdown = messageContentDiv.querySelector('.dropdown') !== null;
@@ -1385,14 +1384,6 @@ function correction_call(message_id, messagebody, senderName) {
 
     const chat_actionss = document.getElementById('chat_action');
     chat_actionss.style.display = 'none';
-
-
-    document.querySelector('.chat_action_file').style.display = 'none';
-
-    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
-        element.style.visibility = 'hidden';
-    });
-
     const Editreplyarea = document.getElementById('correctionreply-area');
 
     if (Editreplyarea) {
@@ -1404,12 +1395,7 @@ function correction_call(message_id, messagebody, senderName) {
     var replyDiv = document.getElementById('correction-div');
 
 
-    if (replyDiv) {
-        replyDiv.style.display = 'block';
-        change_icon_height(replyDiv);
-    } else {
-        console.error("Element 'correction-div' not found");
-    }
+
 
     var quotedTextElement = document.querySelector('#quoted-messages .sender-name');
     var quotedNameElement = document.querySelector('#quoted-messages .quoted-text');
@@ -1427,6 +1413,14 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("Element '#quoted-message .quoted-text' not found");
     }
+
+        if (replyDiv) {
+        replyDiv.style.display = 'block';
+        change_icon_height(replyDiv);
+    } else {
+        console.error("Element 'correction-div' not found");
+    }
+    document.getElementById("messages").style.marginBottom = "68px";
 }
 
 function correction_send_handel() {
@@ -1444,9 +1438,7 @@ function correction_send_handel() {
     const correction_div = document.getElementById('correction-div');
     correction_div.style.display = 'none';
     const chat_action = document.getElementById('chat_action');
-    chat_action.style.display = 'block';
-    document.querySelector('.chat_action_file').style.display = 'block';
-
+    chat_action.style.display = 'flex';
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(correction_message_id));
     if (messageIndex !== -1) {
@@ -1537,30 +1529,30 @@ function removecorrectionMessage() {
 
     const correctionreplyarea = document.getElementById('correctionreply-area');
 
-    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
-        element.style.display = 'block';
-        element.style.visibility = 'visible';
-    });
+    // document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
+    //     element.style.display = 'block';
+    //     element.style.visibility = 'visible';
+    // });
 
-
-    if (chat_action) {
-        chat_action.style.display = 'block';
+    if (getComputedStyle(chat_action).display == "none") {
+        chat_action.style.display = 'flex';
         correctionarea.style.display = 'none';
         Editreplyarea.style.display = 'none';
         correctionreplyarea.style.display = 'none';
         const textarea = document.getElementById('input');
-        textarea.value = '';
-    }
+        textarea.value = ''; 
 
+    }
+ 
     // Select the element with the ID 'chat_action'
-    document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
-        element.style.visibility = 'visible';
-    });
+    // document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
+    //     element.style.visibility = 'visible';
+    // });
 
     // Create a new style element
-    var style = document.createElement('style');
-    style.innerHTML = "#chat_action { display: flex !important; }";
-    document.head.appendChild(style);
+    // var style = document.createElement('style');
+    // style.innerHTML = "#chat_action { display: flex !important; }";
+    // document.head.appendChild(style);
     replyDiv.style.display = 'none';
     iconContainer.style.bottom = '90px';
 }
@@ -1625,16 +1617,20 @@ function editMessage(messageId) {
 
         const Editreplyarea = document.getElementById('Editreply-area');
         const chat_action = document.getElementById('chat_action');
-        const voiceIcon = document.getElementById('voice-icon');
-        const fileicon = document.getElementById('file-icon');
-        const captureid = document.getElementById('captureid');
-
-        if (chat_action) {
-            voiceIcon.style.display = 'none';
+        
+        if ((getComputedStyle(chat_action).display === "flex" || getComputedStyle(chat_action).display === "block") &&
+            getComputedStyle(Editreplyarea).display === "none") {
+            
+            console.log("Attempting to hide chat_action and show Editreplyarea");
+        
+            document.getElementById('chat_action').style.display = 'none';
             Editreplyarea.style.display = 'block';
-            voiceIcon.style.visibility = 'hidden';
-            fileicon.style.visibility = 'hidden';
-            captureid.style.visibility = 'hidden';
+            
+            if(getComputedStyle(chat_action).display == "flex")
+                {
+                    document.getElementById('chat_action').style.display = 'none';
+                }
+           
         }
 
         if (editMessage.length > 200) {
@@ -1690,18 +1686,17 @@ function handleSendMessage() {
         const messageDiv = document.getElementById('messages');
         messageDiv.classList.remove('blur');
         const chat_action = document.getElementById('chat_action');
-        chat_action.style.display = 'block';
         chat_action.style.display = 'flex';
         const Editreplyarea = document.getElementById('Editreply-area');
 
         Editreplyarea.style.display = 'none';
-        const fileicon = document.querySelector('.chat_action_file');
-        fileicon.style.visibility = 'visible';
-        const chat_action_capture = document.querySelector('.chat_action_capture');
-        chat_action_capture.style.visibility = 'visible';
-        const chat_action_voice = document.querySelector('.chat_action_voice');
-        chat_action_voice.style.visibility = 'visible';
-        chat_action_voice.style.display = 'block';
+        // const fileicon = document.querySelector('.chat_action_file');
+        // fileicon.style.visibility = 'visible';
+        // const chat_action_capture = document.querySelector('.chat_action_capture');
+        // chat_action_capture.style.visibility = 'visible';
+        // const chat_action_voice = document.querySelector('.chat_action_voice');
+        // chat_action_voice.style.visibility = 'visible';
+        // chat_action_voice.style.display = 'block';
         const correctionarea = document.getElementById('correction-div');
         correctionarea.style.display = 'none';
 
@@ -1716,28 +1711,31 @@ document.getElementById('send-message-btn').addEventListener('click', handleSend
 function removeEditMessage() {
     document.getElementById('editMessageDiv').style.display = 'none';
     const Editreplyarea = document.getElementById('Editreply-area');
+    if(getComputedStyle(Editreplyarea).display == "block")
+    {
     Editreplyarea.style.display = 'none';
+    console.log("it was shown i hide it");
+    }
     const correctionarea = document.getElementById('correction-div');
     correctionarea.style.display = 'none';
     var iconContainer = document.querySelector('.icon-container');
     iconContainer.style.bottom = '90px';
-    const fileicon = document.querySelector('.chat_action_file');
-    fileicon.style.visibility = 'visible';
-    const chat_action_capture = document.querySelector('.chat_action_capture');
-    chat_action_capture.style.visibility = 'visible';
-    const chat_action_voice = document.querySelector('.chat_action_voice');
-    chat_action_voice.style.visibility = 'visible';
-    chat_action_voice.style.display = 'block';
-
-
-
+    // const fileicon = document.querySelector('.chat_action_file');
+    // fileicon.style.visibility = 'visible';
+    // const chat_action_capture = document.querySelector('.chat_action_capture');
+    // chat_action_capture.style.visibility = 'visible';
+    // const chat_action_voice = document.querySelector('.chat_action_voice');
+    // chat_action_voice.style.visibility = 'visible';
+    // chat_action_voice.style.display = 'block';
+    const chat_action = document.getElementById('chat_action');
+    if(getComputedStyle(chat_action).display == "none")
+    chat_action.style.display="flex";
     const messageDiv = document.getElementById('messages');
     messageDiv.classList.remove('blur');
     const textarea = document.getElementById('input');
     textarea.value = '';
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '28px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
-
 }
 
 function showReply(message_id, senderName, type) {
@@ -1817,20 +1815,24 @@ function showReply(message_id, senderName, type) {
     quotedNameElement.innerHTML = message_body;
 
     replyDiv.style.display = 'block';
-    change_icon_height(replyDiv);
+   
     const Editreplyarea = document.getElementById('message-reply-area');
     const chat_action = document.getElementById('chat_action');
     const voiceIcon = document.getElementById('voice-icon');
     const fileicon = document.getElementById('file-icon');
     const captureid = document.getElementById('captureid');
 
-    if (chat_action) {
 
-        chat_action.style.display = "none";
+    if (getComputedStyle(chat_action).display == "block" || getComputedStyle(chat_action).display == "flex" 
+        && getComputedStyle(Editreplyarea).display == "none"
+    ) {
+       
+        document.getElementById('chat_action').style.display="none";
         Editreplyarea.style.display = 'block';
 
-    }
 
+    }
+    change_icon_height(replyDiv);
 }
 
 function removeQuotedMessage() {
@@ -1842,18 +1844,45 @@ function removeQuotedMessage() {
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '28px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
 
-    const chat_action = document.getElementById('chat_action');
-    if (getComputedStyle(chat_action).display == "none") {
-        const Editreplyarea = document.getElementById('message-reply-area');
-        Editreplyarea.style.display = 'none';
-        chat_action.style.display = "";
-        const fileicon = document.querySelector('.chat_action_file');
-    }
+// <<<<<<< local-dev
+//     const chat_action = document.getElementById('chat_action');
+//     if (getComputedStyle(chat_action).display == "none") {
+//         const Editreplyarea = document.getElementById('message-reply-area');
+//         Editreplyarea.style.display = 'none';
+//         chat_action.style.display = "";
+//         const fileicon = document.querySelector('.chat_action_file');
+//     }
+// =======
+
+// //     const chat_action = document.getElementById('chat_action');
+// //     if(getComputedStyle(chat_action).display == "none")
+// //     {
+// //         const Editreplyarea = document.getElementById('message-reply-area');
+// //         Editreplyarea.style.display = 'none';
+// //         chat_action.style.display="";
+// //         const fileicon = document.querySelector('.chat_action_file');
+// //     }
+
+// >>>>>>> master
 
     const correctionarea = document.getElementById('correction-div');
     if (getComputedStyle(correctionarea).display == "block") {
         correctionarea.style.display = 'none';
     }
+
+    
+    const chat_action = document.getElementById('chat_action');
+    const Editreplyarea = document.getElementById('message-reply-area');
+    if(getComputedStyle(chat_action).display == "none" && getComputedStyle(Editreplyarea).display == "block")
+    {
+    
+        Editreplyarea.style.display = 'none';
+        chat_action.style.display="flex";
+    }
+   
+    document.getElementById("messages").style.marginBottom = "74px";
+    
+   
 
 }
 const sendMessageReply = () => {
@@ -2530,8 +2559,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
 
             const fileIcon = document.querySelector('#file-icon');
             const chaticon = document.querySelector('#captureid');
-            fileIcon.style.visibility = 'visible';
-            chaticon.style.visibility = 'visible';
+            // fileIcon.style.visibility = 'visible';
+            // chaticon.style.visibility = 'visible';
             let value = DOM.messageInput.value;
             if (value === "") return;
             let reason = '';
@@ -2596,8 +2625,8 @@ let sendMessage = (type = 'Message', mediaName = null) => {
         else {
             const fileIcon = document.querySelector('#file-icon');
             const chaticon = document.querySelector('#captureid');
-            fileIcon.style.visibility = 'visible';
-            chaticon.style.visibility = 'visible';
+            // fileIcon.style.visibility = 'visible';
+            // chaticon.style.visibility = 'visible';
             let value = DOM.messageInput.value;
             if (value === "") return;
             let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -2994,6 +3023,11 @@ textarea.addEventListener('keydown', function (event) {
                 chatActionElement.focus();
             }
             textarea.focus();
+//                 chatActionElement.setAttribute('tabindex', '0'); 
+//                 chatActionElement.focus();
+//             }
+        
+// >>>>>>> master
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
             textarea.style.height = '28px';
