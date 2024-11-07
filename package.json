@@ -21,6 +21,7 @@
     "dependencies": {
         "express": "^4.19.2",
         "firebase": "^10.13.1",
+        "onesignal-cordova-plugin": "^5.2.7",
         "socket.io": "^4.7.5"
     }
 }
