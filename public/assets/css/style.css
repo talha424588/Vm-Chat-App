@@ -1363,3 +1363,6 @@ body{
 .right-nidle::after {
     pointer-events: none;
 }
+.msg_deleted{
+	filter: brightness(0.8);
+}

@@ -1148,7 +1148,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
-        <div class="ml-3">
+        <div class="ml-3 ">
             ${message.user.id == user.id ? '' : profileImage}
             <div class="" >
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
@@ -1183,7 +1183,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
-            <div class="ml-3">
+            <div class="ml-3 msg_deleted">
                 ${message.user.id == user.id ? '' : profileImage}
                 <div class="" >
                     <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
@@ -2391,16 +2391,25 @@ function unread_settings(query_set) {
             }
         }
     });
-
+    const groupElem=document.getElementsByClassName(groupId)[0];
     var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
     var first_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var left_count = first_value - unseen;
     if (unseen > 0) {
-        document.querySelector(`.${DOM.groupId}`).innerText = left_count;
+        if(groupElem)
+        {
+            groupElem.innerHTML=left_count;
+        }
+     
+
+        // document.querySelector(`.${DOM.groupId}`).innerText = left_count;
         if (left_count == 0 || left_count < 0) {
-            document.querySelector(`.${DOM.groupId}`).style.display = 'none';
+            if(groupElem)
+                {
+                    groupElem.style.display="none";
+                }
         }
         if (groupToUpdate) {
             groupToUpdate.unread = left_count;
@@ -2815,7 +2824,7 @@ function autoResize() {
     }
     const scrollTop = textarea.scrollTop;
     textarea.style.overflowY = 'hidden';
-    textarea.style.height = 'auto';
+    textarea.style.height = '28px';
     const newHeight = Math.min(textarea.scrollHeight, maxHeight);
     requestAnimationFrame(() => {
         textarea.style.height = newHeight + 'px';
@@ -2860,7 +2869,7 @@ textarea.addEventListener('keydown', function (event) {
                 chatActionElement.setAttribute('tabindex', '0'); 
                 chatActionElement.focus();
             }
-        
+            textarea.focus();
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
             textarea.style.height = '28px';
@@ -3543,6 +3552,9 @@ function restoreMessage(id) {
                 if (restoreButton.length > 0) {
                     restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
                 }
+                var ml3Element = messageElement.parent().parent().removeClass("msg_deleted");
+
+                console.log(ml3Element);
                 messageElement.removeClass('deleted');
             }
         })
