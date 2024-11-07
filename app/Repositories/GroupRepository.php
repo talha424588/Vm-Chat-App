@@ -10,4 +10,5 @@ interface GroupRepository
     public function fetchUserChatGroups(Request $request);
     public function fetchUnreadMessageGroups();
     public function getGroupByName($name,$request);
+    public function fetchGroupById($id);
 }

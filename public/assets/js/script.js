@@ -1181,7 +1181,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
-            <div class="ml-3">
+            <div class="ml-3 msg_deleted">
                 ${message.user.id == user.id ? '' : profileImage}
                 <div class="" >
                     <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
@@ -1394,9 +1394,6 @@ function correction_call(message_id, messagebody, senderName) {
 
     var replyDiv = document.getElementById('correction-div');
 
-
-
-
     var quotedTextElement = document.querySelector('#quoted-messages .sender-name');
     var quotedNameElement = document.querySelector('#quoted-messages .quoted-text');
 
@@ -1414,7 +1411,7 @@ function correction_call(message_id, messagebody, senderName) {
         console.error("Element '#quoted-message .quoted-text' not found");
     }
 
-        if (replyDiv) {
+    if (replyDiv) {
         replyDiv.style.display = 'block';
         change_icon_height(replyDiv);
     } else {
@@ -1540,10 +1537,10 @@ function removecorrectionMessage() {
         Editreplyarea.style.display = 'none';
         correctionreplyarea.style.display = 'none';
         const textarea = document.getElementById('input');
-        textarea.value = ''; 
+        textarea.value = '';
 
     }
- 
+
     // Select the element with the ID 'chat_action'
     // document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
     //     element.style.visibility = 'visible';
@@ -1617,20 +1614,19 @@ function editMessage(messageId) {
 
         const Editreplyarea = document.getElementById('Editreply-area');
         const chat_action = document.getElementById('chat_action');
-        
+
         if ((getComputedStyle(chat_action).display === "flex" || getComputedStyle(chat_action).display === "block") &&
             getComputedStyle(Editreplyarea).display === "none") {
-            
+
             console.log("Attempting to hide chat_action and show Editreplyarea");
-        
+
             document.getElementById('chat_action').style.display = 'none';
             Editreplyarea.style.display = 'block';
-            
-            if(getComputedStyle(chat_action).display == "flex")
-                {
-                    document.getElementById('chat_action').style.display = 'none';
-                }
-           
+
+            if (getComputedStyle(chat_action).display == "flex") {
+                document.getElementById('chat_action').style.display = 'none';
+            }
+
         }
 
         if (editMessage.length > 200) {
@@ -1711,10 +1707,9 @@ document.getElementById('send-message-btn').addEventListener('click', handleSend
 function removeEditMessage() {
     document.getElementById('editMessageDiv').style.display = 'none';
     const Editreplyarea = document.getElementById('Editreply-area');
-    if(getComputedStyle(Editreplyarea).display == "block")
-    {
-    Editreplyarea.style.display = 'none';
-    console.log("it was shown i hide it");
+    if (getComputedStyle(Editreplyarea).display == "block") {
+        Editreplyarea.style.display = 'none';
+        console.log("it was shown i hide it");
     }
     const correctionarea = document.getElementById('correction-div');
     correctionarea.style.display = 'none';
@@ -1728,8 +1723,8 @@ function removeEditMessage() {
     // chat_action_voice.style.visibility = 'visible';
     // chat_action_voice.style.display = 'block';
     const chat_action = document.getElementById('chat_action');
-    if(getComputedStyle(chat_action).display == "none")
-    chat_action.style.display="flex";
+    if (getComputedStyle(chat_action).display == "none")
+        chat_action.style.display = "flex";
     const messageDiv = document.getElementById('messages');
     messageDiv.classList.remove('blur');
     const textarea = document.getElementById('input');
@@ -1815,7 +1810,7 @@ function showReply(message_id, senderName, type) {
     quotedNameElement.innerHTML = message_body;
 
     replyDiv.style.display = 'block';
-   
+
     const Editreplyarea = document.getElementById('message-reply-area');
     const chat_action = document.getElementById('chat_action');
     const voiceIcon = document.getElementById('voice-icon');
@@ -1823,11 +1818,11 @@ function showReply(message_id, senderName, type) {
     const captureid = document.getElementById('captureid');
 
 
-    if (getComputedStyle(chat_action).display == "block" || getComputedStyle(chat_action).display == "flex" 
+    if (getComputedStyle(chat_action).display == "block" || getComputedStyle(chat_action).display == "flex"
         && getComputedStyle(Editreplyarea).display == "none"
     ) {
-       
-        document.getElementById('chat_action').style.display="none";
+
+        document.getElementById('chat_action').style.display = "none";
         Editreplyarea.style.display = 'block';
 
 
@@ -1844,45 +1839,44 @@ function removeQuotedMessage() {
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '28px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
 
-// <<<<<<< local-dev
-//     const chat_action = document.getElementById('chat_action');
-//     if (getComputedStyle(chat_action).display == "none") {
-//         const Editreplyarea = document.getElementById('message-reply-area');
-//         Editreplyarea.style.display = 'none';
-//         chat_action.style.display = "";
-//         const fileicon = document.querySelector('.chat_action_file');
-//     }
-// =======
+    // <<<<<<< local-dev
+    //     const chat_action = document.getElementById('chat_action');
+    //     if (getComputedStyle(chat_action).display == "none") {
+    //         const Editreplyarea = document.getElementById('message-reply-area');
+    //         Editreplyarea.style.display = 'none';
+    //         chat_action.style.display = "";
+    //         const fileicon = document.querySelector('.chat_action_file');
+    //     }
+    // =======
 
-// //     const chat_action = document.getElementById('chat_action');
-// //     if(getComputedStyle(chat_action).display == "none")
-// //     {
-// //         const Editreplyarea = document.getElementById('message-reply-area');
-// //         Editreplyarea.style.display = 'none';
-// //         chat_action.style.display="";
-// //         const fileicon = document.querySelector('.chat_action_file');
-// //     }
+    // //     const chat_action = document.getElementById('chat_action');
+    // //     if(getComputedStyle(chat_action).display == "none")
+    // //     {
+    // //         const Editreplyarea = document.getElementById('message-reply-area');
+    // //         Editreplyarea.style.display = 'none';
+    // //         chat_action.style.display="";
+    // //         const fileicon = document.querySelector('.chat_action_file');
+    // //     }
 
-// >>>>>>> master
+    // >>>>>>> master
 
     const correctionarea = document.getElementById('correction-div');
     if (getComputedStyle(correctionarea).display == "block") {
         correctionarea.style.display = 'none';
     }
 
-    
+
     const chat_action = document.getElementById('chat_action');
     const Editreplyarea = document.getElementById('message-reply-area');
-    if(getComputedStyle(chat_action).display == "none" && getComputedStyle(Editreplyarea).display == "block")
-    {
-    
+    if (getComputedStyle(chat_action).display == "none" && getComputedStyle(Editreplyarea).display == "block") {
+
         Editreplyarea.style.display = 'none';
-        chat_action.style.display="flex";
+        chat_action.style.display = "flex";
     }
-   
+
     document.getElementById("messages").style.marginBottom = "74px";
-    
-   
+
+
 
 }
 const sendMessageReply = () => {
@@ -2142,6 +2136,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
+        console.log("nextPageMessages",nextPageMessages);
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
@@ -2494,7 +2489,18 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     }
 
     DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
-    if (chat.isGroup) {
+    if (searchMessage) {
+        fetch(`/get-group-by-id/${DOM.groupId}`)
+            .then(response => response.json())
+            .then(data => {
+                let memberNames = data.users_with_access.map(member => member.id === user.id ? "You" : member.name);
+                DOM.messageAreaDetails.innerHTML = `${memberNames}`;
+            })
+            .catch(error => {
+                console.error('Error fetching group data:', error);
+            });
+    }
+    else {
         let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
@@ -2697,106 +2703,39 @@ let init = () => {
     //     user.fcm_token = OneSignal.User.PushSubscription.id;
     //     DOM.fcmToken = OneSignal.User.PushSubscription.id;
     // });
-
-
 };
 
 init();
 
 
-// window.OneSignalDeferred = window.OneSignalDeferred || [];
-// OneSignalDeferred.push(async function (OneSignal) {
-//     await OneSignal.init({
-//         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-//         safari_web_id: "web.onesignal.auto.204803f7-478b-4564-9a97-0318e873c676",
-//         notifyButton: {
-//             enable: true,
-//         },
-//         allowLocalhostAsSecureOrigin: true,
-//     });
-// });
-
-// const checkSubscription = setInterval(() => {
-//     if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id) {
-//         clearInterval(checkSubscription);
-//         oneSignalSubscription();
-//     }
-// }, 5000);
-
-var OneSignal = window.OneSignal || [];
-
-OneSignal.push(function () {
-    OneSignal.init({
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function (OneSignal) {
+    await OneSignal.init({
         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
+        safari_web_id: "web.onesignal.auto.204803f7-478b-4564-9a97-0318e873c676",
         notifyButton: {
-            enable: true, /* Required to use the Subscription Bell */
-            /* SUBSCRIPTION BELL CUSTOMIZATIONS START HERE */
-            size: 'medium', /* One of 'small', 'medium', or 'large' */
-            theme: 'default', /* One of 'default' (red-white) or 'inverse" (white-red) */
-            position: 'bottom-right', /* Either 'bottom-left' or 'bottom-right' */
-            offset: {
-                bottom: '0px',
-                left: '0px', /* Only applied if bottom-left */
-                right: '0px' /* Only applied if bottom-right */
-            },
-            showCredit: false, /* Hide the OneSignal logo */
-            text: {
-                'tip.state.unsubscribed': 'Subscribe to notifications',
-                'tip.state.subscribed': "You're subscribed to notifications",
-                'tip.state.blocked': "You've blocked notifications",
-                'message.prenotify': 'Click to subscribe to notifications',
-                'message.action.subscribed': "Thanks for subscribing!",
-                'message.action.resubscribed': "You're subscribed to notifications",
-                'message.action.unsubscribed': "You won't receive notifications again",
-                'dialog.main.title': 'Manage Site Notifications',
-                'dialog.main.button.subscribe': 'SUBSCRIBE',
-                'dialog.main.button.unsubscribe': 'UNSUBSCRIBE',
-                'dialog.blocked.title': 'Unblock Notifications',
-                'dialog.blocked.message': "Follow these instructions to allow notifications:"
-            },
-            colors: { // Customize the colors of the main button and dialog popup button
-                'circle.background': 'rgb(84,110,123)',
-                'circle.foreground': 'white',
-                'badge.background': 'rgb(84,110,123)',
-                'badge.foreground': 'white',
-                'badge.bordercolor': 'white',
-                'pulse.color': 'white',
-                'dialog.button.background.hovering': 'rgb(77, 101, 113)',
-                'dialog.button.background.active': 'rgb(70, 92, 103)',
-                'dialog.button.background': 'rgb(84,110,123)',
-                'dialog.button.foreground': 'white'
-            },
-            displayPredicate: function () {
-                return OneSignal.isPushNotificationsEnabled()
-                    .then(function (isPushEnabled) {
-                        return !isPushEnabled;
-                    });
-            }
+            enable: true,
         },
         allowLocalhostAsSecureOrigin: true,
     });
-    OneSignal.on('subscriptionChange', function (isSubscribed) {
-        if (isSubscribed) {
-            OneSignal.getUserId().then(function (userId) {
-                // console.log("User ID:", userId);
-                if (userId) {
-                    oneSignalSubscription(userId);
-                } else {
-                    console.warn("User ID is not available yet.");
-                }
-            });
-        }
-    });
 });
 
+const checkSubscription = setInterval(() => {
+    if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id) {
+        clearInterval(checkSubscription);
+        oneSignalSubscription();
+    }
+}, 5000);
 
 
-function oneSignalSubscription(userId) {
 
-    DOM.fcmToken = userId;
-    user.fcm_token = userId;
 
-    const updateUserFcmToken = fetch("user/update/" + userId, {
+function oneSignalSubscription() {
+    console.log("OneSignal", OneSignal.User.PushSubscription.id);
+    DOM.fcmToken = OneSignal.User.PushSubscription.id;
+    user.fcm_token = OneSignal.User.PushSubscription.id;
+    console.log("DOM.fcmToken", OneSignal.User.PushSubscription.id);
+    const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -2807,12 +2746,106 @@ function oneSignalSubscription(userId) {
         if (!updateUserFcmToken.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        document.getElementById("login_user_fcm_token").value = userId;
+        document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
     }).catch(error => {
         console.log(error);
     }
     )
 }
+
+// var OneSignal = window.OneSignal || [];
+
+// OneSignal.push(function () {
+//     OneSignal.init({
+//         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
+//         notifyButton: {
+//             enable: true, /* Required to use the Subscription Bell */
+//             /* SUBSCRIPTION BELL CUSTOMIZATIONS START HERE */
+//             size: 'medium', /* One of 'small', 'medium', or 'large' */
+//             theme: 'default', /* One of 'default' (red-white) or 'inverse" (white-red) */
+//             position: 'bottom-right', /* Either 'bottom-left' or 'bottom-right' */
+//             offset: {
+//                 bottom: '0px',
+//                 left: '0px', /* Only applied if bottom-left */
+//                 right: '0px' /* Only applied if bottom-right */
+//             },
+//             showCredit: false, /* Hide the OneSignal logo */
+//             text: {
+//                 'tip.state.unsubscribed': 'Subscribe to notifications',
+//                 'tip.state.subscribed': "You're subscribed to notifications",
+//                 'tip.state.blocked': "You've blocked notifications",
+//                 'message.prenotify': 'Click to subscribe to notifications',
+//                 'message.action.subscribed': "Thanks for subscribing!",
+//                 'message.action.resubscribed': "You're subscribed to notifications",
+//                 'message.action.unsubscribed': "You won't receive notifications again",
+//                 'dialog.main.title': 'Manage Site Notifications',
+//                 'dialog.main.button.subscribe': 'SUBSCRIBE',
+//                 'dialog.main.button.unsubscribe': 'UNSUBSCRIBE',
+//                 'dialog.blocked.title': 'Unblock Notifications',
+//                 'dialog.blocked.message': "Follow these instructions to allow notifications:"
+//             },
+//             colors: { // Customize the colors of the main button and dialog popup button
+//                 'circle.background': 'rgb(84,110,123)',
+//                 'circle.foreground': 'white',
+//                 'badge.background': 'rgb(84,110,123)',
+//                 'badge.foreground': 'white',
+//                 'badge.bordercolor': 'white',
+//                 'pulse.color': 'white',
+//                 'dialog.button.background.hovering': 'rgb(77, 101, 113)',
+//                 'dialog.button.background.active': 'rgb(70, 92, 103)',
+//                 'dialog.button.background': 'rgb(84,110,123)',
+//                 'dialog.button.foreground': 'white'
+//             },
+//             displayPredicate: function () {
+//                 return OneSignal.isPushNotificationsEnabled()
+//                     .then(function (isPushEnabled) {
+//                         return !isPushEnabled;
+//                     });
+//             }
+//         },
+//         allowLocalhostAsSecureOrigin: true,
+//     });
+//     OneSignal.on('subscriptionChange', function (isSubscribed) {
+//         if (isSubscribed) {
+//             OneSignal.getUserId().then(function (userId) {
+//                 // console.log("User ID:", userId);
+//                 if (userId) {
+//                     oneSignalSubscription(userId);
+//                 } else {
+//                     console.warn("User ID is not available yet.");
+//                 }
+//             });
+//         }
+//     });
+// });
+
+
+
+// function oneSignalSubscription(userId) {
+
+//     DOM.fcmToken = userId;
+//     user.fcm_token = userId;
+
+//     const updateUserFcmToken = fetch("user/update/" + userId, {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json",
+//             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+//         },
+//     }).then(updateUserFcmToken => {
+//         console.log("user cubs cription response", updateUserFcmToken);
+//         if (!updateUserFcmToken.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+//         document.getElementById("login_user_fcm_token").value = userId;
+//     }).catch(error => {
+//         console.log(error);
+//     }
+//     )
+// }
+
+
+
 
 
 
@@ -3023,11 +3056,11 @@ textarea.addEventListener('keydown', function (event) {
                 chatActionElement.focus();
             }
             textarea.focus();
-//                 chatActionElement.setAttribute('tabindex', '0'); 
-//                 chatActionElement.focus();
-//             }
-        
-// >>>>>>> master
+            //                 chatActionElement.setAttribute('tabindex', '0');
+            //                 chatActionElement.focus();
+            //             }
+
+            // >>>>>>> master
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
             textarea.style.height = '28px';
@@ -3709,7 +3742,8 @@ function restoreMessage(id) {
                 if (restoreButton.length > 0) {
                     restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
                 }
-                messageElement.removeClass('deleted');
+                // messageElement.removeClass('deleted');
+                messageElement.parent().parent().removeClass("msg_deleted");
             }
         })
     }

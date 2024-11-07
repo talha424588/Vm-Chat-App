@@ -33,7 +33,7 @@ $(document).ready(function () {
                 $(".container-fluid").removeClass("sidebar-open");
                 $("#search-icon").removeClass("icon-move-left");
                 $("#message-area").toggleClass("col-md-4 col-md-8");
-                removeHighlight();
+                // removeHighlight(); // remove highlight message on click ousite the sidebar/cancel icon
                 const MessageInput=document.getElementById("messsage_search_query").value="";
                 const SerachResults=document.getElementById("search-results").innerHTML='';
             }

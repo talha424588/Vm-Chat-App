@@ -63,9 +63,14 @@ class FirebaseService
             return response()->json(['error' => 'Invalid subscription IDs format'], 400);
         }
 
-        $validSubscriptionIds = is_array($subsIdsArray) ? array_filter($subsIdsArray, function ($id) {
-            return isset($id) && $id !== '' && $id !== null;
-        }) : [];
+        // $validSubscriptionIds = is_array($subsIdsArray) ? array_filter($subsIdsArray, function ($id) {
+        //     return isset($id) && $id !== '' && $id !== null;
+        // }) : [];
+
+        $validSubscriptionIds = array_filter($subsIdsArray, function ($id) {
+            return !is_null($id);
+        });
+
 
         $validSubscriptionIds = array_map('trim', $validSubscriptionIds);
 

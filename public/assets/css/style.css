@@ -326,7 +326,7 @@ background-color: rgba(255, 255, 255, 0.5);
 	.chat_list_view{
 		padding: 0px;
 	}
-	
+
 
   }
 
@@ -633,7 +633,7 @@ color: #666;
 	  /* Hide the file input */
 	  #file-input {
 		  display: none;
-		  
+
 	  }
 	  .chat-action-icons {
   	margin-left: -80px;
@@ -659,7 +659,7 @@ color: #666;
 	border-radius: 6px;
 	float: right;
 	right: 20px;
-	
+
   }
 
   .right-nidle::before {
@@ -938,7 +938,7 @@ body{
 	.search-results{
 		height: 80%;
 	}
-	
+
 }
 
 #message-area .overlay {
@@ -950,18 +950,18 @@ body{
     position: fixed;
     bottom: 0px;
 	/* width: 100%; */
-   
+
 }
 
 #input-area #input {
 	outline: none;
 }
 #input {
-	overflow-y: hidden; 
-	resize: none; 
-	box-sizing: content-box; 
+	overflow-y: hidden;
+	resize: none;
+	box-sizing: content-box;
   }
-  
+
 .message-item {
 	position:relative;
 	max-width: 75%;
@@ -1222,8 +1222,8 @@ body{
 	pointer-events: none;
 }
 .lazy_spinner {
-    border: 6px solid rgba(0, 0, 0, 0.1); 
-    border-top: 6px solid #1DAB61; 
+    border: 6px solid rgba(0, 0, 0, 0.1);
+    border-top: 6px solid #1DAB61;
     border-radius: 50%;
     width: 35px;
     height: 35px;
@@ -1234,7 +1234,7 @@ body{
     animation: spin 1s linear infinite;
     transition: top 0.4s ease-in-out;
 	z-index: 1;
-	
+
 }
 
 @keyframes spin {
@@ -1243,14 +1243,14 @@ body{
 }
 
 .show-spinner {
-    top: 85px; 
+    top: 85px;
 }
 
 .hide-spinner {
-    top: -50px; 
+    top: -50px;
 }
 .over_lay_loader{
-	
+
 	filter: brightness(0.9) !important;
 }
 /* Webkit-based browsers (Chrome, Safari) */
@@ -1287,13 +1287,13 @@ body{
 	border-radius: 8px;
 	border: none;
 	font-size: 14px;
-	
+
 }
 
 @media (max-width: 575.98px) {
-  
+
     #input-area {
-        width: 100%; 
+        width: 100%;
     }
 	#side_navbar{
 		width: 100%;
@@ -1305,9 +1305,9 @@ body{
 
 
 @media (min-width: 576px) and (max-width: 767.98px) {
- 
+
     #input-area {
-        width: 58%; 
+        width: 58%;
     }
 	#side_navbar{
 		width: 58%;
@@ -1316,7 +1316,7 @@ body{
 
 /* Medium devices (desktops, 768px and up) */
 @media (min-width: 768px) and (max-width: 991.98px) {
-  
+
     #input-area {
         width: 68%; /* 80% width for medium screens */
     }
@@ -1329,7 +1329,7 @@ body{
 @media (min-width: 992px) and (max-width: 1199.98px) {
 
     #input-area {
-        width: 67%; 
+        width: 67%;
     }
 	#side_navbar{
 		width: 67%;
@@ -1338,7 +1338,7 @@ body{
 
 /* Extra large devices (larger desktops, 1200px and up) */
 @media (min-width: 1200px) {
-   
+
     #input-area {
         width: 67%;/* Fixed width for extra large devices */
     }
@@ -1349,7 +1349,7 @@ body{
 
 /* For very large screens (over 1600px) */
 @media (min-width: 1600px) {
-  
+
     #input-area {
         width: 67%;
 	}
@@ -1362,4 +1362,8 @@ body{
 .right-nidle::before,
 .right-nidle::after {
     pointer-events: none;
+}
+
+.msg_deleted{
+	filter: brightness(0.8);
 }
