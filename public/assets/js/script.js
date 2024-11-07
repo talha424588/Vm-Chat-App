@@ -240,7 +240,7 @@ function getOldMessageMediaName(message) {
 }
 
 function getOldMessageType(message) {
-    console.log("message", message);
+
     if (/<audio[^>]+>/g.test(message.msg)) {
         return "Audio"
     }
@@ -984,9 +984,8 @@ let addMessageToMessageArea = (message, flag = false) => {
     else if (message.type === 'Audio' || /<audio[^>]+>/g.test(message.msg)) {
         let audioSrc;
         if (/<audio[^>]+>/g.test(message.msg)) {
-            console.log("audio message");
+
             const audioTag = message.msg.match(/<audio[^>]+>/g)[0];
-            console.log("audio audioTag", audioTag);
             audioSrc = audioTag.match(/src="([^"]+)"/)[1];
             console.log("audio audioSrc", audioSrc);
 
@@ -2120,6 +2119,8 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         if (message_id) {
             DOM.lastMessageId = nextPageMessages.data.at(-1).id;
         }
+        //error here
+        console.log("nextPageMessages after move", nextPageMessages);
         unread_settings(nextPageMessages);
 
         if (pagnicateChatList && pagnicateChatList.data && DOM.currentPage != 1) {
@@ -2355,6 +2356,48 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
     }
 };
 
+// update chat counter and remove generate chat list from move message event to update only chat list because currently getting refenrece issu to chatlist
+
+// function unread_settings(query_set) {
+//     console.log("query_set", query_set);
+//     var groupId = DOM.groupId;
+//     var groupIdToCheck = groupId;
+//     const userIdToCheck = user.unique_id;
+//     let seenCount = 0;
+//     let unseenCount = 0;
+//     query_set.data.forEach(message => {
+//         if (message.group_id === groupIdToCheck) {
+//             if (message.seen_by.includes(userIdToCheck)) {
+//                 seenCount++;
+//             } else {
+//                 unseenCount++;
+//             }
+//         }
+//     });
+
+//     var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
+//     var unseen = unseenCount;
+//     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
+//     var first_value = DOM.unreadMessagesPerGroup[DOM.groupId];
+//     var left_count = first_value - unseen;
+
+//     const groupElem = document.getElementsByClassName(groupId)[0];
+//     if (unseen > 0) {
+//         if (groupElem) {
+//             groupElem.innerHTML = left_count;
+//         }
+//         document.querySelector(`.${DOM.groupId}`).innerText = left_count;
+//         if (left_count == 0 || left_count < 0) {
+//             document.querySelector(`.${DOM.groupId}`).style.display = 'none';
+//         }
+//         if (groupToUpdate) {
+//             groupToUpdate.unread = left_count;
+//         }
+
+//         DOM.unreadMessagesPerGroup[DOM.groupId] = left_count;
+//     }
+// }
+
 function unread_settings(query_set) {
     var groupId = DOM.groupId;
     var groupIdToCheck = groupId;
@@ -2370,24 +2413,25 @@ function unread_settings(query_set) {
             }
         }
     });
-
+    const groupElem = document.getElementsByClassName(groupId)[0];
     var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
     var first_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var left_count = first_value - unseen;
     if (unseen > 0) {
-        document.querySelector(`.${DOM.groupId}`).innerText = left_count;
+        if (groupElem) {
+            groupElem.innerHTML = left_count;
+        }
         if (left_count == 0 || left_count < 0) {
-            document.querySelector(`.${DOM.groupId}`).style.display = 'none';
+            if (groupElem) {
+                groupElem.style.display = "none";
+            }
         }
         if (groupToUpdate) {
             groupToUpdate.unread = left_count;
         }
-
         DOM.unreadMessagesPerGroup[DOM.groupId] = left_count;
-
-
     }
 }
 
@@ -2631,33 +2675,99 @@ let init = () => {
 init();
 
 
-window.OneSignalDeferred = window.OneSignalDeferred || [];
-OneSignalDeferred.push(async function (OneSignal) {
-    await OneSignal.init({
+// window.OneSignalDeferred = window.OneSignalDeferred || [];
+// OneSignalDeferred.push(async function (OneSignal) {
+//     await OneSignal.init({
+//         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
+//         safari_web_id: "web.onesignal.auto.204803f7-478b-4564-9a97-0318e873c676",
+//         notifyButton: {
+//             enable: true,
+//         },
+//         allowLocalhostAsSecureOrigin: true,
+//     });
+// });
+
+// const checkSubscription = setInterval(() => {
+//     if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id) {
+//         clearInterval(checkSubscription);
+//         oneSignalSubscription();
+//     }
+// }, 5000);
+
+var OneSignal = window.OneSignal || [];
+
+OneSignal.push(function () {
+    OneSignal.init({
         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-        safari_web_id: "web.onesignal.auto.204803f7-478b-4564-9a97-0318e873c676",
         notifyButton: {
-            enable: true,
+            enable: true, /* Required to use the Subscription Bell */
+            /* SUBSCRIPTION BELL CUSTOMIZATIONS START HERE */
+            size: 'medium', /* One of 'small', 'medium', or 'large' */
+            theme: 'default', /* One of 'default' (red-white) or 'inverse" (white-red) */
+            position: 'bottom-right', /* Either 'bottom-left' or 'bottom-right' */
+            offset: {
+                bottom: '0px',
+                left: '0px', /* Only applied if bottom-left */
+                right: '0px' /* Only applied if bottom-right */
+            },
+            showCredit: false, /* Hide the OneSignal logo */
+            text: {
+                'tip.state.unsubscribed': 'Subscribe to notifications',
+                'tip.state.subscribed': "You're subscribed to notifications",
+                'tip.state.blocked': "You've blocked notifications",
+                'message.prenotify': 'Click to subscribe to notifications',
+                'message.action.subscribed': "Thanks for subscribing!",
+                'message.action.resubscribed': "You're subscribed to notifications",
+                'message.action.unsubscribed': "You won't receive notifications again",
+                'dialog.main.title': 'Manage Site Notifications',
+                'dialog.main.button.subscribe': 'SUBSCRIBE',
+                'dialog.main.button.unsubscribe': 'UNSUBSCRIBE',
+                'dialog.blocked.title': 'Unblock Notifications',
+                'dialog.blocked.message': "Follow these instructions to allow notifications:"
+            },
+            colors: { // Customize the colors of the main button and dialog popup button
+                'circle.background': 'rgb(84,110,123)',
+                'circle.foreground': 'white',
+                'badge.background': 'rgb(84,110,123)',
+                'badge.foreground': 'white',
+                'badge.bordercolor': 'white',
+                'pulse.color': 'white',
+                'dialog.button.background.hovering': 'rgb(77, 101, 113)',
+                'dialog.button.background.active': 'rgb(70, 92, 103)',
+                'dialog.button.background': 'rgb(84,110,123)',
+                'dialog.button.foreground': 'white'
+            },
+            displayPredicate: function () {
+                return OneSignal.isPushNotificationsEnabled()
+                    .then(function (isPushEnabled) {
+                        return !isPushEnabled;
+                    });
+            }
         },
         allowLocalhostAsSecureOrigin: true,
     });
+    OneSignal.on('subscriptionChange', function (isSubscribed) {
+        if (isSubscribed) {
+            OneSignal.getUserId().then(function (userId) {
+                // console.log("User ID:", userId);
+                if (userId) {
+                    oneSignalSubscription(userId);
+                } else {
+                    console.warn("User ID is not available yet.");
+                }
+            });
+        }
+    });
 });
 
-const checkSubscription = setInterval(() => {
-    if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id) {
-        clearInterval(checkSubscription);
-        oneSignalSubscription();
-    }
-}, 5000);
 
 
+function oneSignalSubscription(userId) {
 
-function oneSignalSubscription() {
-    console.log("OneSignal", OneSignal.User.PushSubscription.id);
-    DOM.fcmToken = OneSignal.User.PushSubscription.id;
-    user.fcm_token = OneSignal.User.PushSubscription.id;
-    console.log("DOM.fcmToken", OneSignal.User.PushSubscription.id);
-    const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
+    DOM.fcmToken = userId;
+    user.fcm_token = userId;
+
+    const updateUserFcmToken = fetch("user/update/" + userId, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -2668,7 +2778,7 @@ function oneSignalSubscription() {
         if (!updateUserFcmToken.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
+        document.getElementById("login_user_fcm_token").value = userId;
     }).catch(error => {
         console.log(error);
     }
@@ -2847,6 +2957,27 @@ textarea.addEventListener('keydown', function (event) {
     }
 });
 
+// textarea.addEventListener('keydown', function (event) {
+
+//     if (event.key === 'Enter') {
+//         const editReplyArea = document.getElementById('Editreply-area');
+//         if (window.getComputedStyle(editReplyArea).display === 'none') {
+//             event.preventDefault();
+//             sendMessage();
+//             textarea.style.height = '28px';
+//             textarea.style.overflowY = 'hidden';
+//         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
+//             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
+//             textarea.style.height = '28px';
+//             textarea.style.overflowY = 'hidden';
+//         } else {
+//             console.log('The div has a different display property.');
+//         }
+//         removeQuotedMessage();
+//     }
+// });
+
+
 textarea.addEventListener('keydown', function (event) {
 
     if (event.key === 'Enter') {
@@ -2856,6 +2987,13 @@ textarea.addEventListener('keydown', function (event) {
             sendMessage();
             textarea.style.height = '28px';
             textarea.style.overflowY = 'hidden';
+            removeQuotedMessage();
+            const chatActionElement = document.getElementById('chat_action');
+            if (chatActionElement) {
+                chatActionElement.setAttribute('tabindex', '0');
+                chatActionElement.focus();
+            }
+            textarea.focus();
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
             textarea.style.height = '28px';
@@ -2863,10 +3001,8 @@ textarea.addEventListener('keydown', function (event) {
         } else {
             console.log('The div has a different display property.');
         }
-        removeQuotedMessage();
     }
 });
-
 
 
 // delete model
