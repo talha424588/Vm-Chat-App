@@ -26,4 +26,10 @@ class GroupController extends Controller
     {
         return $this->groupRepository->getGroupByName($name, $request);
     }
+
+
+    public function getGroupById($id)
+    {
+        return $this->groupRepository->fetchGroupById($id);
+    }
 }

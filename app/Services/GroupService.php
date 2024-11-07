@@ -148,4 +148,19 @@ class GroupService implements GroupRepository
             ]
         ]);
     }
+
+
+    public function fetchGroupById($id)
+    {
+        $group = Group::where("group_id", $id)->first();
+
+        // Extract the access column and split it into an array of user IDs
+        $userIds = explode(",", $group->access);
+
+        // Fetch users with the specified user IDs
+        $group->users_with_access = User::whereIn('id', $userIds)->get();
+
+        // Return the group with users attached
+        return response()->json($group);
+    }
 }
