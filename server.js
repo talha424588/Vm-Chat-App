@@ -45,9 +45,9 @@ io.on('connection', (socket) => {
         io.emit('updateEditedMessage', editedMessage);
     });
 
-    socket.on('restoreMessage', (messageId) => {
-        console.log("Restore message event", messageId);
-        io.emit('restoreMessage', messageId);
+    socket.on('restoreMessage', (message) => {
+        console.log("Restore message event", message);
+        io.emit('restoreMessage', message);
     })
 
     socket.on('disconnect', () => {
