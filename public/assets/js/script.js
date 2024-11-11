@@ -1782,7 +1782,6 @@ function removeEditMessage() {
     const Editreplyarea = document.getElementById('Editreply-area');
     if (getComputedStyle(Editreplyarea).display == "block") {
         Editreplyarea.style.display = 'none';
-        console.log("it was shown i hide it");
     }
     const correctionarea = document.getElementById('correction-div');
     correctionarea.style.display = 'none';
@@ -1997,9 +1996,6 @@ function moveMessage(messageId) {
 
 
 function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove) {
-    console.log("moveSelectedMessagesToGroup", messagesToMove);
-
-
     const selectedMessages = moveMessageIds.map(id => {
         return {
             id: id,
