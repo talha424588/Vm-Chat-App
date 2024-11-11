@@ -420,14 +420,11 @@ socket.on('deleteMessage', (messageId, isMove) => {
                            id="restore-button-${messageId}" onclick="restoreMessage(${messageId})" data-message-id="${messageId}">Restore</a>
                     `);
             }
-            console.log("paginated data",pagnicateChatList.data);
             const message = findMessageById(messageId);
-            console.log("message",message);
 
             const group = chat.find(group => {
                 return group.group.find(group => group.group_id === message.group_id);
             });
-            console.log("group",group);
             if (group) {
                 const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
                 if (messageIndex !== -1) {
