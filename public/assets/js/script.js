@@ -434,16 +434,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
                 viewChatList();
             }
         }
-        // else {
-        //     console.log("generate chat list for o or 2 user for other login user");
-        //     if (user.role != 0 && user.role != 2) {
-        //         generateChatList();
-        //     }
-        //     else
-        //     {
-        //         // messageElement.parent().parent().addClass("msg_deleted");
-        //     }
-        // }
+
     }
 });
 function findMessageById(messageId) {
@@ -639,7 +630,6 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     messageContentDiv.innerHTML = newMessageDisplay;
                 }
                 else if (/<a[^>]+>/g.test(editedMessage.reply.msg)) {
-                    console.log("file link");
                     let fileLink;
                     const linkTag = editedMessage.reply.msg.match(/<a[^>]+>/g)[0];
                     fileLink = linkTag.match(/href="([^"]+)"/)[1];
@@ -1071,7 +1061,6 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             const audioTag = message.msg.match(/<audio[^>]+>/g)[0];
             audioSrc = audioTag.match(/src="([^"]+)"/)[1];
-            console.log("audio audioSrc", audioSrc);
 
         } else {
             audioSrc = message.msg;
@@ -1703,7 +1692,6 @@ function editMessage(messageId) {
         if ((getComputedStyle(chat_action).display === "flex" || getComputedStyle(chat_action).display === "block") &&
             getComputedStyle(Editreplyarea).display === "none") {
 
-            console.log("Attempting to hide chat_action and show Editreplyarea");
 
             document.getElementById('chat_action').style.display = 'none';
             Editreplyarea.style.display = 'block';
