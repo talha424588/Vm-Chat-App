@@ -150,7 +150,6 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
-    console.log("viewChatList chatlist", chatList);
     if (chatList.length === 0) {
         return;
     }
@@ -168,7 +167,6 @@ let viewChatList = () => {
         }
     })
         .forEach((elem, index) => {
-            console.log("element", elem);
             let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
@@ -383,6 +381,7 @@ function makeformatDate(dateString) {
 }
 
 socket.on('deleteMessage', (messageId, isMove) => {
+
     if (isMove == true) {
         console.log("is move true");
         var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
@@ -391,6 +390,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
         }
     }
     else {
+        console.log("paginate Array on event", pagnicateChatList.data);
         console.log("is move false");
         var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
 
@@ -415,6 +415,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
             }
         }
         else {
+        console.log("paginate Array on else", pagnicateChatList.data);
             var replyLink = messageElement.find('#reply-link');
             if (replyLink.length) {
                 replyLink.replaceWith(`
@@ -429,14 +430,32 @@ socket.on('deleteMessage', (messageId, isMove) => {
     }
 });
 function findMessageById(messageId) {
-    return pagnicateChatList.data.find(message => message.id === messageId);
+    console.log("paginate Array in findMessageById", pagnicateChatList.data);
+
+    if (pagnicateChatList && pagnicateChatList.data) {
+        return pagnicateChatList.data.find(message => message.id === messageId);
+    }
 }
 
 function updateChatList(message) {
-    let currentUsergroup = chatList.find(group => group.group.group_id === message.group_id);
-    if (currentUsergroup) {
-        currentUsergroup.group.group_messages.push(message);
-        viewChatList();
+    console.log("paginate Array in updateChatList", pagnicateChatList.data);
+
+    if (pagnicateChatList && pagnicateChatList.data) {
+        if (pagnicateChatList.data.length > 0) {
+            let currentUsergroup = chatList.find(group => group.group.group_id === message.group_id);
+            if (currentUsergroup) {
+                let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+                currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
+                viewChatList();
+            }
+        }
+    }
+    else {
+        let currentUsergroup = chatList.find(group => group.group.group_id === message.group_id);
+        if (currentUsergroup) {
+            currentUsergroup.group.group_messages.push(message);
+            viewChatList();
+        }
     }
 }
 
@@ -775,9 +794,10 @@ socket.on('updateEditedMessage', (editedMessage) => {
 });
 
 socket.on('restoreMessage', (incomingMessage) => {
-    console.log("message", incomingMessage.message);
 
+    // Check user role
     if (user.role != 0 && user.role != 2) {
+        // Use a different name for the message retrieved from findMessageById
         const retrievedMessage = findMessageById(incomingMessage.message.id);
         updateChatList(retrievedMessage);
         addMessageToMessageArea(retrievedMessage);
@@ -3161,23 +3181,46 @@ $('#deleteModal .btn-delete').on('click', function () {
         .then(function () {
             $('#btn-close').trigger('click');
             const groupId = DOM.groupId;
-            const group = chatList.find(group => group.group.group_id === groupId);
-            if (group) {
-                const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
-                if (messageIndex !== -1) {
-                    group.group.group_messages.splice(messageIndex, 1);
-                }
-            }
+            // const group = chatList.find(group => group.group.group_id === groupId);
+            // if (group) {
+            //     const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
+            //     if (messageIndex !== -1) {
+            //         group.group.group_messages.splice(messageIndex, 1);
+            //     }
+            // }
 
             $("#deleteModal").on('hide.bs.modal', function () { });
             $('#deleteModal').removeClass('show');
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
+            console.log("paginate Array on delete", pagnicateChatList.data);
+            // let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+            // console.log("last message", paginateArrayLastMessage);
+
+
             // messageElement.remove();
             // messageElement.parent().parent().removeClass("msg_deleted");
             // messageElement.parent().parent().addClass("msg_deleted");
-            let deletedMessage = findMessageById(messageId);
-            updateChatList(deletedMessage);
+            // let deletedMessage = findMessageById(messageId);
+            // console.log("delete message for current user",deletedMessage);
+            // const deletedMessage = findMessageById(messageId);
+            //     if (pagnicateChatList.data.length > 0) {
+            //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
+            //         console.log("currentUsergroup", currentUsergroup);
+            //         if (currentUsergroup) {
+            //             currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
+            //             console.log("currentUsergroup", currentUsergroup);
+            //             viewChatList();
+            //         }
+            //     }
+            //     else {
+            //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
+            //         if (currentUsergroup) {
+            //             currentUsergroup.group.group_messages.push(message);
+            //             viewChatList();
+            //         }
+            //     }
+
 
             socket.emit('deleteMessage', messageId, false);
         })
