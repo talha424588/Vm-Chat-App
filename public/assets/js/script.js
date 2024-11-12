@@ -150,6 +150,7 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
+    console.log("viewChatList chatlist", chatList);
     if (chatList.length === 0) {
         return;
     }
@@ -167,6 +168,7 @@ let viewChatList = () => {
         }
     })
         .forEach((elem, index) => {
+            console.log("element", elem);
             let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
@@ -421,16 +423,16 @@ socket.on('deleteMessage', (messageId, isMove) => {
                     `);
             }
             const message = findMessageById(messageId);
+            console.log("message", message);
+            console.log("chatList", chatList);
 
-            const group = chat.find(group => {
-                return group.group.find(group => group.group_id === message.group_id);
-            });
+            // Find the group that matches the message's group_id
+            const group = chatList.find(group => group.group.group_id === message.group_id);
+            console.log("group", group);
+
             if (group) {
-                const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
-                if (messageIndex !== -1) {
-                    group.group.group_messages.splice(messageIndex, 1);
-                    group.unread -= 1
-                }
+                group.group.group_messages.push(message);
+                // Call viewChatList to refresh the UI
                 viewChatList();
             }
         }
@@ -438,7 +440,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
     }
 });
 function findMessageById(messageId) {
-    return paginatedData.find(message => message.id === messageId);
+    return pagnicateChatList.data.find(message => message.id === messageId);
 }
 
 socket.on('updateGroupMessages', (messageId) => {
@@ -3171,6 +3173,12 @@ $('#deleteModal .btn-delete').on('click', function () {
             // messageElement.remove();
             // messageElement.parent().parent().removeClass("msg_deleted");
             // messageElement.parent().parent().addClass("msg_deleted");
+            let deletedMessage = findMessageById(messageId);
+            let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
+            if (currentUsergroup) {
+                currentUsergroup.group.group_messages.push(deletedMessage);
+                viewChatList();
+            }
             socket.emit('deleteMessage', messageId, false);
         })
         .catch(function (error) {
