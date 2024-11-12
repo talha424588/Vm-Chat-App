@@ -405,6 +405,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
                 // messageElement.addClass("msg_deleted");
                 var replyLink = messageElement.find('#reply-link');
                 if (replyLink.length) {
+                    
                     replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                            id="restore-button-${messageId}" onclick="restoreMessage(${messageId})" data-message-id="${messageId}">Restore</a>
@@ -436,7 +437,9 @@ socket.on('deleteMessage', (messageId, isMove) => {
                 viewChatList();
             }
         }
-
+       messageElement.find(".additional_style").addClass("msg_deleted");
+       messageElement.find("#message-"+messageId).addClass("deleted_niddle");
+      
     }
 });
 function findMessageById(messageId) {
@@ -784,6 +787,9 @@ socket.on('restoreMessage', (message) => {
     }
     else {
         const restoreButton = $(`#restore-button-${message.message.id}`);
+        const mainDiv=$(`#message-${message.message.id}`);
+        mainDiv.removeClass("deleted_niddle");
+        mainDiv.find(".additional_style").removeClass("msg_deleted");
         if (restoreButton.length > 0) {
             restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${message.id}','${message.sender}','${message.type}')">Reply</span>`);
         }
@@ -958,7 +964,6 @@ let addMessageToMessageArea = (message, flag = false) => {
         `;
         }
     }
-
     else if (message.type === 'Image') {
         if (message.reply) {
             if (message.reply.type === 'Image') {
@@ -990,7 +995,8 @@ let addMessageToMessageArea = (message, flag = false) => {
             <img src="${message.message ?? message.msg}" data-original="${message.message ?? message.msg}" class="view-image"" style="height:222px; width:100%;">
         `;
         }
-    } else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
+    }
+    else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
         if (message.reply) {
             if (message.reply.type === 'Image' || oldMessageType == "File") {
                 var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:100%;">`;
@@ -1091,9 +1097,6 @@ let addMessageToMessageArea = (message, flag = false) => {
         </div>
     `;
     }
-    // <div class="${message.type == "Message" ? 'w-90' : ''}">
-    // </div>
-
     if (!message.is_privacy_breach && !message.is_deleted) {
         let messageElement = document.createElement('div');
         messageElement.id = "unread-" + message.id;
@@ -1251,18 +1254,16 @@ let addMessageToMessageArea = (message, flag = false) => {
             DOM.messages.insertBefore(messageElement, DOM.messages.firstChild);
         }
     }
-
-
     else if (message.is_deleted && user.role == 0 || user.role == 2) {
         let messageElement = document.createElement('div');
         messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
-            <div class="ml-3 msg_deleted">
+            <div class="ml-3">
                 ${message.user.id == user.id ? '' : profileImage}
                 <div class="" >
-                    <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
+                    <div class="deleted_niddle align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                         <div style="margin-top:-4px">
-                            <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
+                            <div class="shadow-sm additional_style msg_deleted" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
 
                                ${messageContent}
 
@@ -1295,36 +1296,15 @@ let addMessageToMessageArea = (message, flag = false) => {
     if (message.sender == user.unique_id) {
         scroll_function();
     }
-    // if (count > 20 && count % 20 !== 0) {
     if (DOM.showCounter) {
-        //     exceededValue = count - 20;
-        // //     // let unread = DOM.unreadMessagesPerGroup[DOM.groupId];
-
-        // document.getElementById('scrollBottomBtn').style.display = 'block';
         const notificationDiv = document.getElementById('notification-count');
-
         if (DOM.counter > 0) {
-            // const notificationWrapper = document.querySelector('.notification-wrapper');
-            // var iconContainer = document.querySelector('.icon-container');
-            // if (notificationWrapper && notificationWrapper.style.display !== 'none' && getComputedStyle(iconContainer).display !== 'none') {
-            //     notificationWrapper.style.display = 'none';
-
-            // }
-
             DOM.notificationDiv.innerHTML = DOM.counter;
             notificationDiv.style.display = 'block';
         }
-        // //     if (unread == 0) {
-        // //         notificationDiv.style.display = 'block';
-        // //     } else {
-        // //         alert("u dont have unread messages");
-        // //         scroll_function();
-        // //     }
-
     }
     else {
         scroll_function();
-
     }
     ImageViewer(DOM.messages);
 };
@@ -3815,7 +3795,9 @@ function restoreMessage(id) {
                     restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
                 }
                 // messageElement.removeClass('deleted');
-                messageElement.parent().parent().removeClass("msg_deleted");
+                console.log("restoring message",messageElement)
+                messageElement.removeClass("deleted_niddle");
+                messageElement.find(".additional_style").removeClass("msg_deleted");
             }
         })
     }
