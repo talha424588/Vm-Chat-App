@@ -405,6 +405,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
                 // messageElement.addClass("msg_deleted");
                 var replyLink = messageElement.find('#reply-link');
                 if (replyLink.length) {
+                    
                     replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                            id="restore-button-${messageId}" onclick="restoreMessage(${messageId})" data-message-id="${messageId}">Restore</a>
@@ -436,7 +437,9 @@ socket.on('deleteMessage', (messageId, isMove) => {
                 viewChatList();
             }
         }
-
+       messageElement.find(".additional_style").addClass("msg_deleted");
+       messageElement.find("#message-"+messageId).addClass("deleted_niddle");
+      
     }
 });
 function findMessageById(messageId) {
@@ -784,6 +787,9 @@ socket.on('restoreMessage', (message) => {
     }
     else {
         const restoreButton = $(`#restore-button-${message.message.id}`);
+        const mainDiv=$(`#message-${message.message.id}`);
+        mainDiv.removeClass("deleted_niddle");
+        mainDiv.find(".additional_style").removeClass("msg_deleted");
         if (restoreButton.length > 0) {
             restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${message.id}','${message.sender}','${message.type}')">Reply</span>`);
         }
@@ -3815,7 +3821,9 @@ function restoreMessage(id) {
                     restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
                 }
                 // messageElement.removeClass('deleted');
-                messageElement.parent().parent().removeClass("msg_deleted");
+                console.log("restoring message",messageElement)
+                messageElement.removeClass("deleted_niddle");
+                messageElement.find(".additional_style").removeClass("msg_deleted");
             }
         })
     }
