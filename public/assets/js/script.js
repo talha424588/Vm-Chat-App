@@ -150,6 +150,7 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
+    console.log("viewChatList chatlist", chatList);
     if (chatList.length === 0) {
         return;
     }
@@ -167,6 +168,7 @@ let viewChatList = () => {
         }
     })
         .forEach((elem, index) => {
+            console.log("element", elem);
             let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
@@ -285,22 +287,48 @@ let viewMessageList = () => {
             const senderName = elem.user.name;
             let time = new Date(elem.time * 1000)
             const timeText = elem.time ? mDate(time).chatListFormat() : "No messages";
-            let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
-            DOM.messagesList.innerHTML += `
-            <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
-            <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true)">
-              <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
-              <div class="w-50">
-                <div class="name list-user-name">${elem.group.name}</div>
-                <div class="small last-message">${elem ? senderName + ": " : ""}${messageText}</div>
-              </div>
+            if (elem.type == "Message" || elem.type == "null") {
+                let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
+                DOM.messagesList.innerHTML += `
+                <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
+                <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true)">
+                  <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                  <div class="w-50">
+                    <div class="name list-user-name">${elem.group.name}</div>
+                    <div class="small last-message">${elem ? senderName + ": " : ""}${messageText}</div>
+                  </div>
 
-              <div class="flex-grow-1 text-right">
-                <div class="small time">${timeText}
-                </div>
-               ${elem.unread > 0 ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>` : ""}
-              </div>
-            </div>`;
+                  <div class="flex-grow-1 text-right">
+                    <div class="small time">${timeText}
+                    </div>
+                   ${elem.unread > 0 ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>` : ""}
+                  </div>
+                </div>`;
+            }
+            else {
+                if (/<a[^>]+>/g.test(elem.msg) && !/<audio[^>]+>/g.test(elem.msg)) {
+                    console.log(elem);
+                    messageText = getOldMessageMediaName(elem);
+                    // let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
+                    DOM.messagesList.innerHTML += `
+                    <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
+                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true)">
+                      <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                      <div class="w-50">
+                        <div class="name list-user-name">${elem.group.name}</div>
+                        <div class="small last-message">${elem ? senderName + ": " : ""}${messageText}</div>
+                      </div>
+
+                      <div class="flex-grow-1 text-right">
+                        <div class="small time">${timeText}
+                        </div>
+                       ${elem.unread > 0 ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>` : ""}
+                      </div>
+                    </div>`;
+                };
+
+            }
+
         });
 };
 
@@ -365,20 +393,55 @@ socket.on('deleteMessage', (messageId, isMove) => {
     else {
         console.log("is move false");
         var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
-        if (parseInt(user.role) != 0 && parseInt(user.role) != 2) {
+
+        if (user.role != 0 && user.role != 2) {
+            console.log("user role is not 0 or 2");
             if (messageElement) {
                 messageElement.remove();
                 viewChatList();
             }
             else {
+                console.log("else part");
+                // messageElement.addClass("msg_deleted");
+                var replyLink = messageElement.find('#reply-link');
+                if (replyLink.length) {
+                    replyLink.replaceWith(`
+                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+                           id="restore-button-${messageId}" onclick="restoreMessage(${messageId})" data-message-id="${messageId}">Restore</a>
+                    `);
+
+                }
                 viewChatList();
             }
         }
         else {
-            generateChatList();
+            var replyLink = messageElement.find('#reply-link');
+            if (replyLink.length) {
+                replyLink.replaceWith(`
+                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+                           id="restore-button-${messageId}" onclick="restoreMessage(${messageId})" data-message-id="${messageId}">Restore</a>
+                    `);
+            }
+            const message = findMessageById(messageId);
+            console.log("message", message);
+            console.log("chatList", chatList);
+
+            // Find the group that matches the message's group_id
+            const group = chatList.find(group => group.group.group_id === message.group_id);
+            console.log("group", group);
+
+            if (group) {
+                group.group.group_messages.push(message);
+                // Call viewChatList to refresh the UI
+                viewChatList();
+            }
         }
+
     }
 });
+function findMessageById(messageId) {
+    return pagnicateChatList.data.find(message => message.id === messageId);
+}
 
 socket.on('updateGroupMessages', (messageId) => {
     const groupId = DOM.groupId;
@@ -569,7 +632,6 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     messageContentDiv.innerHTML = newMessageDisplay;
                 }
                 else if (/<a[^>]+>/g.test(editedMessage.reply.msg)) {
-                    console.log("file link");
                     let fileLink;
                     const linkTag = editedMessage.reply.msg.match(/<a[^>]+>/g)[0];
                     fileLink = linkTag.match(/href="([^"]+)"/)[1];
@@ -605,7 +667,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
 
                 }
                 else if (editedMessage.reply.type === "Audio") {
-                    var audioSrc = editedMessage.reply.msg.replace(/\/\//g, '/'); // Replace double slashes with a single slash
+                    var audioSrc = editedMessage.reply.msg.replace(/\/\//g, '/');
                     var message_body = `<div class="audio-message" style="background-color:${editedMessage.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
                         <div class="avatar">
                             <!-- Avatar image here -->
@@ -713,6 +775,20 @@ socket.on('updateEditedMessage', (editedMessage) => {
     else {
         updateViewChatList(editedMessage);
     }
+});
+
+socket.on('restoreMessage', (message) => {
+
+    if (user.role != 0 && user.role != 2) {
+        addMessageToMessageArea(message.message);
+    }
+    else {
+        const restoreButton = $(`#restore-button-${message.message.id}`);
+        if (restoreButton.length > 0) {
+            restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${message.id}','${message.sender}','${message.type}')">Reply</span>`);
+        }
+    }
+
 });
 
 function updateViewChatList(editedMessage) {
@@ -915,10 +991,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         `;
         }
     } else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
-
         if (message.reply) {
-
-
             if (message.reply.type === 'Image' || oldMessageType == "File") {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:100%;">`;
             } else if (message.reply.type === 'File' || oldMessageType == "File") {
@@ -939,8 +1012,12 @@ let addMessageToMessageArea = (message, flag = false) => {
                     </svg>
                 </a>
             </div>`;
-            } else if (message.reply.type === 'Audio' || oldMessageType == "Audio") {
-                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+            } else if (message.reply.type === 'Audio' || /<audio[^>]+>/g.test(message.reply.msg)) {
+                let audioTag = null;
+
+                audioTag = message.reply.msg.startsWith("https://") ?? message.reply.msg.match(/<audio[^>]+>/g)[0];
+                audioSrc = message.reply.msg.startsWith("https://") ? message.reply.msg : audioTag.match(/src="([^"]+)"/)[1];
+                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
@@ -986,7 +1063,6 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             const audioTag = message.msg.match(/<audio[^>]+>/g)[0];
             audioSrc = audioTag.match(/src="([^"]+)"/)[1];
-            console.log("audio audioSrc", audioSrc);
 
         } else {
             audioSrc = message.msg;
@@ -1618,7 +1694,6 @@ function editMessage(messageId) {
         if ((getComputedStyle(chat_action).display === "flex" || getComputedStyle(chat_action).display === "block") &&
             getComputedStyle(Editreplyarea).display === "none") {
 
-            console.log("Attempting to hide chat_action and show Editreplyarea");
 
             document.getElementById('chat_action').style.display = 'none';
             Editreplyarea.style.display = 'block';
@@ -1709,7 +1784,6 @@ function removeEditMessage() {
     const Editreplyarea = document.getElementById('Editreply-area');
     if (getComputedStyle(Editreplyarea).display == "block") {
         Editreplyarea.style.display = 'none';
-        console.log("it was shown i hide it");
     }
     const correctionarea = document.getElementById('correction-div');
     correctionarea.style.display = 'none';
@@ -1924,9 +1998,6 @@ function moveMessage(messageId) {
 
 
 function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove) {
-    console.log("moveSelectedMessagesToGroup", messagesToMove);
-
-
     const selectedMessages = moveMessageIds.map(id => {
         return {
             id: id,
@@ -2136,15 +2207,14 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
-        console.log("nextPageMessages",nextPageMessages);
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
+        // here
         if (message_id) {
             DOM.lastMessageId = nextPageMessages.data.at(-1).id;
         }
-        //error here
-        console.log("nextPageMessages after move", nextPageMessages);
+        // here
         unread_settings(nextPageMessages);
 
         if (pagnicateChatList && pagnicateChatList.data && DOM.currentPage != 1) {
@@ -2708,50 +2778,50 @@ let init = () => {
 init();
 
 
-window.OneSignalDeferred = window.OneSignalDeferred || [];
-OneSignalDeferred.push(async function (OneSignal) {
-    await OneSignal.init({
-        appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-        safari_web_id: "web.onesignal.auto.204803f7-478b-4564-9a97-0318e873c676",
-        notifyButton: {
-            enable: true,
-        },
-        allowLocalhostAsSecureOrigin: true,
-    });
-});
+// window.OneSignalDeferred = window.OneSignalDeferred || [];
+// OneSignalDeferred.push(async function (OneSignal) {
+//     await OneSignal.init({
+//         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
+//         safari_web_id: "web.onesignal.auto.204803f7-478b-4564-9a97-0318e873c676",
+//         notifyButton: {
+//             enable: true,
+//         },
+//         allowLocalhostAsSecureOrigin: true,
+//     });
+// });
 
-const checkSubscription = setInterval(() => {
-    if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id) {
-        clearInterval(checkSubscription);
-        oneSignalSubscription();
-    }
-}, 5000);
-
-
+// const checkSubscription = setInterval(() => {
+//     if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id) {
+//         clearInterval(checkSubscription);
+//         oneSignalSubscription();
+//     }
+// }, 5000);
 
 
-function oneSignalSubscription() {
-    console.log("OneSignal", OneSignal.User.PushSubscription.id);
-    DOM.fcmToken = OneSignal.User.PushSubscription.id;
-    user.fcm_token = OneSignal.User.PushSubscription.id;
-    console.log("DOM.fcmToken", OneSignal.User.PushSubscription.id);
-    const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-        },
-    }).then(updateUserFcmToken => {
-        console.log("user cubs cription response", updateUserFcmToken);
-        if (!updateUserFcmToken.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
-    }).catch(error => {
-        console.log(error);
-    }
-    )
-}
+
+
+// function oneSignalSubscription() {
+//     console.log("OneSignal", OneSignal.User.PushSubscription.id);
+//     DOM.fcmToken = OneSignal.User.PushSubscription.id;
+//     user.fcm_token = OneSignal.User.PushSubscription.id;
+//     console.log("DOM.fcmToken", OneSignal.User.PushSubscription.id);
+//     const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json",
+//             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+//         },
+//     }).then(updateUserFcmToken => {
+//         console.log("user cubs cription response", updateUserFcmToken);
+//         if (!updateUserFcmToken.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+//         document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
+//     }).catch(error => {
+//         console.log(error);
+//     }
+//     )
+// }
 
 // var OneSignal = window.OneSignal || [];
 
@@ -2759,17 +2829,10 @@ function oneSignalSubscription() {
 //     OneSignal.init({
 //         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
 //         notifyButton: {
-//             enable: true, /* Required to use the Subscription Bell */
-//             /* SUBSCRIPTION BELL CUSTOMIZATIONS START HERE */
-//             size: 'medium', /* One of 'small', 'medium', or 'large' */
-//             theme: 'default', /* One of 'default' (red-white) or 'inverse" (white-red) */
-//             position: 'bottom-right', /* Either 'bottom-left' or 'bottom-right' */
-//             offset: {
-//                 bottom: '0px',
-//                 left: '0px', /* Only applied if bottom-left */
-//                 right: '0px' /* Only applied if bottom-right */
-//             },
-//             showCredit: false, /* Hide the OneSignal logo */
+//             enable: true,
+//             size: 'medium',
+//             theme: 'default',
+//             showCredit: false,
 //             text: {
 //                 'tip.state.unsubscribed': 'Subscribe to notifications',
 //                 'tip.state.subscribed': "You're subscribed to notifications",
@@ -2784,7 +2847,7 @@ function oneSignalSubscription() {
 //                 'dialog.blocked.title': 'Unblock Notifications',
 //                 'dialog.blocked.message': "Follow these instructions to allow notifications:"
 //             },
-//             colors: { // Customize the colors of the main button and dialog popup button
+//             colors: {
 //                 'circle.background': 'rgb(84,110,123)',
 //                 'circle.foreground': 'white',
 //                 'badge.background': 'rgb(84,110,123)',
@@ -2808,7 +2871,6 @@ function oneSignalSubscription() {
 //     OneSignal.on('subscriptionChange', function (isSubscribed) {
 //         if (isSubscribed) {
 //             OneSignal.getUserId().then(function (userId) {
-//                 // console.log("User ID:", userId);
 //                 if (userId) {
 //                     oneSignalSubscription(userId);
 //                 } else {
@@ -2843,11 +2905,6 @@ function oneSignalSubscription() {
 //     }
 //     )
 // }
-
-
-
-
-
 
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');
@@ -3113,7 +3170,15 @@ $('#deleteModal .btn-delete').on('click', function () {
             $('#deleteModal').removeClass('show');
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
-            messageElement.remove();
+            // messageElement.remove();
+            // messageElement.parent().parent().removeClass("msg_deleted");
+            // messageElement.parent().parent().addClass("msg_deleted");
+            let deletedMessage = findMessageById(messageId);
+            let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
+            if (currentUsergroup) {
+                currentUsergroup.group.group_messages.push(deletedMessage);
+                viewChatList();
+            }
             socket.emit('deleteMessage', messageId, false);
         })
         .catch(function (error) {
@@ -3145,7 +3210,7 @@ let currentPageMessages = 1;
 let isFetchingGroups = false;
 let isFetchingMessages = false;
 
-
+// group here
 let searchGroups = async (searchQuery, loadMore = false) => {
     if (loadMore) {
         currentPageGroups++;
@@ -3160,6 +3225,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     }
 
     if (searchQuery.length > 0) {
+        DOM.messageSearchQuery = searchQuery;
         const url = `search-group-by-name/${searchQuery}?page_groups=${currentPageGroups}&page_messages=${currentPageMessages}`;
         const unique_id = document.getElementById("login_user_unique_id").value;
 
@@ -3616,7 +3682,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                 if (nullTypemessageTextElement) {
                     const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
 
-                    const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
+                    const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(DOM.messageSearchQuery);
                     const isAlreadyHighlighted = messageTextElement.querySelector('.highlight');
 
                     if (nullTypeIndex !== -1 && !isAlreadyHighlighted) {
@@ -3720,6 +3786,7 @@ function get_voice_list() {
 }
 
 function restoreMessage(id) {
+    console.log("message id", id);
     try {
         fetch("message/restore/" + id, {
             headers: {
@@ -3735,8 +3802,11 @@ function restoreMessage(id) {
 
             }
         }).then(message => {
-            socket.emit('restoreMessage', id);
+            socket.emit('restoreMessage', message);
+            console.log("restore message response", message, id);
             var messageElement = $(`[data-message-id="${id}"]`);
+            console.log("restore message element ", messageElement);
+
             if (messageElement.length > 0) {
                 const restoreButton = $(`#restore-button-${id}`);
                 if (restoreButton.length > 0) {

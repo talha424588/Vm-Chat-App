@@ -16,13 +16,17 @@ class MessageResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+             'id' => $this->id,
             'sender' => $this->sender,
             'group_id' => $this->group_id,
             'msg' => $this->msg,
+            'type' => $this->type,
+            'media_name' => $this->media_name,
             'reply_id' => $this->reply_id,
             'seen_by' => $this->seen_by,
             'time' => $this->time,
+            'is_compose' => $this->is_compose,
+            'is_privacy_breach' => $this->is_privacy_breach,
             'is_deleted' => $this->is_deleted,
             'user' => [
                     'id' => $this->user->id,
