@@ -18,8 +18,8 @@
     <script src="https://cdn.tiny.cloud/1/6hun1luhhppu7pkwfe4vetbftca09vpcny2aoik7l4fmmlcf/tinymce/6/tinymce.min.js"
         referrerpolicy="origin"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ asset('assets/css/viewer.css') }}">
     <style>
         .audio-message {
             display: flex;
@@ -189,7 +189,7 @@
                 <!-- Navbar -->
 
                 <div class="row d-flex flex-row align-items-center p-2" id="navbar">
-                    <img alt="Profile Photo" class="img-fluid rounded-circle profile_img" id="display-pic">
+                    <img alt="Profile Photo" onclick="showProfileSettings()" class="img-fluid rounded-circle profile_img" id="display-pic">
                     <div class="username-container">
                         <div class="text-dark font-weight-bold" id="username"></div>
                         <small class="text-muted">Online</small>
@@ -879,6 +879,7 @@
     </script>
     <script src="{{ asset('assets/js/date-utils.js') }}"></script>
     <script src="{{ asset('assets/js/script.js') }}"></script>
+    <script src="{{ asset('assets/js/viewer.js') }}"></script>
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

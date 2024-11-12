@@ -585,7 +585,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     messageContentDiv.innerHTML = newMessageDisplay;
                 }
                 else if (editedMessage.reply.type === "Image") {
-                    var message_body = `<img src="${editedMessage.reply.msg}" style="height:125px; width:100%;">`;
+                    var message_body = `<img  src="${editedMessage.reply.msg}" style="height:125px; width:100%;">`;
 
                     newMessageDisplay = `
                     <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')"> <!-- Add onclick here -->
@@ -817,7 +817,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     if (message.type === 'File') {
         if (message.reply) {
             if (message.reply.type === 'Image') {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
             } else if (message.reply.type === 'File') {
                 var message_body = ` <div class="file-message" >
                 <div class="file-icon">
@@ -962,16 +962,16 @@ let addMessageToMessageArea = (message, flag = false) => {
     else if (message.type === 'Image') {
         if (message.reply) {
             if (message.reply.type === 'Image') {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:100%">`;
+                var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:100%">`;
             } else if (message.reply.type === 'File') {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:125px;">`;
             } else if (message.reply.type === 'Audio') {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:125px;">`;
             } else {
                 var message_body = message.reply.msg;
             }
 
-            var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:100%;">`;
+            var message_new = `<img src="${message.message ?? message.msg}" class="view-image" style="height:222px; width:100%;">`;
             messageContent = `
                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -987,13 +987,13 @@ let addMessageToMessageArea = (message, flag = false) => {
         else {
 
             messageContent = `
-            <img src="${message.message ?? message.msg}" style="height:222px; width:100%;">
+            <img src="${message.message ?? message.msg}" data-original="${message.message ?? message.msg}" class="view-image"" style="height:222px; width:100%;">
         `;
         }
     } else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
         if (message.reply) {
             if (message.reply.type === 'Image' || oldMessageType == "File") {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:100%;">`;
+                var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:100%;">`;
             } else if (message.reply.type === 'File' || oldMessageType == "File") {
                 var message_body = ` <div class="file-message" >
                 <div class="file-icon">
@@ -1326,6 +1326,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         scroll_function();
 
     }
+    ImageViewer(DOM.messages);
 };
 
 function scrollToMessage(messageId) {
@@ -1837,7 +1838,7 @@ function showReply(message_id, senderName, type) {
 
     var quotedNameElement = document.querySelector('#quoted-message .quoted-text');
     if (type === 'Image') {
-        var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
+        var message_body = `<img  src="${messagebody}" style="height:125px; width:125px;">`;
     } else if (type === 'File') {
         var message_body = ` <div class="file-message" >
                 <div class="file-icon">
@@ -2364,7 +2365,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                 }
                             }
                             else if (message.reply.type === "Image") {
-                                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                                var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
                                 replyDisplay = `
                                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -2439,6 +2440,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         const newScrollHeight = DOM.messages.scrollHeight;
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
+        
         if (!message_id) {
             DOM.currentPage += 1;
         }
@@ -3595,7 +3597,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                         }
                     }
                     else if (message.reply.type === "Image") {
-                        var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                        var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
                         replyDisplay = `
                             <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -3864,4 +3866,29 @@ const resetChatArea = () => {
     if (unreadWrapper) {
         unreadWrapper.remove();
     }
+}
+function ImageViewer(elem) {
+    const images = elem.querySelectorAll('.view-image');
+    images.forEach(image => {
+        // Check if Viewer is already initialized
+        if (!image.viewer) {
+            image.viewer = new Viewer(image, {
+                url: 'data-original',
+                toolbar: {
+                    reset: true,
+                },
+                title: false,
+                inline: false,
+                loop: false,
+                movable: false,
+                zoomable: true,
+                rotatable: false,
+                scalable: false
+            });
+        }
+
+        image.addEventListener('click', function() {
+            image.viewer.show();
+        });
+    });
 }
