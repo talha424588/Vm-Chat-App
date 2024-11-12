@@ -818,7 +818,6 @@ socket.on('restoreMessage', (incomingMessage) => {
         // Use a different name for the message retrieved from findMessageById
         console.log("non admin", incomingMessage);
         // const retrievedMessage = findMessageById(incomingMessage.message.id);
-        // console.log("retrive message", retrievedMessage);
         updateChatList(incomingMessage.message);
         addMessageToMessageArea(incomingMessage.message, true);
     } else {
