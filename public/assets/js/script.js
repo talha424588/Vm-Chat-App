@@ -45,6 +45,7 @@ const DOM = {
     currentPage: 0,
     searchMessageClick: false,
     lastMessageId: null,
+    isSubscribed: false,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -239,7 +240,7 @@ function getOldMessageMediaName(message) {
 }
 
 function getOldMessageType(message) {
-    console.log("message", message);
+
     if (/<audio[^>]+>/g.test(message.msg)) {
         return "Audio"
     }
@@ -505,7 +506,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
         if (messageElement) {
             if (editedMessage.reply) {
                 if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null) {
-                                newMessageDisplay = `<div class="reply-message-area">${formatMessageForDisplay(editedMessage.msg)}</div>`;
+                    newMessageDisplay = `<div class="reply-message-area">${formatMessageForDisplay(editedMessage.msg)}</div>`;
                     const replyMessage = editedMessage.reply.msg;
                     newMessageDisplay = `
                         <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')">
@@ -521,7 +522,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     messageContentDiv.innerHTML = newMessageDisplay;
                 }
                 else if (editedMessage.reply.type === "Image") {
-                    var message_body = `<img src="${editedMessage.reply.msg}" style="height:125px; width:100%;">`;
+                    var message_body = `<img  src="${editedMessage.reply.msg}" style="height:125px; width:100%;">`;
 
                     newMessageDisplay = `
                     <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id}')"> <!-- Add onclick here -->
@@ -695,7 +696,6 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 else {
                     messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
                 }
-                  
                 if (messageContentDiv) {
 
                     const hasDropdown = messageContentDiv.querySelector('.dropdown') !== null;
@@ -718,8 +718,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
 function updateViewChatList(editedMessage) {
 
     const chatEntry = chatList.find(chat => chat.msg && chat.msg.id === editedMessage.id);
-    if(chatEntry)
-    {
+    if (chatEntry) {
         chatEntry.msg.msg = editedMessage.msg;
         viewChatList();
     }
@@ -742,7 +741,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     if (message.type === 'File') {
         if (message.reply) {
             if (message.reply.type === 'Image') {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
             } else if (message.reply.type === 'File') {
                 var message_body = ` <div class="file-message" >
                 <div class="file-icon">
@@ -887,16 +886,16 @@ let addMessageToMessageArea = (message, flag = false) => {
     else if (message.type === 'Image') {
         if (message.reply) {
             if (message.reply.type === 'Image') {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:100%">`;
+                var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:100%">`;
             } else if (message.reply.type === 'File') {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:125px;">`;
             } else if (message.reply.type === 'Audio') {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:125px;">`;
             } else {
                 var message_body = message.reply.msg;
             }
 
-            var message_new = `<img src="${message.message ?? message.msg}" style="height:222px; width:100%;">`;
+            var message_new = `<img src="${message.message ?? message.msg}" class="view-image" style="height:222px; width:100%;">`;
             messageContent = `
                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -912,7 +911,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         else {
 
             messageContent = `
-            <img src="${message.message ?? message.msg}" style="height:222px; width:100%;">
+            <img src="${message.message ?? message.msg}" data-original="${message.message ?? message.msg}" class="view-image"" style="height:222px; width:100%;">
         `;
         }
     } else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
@@ -921,7 +920,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
             if (message.reply.type === 'Image' || oldMessageType == "File") {
-                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:100%;">`;
+                var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:100%;">`;
             } else if (message.reply.type === 'File' || oldMessageType == "File") {
                 var message_body = ` <div class="file-message" >
                 <div class="file-icon">
@@ -984,9 +983,8 @@ let addMessageToMessageArea = (message, flag = false) => {
     else if (message.type === 'Audio' || /<audio[^>]+>/g.test(message.msg)) {
         let audioSrc;
         if (/<audio[^>]+>/g.test(message.msg)) {
-            console.log("audio message");
+
             const audioTag = message.msg.match(/<audio[^>]+>/g)[0];
-            console.log("audio audioTag", audioTag);
             audioSrc = audioTag.match(/src="([^"]+)"/)[1];
             console.log("audio audioSrc", audioSrc);
 
@@ -1148,7 +1146,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
-        <div class="ml-3 ">
+        <div class="ml-3">
             ${message.user.id == user.id ? '' : profileImage}
             <div class="" >
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
@@ -1252,6 +1250,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         scroll_function();
 
     }
+    ImageViewer(DOM.messages);
 };
 
 function scrollToMessage(messageId) {
@@ -1396,9 +1395,6 @@ function correction_call(message_id, messagebody, senderName) {
 
     var replyDiv = document.getElementById('correction-div');
 
-
-
-
     var quotedTextElement = document.querySelector('#quoted-messages .sender-name');
     var quotedNameElement = document.querySelector('#quoted-messages .quoted-text');
 
@@ -1416,7 +1412,7 @@ function correction_call(message_id, messagebody, senderName) {
         console.error("Element '#quoted-message .quoted-text' not found");
     }
 
-        if (replyDiv) {
+    if (replyDiv) {
         replyDiv.style.display = 'block';
         change_icon_height(replyDiv);
     } else {
@@ -1541,10 +1537,11 @@ function removecorrectionMessage() {
         correctionarea.style.display = 'none';
         Editreplyarea.style.display = 'none';
         correctionreplyarea.style.display = 'none';
-        
+        const textarea = document.getElementById('input');
+        textarea.value = '';
+
     }
-    const textarea = document.getElementById('input');
-    textarea.value = ''; 
+
     // Select the element with the ID 'chat_action'
     // document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
     //     element.style.visibility = 'visible';
@@ -1618,25 +1615,23 @@ function editMessage(messageId) {
 
         const Editreplyarea = document.getElementById('Editreply-area');
         const chat_action = document.getElementById('chat_action');
-        
+
         if ((getComputedStyle(chat_action).display === "flex" || getComputedStyle(chat_action).display === "block") &&
             getComputedStyle(Editreplyarea).display === "none") {
-            
+
             console.log("Attempting to hide chat_action and show Editreplyarea");
-        
+
             document.getElementById('chat_action').style.display = 'none';
             Editreplyarea.style.display = 'block';
-            
-            if(getComputedStyle(chat_action).display == "flex")
-                {
-                    document.getElementById('chat_action').style.display = 'none';
-                }
-           
+
+            if (getComputedStyle(chat_action).display == "flex") {
+                document.getElementById('chat_action').style.display = 'none';
+            }
+
         }
 
-        if(editMessage.length>200)
-        {
-            DOM.messageInput.style.overflowY='scroll';
+        if (editMessage.length > 200) {
+            DOM.messageInput.style.overflowY = 'scroll';
         }
         DOM.messageInput.style.height = element.offsetHeight + "px";
         change_icon_height(element);
@@ -1713,10 +1708,9 @@ document.getElementById('send-message-btn').addEventListener('click', handleSend
 function removeEditMessage() {
     document.getElementById('editMessageDiv').style.display = 'none';
     const Editreplyarea = document.getElementById('Editreply-area');
-    if(getComputedStyle(Editreplyarea).display == "block")
-    {
-    Editreplyarea.style.display = 'none';
-    console.log("it was shown i hide it");
+    if (getComputedStyle(Editreplyarea).display == "block") {
+        Editreplyarea.style.display = 'none';
+        console.log("it was shown i hide it");
     }
     const correctionarea = document.getElementById('correction-div');
     correctionarea.style.display = 'none';
@@ -1730,8 +1724,8 @@ function removeEditMessage() {
     // chat_action_voice.style.visibility = 'visible';
     // chat_action_voice.style.display = 'block';
     const chat_action = document.getElementById('chat_action');
-    if(getComputedStyle(chat_action).display == "none")
-    chat_action.style.display="flex";
+    if (getComputedStyle(chat_action).display == "none")
+        chat_action.style.display = "flex";
     const messageDiv = document.getElementById('messages');
     messageDiv.classList.remove('blur');
     const textarea = document.getElementById('input');
@@ -1770,7 +1764,7 @@ function showReply(message_id, senderName, type) {
 
     var quotedNameElement = document.querySelector('#quoted-message .quoted-text');
     if (type === 'Image') {
-        var message_body = `<img src="${messagebody}" style="height:125px; width:125px;">`;
+        var message_body = `<img  src="${messagebody}" style="height:125px; width:125px;">`;
     } else if (type === 'File') {
         var message_body = ` <div class="file-message" >
                 <div class="file-icon">
@@ -1811,24 +1805,25 @@ function showReply(message_id, senderName, type) {
         </div>`;
     } else {
 
-        var message_body = messagebody.substring(0,100).replace(/\r\n|\n/g, '<br>')+".....";
+        var message_body = messagebody.substring(0, 100).replace(/\r\n|\n/g, '<br>') + ".....";
 
     }
     quotedNameElement.innerHTML = message_body;
 
     replyDiv.style.display = 'block';
-   
+
     const Editreplyarea = document.getElementById('message-reply-area');
     const chat_action = document.getElementById('chat_action');
     const voiceIcon = document.getElementById('voice-icon');
     const fileicon = document.getElementById('file-icon');
     const captureid = document.getElementById('captureid');
 
-    if (getComputedStyle(chat_action).display == "block" || getComputedStyle(chat_action).display == "flex" 
+
+    if (getComputedStyle(chat_action).display == "block" || getComputedStyle(chat_action).display == "flex"
         && getComputedStyle(Editreplyarea).display == "none"
     ) {
-       
-        document.getElementById('chat_action').style.display="none";
+
+        document.getElementById('chat_action').style.display = "none";
         Editreplyarea.style.display = 'block';
 
 
@@ -1845,39 +1840,47 @@ function removeQuotedMessage() {
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '28px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
 
+    // <<<<<<< local-dev
+    //     const chat_action = document.getElementById('chat_action');
+    //     if (getComputedStyle(chat_action).display == "none") {
+    //         const Editreplyarea = document.getElementById('message-reply-area');
+    //         Editreplyarea.style.display = 'none';
+    //         chat_action.style.display = "";
+    //         const fileicon = document.querySelector('.chat_action_file');
+    //     }
+    // =======
 
-//     const chat_action = document.getElementById('chat_action');
-//     if(getComputedStyle(chat_action).display == "none")
-//     {
-//         const Editreplyarea = document.getElementById('message-reply-area');
-//         Editreplyarea.style.display = 'none';
-//         chat_action.style.display="";
-//         const fileicon = document.querySelector('.chat_action_file');
-//     }
+    // //     const chat_action = document.getElementById('chat_action');
+    // //     if(getComputedStyle(chat_action).display == "none")
+    // //     {
+    // //         const Editreplyarea = document.getElementById('message-reply-area');
+    // //         Editreplyarea.style.display = 'none';
+    // //         chat_action.style.display="";
+    // //         const fileicon = document.querySelector('.chat_action_file');
+    // //     }
 
+    // >>>>>>> master
 
     const correctionarea = document.getElementById('correction-div');
-    if(getComputedStyle(correctionarea).display == "block")
-    {
+    if (getComputedStyle(correctionarea).display == "block") {
         correctionarea.style.display = 'none';
     }
 
-    
+
     const chat_action = document.getElementById('chat_action');
     const Editreplyarea = document.getElementById('message-reply-area');
-    if(getComputedStyle(chat_action).display == "none" && getComputedStyle(Editreplyarea).display == "block")
-    {
-    
+    if (getComputedStyle(chat_action).display == "none" && getComputedStyle(Editreplyarea).display == "block") {
+
         Editreplyarea.style.display = 'none';
-        chat_action.style.display="flex";
+        chat_action.style.display = "flex";
     }
-   
+
     document.getElementById("messages").style.marginBottom = "74px";
-    
-   
+
+
 
 }
-const sendMessageReply=()=>{
+const sendMessageReply = () => {
     sendMessage();
     removeQuotedMessage();
 }
@@ -2069,8 +2072,7 @@ $(document).ready(function () {
         var messagesIds = $('#messages_ids').val();
         var groupToMove = $('#group_to_move_message').val();
         var messageIdArray = messagesIds.split(',');
-        if(DOM.groupId == groupToMove)
-        {
+        if (DOM.groupId == groupToMove) {
             $('#chatModal').modal('hide');
             $('#notAllowed').modal('show');
             return;
@@ -2135,12 +2137,15 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
+        console.log("nextPageMessages",nextPageMessages);
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
         if (message_id) {
             DOM.lastMessageId = nextPageMessages.data.at(-1).id;
         }
+        //error here
+        console.log("nextPageMessages after move", nextPageMessages);
         unread_settings(nextPageMessages);
 
         if (pagnicateChatList && pagnicateChatList.data && DOM.currentPage != 1) {
@@ -2290,7 +2295,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                 }
                             }
                             else if (message.reply.type === "Image") {
-                                var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                                var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
                                 replyDisplay = `
                                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -2365,6 +2370,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         const newScrollHeight = DOM.messages.scrollHeight;
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
+        
         if (!message_id) {
             DOM.currentPage += 1;
         }
@@ -2375,6 +2381,48 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         isLoading = false;
     }
 };
+
+// update chat counter and remove generate chat list from move message event to update only chat list because currently getting refenrece issu to chatlist
+
+// function unread_settings(query_set) {
+//     console.log("query_set", query_set);
+//     var groupId = DOM.groupId;
+//     var groupIdToCheck = groupId;
+//     const userIdToCheck = user.unique_id;
+//     let seenCount = 0;
+//     let unseenCount = 0;
+//     query_set.data.forEach(message => {
+//         if (message.group_id === groupIdToCheck) {
+//             if (message.seen_by.includes(userIdToCheck)) {
+//                 seenCount++;
+//             } else {
+//                 unseenCount++;
+//             }
+//         }
+//     });
+
+//     var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
+//     var unseen = unseenCount;
+//     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
+//     var first_value = DOM.unreadMessagesPerGroup[DOM.groupId];
+//     var left_count = first_value - unseen;
+
+//     const groupElem = document.getElementsByClassName(groupId)[0];
+//     if (unseen > 0) {
+//         if (groupElem) {
+//             groupElem.innerHTML = left_count;
+//         }
+//         document.querySelector(`.${DOM.groupId}`).innerText = left_count;
+//         if (left_count == 0 || left_count < 0) {
+//             document.querySelector(`.${DOM.groupId}`).style.display = 'none';
+//         }
+//         if (groupToUpdate) {
+//             groupToUpdate.unread = left_count;
+//         }
+
+//         DOM.unreadMessagesPerGroup[DOM.groupId] = left_count;
+//     }
+// }
 
 function unread_settings(query_set) {
     var groupId = DOM.groupId;
@@ -2391,33 +2439,25 @@ function unread_settings(query_set) {
             }
         }
     });
-    const groupElem=document.getElementsByClassName(groupId)[0];
+    const groupElem = document.getElementsByClassName(groupId)[0];
     var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
     var first_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var left_count = first_value - unseen;
     if (unseen > 0) {
-        if(groupElem)
-        {
-            groupElem.innerHTML=left_count;
+        if (groupElem) {
+            groupElem.innerHTML = left_count;
         }
-     
-
-        // document.querySelector(`.${DOM.groupId}`).innerText = left_count;
         if (left_count == 0 || left_count < 0) {
-            if(groupElem)
-                {
-                    groupElem.style.display="none";
-                }
+            if (groupElem) {
+                groupElem.style.display = "none";
+            }
         }
         if (groupToUpdate) {
             groupToUpdate.unread = left_count;
         }
-
         DOM.unreadMessagesPerGroup[DOM.groupId] = left_count;
-
-
     }
 }
 
@@ -2451,7 +2491,18 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     }
 
     DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
-    if (chat.isGroup) {
+    if (searchMessage) {
+        fetch(`/get-group-by-id/${DOM.groupId}`)
+            .then(response => response.json())
+            .then(data => {
+                let memberNames = data.users_with_access.map(member => member.id === user.id ? "You" : member.name);
+                DOM.messageAreaDetails.innerHTML = `${memberNames}`;
+            })
+            .catch(error => {
+                console.error('Error fetching group data:', error);
+            });
+    }
+    else {
         let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
@@ -2573,7 +2624,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                     time: Math.floor(Date.now() / 1000),
                     csrf_token: csrfToken,
                 };
-                console.log("message obj",msg);
+                console.log("message obj", msg);
                 socket.emit('sendChatToServer', msg);
             }
             DOM.messageInput.value = "";
@@ -2646,23 +2697,46 @@ let init = () => {
 
     console.log("Click the Image at top-left to open settings.");
 
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function (OneSignal) {
-        await OneSignal.init({
-            appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-        });
-        user.fcm_token = OneSignal.User.PushSubscription.id;
-        DOM.fcmToken = OneSignal.User.PushSubscription.id;
-    });
+    // window.OneSignalDeferred = window.OneSignalDeferred || [];
+    // OneSignalDeferred.push(async function (OneSignal) {
+    //     await OneSignal.init({
+    //         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
+    //     });
+    //     user.fcm_token = OneSignal.User.PushSubscription.id;
+    //     DOM.fcmToken = OneSignal.User.PushSubscription.id;
+    // });
 };
 
 init();
 
-function oneSignalSubcription()
-{
+
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function (OneSignal) {
+    await OneSignal.init({
+        appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
+        safari_web_id: "web.onesignal.auto.204803f7-478b-4564-9a97-0318e873c676",
+        notifyButton: {
+            enable: true,
+        },
+        allowLocalhostAsSecureOrigin: true,
+    });
+});
+
+const checkSubscription = setInterval(() => {
+    if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id) {
+        clearInterval(checkSubscription);
+        oneSignalSubscription();
+    }
+}, 5000);
+
+
+
+
+function oneSignalSubscription() {
+    console.log("OneSignal", OneSignal.User.PushSubscription.id);
     DOM.fcmToken = OneSignal.User.PushSubscription.id;
     user.fcm_token = OneSignal.User.PushSubscription.id;
-    console.log("DOM.fcmToken",OneSignal.User.PushSubscription.id);
+    console.log("DOM.fcmToken", OneSignal.User.PushSubscription.id);
     const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
         method: "POST",
         headers: {
@@ -2670,7 +2744,7 @@ function oneSignalSubcription()
             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
         },
     }).then(updateUserFcmToken => {
-        console.log("user cubs cription response",updateUserFcmToken);
+        console.log("user cubs cription response", updateUserFcmToken);
         if (!updateUserFcmToken.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -2679,10 +2753,103 @@ function oneSignalSubcription()
         console.log(error);
     }
     )
-    console.log("OneSignal", OneSignal.User.PushSubscription.id);
 }
 
-setTimeout(function() { oneSignalSubcription(); }, 20000);
+// var OneSignal = window.OneSignal || [];
+
+// OneSignal.push(function () {
+//     OneSignal.init({
+//         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
+//         notifyButton: {
+//             enable: true, /* Required to use the Subscription Bell */
+//             /* SUBSCRIPTION BELL CUSTOMIZATIONS START HERE */
+//             size: 'medium', /* One of 'small', 'medium', or 'large' */
+//             theme: 'default', /* One of 'default' (red-white) or 'inverse" (white-red) */
+//             position: 'bottom-right', /* Either 'bottom-left' or 'bottom-right' */
+//             offset: {
+//                 bottom: '0px',
+//                 left: '0px', /* Only applied if bottom-left */
+//                 right: '0px' /* Only applied if bottom-right */
+//             },
+//             showCredit: false, /* Hide the OneSignal logo */
+//             text: {
+//                 'tip.state.unsubscribed': 'Subscribe to notifications',
+//                 'tip.state.subscribed': "You're subscribed to notifications",
+//                 'tip.state.blocked': "You've blocked notifications",
+//                 'message.prenotify': 'Click to subscribe to notifications',
+//                 'message.action.subscribed': "Thanks for subscribing!",
+//                 'message.action.resubscribed': "You're subscribed to notifications",
+//                 'message.action.unsubscribed': "You won't receive notifications again",
+//                 'dialog.main.title': 'Manage Site Notifications',
+//                 'dialog.main.button.subscribe': 'SUBSCRIBE',
+//                 'dialog.main.button.unsubscribe': 'UNSUBSCRIBE',
+//                 'dialog.blocked.title': 'Unblock Notifications',
+//                 'dialog.blocked.message': "Follow these instructions to allow notifications:"
+//             },
+//             colors: { // Customize the colors of the main button and dialog popup button
+//                 'circle.background': 'rgb(84,110,123)',
+//                 'circle.foreground': 'white',
+//                 'badge.background': 'rgb(84,110,123)',
+//                 'badge.foreground': 'white',
+//                 'badge.bordercolor': 'white',
+//                 'pulse.color': 'white',
+//                 'dialog.button.background.hovering': 'rgb(77, 101, 113)',
+//                 'dialog.button.background.active': 'rgb(70, 92, 103)',
+//                 'dialog.button.background': 'rgb(84,110,123)',
+//                 'dialog.button.foreground': 'white'
+//             },
+//             displayPredicate: function () {
+//                 return OneSignal.isPushNotificationsEnabled()
+//                     .then(function (isPushEnabled) {
+//                         return !isPushEnabled;
+//                     });
+//             }
+//         },
+//         allowLocalhostAsSecureOrigin: true,
+//     });
+//     OneSignal.on('subscriptionChange', function (isSubscribed) {
+//         if (isSubscribed) {
+//             OneSignal.getUserId().then(function (userId) {
+//                 // console.log("User ID:", userId);
+//                 if (userId) {
+//                     oneSignalSubscription(userId);
+//                 } else {
+//                     console.warn("User ID is not available yet.");
+//                 }
+//             });
+//         }
+//     });
+// });
+
+
+
+// function oneSignalSubscription(userId) {
+
+//     DOM.fcmToken = userId;
+//     user.fcm_token = userId;
+
+//     const updateUserFcmToken = fetch("user/update/" + userId, {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json",
+//             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+//         },
+//     }).then(updateUserFcmToken => {
+//         console.log("user cubs cription response", updateUserFcmToken);
+//         if (!updateUserFcmToken.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+//         document.getElementById("login_user_fcm_token").value = userId;
+//     }).catch(error => {
+//         console.log(error);
+//     }
+//     )
+// }
+
+
+
+
+
 
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');
@@ -2824,7 +2991,7 @@ function autoResize() {
     }
     const scrollTop = textarea.scrollTop;
     textarea.style.overflowY = 'hidden';
-    textarea.style.height = '28px';
+    textarea.style.height = 'auto';
     const newHeight = Math.min(textarea.scrollHeight, maxHeight);
     requestAnimationFrame(() => {
         textarea.style.height = newHeight + 'px';
@@ -2854,6 +3021,27 @@ textarea.addEventListener('keydown', function (event) {
     }
 });
 
+// textarea.addEventListener('keydown', function (event) {
+
+//     if (event.key === 'Enter') {
+//         const editReplyArea = document.getElementById('Editreply-area');
+//         if (window.getComputedStyle(editReplyArea).display === 'none') {
+//             event.preventDefault();
+//             sendMessage();
+//             textarea.style.height = '28px';
+//             textarea.style.overflowY = 'hidden';
+//         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
+//             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
+//             textarea.style.height = '28px';
+//             textarea.style.overflowY = 'hidden';
+//         } else {
+//             console.log('The div has a different display property.');
+//         }
+//         removeQuotedMessage();
+//     }
+// });
+
+
 textarea.addEventListener('keydown', function (event) {
 
     if (event.key === 'Enter') {
@@ -2866,10 +3054,15 @@ textarea.addEventListener('keydown', function (event) {
             removeQuotedMessage();
             const chatActionElement = document.getElementById('chat_action');
             if (chatActionElement) {
-                chatActionElement.setAttribute('tabindex', '0'); 
+                chatActionElement.setAttribute('tabindex', '0');
                 chatActionElement.focus();
             }
             textarea.focus();
+            //                 chatActionElement.setAttribute('tabindex', '0');
+            //                 chatActionElement.focus();
+            //             }
+
+            // >>>>>>> master
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
             textarea.style.height = '28px';
@@ -2879,7 +3072,6 @@ textarea.addEventListener('keydown', function (event) {
         }
     }
 });
-
 
 
 // delete model
@@ -3339,7 +3531,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                         }
                     }
                     else if (message.reply.type === "Image") {
-                        var message_body = `<img src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                        var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
                         replyDisplay = `
                             <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -3552,10 +3744,8 @@ function restoreMessage(id) {
                 if (restoreButton.length > 0) {
                     restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
                 }
-                var ml3Element = messageElement.parent().parent().removeClass("msg_deleted");
-
-                console.log(ml3Element);
-                messageElement.removeClass('deleted');
+                // messageElement.removeClass('deleted');
+                messageElement.parent().parent().removeClass("msg_deleted");
             }
         })
     }
@@ -3606,4 +3796,31 @@ const resetChatArea = () => {
     if (unreadWrapper) {
         unreadWrapper.remove();
     }
+}
+function ImageViewer(elem) {
+    const images = elem.querySelectorAll('.view-image');
+    images.forEach(image => {
+        // Check if Viewer is already initialized
+        if (!image.viewer) {
+            image.viewer = new Viewer(image, {
+                url: 'data-original',
+                toolbar: {
+                    zoomIn: true,
+                    zoomOut: true,
+                    reset: true,
+                },
+                title: false,
+                inline: false,
+                loop: false,
+                movable: false,
+                zoomable: true,
+                rotatable: false,
+                scalable: false
+            });
+        }
+
+        image.addEventListener('click', function() {
+            image.viewer.show();
+        });
+    });
 }

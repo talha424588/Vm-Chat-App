@@ -45,34 +45,33 @@ class FirebaseService
 
     public function sendNotification($message)
     {
-
         $senderName = $message->user->name;
         $messageContent = $message->msg;
         $subsIdsArray = [];
         $subsIdsArray =  $this->getGroupUsers($message->group_id);
         Log::info('subsIdsArray: ' . json_encode($subsIdsArray));
 
-        // Decode if subsIdsArray is still a JSON-encoded string
         $subsIdsArray = is_string($subsIdsArray) ? json_decode($subsIdsArray, true) : $subsIdsArray;
 
-        // Convert collection to array if needed
         if ($subsIdsArray instanceof \Illuminate\Support\Collection) {
             $subsIdsArray = $subsIdsArray->toArray();
         }
 
-        // Check if decoding worked as expected
         Log::info('Decoded subsIdsArray:', $subsIdsArray);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return response()->json(['error' => 'Invalid subscription IDs format'], 400);
         }
 
-        // Filter out null and empty values
-        $validSubscriptionIds = is_array($subsIdsArray) ? array_filter($subsIdsArray, function ($id) {
-            return !is_null($id) && $id !== '';
-        }) : [];
+        // $validSubscriptionIds = is_array($subsIdsArray) ? array_filter($subsIdsArray, function ($id) {
+        //     return isset($id) && $id !== '' && $id !== null;
+        // }) : [];
 
-        // Trim any whitespace from non-null values
+        $validSubscriptionIds = array_filter($subsIdsArray, function ($id) {
+            return !is_null($id);
+        });
+
+
         $validSubscriptionIds = array_map('trim', $validSubscriptionIds);
 
         Log::info('Valid Subscription IDs:', $validSubscriptionIds);
