@@ -400,8 +400,6 @@ socket.on('deleteMessage', (messageId, isMove) => {
                 viewChatList();
             }
             else {
-                console.log("else part");
-                // messageElement.addClass("msg_deleted");
                 var replyLink = messageElement.find('#reply-link');
                 if (replyLink.length) {
                     replyLink.replaceWith(`
@@ -414,6 +412,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
             }
         }
         else {
+            console.log("admin user");
             var replyLink = messageElement.find('#reply-link');
             if (replyLink.length) {
                 replyLink.replaceWith(`
@@ -422,6 +421,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
                     `);
             }
             const message = findMessageById(messageId);
+            console.log("message", message);
             updateChatList(message)
         }
 
@@ -430,6 +430,15 @@ socket.on('deleteMessage', (messageId, isMove) => {
 function findMessageById(messageId) {
     if (pagnicateChatList && pagnicateChatList.data) {
         return pagnicateChatList.data.find(message => message.id === messageId);
+    }
+    else {
+        console.log("chat list", chatList);
+        let group = chatList.find(group =>
+            group.group.group_messages.some(message => message.id === messageId)
+        );
+        let deleteMessage = group ? group.group.group_messages.find(message => message.id === messageId) : null;
+        console.log("message without pagination", deleteMessage);
+        return deleteMessage;
     }
 }
 
@@ -443,16 +452,13 @@ function updateChatList(message) {
                     currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
                     viewChatList();
                 }
-                else
-                {
+                else {
                     const findMessage = pagnicateChatList.data.find((message) => message.id === parseInt(message.id));
-                    if(findMessage.id == message.id)
-                    {
+                    if (findMessage.id == message.id) {
                         let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
                         currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
                     }
-                    else
-                    {
+                    else {
                         let paginateArrayLastMessage = pagnicateChatList.data[pagnicateChatList.data.length - 1]
                         currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
                     }
@@ -462,9 +468,11 @@ function updateChatList(message) {
         }
     }
     else {
+        console.log("else part without pagination", message);
         let currentUsergroup = chatList.find(group => group.group.group_id === message.group_id);
         if (currentUsergroup) {
             currentUsergroup.group.group_messages.push(message);
+            console.log("event user group", currentUsergroup)
             viewChatList();
         }
     }
@@ -808,9 +816,11 @@ socket.on('restoreMessage', (incomingMessage) => {
     // Check user role
     if (user.role != 0 && user.role != 2) {
         // Use a different name for the message retrieved from findMessageById
-        const retrievedMessage = findMessageById(incomingMessage.message.id);
-        updateChatList(retrievedMessage);
-        addMessageToMessageArea(retrievedMessage,true);
+        console.log("non admin", incomingMessage);
+        // const retrievedMessage = findMessageById(incomingMessage.message.id);
+        // console.log("retrive message", retrievedMessage);
+        updateChatList(incomingMessage.message);
+        addMessageToMessageArea(incomingMessage.message, true);
     } else {
         const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
         if (restoreButton.length > 0) {
@@ -1024,7 +1034,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         `;
         }
     } else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
-        console.log("message restore",message);
+        console.log("message restore", message);
         if (message.reply) {
             if (message.reply.type === 'Image' || oldMessageType == "File") {
                 var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:100%;">`;
@@ -1088,7 +1098,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         `;
         } else {
             messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
-            console.log("messageContent",messageContent);
+            console.log("messageContent", messageContent);
         }
 
     }
@@ -1130,7 +1140,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     // </div>
 
     if (!message.is_privacy_breach && !message.is_deleted) {
-        console.log("recover message here",message);
+        console.log("recover message here", message);
         let messageElement = document.createElement('div');
         messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
@@ -2475,7 +2485,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         const newScrollHeight = DOM.messages.scrollHeight;
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
-        
+
         if (!message_id) {
             DOM.currentPage += 1;
         }
@@ -3941,7 +3951,7 @@ function ImageViewer(elem) {
             });
         }
 
-        image.addEventListener('click', function() {
+        image.addEventListener('click', function () {
             image.viewer.show();
         });
     });
