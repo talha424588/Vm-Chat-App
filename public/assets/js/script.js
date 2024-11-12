@@ -390,7 +390,6 @@ socket.on('deleteMessage', (messageId, isMove) => {
         }
     }
     else {
-        console.log("paginate Array on event", pagnicateChatList.data);
         console.log("is move false");
         var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
 
@@ -415,7 +414,6 @@ socket.on('deleteMessage', (messageId, isMove) => {
             }
         }
         else {
-        console.log("paginate Array on else", pagnicateChatList.data);
             var replyLink = messageElement.find('#reply-link');
             if (replyLink.length) {
                 replyLink.replaceWith(`
@@ -430,23 +428,36 @@ socket.on('deleteMessage', (messageId, isMove) => {
     }
 });
 function findMessageById(messageId) {
-    console.log("paginate Array in findMessageById", pagnicateChatList.data);
-
     if (pagnicateChatList && pagnicateChatList.data) {
         return pagnicateChatList.data.find(message => message.id === messageId);
     }
 }
 
 function updateChatList(message) {
-    console.log("paginate Array in updateChatList", pagnicateChatList.data);
-
     if (pagnicateChatList && pagnicateChatList.data) {
         if (pagnicateChatList.data.length > 0) {
             let currentUsergroup = chatList.find(group => group.group.group_id === message.group_id);
             if (currentUsergroup) {
-                let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
-                currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
-                viewChatList();
+                if (user.role != 0 && user.role != 2) {
+                    let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+                    currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
+                    viewChatList();
+                }
+                else
+                {
+                    const findMessage = pagnicateChatList.data.find((message) => message.id === parseInt(message.id));
+                    if(findMessage.id == message.id)
+                    {
+                        let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+                        currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
+                    }
+                    else
+                    {
+                        let paginateArrayLastMessage = pagnicateChatList.data[pagnicateChatList.data.length - 1]
+                        currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
+                    }
+                    viewChatList();
+                }
             }
         }
     }
@@ -794,13 +805,12 @@ socket.on('updateEditedMessage', (editedMessage) => {
 });
 
 socket.on('restoreMessage', (incomingMessage) => {
-
     // Check user role
     if (user.role != 0 && user.role != 2) {
         // Use a different name for the message retrieved from findMessageById
         const retrievedMessage = findMessageById(incomingMessage.message.id);
         updateChatList(retrievedMessage);
-        addMessageToMessageArea(retrievedMessage);
+        addMessageToMessageArea(retrievedMessage,true);
     } else {
         const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
         if (restoreButton.length > 0) {
@@ -1014,6 +1024,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         `;
         }
     } else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
+        console.log("message restore",message);
         if (message.reply) {
             if (message.reply.type === 'Image' || oldMessageType == "File") {
                 var message_body = `<img src="${message.reply.msg}" style="height:125px; width:100%;">`;
@@ -1077,6 +1088,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         `;
         } else {
             messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
+            console.log("messageContent",messageContent);
         }
 
     }
@@ -1118,6 +1130,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     // </div>
 
     if (!message.is_privacy_breach && !message.is_deleted) {
+        console.log("recover message here",message);
         let messageElement = document.createElement('div');
         messageElement.id = "unread-" + message.id;
         messageElement.innerHTML = `
@@ -1347,7 +1360,6 @@ let addMessageToMessageArea = (message, flag = false) => {
     }
     else {
         scroll_function();
-
     }
 };
 
@@ -3193,7 +3205,6 @@ $('#deleteModal .btn-delete').on('click', function () {
             $('#deleteModal').removeClass('show');
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
-            console.log("paginate Array on delete", pagnicateChatList.data);
             // let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
             // console.log("last message", paginateArrayLastMessage);
 
