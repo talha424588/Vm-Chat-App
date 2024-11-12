@@ -423,24 +423,21 @@ socket.on('deleteMessage', (messageId, isMove) => {
                     `);
             }
             const message = findMessageById(messageId);
-            console.log("message", message);
-            console.log("chatList", chatList);
-
-            // Find the group that matches the message's group_id
-            const group = chatList.find(group => group.group.group_id === message.group_id);
-            console.log("group", group);
-
-            if (group) {
-                group.group.group_messages.push(message);
-                // Call viewChatList to refresh the UI
-                viewChatList();
-            }
+            updateChatList(message)
         }
 
     }
 });
 function findMessageById(messageId) {
     return pagnicateChatList.data.find(message => message.id === messageId);
+}
+
+function updateChatList(message) {
+    let currentUsergroup = chatList.find(group => group.group.group_id === message.group_id);
+    if (currentUsergroup) {
+        currentUsergroup.group.group_messages.push(message);
+        viewChatList();
+    }
 }
 
 socket.on('updateGroupMessages', (messageId) => {
@@ -777,18 +774,24 @@ socket.on('updateEditedMessage', (editedMessage) => {
     }
 });
 
-socket.on('restoreMessage', (message) => {
+socket.on('restoreMessage', (incomingMessage) => {
+    console.log("message", incomingMessage.message);
 
     if (user.role != 0 && user.role != 2) {
-        addMessageToMessageArea(message.message);
-    }
-    else {
-        const restoreButton = $(`#restore-button-${message.message.id}`);
+        const retrievedMessage = findMessageById(incomingMessage.message.id);
+        updateChatList(retrievedMessage);
+        addMessageToMessageArea(retrievedMessage);
+    } else {
+        const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
         if (restoreButton.length > 0) {
-            restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${message.id}','${message.sender}','${message.type}')">Reply</span>`);
+            restoreButton.replaceWith(`
+                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;"
+                      onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.sender}','${incomingMessage.message.type}')">
+                    Reply
+                </span>
+            `);
         }
     }
-
 });
 
 function updateViewChatList(editedMessage) {
@@ -3174,11 +3177,8 @@ $('#deleteModal .btn-delete').on('click', function () {
             // messageElement.parent().parent().removeClass("msg_deleted");
             // messageElement.parent().parent().addClass("msg_deleted");
             let deletedMessage = findMessageById(messageId);
-            let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
-            if (currentUsergroup) {
-                currentUsergroup.group.group_messages.push(deletedMessage);
-                viewChatList();
-            }
+            updateChatList(deletedMessage);
+
             socket.emit('deleteMessage', messageId, false);
         })
         .catch(function (error) {
@@ -3785,10 +3785,10 @@ function get_voice_list() {
     });
 }
 
-function restoreMessage(id) {
+async function restoreMessage(id) {
     console.log("message id", id);
     try {
-        fetch("message/restore/" + id, {
+        await fetch("message/restore/" + id, {
             headers: {
                 method: 'POST',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
