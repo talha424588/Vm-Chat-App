@@ -189,7 +189,7 @@
                 <!-- Navbar -->
 
                 <div class="row d-flex flex-row align-items-center p-2" id="navbar">
-                    <img alt="Profile Photo" class="img-fluid rounded-circle profile_img" id="display-pic">
+                    <img alt="Profile Photo" onclick="showProfileSettings()" class="img-fluid rounded-circle profile_img" id="display-pic">
                     <div class="username-container">
                         <div class="text-dark font-weight-bold" id="username"></div>
                         <small class="text-muted">Online</small>

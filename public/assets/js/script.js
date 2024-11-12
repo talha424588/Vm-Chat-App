@@ -3805,8 +3805,6 @@ function ImageViewer(elem) {
             image.viewer = new Viewer(image, {
                 url: 'data-original',
                 toolbar: {
-                    zoomIn: true,
-                    zoomOut: true,
                     reset: true,
                 },
                 title: false,
