@@ -150,7 +150,6 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
-    console.log("viewChatList chatlist", chatList);
     if (chatList.length === 0) {
         return;
     }
@@ -168,7 +167,6 @@ let viewChatList = () => {
         }
     })
         .forEach((elem, index) => {
-            console.log("element", elem);
             let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
@@ -383,6 +381,7 @@ function makeformatDate(dateString) {
 }
 
 socket.on('deleteMessage', (messageId, isMove) => {
+
     if (isMove == true) {
         console.log("is move true");
         var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
@@ -401,11 +400,9 @@ socket.on('deleteMessage', (messageId, isMove) => {
                 viewChatList();
             }
             else {
-                console.log("else part");
-                // messageElement.addClass("msg_deleted");
                 var replyLink = messageElement.find('#reply-link');
                 if (replyLink.length) {
-                    
+
                     replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                            id="restore-button-${messageId}" onclick="restoreMessage(${messageId})" data-message-id="${messageId}">Restore</a>
@@ -416,34 +413,133 @@ socket.on('deleteMessage', (messageId, isMove) => {
             }
         }
         else {
+            console.log("admin user");
             var replyLink = messageElement.find('#reply-link');
+            console.log("reply link", replyLink);
             if (replyLink.length) {
                 replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                            id="restore-button-${messageId}" onclick="restoreMessage(${messageId})" data-message-id="${messageId}">Restore</a>
                     `);
             }
-            const message = findMessageById(messageId);
-            console.log("message", message);
-            console.log("chatList", chatList);
-
-            // Find the group that matches the message's group_id
-            const group = chatList.find(group => group.group.group_id === message.group_id);
-            console.log("group", group);
-
-            if (group) {
-                group.group.group_messages.push(message);
-                // Call viewChatList to refresh the UI
-                viewChatList();
-            }
+            // const message = findMessageById(messageId);
+            const message = getPaginatedArrayLastMessage(messageId);
+            console.log(" last message in delete Message", message);
+            updateChatList(message)
         }
-       messageElement.find(".additional_style").addClass("msg_deleted");
-       messageElement.find("#message-"+messageId).addClass("deleted_niddle");
-      
+        messageElement.find(".additional_style").addClass("msg_deleted");
+        messageElement.find("#message-" + messageId).addClass("deleted_niddle");
+
     }
 });
+// function getPaginatedArrayLastMessage(id) {
+//     console.log("chatList", chatList);
+//     if (pagnicateChatList && pagnicateChatList.data) {
+//         return pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+//     }
+//     else {
+//         let group = chatList.find(group =>
+//             group.group.group_messages.some(message => message.id === id)
+//         );
+//         if (group) {
+//             console.log("grouo", group);
+
+//             let lastMessage;
+
+//             if (Array.isArray(group.group_messages)) {
+//                 lastMessage = group.group_messages[group.group_messages.length - 1];
+//             } else {
+//                 lastMessage = group.group_messages;
+//             }
+//             console.log(lastMessage);
+//             return lastMessage;
+//         } else {
+//             console.log("Group not found");
+//         }
+//     }
+//     // console.log("pagnicateChatList.data",pagnicateChatList.data);
+// }
+
+function getPaginatedArrayLastMessage(id) {
+    console.log("chatList", chatList);
+    if (pagnicateChatList && pagnicateChatList.data && pagnicateChatList.data.length > 0) {
+
+        const sortedMessages = pagnicateChatList.data.sort((a, b) => b.id - a.id);
+        const lastMessage = sortedMessages[0];
+        console.log("pagnicateChatList",pagnicateChatList.data);
+        // return pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+        return lastMessage;
+    } else {
+        let group = chatList.find(group =>
+            group.group.group_messages.some(message => message.id === id)
+        );
+        if (group) {
+            console.log("group", group);
+
+            let lastMessage;
+
+            if (Array.isArray(group.group.group_messages)) {
+                lastMessage = group.group.group_messages[group.group.group_messages.length - 1];
+            } else {
+                lastMessage = group.group.group_messages;
+            }
+            return lastMessage;
+        } else {
+            console.log("Group not found for the given message ID");
+            return null;
+        }
+    }
+}
+
 function findMessageById(messageId) {
-    return pagnicateChatList.data.find(message => message.id === messageId);
+    if (pagnicateChatList && pagnicateChatList.data) {
+        return pagnicateChatList.data.find(message => message.id === messageId);
+    }
+    else {
+        console.log("chat list", chatList);
+        let group = chatList.find(group =>
+            group.group.group_messages.some(message => message.id === messageId)
+        );
+        let deleteMessage = group ? group.group.group_messages.find(message => message.id === messageId) : null;
+        console.log("message without pagination", deleteMessage);
+        return deleteMessage;
+    }
+}
+
+function updateChatList(message) {
+    if (pagnicateChatList && pagnicateChatList.data) {
+        if (pagnicateChatList.data.length > 0) {
+            let currentUsergroup = chatList.find(group => group.group.group_id === message.group_id);
+            if (currentUsergroup) {
+                if (user.role != 0 && user.role != 2) {
+                    let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+                    currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
+                    viewChatList();
+                }
+                else {
+                    const findMessage = pagnicateChatList.data.find((message) => message.id === parseInt(message.id));
+                    if (findMessage.id == message.id) {
+                        let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+                        currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
+                    }
+                    else {
+                        let paginateArrayLastMessage = pagnicateChatList.data[pagnicateChatList.data.length - 1]
+                        currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
+                    }
+                    viewChatList();
+                }
+            }
+        }
+    }
+    else {
+        console.log("else part without pagination", message);
+        let currentUsergroup = chatList.find(group => group.group.group_id === message.group_id);
+        if (currentUsergroup) {
+            currentUsergroup.group.group_messages.push(message);
+            console.log("event user group", currentUsergroup)
+            viewChatList();
+        }
+    }
 }
 
 socket.on('updateGroupMessages', (messageId) => {
@@ -780,21 +876,28 @@ socket.on('updateEditedMessage', (editedMessage) => {
     }
 });
 
-socket.on('restoreMessage', (message) => {
-
+socket.on('restoreMessage', (incomingMessage) => {
+    // Check user role
     if (user.role != 0 && user.role != 2) {
-        addMessageToMessageArea(message.message);
-    }
-    else {
-        const restoreButton = $(`#restore-button-${message.message.id}`);
-        const mainDiv=$(`#message-${message.message.id}`);
+        // Use a different name for the message retrieved from findMessageById
+        console.log("non admin", incomingMessage);
+        // const retrievedMessage = findMessageById(incomingMessage.message.id);
+        updateChatList(incomingMessage.message);
+        addMessageToMessageArea(incomingMessage.message, true);
+    } else {
+        const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
+        const mainDiv = $(`#message-${incomingMessage.message.id}`);
         mainDiv.removeClass("deleted_niddle");
         mainDiv.find(".additional_style").removeClass("msg_deleted");
         if (restoreButton.length > 0) {
-            restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${message.id}','${message.sender}','${message.type}')">Reply</span>`);
+            restoreButton.replaceWith(`
+                <span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666; "
+                      onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.sender}','${incomingMessage.message.type}')">
+                    Reply
+                </span>
+            `);
         }
     }
-
 });
 
 function updateViewChatList(editedMessage) {
@@ -993,8 +1096,7 @@ console.log(message.user);
             <img src="${message.message ?? message.msg}" data-original="${message.message ?? message.msg}" class="view-image"" style="height:222px; width:100%;">
         `;
         }
-    }
-    else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
+    } else if (message.type === 'Message' || message.type === null && !/<audio[^>]+>/g.test(message.msg)) {
         if (message.reply) {
             if (message.reply.type === 'Image' || oldMessageType == "File") {
                 var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:100%;">`;
@@ -1058,6 +1160,7 @@ console.log(message.user);
         `;
         } else {
             messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
+            console.log("messageContent", messageContent);
         }
 
     }
@@ -1096,10 +1199,11 @@ console.log(message.user);
     `;
     }
     if (!message.is_privacy_breach && !message.is_deleted) {
+        console.log("recover message here", message);
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
-       
+
             ${message.user.id == user.id ? '' : profileImage}
 
             <div class="" >
@@ -2416,7 +2520,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         const newScrollHeight = DOM.messages.scrollHeight;
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
-        
+
         if (!message_id) {
             DOM.currentPage += 1;
         }
@@ -3026,11 +3130,11 @@ function autoResize() {
     textarea.style.overflowY = 'hidden';
     const newHeight = Math.min(textarea.scrollHeight, maxHeight);
     requestAnimationFrame(() => {
-      
+
         if (newHeight >= maxHeight) {
-              textarea.style.height = newHeight + 'px';
-              textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
-             textarea.scrollTop = scrollTop;
+            textarea.style.height = newHeight + 'px';
+            textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
+            textarea.scrollTop = scrollTop;
         }
     });
     var iconContainer = document.querySelector('.icon-container');
@@ -3130,27 +3234,46 @@ $('#deleteModal .btn-delete').on('click', function () {
         .then(function () {
             $('#btn-close').trigger('click');
             const groupId = DOM.groupId;
-            const group = chatList.find(group => group.group.group_id === groupId);
-            if (group) {
-                const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
-                if (messageIndex !== -1) {
-                    group.group.group_messages.splice(messageIndex, 1);
-                }
-            }
+            // const group = chatList.find(group => group.group.group_id === groupId);
+            // if (group) {
+            //     const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
+            //     if (messageIndex !== -1) {
+            //         group.group.group_messages.splice(messageIndex, 1);
+            //     }
+            // }
 
             $("#deleteModal").on('hide.bs.modal', function () { });
             $('#deleteModal').removeClass('show');
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
+            // let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+            // console.log("last message", paginateArrayLastMessage);
+
+
             // messageElement.remove();
             // messageElement.parent().parent().removeClass("msg_deleted");
             // messageElement.parent().parent().addClass("msg_deleted");
-            let deletedMessage = findMessageById(messageId);
-            let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
-            if (currentUsergroup) {
-                currentUsergroup.group.group_messages.push(deletedMessage);
-                viewChatList();
-            }
+            // let deletedMessage = findMessageById(messageId);
+            // console.log("delete message for current user",deletedMessage);
+            // const deletedMessage = findMessageById(messageId);
+            //     if (pagnicateChatList.data.length > 0) {
+            //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
+            //         console.log("currentUsergroup", currentUsergroup);
+            //         if (currentUsergroup) {
+            //             currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
+            //             console.log("currentUsergroup", currentUsergroup);
+            //             viewChatList();
+            //         }
+            //     }
+            //     else {
+            //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
+            //         if (currentUsergroup) {
+            //             currentUsergroup.group.group_messages.push(message);
+            //             viewChatList();
+            //         }
+            //     }
+
+
             socket.emit('deleteMessage', messageId, false);
         })
         .catch(function (error) {
@@ -3757,10 +3880,10 @@ function get_voice_list() {
     });
 }
 
-function restoreMessage(id) {
+async function restoreMessage(id) {
     console.log("message id", id);
     try {
-        fetch("message/restore/" + id, {
+        await fetch("message/restore/" + id, {
             headers: {
                 method: 'POST',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -3782,10 +3905,11 @@ function restoreMessage(id) {
             if (messageElement.length > 0) {
                 const restoreButton = $(`#restore-button-${id}`);
                 if (restoreButton.length > 0) {
-                    restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
+
+                    restoreButton.replaceWith(`<span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
                 }
                 // messageElement.removeClass('deleted');
-                console.log("restoring message",messageElement)
+                console.log("restoring message", messageElement)
                 messageElement.removeClass("deleted_niddle");
                 messageElement.find(".additional_style").removeClass("msg_deleted");
             }
@@ -3859,11 +3983,12 @@ function ImageViewer(elem) {
             });
         }
 
-        image.addEventListener('click', function() {
+        image.addEventListener('click', function () {
             image.viewer.show();
         });
     });
 }
+
 let update_user_profile=async (file)=>{
     try {
         const response=await fetch("update_user_profile", {
@@ -3886,3 +4011,4 @@ let update_user_profile=async (file)=>{
         console.error('Error updating User Profile:', error);
     }
 }
+
