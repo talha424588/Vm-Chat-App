@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('group_messages', 'is_privacy_breach')) {
-            Schema::table('group_messages', function (Blueprint $table) {
-                $table->boolean("is_privacy_breach")->default(0);
-            });
-        }
+        Schema::table('user', function (Blueprint $table) {
+            $table->text("profile_img")->default("default.webp");
+        });
     }
 
     /**
@@ -23,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('group_messages', function (Blueprint $table) {
+        Schema::table('user', function (Blueprint $table) {
             //
         });
     }

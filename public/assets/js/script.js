@@ -912,8 +912,8 @@ function updateViewChatList(editedMessage) {
 
 let addMessageToMessageArea = (message, flag = false) => {
     let msgDate = mDate(message.time).getDate();
-
-    let profileImage = `<img src="${message.user?.pic ?? 'assets/images/Alsdk120asdj913jk.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+console.log(message.user);
+    let profileImage = `<img src="assets/profile_pics/${message.user?.pic}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
 
     let messageContent;
@@ -2811,7 +2811,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
 
 let showProfileSettings = () => {
     DOM.profileSettings.style.left = 0;
-    DOM.profilePic.src = user.pic;
+    // DOM.profilePic.src = user.pic;
     DOM.inputName.value = user.name;
 };
 
@@ -2826,10 +2826,10 @@ window.addEventListener("resize", e => {
 
 let init = () => {
     DOM.username.innerHTML = user.name;
-    DOM.displayPic.src = user.pic;
-    DOM.profilePic.stc = user.pic;
-    DOM.profilePic.addEventListener("click", () => DOM.profilePicInput.click());
-    DOM.profilePicInput.addEventListener("change", () => console.log(DOM.profilePicInput.files[0]));
+    // DOM.displayPic.src = user.pic;
+    // DOM.profilePic.src = user.pic;
+    // DOM.profilePic.addEventListener("click", () => DOM.profilePicInput.click());
+    // DOM.profilePicInput.addEventListener("change", () => console.log(DOM.profilePicInput.files[0]));
     DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
     generateChatList();
     const firebaseConfig = {
@@ -3988,3 +3988,27 @@ function ImageViewer(elem) {
         });
     });
 }
+
+let update_user_profile=async (file)=>{
+    try {
+        const response=await fetch("update_user_profile", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": csrfToken,
+            },
+            body: JSON.stringify({ 
+                userId:user.id,
+                imgUrl:file
+             }),
+        });
+        const res = await response.json();
+       if(res.status == 200){
+        DOM.profilePic.src="assets/profile_pics/"+file;
+        DOM.displayPic.src="assets/profile_pics/"+file;
+       }
+    } catch (error) {
+        console.error('Error updating User Profile:', error);
+    }
+}
+
