@@ -1365,5 +1365,9 @@ body{
 }
 
 .msg_deleted{
-	filter: brightness(0.8);
+	background-color: #f4baba !important;
+}
+.deleted_niddle::after{
+	
+	border-top: 10px solid #f4baba !important;
 }
