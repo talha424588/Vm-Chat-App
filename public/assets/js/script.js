@@ -415,21 +415,82 @@ socket.on('deleteMessage', (messageId, isMove) => {
         else {
             console.log("admin user");
             var replyLink = messageElement.find('#reply-link');
+            console.log("reply link", replyLink);
             if (replyLink.length) {
                 replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                            id="restore-button-${messageId}" onclick="restoreMessage(${messageId})" data-message-id="${messageId}">Restore</a>
                     `);
             }
-            const message = findMessageById(messageId);
-            console.log("message", message);
+            // const message = findMessageById(messageId);
+            const message = getPaginatedArrayLastMessage(messageId);
+            console.log(" last message in delete Message", message);
             updateChatList(message)
         }
-       messageElement.find(".additional_style").addClass("msg_deleted");
-       messageElement.find("#message-"+messageId).addClass("deleted_niddle");
+        messageElement.find(".additional_style").addClass("msg_deleted");
+        messageElement.find("#message-" + messageId).addClass("deleted_niddle");
 
     }
 });
+// function getPaginatedArrayLastMessage(id) {
+//     console.log("chatList", chatList);
+//     if (pagnicateChatList && pagnicateChatList.data) {
+//         return pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+//     }
+//     else {
+//         let group = chatList.find(group =>
+//             group.group.group_messages.some(message => message.id === id)
+//         );
+//         if (group) {
+//             console.log("grouo", group);
+
+//             let lastMessage;
+
+//             if (Array.isArray(group.group_messages)) {
+//                 lastMessage = group.group_messages[group.group_messages.length - 1];
+//             } else {
+//                 lastMessage = group.group_messages;
+//             }
+//             console.log(lastMessage);
+//             return lastMessage;
+//         } else {
+//             console.log("Group not found");
+//         }
+//     }
+//     // console.log("pagnicateChatList.data",pagnicateChatList.data);
+// }
+
+function getPaginatedArrayLastMessage(id) {
+    console.log("chatList", chatList);
+    if (pagnicateChatList && pagnicateChatList.data && pagnicateChatList.data.length > 0) {
+
+        const sortedMessages = pagnicateChatList.data.sort((a, b) => b.id - a.id);
+        const lastMessage = sortedMessages[0];
+        console.log("pagnicateChatList",pagnicateChatList.data);
+        // return pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
+        return lastMessage;
+    } else {
+        let group = chatList.find(group =>
+            group.group.group_messages.some(message => message.id === id)
+        );
+        if (group) {
+            console.log("group", group);
+
+            let lastMessage;
+
+            if (Array.isArray(group.group.group_messages)) {
+                lastMessage = group.group.group_messages[group.group.group_messages.length - 1];
+            } else {
+                lastMessage = group.group.group_messages;
+            }
+            return lastMessage;
+        } else {
+            console.log("Group not found for the given message ID");
+            return null;
+        }
+    }
+}
+
 function findMessageById(messageId) {
     if (pagnicateChatList && pagnicateChatList.data) {
         return pagnicateChatList.data.find(message => message.id === messageId);
@@ -825,12 +886,12 @@ socket.on('restoreMessage', (incomingMessage) => {
         addMessageToMessageArea(incomingMessage.message, true);
     } else {
         const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
-        const mainDiv=$(`#message-${incomingMessage.message.id}`);
+        const mainDiv = $(`#message-${incomingMessage.message.id}`);
         mainDiv.removeClass("deleted_niddle");
         mainDiv.find(".additional_style").removeClass("msg_deleted");
         if (restoreButton.length > 0) {
             restoreButton.replaceWith(`
-                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;"
+                <span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666; "
                       onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.sender}','${incomingMessage.message.type}')">
                     Reply
                 </span>
@@ -1142,7 +1203,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
-       
+
             ${message.user.id == user.id ? '' : profileImage}
 
             <div class="" >
@@ -3069,11 +3130,11 @@ function autoResize() {
     textarea.style.overflowY = 'hidden';
     const newHeight = Math.min(textarea.scrollHeight, maxHeight);
     requestAnimationFrame(() => {
-      
+
         if (newHeight >= maxHeight) {
-              textarea.style.height = newHeight + 'px';
-              textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
-             textarea.scrollTop = scrollTop;
+            textarea.style.height = newHeight + 'px';
+            textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
+            textarea.scrollTop = scrollTop;
         }
     });
     var iconContainer = document.querySelector('.icon-container');
@@ -3844,10 +3905,11 @@ async function restoreMessage(id) {
             if (messageElement.length > 0) {
                 const restoreButton = $(`#restore-button-${id}`);
                 if (restoreButton.length > 0) {
-                    restoreButton.replaceWith(`<span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
+
+                    restoreButton.replaceWith(`<span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
                 }
                 // messageElement.removeClass('deleted');
-                console.log("restoring message",messageElement)
+                console.log("restoring message", messageElement)
                 messageElement.removeClass("deleted_niddle");
                 messageElement.find(".additional_style").removeClass("msg_deleted");
             }
