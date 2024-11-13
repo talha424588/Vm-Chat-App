@@ -67,6 +67,7 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::post("/message/correction" , [ChatController::class, 'messageCorrection']);
     Route::post("/alert-email" , [MailController::class, 'sendAlertMail']);
     Route::get('/view/doc', [ChatController::class,'viewDocument'])->name('view-doc');
+    Route::post("/update_user_profile",[UserController::class,'updateUserProfile']);
 });
 
 Route::post('/messages/move', [ChatController::class, 'moveMessages']);

@@ -89,6 +89,7 @@ class MessageResourceCollection extends ResourceCollection
                 'code' => $message->user->code,
                 'status' => $message->user->status,
                 'fcm_token' => $message->user->fcm_token,
+                'pic'=>$message->user->profile_img,
             ],
             'reply' => $reply,
         ];

@@ -28,6 +28,7 @@ class UserResource extends JsonResource
             'code' => $this->code,
             'status' => $this->status,
             'token' => $this->when(isset($this->token), $this->token),
+            'pic'=>$this->profile_img,
         ];
     }
 

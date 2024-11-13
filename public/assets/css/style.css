@@ -519,7 +519,15 @@ color: #666;
   font-family: 'Open Sans', sans-serif;
 }
 
-
+.profile-icons{
+	margin-left: 58px;
+	margin-top: 5px;
+	padding: 5px;
+}
+.profile-setting-name{
+	margin-left: 15px;
+	font-weight: bold;
+}
 .chat-input-container {
 		  display: flex;
 		  align-items: center;
@@ -873,6 +881,7 @@ body{
     border-radius: 50%;
     margin-right: 10px;
 	margin-left: 20px;
+	
 }
 
 /* Profile details styling */
@@ -1008,12 +1017,27 @@ body{
 #profile-pic {
 	cursor: pointer;
 	position: relative;
-	width: 200px;
+	width: 150px;
 }
-
+.choose-profile-images{
+	border: 1px solid #ddd;
+	border-radius: 50%;
+	margin: 12px;
+}
+.profile-input-wrapper{
+	border-bottom: 1px solid #ddd ;
+}
+.choose-profile-images.active{
+	border: 2px solid black;
+}
+.profile-name-container{
+	padding-left: 40px;
+}
 .profile-input {
-	border-bottom: 2px solid transparent  !important;
+	border: none;
 	outline: none;
+	margin-left: 37px;
+	width: 90%;
 }
 
 .profile-input:focus {
@@ -1300,6 +1324,15 @@ body{
 	#messages{
 		height: 100%;
 	}
+	.choose-profile-images {
+		margin: 5px;
+	}
+	.profile-icons{
+		margin-left: 35px;
+	}
+	.profile-name-container{
+		padding-left: 10px;
+	}
 }
 
 
@@ -1369,4 +1402,7 @@ body{
 .deleted_niddle::after{
 	
 	border-top: 10px solid #f4baba !important;
+}
+#profile-pic{
+	border: 2px solid black;
 }

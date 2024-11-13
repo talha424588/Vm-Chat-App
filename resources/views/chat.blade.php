@@ -189,7 +189,7 @@
                 <!-- Navbar -->
 
                 <div class="row d-flex flex-row align-items-center p-2" id="navbar">
-                    <img alt="Profile Photo" onclick="showProfileSettings()" class="img-fluid rounded-circle profile_img" id="display-pic">
+                    <img src="{{asset('assets/profile_pics/'.auth()->user()->profile_img)}}" alt="Profile Photo" onclick="showProfileSettings()" class="img-fluid rounded-circle profile_img" id="display-pic">
                     <div class="username-container">
                         <div class="text-dark font-weight-bold" id="username"></div>
                         <small class="text-muted">Online</small>
@@ -234,7 +234,7 @@
 
 
                 <!-- Profile Settings -->
-                <div class="d-flex flex-column w-100 h-100" id="profile-settings">
+                <!-- <div class="d-flex flex-column w-100 h-100" id="profile-settings">
                     <div class="row d-flex flex-row align-items-center p-2 m-0"
                         style="background:#009688; min-height:65px;">
                         <i class="fas fa-arrow-left p-2 mx-3 my-1 text-dark" style="font-size: 1.5rem; cursor: pointer;"
@@ -261,6 +261,50 @@
                     </div>
 
                 </div>
+            </div> -->
+            <div class="d-flex flex-column w-100 h-100 bg-white" id="profile-settings">
+                    <div class="row d-flex flex-row align-items-center p-2 "
+                        style="background:#E4E6E7; min-height:78px;border:1px solid #ddd">
+                        <i class="fas fa-arrow-left p-2 mx-3 my-1 text-dark" style="font-size: 1.5rem; cursor: pointer;"
+                            onclick="hideProfileSettings()"></i>
+                        <div class="text-dark font-weight-bold">Profile</div>
+                    </div>
+                    
+                    <div class="d-flex flex-column" style="overflow:auto;">
+                        <img src="{{asset('assets/profile_pics/'.auth()->user()->profile_img)}}" alt="Profile Photo" class="img-fluid rounded-circle my-4 justify-self-center mx-auto"
+                            id="profile-pic">
+                        <input type="file" id="profile-pic-input" class="d-none">
+                        <div class="profile-name-container">
+                            
+                            <div class="d-flex">
+                            <div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 15.9997L4 19.9997L8 18.9997L19.586 7.4137C19.9609 7.03864 20.1716 6.53003 20.1716 5.9997C20.1716 5.46937 19.9609 4.96075 19.586 4.5857L19.414 4.4137C19.0389 4.03876 18.5303 3.82812 18 3.82812C17.4697 3.82813 16.9611 4.03876 16.586 4.4137L5 15.9997Z" stroke="#463C3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5 16L4 20L8 19L18 9L15 6L5 16Z" fill="#463C3C"/>
+                            <path d="M15 6L18 9M13 20H21" stroke="#463C3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg></div>
+                            <label for="input-name" class="profile-setting-name">Name</label>
+                            </div>
+                            <div class="profile-input-wrapper">
+                            <input type="text" name="name" id="input-name" class="py-2 profile-input">
+                            </div>
+                            <div class="mt-2 d-flex">
+                            <div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M12 4C10.6008 3.99974 9.22593 4.36649 8.01273 5.06363C6.79952 5.76077 5.79038 6.76392 5.08603 7.97295C4.38168 9.18199 4.00675 10.5546 3.99868 11.9538C3.9906 13.3531 4.34966 14.7299 5.04001 15.947C5.50662 15.3406 6.10644 14.8496 6.7931 14.512C7.47975 14.1744 8.23485 13.9992 9.00001 14H15C15.7652 13.9992 16.5203 14.1744 17.2069 14.512C17.8936 14.8496 18.4934 15.3406 18.96 15.947C19.6504 14.7299 20.0094 13.3531 20.0013 11.9538C19.9933 10.5546 19.6183 9.18199 18.914 7.97295C18.2096 6.76392 17.2005 5.76077 15.9873 5.06363C14.7741 4.36649 13.3993 3.99974 12 4ZM19.943 18.076C20.0683 17.9127 20.1883 17.7453 20.303 17.574C21.4116 15.9267 22.0026 13.9856 22 12C22 6.477 17.523 2 12 2C6.47701 2 2.00001 6.477 2.00001 12C1.99686 14.1968 2.72005 16.3329 4.05701 18.076L4.05201 18.094L4.40701 18.507C5.3449 19.6035 6.50939 20.4836 7.82024 21.0866C9.13109 21.6897 10.5571 22.0013 12 22C12.216 22 12.4307 21.9933 12.644 21.98C14.4484 21.8662 16.1877 21.2629 17.675 20.235C18.3863 19.7443 19.031 19.1635 19.593 18.507L19.948 18.094L19.943 18.076ZM12 6C11.2044 6 10.4413 6.31607 9.87869 6.87868C9.31608 7.44129 9.00001 8.20435 9.00001 9C9.00001 9.79565 9.31608 10.5587 9.87869 11.1213C10.4413 11.6839 11.2044 12 12 12C12.7957 12 13.5587 11.6839 14.1213 11.1213C14.6839 10.5587 15 9.79565 15 9C15 8.20435 14.6839 7.44129 14.1213 6.87868C13.5587 6.31607 12.7957 6 12 6Z" fill="#463C3C"/>
+</svg></div>
+                            <label class="profile-setting-name">Profile Pictures</label>
+                            </div>
+                        </div>
+                        <div class="profile-icons">        
+                    @for($i=1;$i<=10;$i++)
+                    <img onclick="update_user_profile('<?= $i ?>.png')" src="{{asset('assets/profile_pics/'.$i.'.png')}}" alt="profile-img"
+                     class="choose-profile-images {{pathinfo(auth()->user()->profile_img, PATHINFO_FILENAME) == $i ? 'active':''}}" />
+                    @endfor
+
+                    </div>
+                    </div>
+
+              
+                    </div>
             </div>
 
             <!-- Message Area -->
