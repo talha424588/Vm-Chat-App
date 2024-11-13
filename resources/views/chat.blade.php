@@ -55,6 +55,9 @@
             cursor: pointer;
             margin-right: 10px;
         }
+        .play-button:focus{
+            outline:none;
+        }
 
         .playbutton {
             background: none;
@@ -174,9 +177,6 @@
             font-size: 14px;
         }
 
-        .auto-resize-textarea {
-            overflow: hidden;
-        }
     </style>
 </head>
 

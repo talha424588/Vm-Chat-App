@@ -296,7 +296,7 @@ background-color: rgba(255, 255, 255, 0.5);
 }
 
 .additional_style{
-	padding:12px 10px 10px 10px;
+	padding:12px 15px 10px 12px;
 	 border-radius:5px;
 }
 
@@ -537,8 +537,8 @@ color: #666;
 		  background-color: transparent;
 		  padding: 10px;
 		  font-size: 16px;
-			background-color: #ffffff;
-			border-radius:10px;
+		background-color: #ffffff;
+		border-radius:10px;
 	  }
 
 	  .chat-input:focus {
@@ -959,7 +959,6 @@ body{
 #input {
 	overflow-y: hidden;
 	resize: none;
-	box-sizing: content-box;
   }
 
 .message-item {
