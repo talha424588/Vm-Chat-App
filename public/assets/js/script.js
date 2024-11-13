@@ -815,11 +815,9 @@ let addMessageToMessageArea = (message, flag = false) => {
 
     let messageContent;
     let oldMessageType = null;
-
     if (/<a[^>]+>/g.test(message.msg) || /<audio[^>]+>/g.test(message.msg)) {
         oldMessageType = getOldMessageType(message);
     }
-
     if (message.type === 'File') {
         if (message.reply) {
             if (message.reply.type === 'Image') {
@@ -1099,9 +1097,9 @@ let addMessageToMessageArea = (message, flag = false) => {
     }
     if (!message.is_privacy_breach && !message.is_deleted) {
         let messageElement = document.createElement('div');
-        messageElement.id = "unread-" + message.id;
+        messageElement.className = "ml-3";
         messageElement.innerHTML = `
-        <div class="ml-3">
+       
             ${message.user.id == user.id ? '' : profileImage}
 
             <div class="" >
@@ -1139,7 +1137,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
                             </div>
                             ${message.sender === user.unique_id ? `
-                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '-2px' : '10px')}; right: 0px;">
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;">
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
@@ -1174,7 +1172,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
                             ${user.role != '1' && user.role != '3' && message.sender != user.unique_id ? `
-                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '10px' : (message.type === 'Message' ? '-2px' : '10px')}; right: 2px;">
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;">
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
@@ -1210,8 +1208,6 @@ let addMessageToMessageArea = (message, flag = false) => {
                        </div>
                     </div>
                 </div>
-
-        </div>
         `;
         if (flag) {
             DOM.messages.appendChild(messageElement);
@@ -1485,7 +1481,7 @@ function correction_send_handel() {
     tinymce.remove('#input');
     isTinyMCEInitialized = false;
     removecorrectionMessage();
-    document.getElementById('input').style.height = '28px';
+    document.getElementById('input').style.height = '44px';
     const textarea = document.getElementById('input');
     textarea.value = '';
 
@@ -1704,7 +1700,7 @@ function change_icon_height(element) {
 
 function handleSendMessage() {
 
-    document.querySelector('.auto-resize-textarea').style.setProperty('height', '26px');
+    document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
     const messageId = document.getElementById('edit_message_id').value;
     let messageContent = document.getElementById('input').value;
@@ -1784,7 +1780,7 @@ function removeEditMessage() {
     messageDiv.classList.remove('blur');
     const textarea = document.getElementById('input');
     textarea.value = '';
-    document.querySelector('.auto-resize-textarea').style.setProperty('height', '28px');
+    document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
 }
 
@@ -1891,7 +1887,7 @@ function removeQuotedMessage() {
     replyDiv.style.display = 'none';
     iconContainer.style.bottom = '90px';
     DOM.replyId = null;
-    document.querySelector('.auto-resize-textarea').style.setProperty('height', '28px');
+    document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
 
     // <<<<<<< local-dev
@@ -3022,19 +3018,19 @@ const textarea = document.getElementById('input');
 const maxHeight = 200;
 function autoResize() {
     if (!textarea.value.trim()) {
-        textarea.style.height = '28px';
+        textarea.style.height = '44px';
         textarea.style.overflowY = 'hidden';
         return;
     }
     const scrollTop = textarea.scrollTop;
     textarea.style.overflowY = 'hidden';
-    textarea.style.height = 'auto';
     const newHeight = Math.min(textarea.scrollHeight, maxHeight);
     requestAnimationFrame(() => {
-        textarea.style.height = newHeight + 'px';
-        textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
+      
         if (newHeight >= maxHeight) {
-            textarea.scrollTop = scrollTop;
+              textarea.style.height = newHeight + 'px';
+              textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
+             textarea.scrollTop = scrollTop;
         }
     });
     var iconContainer = document.querySelector('.icon-container');
@@ -3053,23 +3049,22 @@ textarea.addEventListener('input', autoResize);
 textarea.addEventListener('paste', autoResize);
 textarea.addEventListener('keydown', function (event) {
     if ((event.key === 'Backspace' || event.key === 'Delete') && !textarea.value.trim()) {
-        textarea.style.height = '28px';
+        textarea.style.height = '44px';
         textarea.style.overflowY = 'hidden';
     }
 });
 
 // textarea.addEventListener('keydown', function (event) {
-
 //     if (event.key === 'Enter') {
 //         const editReplyArea = document.getElementById('Editreply-area');
 //         if (window.getComputedStyle(editReplyArea).display === 'none') {
 //             event.preventDefault();
 //             sendMessage();
-//             textarea.style.height = '28px';
+//             textarea.style.height = '44px';
 //             textarea.style.overflowY = 'hidden';
 //         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
 //             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
-//             textarea.style.height = '28px';
+//             textarea.style.height = '44px';
 //             textarea.style.overflowY = 'hidden';
 //         } else {
 //             console.log('The div has a different display property.');
@@ -3086,7 +3081,7 @@ textarea.addEventListener('keydown', function (event) {
         if (window.getComputedStyle(editReplyArea).display === 'none') {
             event.preventDefault();
             sendMessage();
-            textarea.style.height = '28px';
+            textarea.style.height = '44px';
             textarea.style.overflowY = 'hidden';
             removeQuotedMessage();
             const chatActionElement = document.getElementById('chat_action');
@@ -3095,14 +3090,9 @@ textarea.addEventListener('keydown', function (event) {
                 chatActionElement.focus();
             }
             textarea.focus();
-            //                 chatActionElement.setAttribute('tabindex', '0');
-            //                 chatActionElement.focus();
-            //             }
-
-            // >>>>>>> master
         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
-            textarea.style.height = '28px';
+            textarea.style.height = '44px';
             textarea.style.overflowY = 'hidden';
         } else {
             console.log('The div has a different display property.');
