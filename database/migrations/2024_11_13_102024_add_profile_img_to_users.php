@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user', function (Blueprint $table) {
-            $table->text("profile_img")->default("default.webp");
+            $table->string("profile_img")->default("default.webp");
         });
     }
 

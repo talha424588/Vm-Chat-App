@@ -94,17 +94,25 @@ class ChatService implements ChatRepository
         ->where('id', '>=', $messageId)
         ->where('is_deleted', false)
         ->orderBy('id', 'desc')
-        ->take(1000)
+        // ->take(10000)
         // ->skip($pageNo * 20)
         ->get();
-
-
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Messages found',
-            'data' => new MessageResourceCollection($messages),
-        ]);
+        if(count($messages))
+        {
+            return response()->json([
+                'status' => true,
+                'message' => 'Messages found',
+                'data' => new MessageResourceCollection($messages),
+            ],200);
+        }
+        else
+        {
+            return response()->json([
+                'status' => false,
+                'message' => 'Not found',
+                'data' => null,
+            ],404);
+        }
     }
 
     private function fetchMessagesFromSpecificId($request, $perPage)

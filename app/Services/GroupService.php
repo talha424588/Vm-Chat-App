@@ -21,8 +21,8 @@ class GroupService implements GroupRepository
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
             ->with(['groupMessages' => function ($query) {
                 $query->latest('time')
-                // ->where('is_deleted', false)
-                ->whereNot('status', EnumMessageEnum::MOVE);
+                    // ->where('is_deleted', false)
+                    ->whereNot('status', EnumMessageEnum::MOVE);
             }, 'groupMessages.user'])
             ->get();
 
@@ -113,8 +113,8 @@ class GroupService implements GroupRepository
 
     public function getGroupByName($name, $request)
     {
-        $perPageGroups = 20; // Set number of groups per page
-        $perPageMessages = 40; // Set number of messages per page
+        $perPageGroups = 20;
+        $perPageMessages = 40;
         $pageGroups = $request->input('page_groups', 1);
         $pageMessages = $request->input('page_messages', 1);
 
@@ -138,6 +138,17 @@ class GroupService implements GroupRepository
             ->whereIn('group_id', $userGroups)
             ->with("user", "group")
             ->paginate($perPageMessages, ['*'], 'page', $pageMessages);
+
+        if ($groups->isEmpty() && $messages->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No groups or messages found.',
+                'data' => [
+                    'groups' => [],
+                    'messages' => []
+                ]
+            ]);
+        }
 
         return response()->json([
             "status" => true,

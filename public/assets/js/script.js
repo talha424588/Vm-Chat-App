@@ -263,7 +263,7 @@ function getCleanedTextSnippet(text) {
         .slice(0, 30);
 }
 let viewMessageList = () => {
-
+    console.log("messageList",messageList);
     DOM.messagesList.innerHTML = `
     <div class="heading">
         <h2>Messages</h2>
@@ -281,19 +281,18 @@ let viewMessageList = () => {
     })
         .forEach((elem, index) => {
             let unreadClass = elem.unread ? "unread" : "";
-            DOM.clickSearchMessageId = elem.id;
             const senderName = elem.user.name;
             let time = new Date(elem.time * 1000)
             const timeText = elem.time ? mDate(time).chatListFormat() : "No messages";
-            if (elem.type == "Message" || elem.type == "null") {
+            if (elem.type == "Message" || elem.type == null) {
                 let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
                 DOM.messagesList.innerHTML += `
                 <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
-                <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true)">
+                <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true,${elem.id})">
                   <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                   <div class="w-50">
                     <div class="name list-user-name">${elem.group.name}</div>
-                    <div class="small last-message">${elem ? senderName + ": " : ""}${messageText}</div>
+                    <div class="small last-message">${elem ? senderName + ": " : ""}${messageText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<a[^>]*>(.*?)<\/a>/g, '$1')}</div>
                   </div>
 
                   <div class="flex-grow-1 text-right">
@@ -305,16 +304,15 @@ let viewMessageList = () => {
             }
             else {
                 if (/<a[^>]+>/g.test(elem.msg) && !/<audio[^>]+>/g.test(elem.msg)) {
-                    console.log(elem);
                     messageText = getOldMessageMediaName(elem);
                     // let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
                     DOM.messagesList.innerHTML += `
                     <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
-                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true)">
+                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true,${elem.id})">
                       <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                       <div class="w-50">
                         <div class="name list-user-name">${elem.group.name}</div>
-                        <div class="small last-message">${elem ? senderName + ": " : ""}${messageText}</div>
+                        <div class="small last-message">${elem ? senderName + ": " : ""}${messageText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<a[^>]*>(.*?)<\/a>/g, '$1')}</div>
                       </div>
 
                       <div class="flex-grow-1 text-right">
@@ -466,7 +464,7 @@ function getPaginatedArrayLastMessage(id) {
 
         const sortedMessages = pagnicateChatList.data.sort((a, b) => b.id - a.id);
         const lastMessage = sortedMessages[0];
-        console.log("pagnicateChatList",pagnicateChatList.data);
+        console.log("pagnicateChatList", pagnicateChatList.data);
         // return pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
         return lastMessage;
     } else {
@@ -912,7 +910,6 @@ function updateViewChatList(editedMessage) {
 
 let addMessageToMessageArea = (message, flag = false) => {
     let msgDate = mDate(message.time).getDate();
-console.log(message.user);
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
     let senderName = message.user.name;
 
@@ -1160,7 +1157,6 @@ console.log(message.user);
         `;
         } else {
             messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
-            console.log("messageContent", messageContent);
         }
 
     }
@@ -1199,7 +1195,6 @@ console.log(message.user);
     `;
     }
     if (!message.is_privacy_breach && !message.is_deleted) {
-        console.log("recover message here", message);
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -2176,7 +2171,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
             socket.emit('moveMessage', selectedMessageIds, newGroupId, DOM.groupId);
 
             const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
-            generateMessageArea(newGroupChatListItem, newIndex, false);
+            generateMessageArea(newGroupChatListItem, newIndex, false, null);
             cancelMoveMessage();
             document.querySelector(".close").click();
         })
@@ -2253,7 +2248,7 @@ DOM.messages.addEventListener('scroll', async () => {
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
         showSpinner();
-        await fetchPaginatedMessages();
+        await fetchPaginatedMessages(null,null,null);
         hideSpinner();
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
@@ -2266,6 +2261,7 @@ const displayedMessageIds = new Set();
 
 let isLoading = false;
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null) => {
+    console.log("message",message_id);
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
@@ -2613,7 +2609,7 @@ function unread_settings(query_set) {
 
 let currentlyPlayingAudio = null;
 
-let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) => {
+let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null) => {
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
 
@@ -2641,7 +2637,8 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
     }
 
     DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
-    if (searchMessage) {
+    if (groupSearchMessageId) {
+        console.log("search message", searchMessage);
         fetch(`/get-group-by-id/${DOM.groupId}`)
             .then(response => response.json())
             .then(data => {
@@ -2657,11 +2654,11 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false) 
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-    if (searchMessage) {
-        await fetchPaginatedMessages(DOM.clickSearchMessageId, null, DOM.groupId);
+    if (groupSearchMessageId) {
+        await fetchPaginatedMessages(groupSearchMessageId, null, DOM.groupId);
     }
     else {
-        await fetchPaginatedMessages();
+        await fetchPaginatedMessages(null,null,null);
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
@@ -3328,10 +3325,12 @@ let searchGroups = async (searchQuery, loadMore = false) => {
             const groupResponse = await fetch(url);
             const response = await groupResponse.json();
             if (response) {
-                const groups = response.data.groups.data; // Paginated groups
-                const messages = response.data.messages.data; // Paginated messages
+                console.log("group search response",response);
+                const groups = response.data.groups.data;
+                const messages = response.data.messages.data;
+                console.log("messags",messages);
 
-                if (groups.length === 0) {
+                if (!groups || !groups.data || groups.data.length === 0) {
                     if (!loadMore) {
                         DOM.chatList.innerHTML += ` <div class="no-groups-found">No Groups Found.</div>`;
                     }
@@ -3989,24 +3988,24 @@ function ImageViewer(elem) {
     });
 }
 
-let update_user_profile=async (file)=>{
+let update_user_profile = async (file) => {
     try {
-        const response=await fetch("update_user_profile", {
+        const response = await fetch("update_user_profile", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-Token": csrfToken,
             },
-            body: JSON.stringify({ 
-                userId:user.id,
-                imgUrl:file
-             }),
+            body: JSON.stringify({
+                userId: user.id,
+                imgUrl: file
+            }),
         });
         const res = await response.json();
-       if(res.status == 200){
-        DOM.profilePic.src="assets/profile_pics/"+file;
-        DOM.displayPic.src="assets/profile_pics/"+file;
-       }
+        if (res.status == 200) {
+            DOM.profilePic.src = "assets/profile_pics/" + file;
+            DOM.displayPic.src = "assets/profile_pics/" + file;
+        }
     } catch (error) {
         console.error('Error updating User Profile:', error);
     }
