@@ -568,6 +568,7 @@ socket.on('sendChatToClient', (message) => {
     if (pagnicateChatList && pagnicateChatList.data) {
         pagnicateChatList.data.push(message);
     }
+    
     let unique_id = document.getElementById("login_user_unique_id").value;
 
     const groupId = message.group_id;
@@ -903,7 +904,7 @@ function updateViewChatList(editedMessage) {
 
 let addMessageToMessageArea = (message, flag = false) => {
     let msgDate = mDate(message.time).getDate();
-    let profileImage = `<img src="assets/profile_pics/${message.user?.pic}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px; width:50px;">`;
+    let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:50px; width:50px; margin-top:5px">`;
     let senderName = message.user.name;
 
     let messageContent;
@@ -1191,11 +1192,12 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
+       
+            
 
-            ${message.user.id == user.id ? '' : profileImage}
-
-            <div class="" >
-                <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
+            <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
+            ${message.user.id == user.id ? '' : profileImage}    
+            <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
                            ${messageContent}
@@ -1311,11 +1313,11 @@ let addMessageToMessageArea = (message, flag = false) => {
     else if (message.is_privacy_breach && user.role == 0 || user.role == 2) {
 
         let messageElement = document.createElement('div');
-        messageElement.id = "unread-" + message.id;
+        messageElement.className = "ml-3";
         messageElement.innerHTML = `
-        <div class="ml-3">
-            ${message.user.id == user.id ? '' : profileImage}
-            <div class="" >
+       
+              <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
+            ${message.user.id == user.id ? '' : profileImage} 
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
@@ -1333,7 +1335,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                     </div>
                 </div>
             </div>
-        </div>
+       
     `;
         if (flag) {
             DOM.messages.appendChild(messageElement);
@@ -1344,11 +1346,11 @@ let addMessageToMessageArea = (message, flag = false) => {
     }
     else if (message.is_deleted && user.role == 0 || user.role == 2) {
         let messageElement = document.createElement('div');
-        messageElement.id = "unread-" + message.id;
+        messageElement.className = "ml-3";
         messageElement.innerHTML = `
-            <div class="ml-3">
-                ${message.user.id == user.id ? '' : profileImage}
-                <div class="" >
+            
+                <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
+            ${message.user.id == user.id ? '' : profileImage} 
                     <div class="deleted_niddle align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                         <div style="margin-top:-4px">
                             <div class="shadow-sm additional_style msg_deleted" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
@@ -1367,7 +1369,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         </div>
                     </div>
                 </div>
-            </div>
+           
         `;
         if (flag) {
             DOM.messages.appendChild(messageElement);
@@ -1562,7 +1564,6 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("Element 'correction-div' not found");
     }
-    document.getElementById("messages").style.marginBottom = "68px";
 }
 
 function correction_send_handel() {
@@ -1773,10 +1774,20 @@ function editMessage(messageId) {
 
         }
 
-        if (editMessage.length > 200) {
-            DOM.messageInput.style.overflowY = 'scroll';
-        }
-        DOM.messageInput.style.height = element.offsetHeight + "px";
+       const msgElem= DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+       const replyMessageArea = msgElem.querySelector('.reply-message-area');
+      
+    
+       if(replyMessageArea)
+       {
+        console.log("replyed message height",replyMessageArea.offsetHeight);
+        DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
+       }
+       else{
+        console.log("Normal message height",msgElem.offsetHeight);
+        DOM.messageInput.style.height = msgElem.offsetHeight + "px";
+       }
+        autoResize();
         change_icon_height(element);
     }
 }
@@ -1981,8 +1992,8 @@ function removeQuotedMessage() {
     DOM.replyId = null;
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
-
-    // <<<<<<< local-dev
+    document.querySelector("#input").value="";
+        // <<<<<<< local-dev
     //     const chat_action = document.getElementById('chat_action');
     //     if (getComputedStyle(chat_action).display == "none") {
     //         const Editreplyarea = document.getElementById('message-reply-area');
@@ -2046,7 +2057,6 @@ function moveMessage(messageId) {
 
     if (messageElement) {
         const parentDiv = messageElement.closest('.ml-3');
-
         if (parentDiv) {
             parentDiv.classList.toggle('selected-message');
         } else {
@@ -2818,7 +2828,7 @@ let init = () => {
     // DOM.profilePic.src = user.pic;
     // DOM.profilePic.addEventListener("click", () => DOM.profilePicInput.click());
     // DOM.profilePicInput.addEventListener("change", () => console.log(DOM.profilePicInput.files[0]));
-    DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
+    // DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
     generateChatList();
     const firebaseConfig = {
         apiKey: "AIzaSyA8spaZnrsTPHRM-c-Cvybu6fJD-o8CMAQ",
@@ -3117,12 +3127,11 @@ function autoResize() {
     const scrollTop = textarea.scrollTop;
     textarea.style.overflowY = 'hidden';
     const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+    textarea.style.height = newHeight + 'px';
     requestAnimationFrame(() => {
-
         if (newHeight >= maxHeight) {
-            textarea.style.height = newHeight + 'px';
-            textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
-            textarea.scrollTop = scrollTop;
+              textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
+                textarea.scrollTop = scrollTop;
         }
     });
     var iconContainer = document.querySelector('.icon-container');
@@ -3134,7 +3143,6 @@ function autoResize() {
     if (getComputedStyle(repDiv).display == "block") {
         var combinedHeight = parseInt(repDiv.offsetHeight) + parseInt(newHeight);
     }
-
     iconContainer.style.bottom = (combinedHeight + 50) + "px";
 }
 textarea.addEventListener('input', autoResize);
@@ -3977,8 +3985,8 @@ function ImageViewer(elem) {
         });
     });
 }
-
-let update_user_profile = async (file) => {
+let update_user_profile=async (elem,file)=>{
+    
     try {
         const response = await fetch("update_user_profile", {
             method: "POST",
@@ -3992,12 +4000,38 @@ let update_user_profile = async (file) => {
             }),
         });
         const res = await response.json();
-        if (res.status == 200) {
-            DOM.profilePic.src = "assets/profile_pics/" + file;
-            DOM.displayPic.src = "assets/profile_pics/" + file;
-        }
+       if(res.status == 200){
+        const profileDiv=document.getElementsByClassName("profile-icons")[0];
+        const activeImage = profileDiv.getElementsByClassName("choose-profile-images active")[0];
+        activeImage.classList.remove("active");
+        DOM.profilePic.src="assets/profile_pics/"+file;
+        DOM.displayPic.src="assets/profile_pics/"+file;
+        elem.classList.add('active');
+       }
     } catch (error) {
         console.error('Error updating User Profile:', error);
     }
 }
+DOM.inputName.addEventListener("blur",async (e) =>{
+    const name= e.target.value;
 
+    try {
+        const response=await fetch("update_user_profile", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": csrfToken,
+            },
+            body: JSON.stringify({ 
+                userId:user.id,
+                name:name
+             }),
+        });
+        const res = await response.json();
+       if(res.status == 200){
+        user.name = name;
+       }
+    } catch (error) {
+        console.error('Error updating User Profile:', error);
+    }
+});

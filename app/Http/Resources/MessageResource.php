@@ -41,6 +41,7 @@ class MessageResource extends JsonResource
                     'seen_privacy' => $this->user->seen_privacy,
                     'code' => $this->user->code,
                     'status' => $this->user->status,
+                    'pic'=>$this->user->profile_img,
                 ],
         ];
     }

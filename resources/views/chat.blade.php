@@ -296,7 +296,7 @@
                         </div>
                         <div class="profile-icons">        
                     @for($i=1;$i<=10;$i++)
-                    <img onclick="update_user_profile('<?= $i ?>.png')" src="{{asset('assets/profile_pics/'.$i.'.png')}}" alt="profile-img"
+                    <img onclick="update_user_profile(this, '<?= $i ?>.png')" src="{{ asset('assets/profile_pics/'.$i.'.png') }}" alt="profile-img"
                      class="choose-profile-images {{pathinfo(auth()->user()->profile_img, PATHINFO_FILENAME) == $i ? 'active':''}}" />
                     @endfor
 
@@ -819,7 +819,7 @@
     </script>
 
 
-    <script type="module">
+    <!-- <script type="module">
         import {
             Picker
         } from 'https://esm.sh/emoji-picker-element@1.18.2';
@@ -871,7 +871,7 @@
                 }
             });
         });
-    </script>
+    </script> -->
 
     <!-- Your JavaScript -->
     <script>
@@ -893,8 +893,8 @@
 
             textarea.addEventListener('input', function() {
 
-                textarea.style.height = 'auto';
-                textarea.style.height = (textarea.scrollHeight) + 'px';
+                // textarea.style.height = 'auto';
+                // textarea.style.height = (textarea.scrollHeight) + 'px';
 
 
                 updateFileIconVisibility();
@@ -909,6 +909,7 @@
                 updateFileIconVisibility();
             });
         });
+       
     </script>
     <script src="{{ asset('assets/js/filesize-aleart.js') }}"></script>
     <script src="{{ asset('assets/js/sidemodel.js') }}"></script>
