@@ -263,7 +263,6 @@ function getCleanedTextSnippet(text) {
         .slice(0, 30);
 }
 let viewMessageList = () => {
-    console.log("messageList",messageList);
     DOM.messagesList.innerHTML = `
     <div class="heading">
         <h2>Messages</h2>
@@ -381,18 +380,18 @@ function makeformatDate(dateString) {
 socket.on('deleteMessage', (messageId, isMove) => {
 
     if (isMove == true) {
-        console.log("is move true");
+
         var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
         if (messageElement) {
             messageElement.remove();
         }
     }
     else {
-        console.log("is move false");
+
         var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
 
         if (user.role != 0 && user.role != 2) {
-            console.log("user role is not 0 or 2");
+
             if (messageElement) {
                 messageElement.remove();
                 viewChatList();
@@ -411,9 +410,9 @@ socket.on('deleteMessage', (messageId, isMove) => {
             }
         }
         else {
-            console.log("admin user");
+
             var replyLink = messageElement.find('#reply-link');
-            console.log("reply link", replyLink);
+
             if (replyLink.length) {
                 replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
@@ -422,7 +421,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
             }
             // const message = findMessageById(messageId);
             const message = getPaginatedArrayLastMessage(messageId);
-            console.log(" last message in delete Message", message);
+
             updateChatList(message)
         }
         messageElement.find(".additional_style").addClass("msg_deleted");
@@ -431,7 +430,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
     }
 });
 // function getPaginatedArrayLastMessage(id) {
-//     console.log("chatList", chatList);
+//
 //     if (pagnicateChatList && pagnicateChatList.data) {
 //         return pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
 //     }
@@ -440,7 +439,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
 //             group.group.group_messages.some(message => message.id === id)
 //         );
 //         if (group) {
-//             console.log("grouo", group);
+//
 
 //             let lastMessage;
 
@@ -449,22 +448,20 @@ socket.on('deleteMessage', (messageId, isMove) => {
 //             } else {
 //                 lastMessage = group.group_messages;
 //             }
-//             console.log(lastMessage);
+//
 //             return lastMessage;
 //         } else {
 //             console.log("Group not found");
 //         }
 //     }
-//     // console.log("pagnicateChatList.data",pagnicateChatList.data);
+//
 // }
 
 function getPaginatedArrayLastMessage(id) {
-    console.log("chatList", chatList);
-    if (pagnicateChatList && pagnicateChatList.data && pagnicateChatList.data.length > 0) {
 
+    if (pagnicateChatList && pagnicateChatList.data && pagnicateChatList.data.length > 0) {
         const sortedMessages = pagnicateChatList.data.sort((a, b) => b.id - a.id);
         const lastMessage = sortedMessages[0];
-        console.log("pagnicateChatList", pagnicateChatList.data);
         // return pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
         return lastMessage;
     } else {
@@ -472,7 +469,6 @@ function getPaginatedArrayLastMessage(id) {
             group.group.group_messages.some(message => message.id === id)
         );
         if (group) {
-            console.log("group", group);
 
             let lastMessage;
 
@@ -483,7 +479,6 @@ function getPaginatedArrayLastMessage(id) {
             }
             return lastMessage;
         } else {
-            console.log("Group not found for the given message ID");
             return null;
         }
     }
@@ -494,12 +489,12 @@ function findMessageById(messageId) {
         return pagnicateChatList.data.find(message => message.id === messageId);
     }
     else {
-        console.log("chat list", chatList);
+
         let group = chatList.find(group =>
             group.group.group_messages.some(message => message.id === messageId)
         );
         let deleteMessage = group ? group.group.group_messages.find(message => message.id === messageId) : null;
-        console.log("message without pagination", deleteMessage);
+
         return deleteMessage;
     }
 }
@@ -530,11 +525,11 @@ function updateChatList(message) {
         }
     }
     else {
-        console.log("else part without pagination", message);
+
         let currentUsergroup = chatList.find(group => group.group.group_id === message.group_id);
         if (currentUsergroup) {
             currentUsergroup.group.group_messages.push(message);
-            console.log("event user group", currentUsergroup)
+
             viewChatList();
         }
     }
@@ -877,9 +872,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
 socket.on('restoreMessage', (incomingMessage) => {
     // Check user role
     if (user.role != 0 && user.role != 2) {
-        // Use a different name for the message retrieved from findMessageById
-        console.log("non admin", incomingMessage);
-        // const retrievedMessage = findMessageById(incomingMessage.message.id);
+
         updateChatList(incomingMessage.message);
         addMessageToMessageArea(incomingMessage.message, true);
     } else {
@@ -2120,8 +2113,6 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
                 socket.emit('deleteMessage', oldMessage.id, true);
             });
 
-            console.log("move message server response", data);
-
             const newGroupIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
 
             if (newGroupIndex !== -1) {
@@ -2261,7 +2252,7 @@ const displayedMessageIds = new Set();
 
 let isLoading = false;
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null) => {
-    console.log("message",message_id);
+
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
@@ -2638,7 +2629,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
 
     DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
     if (groupSearchMessageId) {
-        console.log("search message", searchMessage);
+
         fetch(`/get-group-by-id/${DOM.groupId}`)
             .then(response => response.json())
             .then(data => {
@@ -2771,7 +2762,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                     time: Math.floor(Date.now() / 1000),
                     csrf_token: csrfToken,
                 };
-                console.log("message obj", msg);
+
                 socket.emit('sendChatToServer', msg);
             }
             DOM.messageInput.value = "";
@@ -3325,10 +3316,10 @@ let searchGroups = async (searchQuery, loadMore = false) => {
             const groupResponse = await fetch(url);
             const response = await groupResponse.json();
             if (response) {
-                console.log("group search response",response);
+
                 const groups = response.data.groups.data;
                 const messages = response.data.messages.data;
-                console.log("messags",messages);
+
 
                 if (!groups || !groups.data || groups.data.length === 0) {
                     if (!loadMore) {
@@ -3880,7 +3871,7 @@ function get_voice_list() {
 }
 
 async function restoreMessage(id) {
-    console.log("message id", id);
+
     try {
         await fetch("message/restore/" + id, {
             headers: {
@@ -3897,9 +3888,8 @@ async function restoreMessage(id) {
             }
         }).then(message => {
             socket.emit('restoreMessage', message);
-            console.log("restore message response", message, id);
+
             var messageElement = $(`[data-message-id="${id}"]`);
-            console.log("restore message element ", messageElement);
 
             if (messageElement.length > 0) {
                 const restoreButton = $(`#restore-button-${id}`);
@@ -3908,7 +3898,7 @@ async function restoreMessage(id) {
                     restoreButton.replaceWith(`<span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
                 }
                 // messageElement.removeClass('deleted');
-                console.log("restoring message", messageElement)
+
                 messageElement.removeClass("deleted_niddle");
                 messageElement.find(".additional_style").removeClass("msg_deleted");
             }
