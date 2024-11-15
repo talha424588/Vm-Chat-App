@@ -1402,3 +1402,13 @@ body{
 .deleted_niddle::after{
 	border-top: 10px solid #f4baba !important;
 }
+#onesignal-bell-launcher{
+	bottom: unset !important;
+	right:unset !important;
+}
+.onesignal-bell-container{
+	position: absolute !important;
+	bottom: 200px !important;
+	right: 60px !important;
+	
+}

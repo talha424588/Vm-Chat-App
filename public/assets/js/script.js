@@ -3970,3 +3970,41 @@ DOM.inputName.addEventListener("blur",async (e) =>{
         console.error('Error updating User Profile:', error);
     }
 });
+let dragableIcon = () => {
+    const draggableIcon = document.querySelector('.onesignal-bell-container');
+    draggableIcon.setAttribute('draggable', 'true');
+
+    draggableIcon.addEventListener('dragstart', (event) => {
+        event.dataTransfer.setData('text/plain', null); // For Firefox compatibility
+        event.dataTransfer.effectAllowed = 'move';
+    });
+
+    document.addEventListener('dragover', (event) => {
+        event.preventDefault(); // Prevent default to allow drop
+    });
+
+    document.addEventListener('drop', (event) => {
+        event.preventDefault();
+        
+        const iconSize = 50; // Adjust this based on the actual icon size
+        const x = event.clientX;
+        const y = event.clientY;
+        
+        // Calculate the boundaries for the icon
+        const minX = 0;
+        const maxX = window.innerWidth - iconSize;
+        const minY = 0;
+        const maxY = window.innerHeight - iconSize;
+
+        // Ensure the new position is within the boundaries
+        const newX = Math.max(minX, Math.min(x - iconSize / 2, maxX));
+        const newY = Math.max(minY, Math.min(y - iconSize / 2, maxY));
+
+        // Set the position of the icon based on the adjusted drop location
+        draggableIcon.style.position = 'absolute';
+        draggableIcon.style.left = `${newX}px`;
+        draggableIcon.style.top = `${newY}px`;
+    });
+}
+
+setTimeout(dragableIcon, 2000);
