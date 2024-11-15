@@ -304,7 +304,7 @@
                                 <label class="profile-setting-name">Profile Pictures</label>
                             </div>
                         </div>
-                        <div class="profile-icons">        
+                        <div class="profile-icons">
                     @for($i=1;$i<=10;$i++)
                     <img onclick="update_user_profile(this, '<?= $i ?>.png')" src="{{ asset('assets/profile_pics/'.$i.'.png') }}" alt="profile-img"
                      class="choose-profile-images {{pathinfo(auth()->user()->profile_img, PATHINFO_FILENAME) == $i ? 'active':''}}" />
@@ -916,7 +916,7 @@
                 updateFileIconVisibility();
             });
         });
-       
+
     </script>
     <script src="{{ asset('assets/js/filesize-aleart.js') }}"></script>
     <script src="{{ asset('assets/js/sidemodel.js') }}"></script>

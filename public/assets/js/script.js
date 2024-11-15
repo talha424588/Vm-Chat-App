@@ -567,7 +567,7 @@ socket.on('sendChatToClient', (message) => {
     if (pagnicateChatList && pagnicateChatList.data) {
         pagnicateChatList.data.push(message);
     }
-    
+
     let unique_id = document.getElementById("login_user_unique_id").value;
 
     const groupId = message.group_id;
@@ -1191,11 +1191,11 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
-       
-            
+
+
 
             <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
-            ${message.user.id == user.id ? '' : profileImage}    
+            ${message.user.id == user.id ? '' : profileImage}
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
@@ -1314,9 +1314,9 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
-       
+
               <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
-            ${message.user.id == user.id ? '' : profileImage} 
+            ${message.user.id == user.id ? '' : profileImage}
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
@@ -1334,7 +1334,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                     </div>
                 </div>
             </div>
-       
+
     `;
         if (flag) {
             DOM.messages.appendChild(messageElement);
@@ -1347,9 +1347,9 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
-            
+
                 <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
-            ${message.user.id == user.id ? '' : profileImage} 
+            ${message.user.id == user.id ? '' : profileImage}
                     <div class="deleted_niddle align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                         <div style="margin-top:-4px">
                             <div class="shadow-sm additional_style msg_deleted" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
@@ -1368,7 +1368,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         </div>
                     </div>
                 </div>
-           
+
         `;
         if (flag) {
             DOM.messages.appendChild(messageElement);
@@ -1761,8 +1761,8 @@ function editMessage(messageId) {
 
        const msgElem= DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
        const replyMessageArea = msgElem.querySelector('.reply-message-area');
-      
-    
+
+
        if(replyMessageArea)
        {
         console.log("replyed message height",replyMessageArea.offsetHeight);
@@ -2837,51 +2837,6 @@ let init = () => {
 
 init();
 
-
-// window.OneSignalDeferred = window.OneSignalDeferred || [];
-// OneSignalDeferred.push(async function (OneSignal) {
-//     await OneSignal.init({
-//         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-//         safari_web_id: "web.onesignal.auto.204803f7-478b-4564-9a97-0318e873c676",
-//         notifyButton: {
-//             enable: true,
-//         },
-//         allowLocalhostAsSecureOrigin: true,
-//     });
-// });
-
-// const checkSubscription = setInterval(() => {
-//     if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id) {
-//         clearInterval(checkSubscription);
-//         oneSignalSubscription();
-//     }
-// }, 5000);
-
-
-
-
-// function oneSignalSubscription() {
-//     console.log("OneSignal", OneSignal.User.PushSubscription.id);
-//     DOM.fcmToken = OneSignal.User.PushSubscription.id;
-//     user.fcm_token = OneSignal.User.PushSubscription.id;
-//     console.log("DOM.fcmToken", OneSignal.User.PushSubscription.id);
-//     const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json",
-//             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-//         },
-//     }).then(updateUserFcmToken => {
-//         console.log("user cubs cription response", updateUserFcmToken);
-//         if (!updateUserFcmToken.ok) {
-//             throw new Error(`HTTP error! Status: ${response.status}`);
-//         }
-//         document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
-//     }).catch(error => {
-//         console.log(error);
-//     }
-//     )
-// }
 
 var OneSignal = window.OneSignal || [];
 
@@ -3967,7 +3922,7 @@ function ImageViewer(elem) {
     });
 }
 let update_user_profile=async (elem,file)=>{
-    
+
     try {
         const response = await fetch("update_user_profile", {
             method: "POST",
@@ -4002,7 +3957,7 @@ DOM.inputName.addEventListener("blur",async (e) =>{
                 "Content-Type": "application/json",
                 "X-CSRF-Token": csrfToken,
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 userId:user.id,
                 name:name
              }),

@@ -63,9 +63,6 @@ class FirebaseService
             return response()->json(['error' => 'Invalid subscription IDs format'], 400);
         }
 
-        // $validSubscriptionIds = is_array($subsIdsArray) ? array_filter($subsIdsArray, function ($id) {
-        //     return isset($id) && $id !== '' && $id !== null;
-        // }) : [];
 
         $validSubscriptionIds = array_filter($subsIdsArray, function ($id) {
             return !is_null($id);
@@ -84,23 +81,26 @@ class FirebaseService
         $fullMessage = "$senderName\n$messageContent";
 
         Log::info('Request Payload:', [
-            'app_id' => 'd9ec86fd-fc8c-4567-8573-0428916eb93e',
+            'app_id' => '4b86d80b-744a-4d02-bd8e-0aea7235d4c2',
             'headings' => ['en' => 'Vm Chat'],
             'contents' => ['en' => $fullMessage],
             'include_subscription_ids' => $validSubscriptionIds,
         ]);
 
+        $groupUrl = url("/group-chat/{$message->group_id}");
+
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Basic MGZjOWMzNTctMzlmOS00ZjMxLWE4MmUtNzIxOTkyZjFmYjhm',
+                'Authorization' => 'Basic NmU3YzYzMWMtYjZkNy00ZDcwLTgyZmMtY2U1ZDdmOTViZDIx',
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ])->post('https://api.onesignal.com/notifications', [
-                'app_id' => 'd9ec86fd-fc8c-4567-8573-0428916eb93e',
+                'app_id' => '4b86d80b-744a-4d02-bd8e-0aea7235d4c2',
                 'target_channel' => 'push',
                 'headings' => ['en' => 'Vm Chat'],
                 'contents' => ['en' => $fullMessage],
                 'include_subscription_ids' => array_values($validSubscriptionIds),
+                'url' => $groupUrl, // Link to the group chat
             ]);
 
             if ($response->failed()) {
