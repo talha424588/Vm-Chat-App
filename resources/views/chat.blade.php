@@ -589,7 +589,22 @@
 
                             </i>
                         </div>
+                        <div class="chat-action-icons" id="message-send-area"
+                            style="display:none; margin-left: 5px;margin-top:15px">
 
+
+                            <i id="send-normal-message-btn" onclick="sendMessageFunc()" class="chat-icon">
+
+                                <svg width="31" height="30" viewBox="0 0 31 31" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
+                                    <path
+                                        d="M22.4355 8.33332L5.11261 12.4775C4.93818 12.5193 4.77916 12.6096 4.65403 12.7381C4.5289 12.8666 4.44279 13.028 4.40569 13.2035C4.3686 13.3789 4.38204 13.5613 4.44446 13.7295C4.50688 13.8976 4.61571 14.0446 4.75833 14.1534L8.52702 17.0255L15.9931 14.5851L11.9722 21.3327L13.9464 25.6403C14.0206 25.8039 14.1399 25.943 14.2903 26.0413C14.4407 26.1397 14.6159 26.1931 14.7956 26.1955C14.9753 26.1979 15.1519 26.149 15.3048 26.0547C15.4577 25.9603 15.5806 25.8244 15.6591 25.6628L23.5073 9.67331C23.5867 9.51179 23.6184 9.33102 23.5989 9.15212C23.5793 8.97323 23.5092 8.8036 23.3968 8.66306C23.2844 8.52252 23.1343 8.41689 22.9641 8.35849C22.7938 8.3001 22.6105 8.29137 22.4355 8.33332Z"
+                                        fill="white" />
+                                </svg>
+
+                            </i>
+                        </div>
                         <div class="chat-action-icons" id="correctionreply-area"
                             style="display:none; margin-left:4px !important; ">
                             <i id="correction-send-message-btn" class="chat-icon">
@@ -886,17 +901,38 @@
             const textarea = document.querySelector('.chat-input');
             const fileIcon = document.querySelector('#file-icon');
             const chaticon = document.querySelector('#captureid');
-
-            function updateFileIconVisibility() {
-                if (textarea.value.trim() === "") {
-                    fileIcon.style.visibility = 'visible';
-                    chaticon.style.visibility = 'visible';
-                } else {
-                    fileIcon.style.visibility = 'hidden'; // Hide the file-icon when textarea has text
-                    chaticon.style.visibility = 'hidden';
-                }
+            const chatIcons=document.querySelector('#chat_action');
+            const sendButton=document.querySelector('#message-send-area');
+            const replyDiv = document.querySelector('#reply-div');
+            const editMessageDiv = document.querySelector('#editMessageDiv');
+           
+    // Check if #reply-div is not displayed
+    function updateFileIconVisibility() {
+    // Check if #reply-div or #editMessageDiv is not displayed
+    if (window.getComputedStyle(replyDiv).display !== "block" && window.getComputedStyle(editMessageDiv).display !== "block") {
+        if (textarea.value.trim() === "") {
+            if (chatIcons.style.display !== "flex") {
+                chatIcons.style.display = "flex";
             }
-
+            if (sendButton.style.display !== "none") {
+                sendButton.style.display = "none";
+            }
+            if (fileIcon.style.display !== "initial") {
+                fileIcon.style.display = "initial";
+            }
+        } else {
+            if (fileIcon.style.display !== "none") {
+                fileIcon.style.display = "none";
+            }
+            if (chatIcons.style.display !== "none") {
+                chatIcons.style.display = "none";
+            }
+            if (sendButton.style.display !== "block") {
+                sendButton.style.display = "block";
+            }
+        }
+    }
+}
 
             textarea.addEventListener('input', function() {
 
