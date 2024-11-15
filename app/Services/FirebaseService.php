@@ -87,7 +87,7 @@ class FirebaseService
             'include_subscription_ids' => $validSubscriptionIds,
         ]);
 
-        $groupUrl = url("/group-chat/{$message->group_id}");
+        $groupUrl = url("/group-chat/{$message->group_id}?message_id={$message->id}");
 
         try {
             $response = Http::withHeaders([
@@ -100,7 +100,7 @@ class FirebaseService
                 'headings' => ['en' => 'Vm Chat'],
                 'contents' => ['en' => $fullMessage],
                 'include_subscription_ids' => array_values($validSubscriptionIds),
-                'url' => $groupUrl, // Link to the group chat
+                'url' => $groupUrl,
             ]);
 
             if ($response->failed()) {
