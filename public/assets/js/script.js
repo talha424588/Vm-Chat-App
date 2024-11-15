@@ -4014,7 +4014,6 @@ let update_user_profile=async (elem,file)=>{
 }
 DOM.inputName.addEventListener("blur",async (e) =>{
     const name= e.target.value;
-
     try {
         const response=await fetch("update_user_profile", {
             method: "POST",
