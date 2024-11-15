@@ -19,17 +19,14 @@ class UserController extends Controller
 
     $user=User::find($request->userId);
     if($user)
-    {
+    { 
+        if($request->name)
+        $user->name = $request->name;
+        if($request->imgUrl)
         $user->profile_img = $request->imgUrl;
-        if($user->save())
-        {
-            return response()->json(["status" => 200, "profile" => "updated successfully"],200);
-        }
+        $user->save();
+        return response()->json(["status" => 200, "profile" => "updated successfully"],200);
     }
-    else
-    {
-        return response()->json(["status" =>404, "message" => "updated successfully"],404);
-
-    }
+        return response()->json(["status" =>404, "message" => "an error occured while updating"],404);
     }
 }

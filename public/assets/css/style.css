@@ -708,8 +708,8 @@ color: #666;
 	padding: 10px 15px;
 	border-radius: 6px;
 	float: left;
-	left: 44px;
-	top:-50px;
+	left: -10px;
+	
   }
 
   .left-nidle::before {
@@ -1400,9 +1400,5 @@ body{
 	background-color: #f4baba !important;
 }
 .deleted_niddle::after{
-	
 	border-top: 10px solid #f4baba !important;
-}
-#profile-pic{
-	border: 2px solid black;
 }
