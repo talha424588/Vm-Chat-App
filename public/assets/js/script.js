@@ -525,7 +525,6 @@ function updateChatList(message) {
         }
     }
     else {
-
         let currentUsergroup = chatList.find(group => group.group.group_id === message.group_id);
         if (currentUsergroup) {
             currentUsergroup.group.group_messages.push(message);
@@ -871,7 +870,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
 });
 
 socket.on('restoreMessage', (incomingMessage) => {
-    // Check user role
+
     if (user.role != 0 && user.role != 2) {
 
         updateChatList(incomingMessage.message);
@@ -1672,11 +1671,6 @@ function removecorrectionMessage() {
 
     const correctionreplyarea = document.getElementById('correctionreply-area');
 
-    // document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
-    //     element.style.display = 'block';
-    //     element.style.visibility = 'visible';
-    // });
-
     if (getComputedStyle(chat_action).display == "none") {
         chat_action.style.display = 'flex';
         correctionarea.style.display = 'none';
@@ -1687,15 +1681,6 @@ function removecorrectionMessage() {
 
     }
 
-    // Select the element with the ID 'chat_action'
-    // document.querySelectorAll('.chat_action_file, .chat_action_capture, .chat_action_voice').forEach(function (element) {
-    //     element.style.visibility = 'visible';
-    // });
-
-    // Create a new style element
-    // var style = document.createElement('style');
-    // style.innerHTML = "#chat_action { display: flex !important; }";
-    // document.head.appendChild(style);
     replyDiv.style.display = 'none';
     iconContainer.style.bottom = '90px';
 }
@@ -1799,7 +1784,6 @@ function change_icon_height(element) {
     const dis = viewportHeight - elementRect.top + 10;
     iconContainer.style.bottom = dis + 'px';
 }
-
 
 function handleSendMessage() {
 
@@ -2037,7 +2021,7 @@ const sendMessageReply = () => {
     sendMessage();
     removeQuotedMessage();
 }
-// Array to store selected message IDs
+
 let selectedMessageIds = [];
 let selectedMessages = [];
 
@@ -2074,7 +2058,6 @@ function moveMessage(messageId) {
         console.error(`Message with ID: ${messageId} not found.`);
     }
 }
-
 
 function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove) {
     const selectedMessages = moveMessageIds.map(id => {
@@ -2713,10 +2696,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
             const numberPattern = /\b\d{7,}\b/;
             const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
 
-            const fileIcon = document.querySelector('#file-icon');
-            const chaticon = document.querySelector('#captureid');
-            // fileIcon.style.visibility = 'visible';
-            // chaticon.style.visibility = 'visible';
             let value = DOM.messageInput.value;
             if (value === "") return;
             let reason = '';
@@ -2809,7 +2788,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
 
 let showProfileSettings = () => {
     DOM.profileSettings.style.left = 0;
-    // DOM.profilePic.src = user.pic;
     DOM.inputName.value = user.name;
 };
 
@@ -2824,11 +2802,13 @@ window.addEventListener("resize", e => {
 
 let init = () => {
     DOM.username.innerHTML = user.name;
+
     // DOM.displayPic.src = user.pic;
     // DOM.profilePic.src = user.pic;
     // DOM.profilePic.addEventListener("click", () => DOM.profilePicInput.click());
     // DOM.profilePicInput.addEventListener("change", () => console.log(DOM.profilePicInput.files[0]));
     // DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
+
     generateChatList();
     const firebaseConfig = {
         apiKey: "AIzaSyA8spaZnrsTPHRM-c-Cvybu6fJD-o8CMAQ",
@@ -2903,88 +2883,88 @@ init();
 //     )
 // }
 
-// var OneSignal = window.OneSignal || [];
+var OneSignal = window.OneSignal || [];
 
-// OneSignal.push(function () {
-//     OneSignal.init({
-//         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-//         notifyButton: {
-//             enable: true,
-//             size: 'medium',
-//             theme: 'default',
-//             showCredit: false,
-//             text: {
-//                 'tip.state.unsubscribed': 'Subscribe to notifications',
-//                 'tip.state.subscribed': "You're subscribed to notifications",
-//                 'tip.state.blocked': "You've blocked notifications",
-//                 'message.prenotify': 'Click to subscribe to notifications',
-//                 'message.action.subscribed': "Thanks for subscribing!",
-//                 'message.action.resubscribed': "You're subscribed to notifications",
-//                 'message.action.unsubscribed': "You won't receive notifications again",
-//                 'dialog.main.title': 'Manage Site Notifications',
-//                 'dialog.main.button.subscribe': 'SUBSCRIBE',
-//                 'dialog.main.button.unsubscribe': 'UNSUBSCRIBE',
-//                 'dialog.blocked.title': 'Unblock Notifications',
-//                 'dialog.blocked.message': "Follow these instructions to allow notifications:"
-//             },
-//             colors: {
-//                 'circle.background': 'rgb(84,110,123)',
-//                 'circle.foreground': 'white',
-//                 'badge.background': 'rgb(84,110,123)',
-//                 'badge.foreground': 'white',
-//                 'badge.bordercolor': 'white',
-//                 'pulse.color': 'white',
-//                 'dialog.button.background.hovering': 'rgb(77, 101, 113)',
-//                 'dialog.button.background.active': 'rgb(70, 92, 103)',
-//                 'dialog.button.background': 'rgb(84,110,123)',
-//                 'dialog.button.foreground': 'white'
-//             },
-//             displayPredicate: function () {
-//                 return OneSignal.isPushNotificationsEnabled()
-//                     .then(function (isPushEnabled) {
-//                         return !isPushEnabled;
-//                     });
-//             }
-//         },
-//         allowLocalhostAsSecureOrigin: true,
-//     });
-//     OneSignal.on('subscriptionChange', function (isSubscribed) {
-//         if (isSubscribed) {
-//             OneSignal.getUserId().then(function (userId) {
-//                 if (userId) {
-//                     oneSignalSubscription(userId);
-//                 } else {
-//                     console.warn("User ID is not available yet.");
-//                 }
-//             });
-//         }
-//     });
-// });
+OneSignal.push(function () {
+    OneSignal.init({
+        appId: "4b86d80b-744a-4d02-bd8e-0aea7235d4c2",
+        notifyButton: {
+            enable: true,
+            size: 'medium',
+            theme: 'default',
+            showCredit: false,
+            text: {
+                'tip.state.unsubscribed': 'Subscribe to notifications',
+                'tip.state.subscribed': "You're subscribed to notifications",
+                'tip.state.blocked': "You've blocked notifications",
+                'message.prenotify': 'Click to subscribe to notifications',
+                'message.action.subscribed': "Thanks for subscribing!",
+                'message.action.resubscribed': "You're subscribed to notifications",
+                'message.action.unsubscribed': "You won't receive notifications again",
+                'dialog.main.title': 'Manage Site Notifications',
+                'dialog.main.button.subscribe': 'SUBSCRIBE',
+                'dialog.main.button.unsubscribe': 'UNSUBSCRIBE',
+                'dialog.blocked.title': 'Unblock Notifications',
+                'dialog.blocked.message': "Follow these instructions to allow notifications:"
+            },
+            colors: {
+                'circle.background': 'rgb(84,110,123)',
+                'circle.foreground': 'white',
+                'badge.background': 'rgb(84,110,123)',
+                'badge.foreground': 'white',
+                'badge.bordercolor': 'white',
+                'pulse.color': 'white',
+                'dialog.button.background.hovering': 'rgb(77, 101, 113)',
+                'dialog.button.background.active': 'rgb(70, 92, 103)',
+                'dialog.button.background': 'rgb(84,110,123)',
+                'dialog.button.foreground': 'white'
+            },
+            displayPredicate: function () {
+                return OneSignal.isPushNotificationsEnabled()
+                    .then(function (isPushEnabled) {
+                        return !isPushEnabled;
+                    });
+            }
+        },
+        allowLocalhostAsSecureOrigin: true,
+    });
+    OneSignal.on('subscriptionChange', function (isSubscribed) {
+        if (isSubscribed) {
+            OneSignal.getUserId().then(function (userId) {
+                if (userId) {
+                    oneSignalSubscription(userId);
+                } else {
+                    console.warn("User ID is not available yet.");
+                }
+            });
+        }
+    });
+});
 
 
 
-// function oneSignalSubscription(userId) {
+function oneSignalSubscription(userId) {
 
-//     DOM.fcmToken = userId;
-//     user.fcm_token = userId;
+    DOM.fcmToken = userId;
+    user.fcm_token = userId;
 
-//     const updateUserFcmToken = fetch("user/update/" + userId, {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json",
-//             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-//         },
-//     }).then(updateUserFcmToken => {
-//         console.log("user cubs cription response", updateUserFcmToken);
-//         if (!updateUserFcmToken.ok) {
-//             throw new Error(`HTTP error! Status: ${response.status}`);
-//         }
-//         document.getElementById("login_user_fcm_token").value = userId;
-//     }).catch(error => {
-//         console.log(error);
-//     }
-//     )
-// }
+    const updateUserFcmToken = fetch("user/update/" + userId, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+        },
+    }).then(updateUserFcmToken => {
+        console.log("user cubs cription response", updateUserFcmToken);
+        if (!updateUserFcmToken.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        document.getElementById("login_user_fcm_token").value = userId;
+    }).catch(error => {
+        console.log(error);
+    }
+    )
+}
 
 const voiceIcon = document.getElementById('voice-icon');
 const voiceSvg = document.getElementById('voice-svg');
@@ -3960,6 +3940,7 @@ const resetChatArea = () => {
         unreadWrapper.remove();
     }
 }
+
 function ImageViewer(elem) {
     const images = elem.querySelectorAll('.view-image');
     images.forEach(image => {
