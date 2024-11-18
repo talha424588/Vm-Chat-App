@@ -2941,6 +2941,7 @@ OneSignal.push(function () {
             }
         },
         allowLocalhostAsSecureOrigin: true,
+        persistNotification:false,
     });
     OneSignal.on('subscriptionChange', function (isSubscribed) {
         if (isSubscribed) {
