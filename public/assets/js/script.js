@@ -46,8 +46,8 @@ const DOM = {
     searchMessageClick: false,
     lastMessageId: null,
     isSubscribed: false,
-    notification_message_id: document.getElementById("notification_message_id"),
-    notification_group_id: document.getElementById("notification_group_id"),
+    notification_message_id: document.getElementById("notification_message_id").value,
+    notification_group_id: document.getElementById("notification_group_id").value,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -329,12 +329,9 @@ let viewMessageList = () => {
         });
 };
 
-let generateChatList = async (groupId = null, messageId = null) => {
+let generateChatList = async () => {
     await populateGroupList();
     viewChatList();
-    if (groupId && messageId) {
-        generateMessageArea(null, null, false, groupId, messageId);
-    }
 };
 
 let addDateToMessageArea = (date) => {
@@ -1501,7 +1498,7 @@ function CorrectionMessage(message_id, senderName) {
     }
     const sendMessagebutton = document.getElementById('message-send-area');
     if (window.getComputedStyle(sendMessagebutton).display === 'block') {
-        sendMessagebutton.style.display="none";
+        sendMessagebutton.style.display = "none";
     }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg.replace(/\n/g, "<br>").trim();
@@ -1520,13 +1517,13 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("TinyMCE editor not initialized for #input");
     }
-    console.log("this is the message after the tiny get set content",messagebody);
+    console.log("this is the message after the tiny get set content", messagebody);
 
     const correction_message_id = document.getElementById('correction_message_id');
     correction_message_id.value = message_id;
 
     const messageContent = tinymce.get('input').getContent();
-    console.log("after setting now getting content",messageContent);
+    console.log("after setting now getting content", messageContent);
 
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
@@ -1560,7 +1557,7 @@ function correction_call(message_id, messagebody, senderName) {
     }
 
     if (quotedNameElement) {
-        quotedNameElement.innerHTML = messagebody.substring(0,200)+".....";
+        quotedNameElement.innerHTML = messagebody.substring(0, 200) + ".....";
 
         // quotedNameElement.textContent = messagebody;
     } else {
@@ -1714,7 +1711,7 @@ function editMessage(messageId) {
     }
     const sendMessagebutton = document.getElementById('message-send-area');
     if (window.getComputedStyle(sendMessagebutton).display === 'block') {
-        sendMessagebutton.style.display="none";
+        sendMessagebutton.style.display = "none";
     }
     let editMessage = null;
 
@@ -1759,9 +1756,8 @@ function editMessage(messageId) {
 
         const Editreplyarea = document.getElementById('Editreply-area');
         const chat_action = document.getElementById('chat_action');
-        if(getComputedStyle(chat_action).display == "none")
-        {
-            chat_action.style.display="flex";
+        if (getComputedStyle(chat_action).display == "none") {
+            chat_action.style.display = "flex";
         }
         if ((getComputedStyle(chat_action).display === "flex" || getComputedStyle(chat_action).display === "block") &&
             getComputedStyle(Editreplyarea).display === "none") {
@@ -1898,7 +1894,7 @@ function showReply(message_id, senderName, type) {
     if (selectedMessageIds > 0) {
         return;
     }
-    document.querySelector("#input").value="";
+    document.querySelector("#input").value = "";
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
@@ -2625,7 +2621,7 @@ function unread_settings(query_set) {
 
 let currentlyPlayingAudio = null;
 
-let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null,notificationMessageId=null) => {
+let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
 
@@ -2653,7 +2649,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     }
 
     DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
-    if (groupSearchMessageId) {
+    if (groupSearchMessageId || (groupSearchMessageId && notificationMessageId)) {
 
         fetch(`/get-group-by-id/${DOM.groupId}`)
             .then(response => response.json())
@@ -2670,7 +2666,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-    if (groupSearchMessageId) {
+    if (groupSearchMessageId && !notificationMessageId) {
         await fetchPaginatedMessages(groupSearchMessageId, null, DOM.groupId);
     }
     else {
@@ -2841,7 +2837,38 @@ let init = () => {
     // DOM.profilePicInput.addEventListener("change", () => console.log(DOM.profilePicInput.files[0]));
     // DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
 
-    generateChatList(DOM.notification_group_id, DOM.notification_message_id);
+    generateChatList();
+    // if (DOM.notification_group_id != null && DOM.notification_group_id !== "" &&
+    //     DOM.notification_message_id != null && DOM.notification_message_id !== "") {
+    //     setTimeout(() => {
+    //         console.log("init function", chatList);
+    //         const elem = document.querySelector(`[data-group-id="${DOM.notification_group_id}"]`);
+    //         console.log("init elem", elem);
+    //         const newIndex = chatList.findIndex(group => group.group.group_id === DOM.notification_group_id);
+    //         console.log("init newIndex", newIndex);
+    //         generateMessageArea(elem, newIndex, null, DOM.notification_group_id, DOM.notification_message_id);
+    //     }, 4000);
+    // }
+
+    const waitForChatList = setInterval(() => {
+        if (chatList.length > 1) {
+            clearInterval(waitForChatList);
+
+            if (DOM.notification_group_id != null && DOM.notification_group_id !== "" &&
+                DOM.notification_message_id != null && DOM.notification_message_id !== "") {
+
+                const elem = document.querySelector(`[data-group-id="${DOM.notification_group_id}"]`);
+                const newIndex = chatList.findIndex(group => group.group.group_id === DOM.notification_group_id);
+
+                if (newIndex !== -1) {
+                    generateMessageArea(elem, newIndex, null, DOM.notification_group_id, DOM.notification_message_id);
+                } else {
+                    console.warn("Notification group not found in chatList.");
+                }
+            }
+        }
+    }, 100);
+
     const firebaseConfig = {
         apiKey: "AIzaSyA8spaZnrsTPHRM-c-Cvybu6fJD-o8CMAQ",
         authDomain: "vm-chat-5c18d.firebaseapp.com",
@@ -3149,11 +3176,11 @@ textarea.addEventListener('keydown', function (event) {
         const sendMessagebutton = document.getElementById('message-send-area');
 
         if (window.getComputedStyle(sendMessagebutton).display === 'block') {
-        sendMessagebutton.style.display="none";
-        const chatIcons=document.querySelector('#chat_action');
-        if (chatIcons.style.display !== "flex") {
-            chatIcons.style.display = "flex";
-        }
+            sendMessagebutton.style.display = "none";
+            const chatIcons = document.querySelector('#chat_action');
+            if (chatIcons.style.display !== "flex") {
+                chatIcons.style.display = "flex";
+            }
         }
         if (window.getComputedStyle(editReplyArea).display === 'none') {
             event.preventDefault();
@@ -3978,15 +4005,15 @@ let update_user_profile = async (elem, file) => {
             }),
         });
         const res = await response.json();
-       if(res.status == 200){
-        const profileDiv=document.getElementsByClassName("profile-icons")[0];
-        const activeImage = profileDiv.getElementsByClassName("choose-profile-images active")[0];
-        if(activeImage)
-        activeImage.classList.remove("active");
-        DOM.profilePic.src="assets/profile_pics/"+file;
-        DOM.displayPic.src="assets/profile_pics/"+file;
-        elem.classList.add('active');
-       }
+        if (res.status == 200) {
+            const profileDiv = document.getElementsByClassName("profile-icons")[0];
+            const activeImage = profileDiv.getElementsByClassName("choose-profile-images active")[0];
+            if (activeImage)
+                activeImage.classList.remove("active");
+            DOM.profilePic.src = "assets/profile_pics/" + file;
+            DOM.displayPic.src = "assets/profile_pics/" + file;
+            elem.classList.add('active');
+        }
     } catch (error) {
         console.error('Error updating User Profile:', error);
     }
@@ -4015,7 +4042,7 @@ DOM.inputName.addEventListener("blur", async (e) => {
 });
 let dragableIcon = () => {
     const draggableIcon = document.querySelector('.onesignal-bell-container');
-    if(!draggableIcon)
+    if (!draggableIcon)
         return;
     draggableIcon.setAttribute('draggable', 'true');
 
@@ -4053,25 +4080,25 @@ let dragableIcon = () => {
 }
 
 setTimeout(dragableIcon, 2000);
-let sendMessageFunc=()=>{
+let sendMessageFunc = () => {
     const sendMessagebutton = document.getElementById('message-send-area');
 
     if (window.getComputedStyle(sendMessagebutton).display === 'block') {
-    sendMessagebutton.style.display="none";
-    const chatIcons=document.querySelector('#chat_action');
-    if (chatIcons.style.display !== "flex") {
-        chatIcons.style.display = "flex";
+        sendMessagebutton.style.display = "none";
+        const chatIcons = document.querySelector('#chat_action');
+        if (chatIcons.style.display !== "flex") {
+            chatIcons.style.display = "flex";
+        }
     }
-}
 
-sendMessage();
-            textarea.style.height = '44px';
-            textarea.style.overflowY = 'hidden';
-            removeQuotedMessage();
-            const chatActionElement = document.getElementById('chat_action');
-            if (chatActionElement) {
-                chatActionElement.setAttribute('tabindex', '0');
-                chatActionElement.focus();
-            }
-            textarea.focus();
+    sendMessage();
+    textarea.style.height = '44px';
+    textarea.style.overflowY = 'hidden';
+    removeQuotedMessage();
+    const chatActionElement = document.getElementById('chat_action');
+    if (chatActionElement) {
+        chatActionElement.setAttribute('tabindex', '0');
+        chatActionElement.focus();
+    }
+    textarea.focus();
 };

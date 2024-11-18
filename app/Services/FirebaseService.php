@@ -86,7 +86,7 @@ class FirebaseService
             'include_subscription_ids' => $validSubscriptionIds,
         ]);
 
-        $groupUrl = url("/?group_id={$message->group_id}?message_id={$message->id}");
+        $groupUrl = url("/?group_id={$message->group_id}&message_id={$message->id}");
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Basic NmU3YzYzMWMtYjZkNy00ZDcwLTgyZmMtY2U1ZDdmOTViZDIx',

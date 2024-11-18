@@ -907,7 +907,7 @@
             const sendButton=document.querySelector('#message-send-area');
             const replyDiv = document.querySelector('#reply-div');
             const editMessageDiv = document.querySelector('#editMessageDiv');
-           
+
     // Check if #reply-div is not displayed
     function updateFileIconVisibility() {
     // Check if #reply-div or #editMessageDiv is not displayed

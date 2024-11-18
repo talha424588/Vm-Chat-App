@@ -20,13 +20,9 @@ class ChatController extends Controller
 
     public function index(Request $request)
     {
-        // if ($request->group_id) {
             $group_id = $request->group_id ?? null;
             $message_id = $request->message_id ?? null;
             return view('chat', compact("group_id","message_id"));
-        // }
-
-        // return view('chat');
     }
     //
     public function searchGroupMessages(Request $request)
