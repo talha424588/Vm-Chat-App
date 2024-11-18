@@ -46,6 +46,8 @@ const DOM = {
     searchMessageClick: false,
     lastMessageId: null,
     isSubscribed: false,
+    notification_message_id: document.getElementById("notification_message_id").value,
+    notification_group_id: document.getElementById("notification_group_id").value,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -567,7 +569,7 @@ socket.on('sendChatToClient', (message) => {
     if (pagnicateChatList && pagnicateChatList.data) {
         pagnicateChatList.data.push(message);
     }
-    
+
     let unique_id = document.getElementById("login_user_unique_id").value;
 
     const groupId = message.group_id;
@@ -1190,11 +1192,11 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
-       
-            
 
-            <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
-            ${message.user.id == user.id ? '' : profileImage}    
+
+
+            <div class="" ${message.user.id == user.id ? '' : 'style="display:flex"'}>
+            ${message.user.id == user.id ? '' : profileImage}
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
@@ -1313,9 +1315,9 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
-       
-              <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
-            ${message.user.id == user.id ? '' : profileImage} 
+
+              <div class="" ${message.user.id == user.id ? '' : 'style="display:flex"'}>
+            ${message.user.id == user.id ? '' : profileImage}
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
@@ -1333,7 +1335,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                     </div>
                 </div>
             </div>
-       
+
     `;
         if (flag) {
             DOM.messages.appendChild(messageElement);
@@ -1346,9 +1348,9 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
-            
-                <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
-            ${message.user.id == user.id ? '' : profileImage} 
+
+                <div class="" ${message.user.id == user.id ? '' : 'style="display:flex"'}>
+            ${message.user.id == user.id ? '' : profileImage}
                     <div class="deleted_niddle align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                         <div style="margin-top:-4px">
                             <div class="shadow-sm additional_style msg_deleted" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
@@ -1367,7 +1369,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         </div>
                     </div>
                 </div>
-           
+
         `;
         if (flag) {
             DOM.messages.appendChild(messageElement);
@@ -1496,12 +1498,12 @@ function CorrectionMessage(message_id, senderName) {
     }
     const sendMessagebutton = document.getElementById('message-send-area');
     if (window.getComputedStyle(sendMessagebutton).display === 'block') {
-        sendMessagebutton.style.display="none";
+        sendMessagebutton.style.display = "none";
     }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg.replace(/\n/g, "<br>").trim();
-  
-    
+
+
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
     });
@@ -1509,20 +1511,20 @@ function CorrectionMessage(message_id, senderName) {
 
 function correction_call(message_id, messagebody, senderName) {
 
-    
+
     if (tinymce.get('input')) {
         tinymce.get('input').setContent(messagebody);
     } else {
         console.error("TinyMCE editor not initialized for #input");
     }
-    console.log("this is the message after the tiny get set content",messagebody);
-    
+    console.log("this is the message after the tiny get set content", messagebody);
+
     const correction_message_id = document.getElementById('correction_message_id');
     correction_message_id.value = message_id;
 
     const messageContent = tinymce.get('input').getContent();
-    console.log("after setting now getting content",messageContent);
-    
+    console.log("after setting now getting content", messageContent);
+
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
 
@@ -1555,7 +1557,7 @@ function correction_call(message_id, messagebody, senderName) {
     }
 
     if (quotedNameElement) {
-        quotedNameElement.innerHTML = messagebody.substring(0,200)+".....";
+        quotedNameElement.innerHTML = messagebody.substring(0, 200) + ".....";
 
         // quotedNameElement.textContent = messagebody;
     } else {
@@ -1709,7 +1711,7 @@ function editMessage(messageId) {
     }
     const sendMessagebutton = document.getElementById('message-send-area');
     if (window.getComputedStyle(sendMessagebutton).display === 'block') {
-        sendMessagebutton.style.display="none";
+        sendMessagebutton.style.display = "none";
     }
     let editMessage = null;
 
@@ -1754,9 +1756,8 @@ function editMessage(messageId) {
 
         const Editreplyarea = document.getElementById('Editreply-area');
         const chat_action = document.getElementById('chat_action');
-        if(getComputedStyle(chat_action).display == "none")
-        {
-            chat_action.style.display="flex";
+        if (getComputedStyle(chat_action).display == "none") {
+            chat_action.style.display = "flex";
         }
         if ((getComputedStyle(chat_action).display === "flex" || getComputedStyle(chat_action).display === "block") &&
             getComputedStyle(Editreplyarea).display === "none") {
@@ -1771,17 +1772,31 @@ function editMessage(messageId) {
 
         }
 
-       const msgElem= DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-       const replyMessageArea = msgElem.querySelector('.reply-message-area');
+// <<<<<<< hassanraza
+//        const msgElem= DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+//        const replyMessageArea = msgElem.querySelector('.reply-message-area');
       
     
-       if(replyMessageArea)
-       {
-        DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
-       }
-       else{
-        DOM.messageInput.style.height = msgElem.offsetHeight + "px";
-       }
+//        if(replyMessageArea)
+//        {
+//         DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
+//        }
+//        else{
+//         DOM.messageInput.style.height = msgElem.offsetHeight + "px";
+//        }
+// =======
+        const msgElem = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+        const replyMessageArea = msgElem.querySelector('.reply-message-area');
+
+
+        if (replyMessageArea) {
+            console.log("replyed message height", replyMessageArea.offsetHeight);
+            DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
+        }
+        else {
+            console.log("Normal message height", msgElem.offsetHeight);
+            DOM.messageInput.style.height = msgElem.offsetHeight + "px";
+        }
         autoResize();
         change_icon_height(element);
     }
@@ -1892,7 +1907,7 @@ function showReply(message_id, senderName, type) {
     if (selectedMessageIds > 0) {
         return;
     }
-    document.querySelector("#input").value="";
+    document.querySelector("#input").value = "";
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
@@ -1987,8 +2002,8 @@ function removeQuotedMessage() {
     DOM.replyId = null;
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
-    document.querySelector("#input").value="";
-        // <<<<<<< local-dev
+    document.querySelector("#input").value = "";
+    // <<<<<<< local-dev
     //     const chat_action = document.getElementById('chat_action');
     //     if (getComputedStyle(chat_action).display == "none") {
     //         const Editreplyarea = document.getElementById('message-reply-area');
@@ -2243,7 +2258,7 @@ DOM.messages.addEventListener('scroll', async () => {
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
         showSpinner();
-        await fetchPaginatedMessages(null,null,null);
+        await fetchPaginatedMessages(null, null, null);
         hideSpinner();
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
@@ -2304,20 +2319,35 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         DOM.unreadCounter = Notseenby.length;
         const notSeenById = Notseenby.at(-1);
 
-        try {
-            const response = await fetch("message/seen-by/update", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-Token": csrfToken,
-                },
-                body: JSON.stringify({ ids }),
-            });
+        // try {
+        //     const response = await fetch("message/seen-by/update", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //             "X-CSRF-Token": csrfToken,
+        //         },
+        //         body: JSON.stringify({ ids }),
+        //     });
 
-            const readMessageResponse = await response.json();
-        } catch (error) {
-            console.error('Error updating seen messages:', error);
-        }
+        //     const readMessageResponse = await response.json();
+        // } catch (error) {
+        //     console.error('Error updating seen messages:', error);
+        // }
+
+        (async () => {
+            try {
+                await fetch("message/seen-by/update", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-Token": csrfToken,
+                    },
+                    body: JSON.stringify({ ids }),
+                });
+            } catch (error) {
+                console.error('Error updating seen messages:', error);
+            }
+        })();
 
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
@@ -2604,13 +2634,13 @@ function unread_settings(query_set) {
 
 let currentlyPlayingAudio = null;
 
-let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null) => {
+let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
 
     DOM.messages.innerHTML = '';
 
-    DOM.groupId = elem.dataset.groupId;
+    DOM.groupId = elem.dataset.groupId ?? groupSearchMessageId;
     DOM.currentPage = 1;
     displayedMessageIds.clear();
 
@@ -2632,7 +2662,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     }
 
     DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
-    if (groupSearchMessageId) {
+    if (groupSearchMessageId || (groupSearchMessageId && notificationMessageId)) {
 
         fetch(`/get-group-by-id/${DOM.groupId}`)
             .then(response => response.json())
@@ -2649,11 +2679,11 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-    if (groupSearchMessageId) {
+    if (groupSearchMessageId && !notificationMessageId) {
         await fetchPaginatedMessages(groupSearchMessageId, null, DOM.groupId);
     }
     else {
-        await fetchPaginatedMessages(null,null,null);
+        await fetchPaginatedMessages(null, null, null);
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
@@ -2673,20 +2703,20 @@ function scroll_to_unread_div() {
 }
 
 async function updateMessageSeenBy(ids) {
-    try {
-        const response = await fetch("message/seen-by/update", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken,
-            },
-            body: JSON.stringify({ ids }),
-        });
-
-        const readMessageResponse = await response.json();
-    } catch (error) {
-        console.log(error);
-    }
+    (async () => {
+        try {
+            await fetch("message/seen-by/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken,
+                },
+                body: JSON.stringify({ ids }),
+            });
+        } catch (error) {
+            console.error('Error updating seen messages:', error);
+        }
+    })();
 }
 
 let showChatList = () => {
@@ -2821,6 +2851,37 @@ let init = () => {
     // DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
 
     generateChatList();
+    // if (DOM.notification_group_id != null && DOM.notification_group_id !== "" &&
+    //     DOM.notification_message_id != null && DOM.notification_message_id !== "") {
+    //     setTimeout(() => {
+    //         console.log("init function", chatList);
+    //         const elem = document.querySelector(`[data-group-id="${DOM.notification_group_id}"]`);
+    //         console.log("init elem", elem);
+    //         const newIndex = chatList.findIndex(group => group.group.group_id === DOM.notification_group_id);
+    //         console.log("init newIndex", newIndex);
+    //         generateMessageArea(elem, newIndex, null, DOM.notification_group_id, DOM.notification_message_id);
+    //     }, 4000);
+    // }
+
+    const waitForChatList = setInterval(() => {
+        if (chatList.length > 1) {
+            clearInterval(waitForChatList);
+
+            if (DOM.notification_group_id != null && DOM.notification_group_id !== "" &&
+                DOM.notification_message_id != null && DOM.notification_message_id !== "") {
+
+                const elem = document.querySelector(`[data-group-id="${DOM.notification_group_id}"]`);
+                const newIndex = chatList.findIndex(group => group.group.group_id === DOM.notification_group_id);
+
+                if (newIndex !== -1) {
+                    generateMessageArea(elem, newIndex, null, DOM.notification_group_id, DOM.notification_message_id);
+                } else {
+                    console.warn("Notification group not found in chatList.");
+                }
+            }
+        }
+    }, 100);
+
     const firebaseConfig = {
         apiKey: "AIzaSyA8spaZnrsTPHRM-c-Cvybu6fJD-o8CMAQ",
         authDomain: "vm-chat-5c18d.firebaseapp.com",
@@ -2848,51 +2909,6 @@ let init = () => {
 
 init();
 
-
-// window.OneSignalDeferred = window.OneSignalDeferred || [];
-// OneSignalDeferred.push(async function (OneSignal) {
-//     await OneSignal.init({
-//         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-//         safari_web_id: "web.onesignal.auto.204803f7-478b-4564-9a97-0318e873c676",
-//         notifyButton: {
-//             enable: true,
-//         },
-//         allowLocalhostAsSecureOrigin: true,
-//     });
-// });
-
-// const checkSubscription = setInterval(() => {
-//     if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id) {
-//         clearInterval(checkSubscription);
-//         oneSignalSubscription();
-//     }
-// }, 5000);
-
-
-
-
-// function oneSignalSubscription() {
-//     console.log("OneSignal", OneSignal.User.PushSubscription.id);
-//     DOM.fcmToken = OneSignal.User.PushSubscription.id;
-//     user.fcm_token = OneSignal.User.PushSubscription.id;
-//     console.log("DOM.fcmToken", OneSignal.User.PushSubscription.id);
-//     const updateUserFcmToken = fetch("user/update/" + OneSignal.User.PushSubscription.id, {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json",
-//             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
-//         },
-//     }).then(updateUserFcmToken => {
-//         console.log("user cubs cription response", updateUserFcmToken);
-//         if (!updateUserFcmToken.ok) {
-//             throw new Error(`HTTP error! Status: ${response.status}`);
-//         }
-//         document.getElementById("login_user_fcm_token").value = OneSignal.User.PushSubscription.id;
-//     }).catch(error => {
-//         console.log(error);
-//     }
-//     )
-// }
 
 var OneSignal = window.OneSignal || [];
 
@@ -3132,6 +3148,7 @@ function autoResize() {
 
     requestAnimationFrame(() => {
         if (newHeight >= maxHeight) {
+
             textarea.style.overflowY = 'scroll';
             // Only scroll to bottom if the user hasn't manually scrolled up
             if (!isUserScrolledUp) {
@@ -3140,6 +3157,10 @@ function autoResize() {
         } else {
             textarea.style.overflowY = 'hidden';
             textarea.scrollTop = textarea.scrollTop;  // Maintain current scroll position
+
+//             textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
+//             textarea.scrollTop = scrollTop;
+
         }
     });
 
@@ -3199,7 +3220,9 @@ textarea.addEventListener('keydown', function (event) {
 
 
 textarea.addEventListener('keydown', function (event) {
+
     if (event.key === 'Enter' && !event.shiftKey) {
+
         const editReplyArea = document.getElementById('Editreply-area');
         const sendMessagebutton = document.getElementById('message-send-area');
 
@@ -4021,8 +4044,8 @@ function ImageViewer(elem) {
         });
     });
 }
-let update_user_profile=async (elem,file)=>{
-    
+let update_user_profile = async (elem, file) => {
+
     try {
         const response = await fetch("update_user_profile", {
             method: "POST",
@@ -4036,44 +4059,44 @@ let update_user_profile=async (elem,file)=>{
             }),
         });
         const res = await response.json();
-       if(res.status == 200){
-        const profileDiv=document.getElementsByClassName("profile-icons")[0];
-        const activeImage = profileDiv.getElementsByClassName("choose-profile-images active")[0];
-        if(activeImage)
-        activeImage.classList.remove("active");
-        DOM.profilePic.src="assets/profile_pics/"+file;
-        DOM.displayPic.src="assets/profile_pics/"+file;
-        elem.classList.add('active');
-       }
+        if (res.status == 200) {
+            const profileDiv = document.getElementsByClassName("profile-icons")[0];
+            const activeImage = profileDiv.getElementsByClassName("choose-profile-images active")[0];
+            if (activeImage)
+                activeImage.classList.remove("active");
+            DOM.profilePic.src = "assets/profile_pics/" + file;
+            DOM.displayPic.src = "assets/profile_pics/" + file;
+            elem.classList.add('active');
+        }
     } catch (error) {
         console.error('Error updating User Profile:', error);
     }
 }
-DOM.inputName.addEventListener("blur",async (e) =>{
-    const name= e.target.value;
+DOM.inputName.addEventListener("blur", async (e) => {
+    const name = e.target.value;
     try {
-        const response=await fetch("update_user_profile", {
+        const response = await fetch("update_user_profile", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-Token": csrfToken,
             },
-            body: JSON.stringify({ 
-                userId:user.id,
-                name:name
-             }),
+            body: JSON.stringify({
+                userId: user.id,
+                name: name
+            }),
         });
         const res = await response.json();
-       if(res.status == 200){
-        user.name = name;
-       }
+        if (res.status == 200) {
+            user.name = name;
+        }
     } catch (error) {
         console.error('Error updating User Profile:', error);
     }
 });
 let dragableIcon = () => {
     const draggableIcon = document.querySelector('.onesignal-bell-container');
-    if(!draggableIcon)
+    if (!draggableIcon)
         return;
     draggableIcon.setAttribute('draggable', 'true');
 
@@ -4088,11 +4111,11 @@ let dragableIcon = () => {
 
     document.addEventListener('drop', (event) => {
         event.preventDefault();
-        
+
         const iconSize = 50; // Adjust this based on the actual icon size
         const x = event.clientX;
         const y = event.clientY;
-        
+
         // Calculate the boundaries for the icon
         const minX = 0;
         const maxX = window.innerWidth - iconSize;
@@ -4111,25 +4134,25 @@ let dragableIcon = () => {
 }
 
 setTimeout(dragableIcon, 2000);
-let sendMessageFunc=()=>{
+let sendMessageFunc = () => {
     const sendMessagebutton = document.getElementById('message-send-area');
-        
-    if (window.getComputedStyle(sendMessagebutton).display === 'block') {
-    sendMessagebutton.style.display="none";
-    const chatIcons=document.querySelector('#chat_action');
-    if (chatIcons.style.display !== "flex") {
-        chatIcons.style.display = "flex";
-    }
-}
 
-sendMessage();
-            textarea.style.height = '44px';
-            textarea.style.overflowY = 'hidden';
-            removeQuotedMessage();
-            const chatActionElement = document.getElementById('chat_action');
-            if (chatActionElement) {
-                chatActionElement.setAttribute('tabindex', '0');
-                chatActionElement.focus();
-            }
-            textarea.focus();
+    if (window.getComputedStyle(sendMessagebutton).display === 'block') {
+        sendMessagebutton.style.display = "none";
+        const chatIcons = document.querySelector('#chat_action');
+        if (chatIcons.style.display !== "flex") {
+            chatIcons.style.display = "flex";
+        }
+    }
+
+    sendMessage();
+    textarea.style.height = '44px';
+    textarea.style.overflowY = 'hidden';
+    removeQuotedMessage();
+    const chatActionElement = document.getElementById('chat_action');
+    if (chatActionElement) {
+        chatActionElement.setAttribute('tabindex', '0');
+        chatActionElement.focus();
+    }
+    textarea.focus();
 };

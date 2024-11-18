@@ -75,12 +75,10 @@ class ChatService implements ChatRepository
                     ]
                 ], 404);
             }
-        } else if ($request->messageId){
+        } else if ($request->messageId) {
             return $this->fetchMessagesUpToSearched($request);
-        }
-        else if($request->lastMessageId)
-        {
-            return $this->fetchMessagesFromSpecificId($request,50);
+        } else if ($request->lastMessageId) {
+            return $this->fetchMessagesFromSpecificId($request, 50);
         }
     }
     private function fetchMessagesUpToSearched($request)
@@ -91,27 +89,24 @@ class ChatService implements ChatRepository
         Log::info('fetchMessagesUpToSearched:', ['pageNo' => $pageNo, 'messageId' => $messageId, 'groupId' => $groupId]);
 
         $messages = GroupMessage::where('group_id', $groupId)
-        ->where('id', '>=', $messageId)
-        ->where('is_deleted', false)
-        ->orderBy('id', 'desc')
-        // ->take(10000)
-        // ->skip($pageNo * 20)
-        ->get();
-        if(count($messages))
-        {
+            ->where('id', '>=', $messageId)
+            ->where('is_deleted', false)
+            ->orderBy('id', 'desc')
+            // ->take(10000)
+            // ->skip($pageNo * 20)
+            ->get();
+        if (count($messages)) {
             return response()->json([
                 'status' => true,
                 'message' => 'Messages found',
                 'data' => new MessageResourceCollection($messages),
-            ],200);
-        }
-        else
-        {
+            ], 200);
+        } else {
             return response()->json([
                 'status' => false,
                 'message' => 'Not found',
                 'data' => null,
-            ],404);
+            ], 404);
         }
     }
 
@@ -301,5 +296,11 @@ class ChatService implements ChatRepository
         } else {
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
         }
+    }
+
+    public function openChatGroup($request, $groupId)
+    {
+        $message_id = $request->message_id;
+        return view('chat', compact('message_id', 'groupId'));
     }
 }

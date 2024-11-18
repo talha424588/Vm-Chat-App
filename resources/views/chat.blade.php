@@ -304,7 +304,7 @@
                                 <label class="profile-setting-name">Profile Pictures</label>
                             </div>
                         </div>
-                        <div class="profile-icons">        
+                        <div class="profile-icons">
                     @for($i=1;$i<=10;$i++)
                     <img onclick="update_user_profile(this, '<?= $i ?>.png')" src="{{ asset('assets/profile_pics/'.$i.'.png') }}" alt="profile-img"
                      class="choose-profile-images {{pathinfo(auth()->user()->profile_img, PATHINFO_FILENAME) == $i ? 'active':''}}" />
@@ -776,6 +776,8 @@
     <input type="hidden" value="{{ Auth::user()->fcm_token }}" id="login_user_fcm_token">
     <input type="hidden" value="{{ Auth::user()->seen_privacy }}" id="login_user_seen_privacy">
     <input type="hidden" value="{{ Auth::user()->role }}" id="login_user_role">
+    <input type="hidden" value="{{$group_id}}" id="notification_group_id">
+    <input type="hidden" value="{{$message_id}}" id="notification_message_id">
 
     <style>
         .hidden {
@@ -905,7 +907,7 @@
             const sendButton=document.querySelector('#message-send-area');
             const replyDiv = document.querySelector('#reply-div');
             const editMessageDiv = document.querySelector('#editMessageDiv');
-           
+
     // Check if #reply-div is not displayed
     function updateFileIconVisibility() {
     // Check if #reply-div or #editMessageDiv is not displayed
@@ -952,7 +954,7 @@
                 updateFileIconVisibility();
             });
         });
-       
+
     </script>
     <script src="{{ asset('assets/js/filesize-aleart.js') }}"></script>
     <script src="{{ asset('assets/js/sidemodel.js') }}"></script>

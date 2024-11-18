@@ -11,20 +11,18 @@ use App\Repositories\ChatRepository;
 use App\Services\FirebaseService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
-use Google\Client;
 
 class ChatController extends Controller
 {
     public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        return view('chat');
+            $group_id = $request->group_id ?? null;
+            $message_id = $request->message_id ?? null;
+            return view('chat', compact("group_id","message_id"));
     }
     //
     public function searchGroupMessages(Request $request)
@@ -100,7 +98,7 @@ class ChatController extends Controller
                 $message->reply ? GroupMessage::where("id", $message->reply_id)->first() : "null";
                 $message->reply->user ? User::where("unique_id", $message->sender)->first() : "null";
             }
-            // $this->firebaseService->sendNotification($message);
+            $this->firebaseService->sendNotification($message);
             return response()->json($message, 201);
         }
     }
@@ -208,5 +206,10 @@ class ChatController extends Controller
     public function restoreMessage($id)
     {
         return $this->chatRepository->restoreDeletedMessage($id);
+    }
+
+    public function openChatGroup(Request $request, $group_id)
+    {
+        return $this->chatRepository->openChatGroup($request, $group_id);
     }
 }

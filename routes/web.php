@@ -51,6 +51,9 @@ Route::group(['middleware' => ['auth:web']], function () {
 
     //Chats Routes
     Route::get('search-groups-chat-messages', [ChatController::class, 'searchGroupMessages']);
+
+    // Route::get('?{group_id}', [ChatController::class, 'openChatGroup']);
+
     Route::get('get-groups-messages-by-group-id', [ChatController::class, 'getUserAllGroupsMessages']);
 
     Route::get('/messages', [ChatController::class, 'index']);
