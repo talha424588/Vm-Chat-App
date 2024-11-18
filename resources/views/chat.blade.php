@@ -761,6 +761,8 @@
     <input type="hidden" value="{{ Auth::user()->fcm_token }}" id="login_user_fcm_token">
     <input type="hidden" value="{{ Auth::user()->seen_privacy }}" id="login_user_seen_privacy">
     <input type="hidden" value="{{ Auth::user()->role }}" id="login_user_role">
+    <input type="hidden" value="{{$group_id}}" id="notification_group_id">
+    <input type="hidden" value="{{$message_id}}" id="notification_message_id">
 
     <style>
         .hidden {

@@ -46,6 +46,8 @@ const DOM = {
     searchMessageClick: false,
     lastMessageId: null,
     isSubscribed: false,
+    notification_message_id: document.getElementById("notification_message_id"),
+    notification_group_id: document.getElementById("notification_group_id"),
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -327,9 +329,12 @@ let viewMessageList = () => {
         });
 };
 
-let generateChatList = async () => {
+let generateChatList = async (groupId = null, messageId = null) => {
     await populateGroupList();
     viewChatList();
+    if (groupId && messageId) {
+        generateMessageArea(null, null, false, groupId, messageId);
+    }
 };
 
 let addDateToMessageArea = (date) => {
@@ -1194,7 +1199,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
 
-            <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
+            <div class="" ${message.user.id == user.id ? '' : 'style="display:flex"'}>
             ${message.user.id == user.id ? '' : profileImage}
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
@@ -1315,7 +1320,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
 
-              <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
+              <div class="" ${message.user.id == user.id ? '' : 'style="display:flex"'}>
             ${message.user.id == user.id ? '' : profileImage}
                 <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
@@ -1348,7 +1353,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
 
-                <div class="" ${message.user.id == user.id ? '' :'style="display:flex"'}>
+                <div class="" ${message.user.id == user.id ? '' : 'style="display:flex"'}>
             ${message.user.id == user.id ? '' : profileImage}
                     <div class="deleted_niddle align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                         <div style="margin-top:-4px">
@@ -1759,19 +1764,18 @@ function editMessage(messageId) {
 
         }
 
-       const msgElem= DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-       const replyMessageArea = msgElem.querySelector('.reply-message-area');
+        const msgElem = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+        const replyMessageArea = msgElem.querySelector('.reply-message-area');
 
 
-       if(replyMessageArea)
-       {
-        console.log("replyed message height",replyMessageArea.offsetHeight);
-        DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
-       }
-       else{
-        console.log("Normal message height",msgElem.offsetHeight);
-        DOM.messageInput.style.height = msgElem.offsetHeight + "px";
-       }
+        if (replyMessageArea) {
+            console.log("replyed message height", replyMessageArea.offsetHeight);
+            DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
+        }
+        else {
+            console.log("Normal message height", msgElem.offsetHeight);
+            DOM.messageInput.style.height = msgElem.offsetHeight + "px";
+        }
         autoResize();
         change_icon_height(element);
     }
@@ -1976,8 +1980,8 @@ function removeQuotedMessage() {
     DOM.replyId = null;
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
-    document.querySelector("#input").value="";
-        // <<<<<<< local-dev
+    document.querySelector("#input").value = "";
+    // <<<<<<< local-dev
     //     const chat_action = document.getElementById('chat_action');
     //     if (getComputedStyle(chat_action).display == "none") {
     //         const Editreplyarea = document.getElementById('message-reply-area');
@@ -2232,7 +2236,7 @@ DOM.messages.addEventListener('scroll', async () => {
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
         showSpinner();
-        await fetchPaginatedMessages(null,null,null);
+        await fetchPaginatedMessages(null, null, null);
         hideSpinner();
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
@@ -2293,20 +2297,35 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         DOM.unreadCounter = Notseenby.length;
         const notSeenById = Notseenby.at(-1);
 
-        try {
-            const response = await fetch("message/seen-by/update", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-Token": csrfToken,
-                },
-                body: JSON.stringify({ ids }),
-            });
+        // try {
+        //     const response = await fetch("message/seen-by/update", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //             "X-CSRF-Token": csrfToken,
+        //         },
+        //         body: JSON.stringify({ ids }),
+        //     });
 
-            const readMessageResponse = await response.json();
-        } catch (error) {
-            console.error('Error updating seen messages:', error);
-        }
+        //     const readMessageResponse = await response.json();
+        // } catch (error) {
+        //     console.error('Error updating seen messages:', error);
+        // }
+
+        (async () => {
+            try {
+                await fetch("message/seen-by/update", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-Token": csrfToken,
+                    },
+                    body: JSON.stringify({ ids }),
+                });
+            } catch (error) {
+                console.error('Error updating seen messages:', error);
+            }
+        })();
 
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
@@ -2593,13 +2612,13 @@ function unread_settings(query_set) {
 
 let currentlyPlayingAudio = null;
 
-let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null) => {
+let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null,notificationMessageId=null) => {
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
 
     DOM.messages.innerHTML = '';
 
-    DOM.groupId = elem.dataset.groupId;
+    DOM.groupId = elem.dataset.groupId ?? groupSearchMessageId;
     DOM.currentPage = 1;
     displayedMessageIds.clear();
 
@@ -2642,7 +2661,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         await fetchPaginatedMessages(groupSearchMessageId, null, DOM.groupId);
     }
     else {
-        await fetchPaginatedMessages(null,null,null);
+        await fetchPaginatedMessages(null, null, null);
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
@@ -2662,20 +2681,20 @@ function scroll_to_unread_div() {
 }
 
 async function updateMessageSeenBy(ids) {
-    try {
-        const response = await fetch("message/seen-by/update", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken,
-            },
-            body: JSON.stringify({ ids }),
-        });
-
-        const readMessageResponse = await response.json();
-    } catch (error) {
-        console.log(error);
-    }
+    (async () => {
+        try {
+            await fetch("message/seen-by/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken,
+                },
+                body: JSON.stringify({ ids }),
+            });
+        } catch (error) {
+            console.error('Error updating seen messages:', error);
+        }
+    })();
 }
 
 let showChatList = () => {
@@ -2809,7 +2828,7 @@ let init = () => {
     // DOM.profilePicInput.addEventListener("change", () => console.log(DOM.profilePicInput.files[0]));
     // DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
 
-    generateChatList();
+    generateChatList(DOM.notification_group_id, DOM.notification_message_id);
     const firebaseConfig = {
         apiKey: "AIzaSyA8spaZnrsTPHRM-c-Cvybu6fJD-o8CMAQ",
         authDomain: "vm-chat-5c18d.firebaseapp.com",
@@ -3065,8 +3084,8 @@ function autoResize() {
     textarea.style.height = newHeight + 'px';
     requestAnimationFrame(() => {
         if (newHeight >= maxHeight) {
-              textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
-                textarea.scrollTop = scrollTop;
+            textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
+            textarea.scrollTop = scrollTop;
         }
     });
     var iconContainer = document.querySelector('.icon-container');
@@ -3921,7 +3940,7 @@ function ImageViewer(elem) {
         });
     });
 }
-let update_user_profile=async (elem,file)=>{
+let update_user_profile = async (elem, file) => {
 
     try {
         const response = await fetch("update_user_profile", {
@@ -3936,36 +3955,36 @@ let update_user_profile=async (elem,file)=>{
             }),
         });
         const res = await response.json();
-       if(res.status == 200){
-        const profileDiv=document.getElementsByClassName("profile-icons")[0];
-        const activeImage = profileDiv.getElementsByClassName("choose-profile-images active")[0];
-        activeImage.classList.remove("active");
-        DOM.profilePic.src="assets/profile_pics/"+file;
-        DOM.displayPic.src="assets/profile_pics/"+file;
-        elem.classList.add('active');
-       }
+        if (res.status == 200) {
+            const profileDiv = document.getElementsByClassName("profile-icons")[0];
+            const activeImage = profileDiv.getElementsByClassName("choose-profile-images active")[0];
+            activeImage.classList.remove("active");
+            DOM.profilePic.src = "assets/profile_pics/" + file;
+            DOM.displayPic.src = "assets/profile_pics/" + file;
+            elem.classList.add('active');
+        }
     } catch (error) {
         console.error('Error updating User Profile:', error);
     }
 }
-DOM.inputName.addEventListener("blur",async (e) =>{
-    const name= e.target.value;
+DOM.inputName.addEventListener("blur", async (e) => {
+    const name = e.target.value;
     try {
-        const response=await fetch("update_user_profile", {
+        const response = await fetch("update_user_profile", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-Token": csrfToken,
             },
             body: JSON.stringify({
-                userId:user.id,
-                name:name
-             }),
+                userId: user.id,
+                name: name
+            }),
         });
         const res = await response.json();
-       if(res.status == 200){
-        user.name = name;
-       }
+        if (res.status == 200) {
+            user.name = name;
+        }
     } catch (error) {
         console.error('Error updating User Profile:', error);
     }
@@ -3985,11 +4004,11 @@ let dragableIcon = () => {
 
     document.addEventListener('drop', (event) => {
         event.preventDefault();
-        
+
         const iconSize = 50; // Adjust this based on the actual icon size
         const x = event.clientX;
         const y = event.clientY;
-        
+
         // Calculate the boundaries for the icon
         const minX = 0;
         const maxX = window.innerWidth - iconSize;
