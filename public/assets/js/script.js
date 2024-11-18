@@ -1772,6 +1772,19 @@ function editMessage(messageId) {
 
         }
 
+// <<<<<<< hassanraza
+//        const msgElem= DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+//        const replyMessageArea = msgElem.querySelector('.reply-message-area');
+      
+    
+//        if(replyMessageArea)
+//        {
+//         DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
+//        }
+//        else{
+//         DOM.messageInput.style.height = msgElem.offsetHeight + "px";
+//        }
+// =======
         const msgElem = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
         const replyMessageArea = msgElem.querySelector('.reply-message-area');
 
@@ -3112,41 +3125,79 @@ fileInput.addEventListener('change', (event) => {
 
 const textarea = document.getElementById('input');
 const maxHeight = 200;
+let isUserScrolledUp = false;
+
 function autoResize() {
     if (!textarea.value.trim()) {
         textarea.style.height = '44px';
         textarea.style.overflowY = 'hidden';
         return;
     }
-    const scrollTop = textarea.scrollTop;
+
+    // Check if the user has scrolled up
+    if (textarea.scrollTop < textarea.scrollHeight - textarea.clientHeight) {
+        isUserScrolledUp = true;
+    } else {
+        isUserScrolledUp = false;
+    }
+
     textarea.style.overflowY = 'hidden';
+
     const newHeight = Math.min(textarea.scrollHeight, maxHeight);
     textarea.style.height = newHeight + 'px';
+
     requestAnimationFrame(() => {
         if (newHeight >= maxHeight) {
-            textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
-            textarea.scrollTop = scrollTop;
+
+            textarea.style.overflowY = 'scroll';
+            // Only scroll to bottom if the user hasn't manually scrolled up
+            if (!isUserScrolledUp) {
+                textarea.scrollTop = textarea.scrollHeight;
+            }
+        } else {
+            textarea.style.overflowY = 'hidden';
+            textarea.scrollTop = textarea.scrollTop;  // Maintain current scroll position
+
+//             textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
+//             textarea.scrollTop = scrollTop;
+
         }
     });
+
     var iconContainer = document.querySelector('.icon-container');
     var editDiv = document.getElementById("editMessageDiv");
     var repDiv = document.getElementById("reply-div");
-    if (getComputedStyle(editDiv).display == "block") {
-        var combinedHeight = parseInt(editDiv.offsetHeight) + parseInt(newHeight);
+    let combinedHeight = parseInt(newHeight);
+
+    if (getComputedStyle(editDiv).display === "block") {
+        combinedHeight += parseInt(editDiv.offsetHeight);
     }
-    if (getComputedStyle(repDiv).display == "block") {
-        var combinedHeight = parseInt(repDiv.offsetHeight) + parseInt(newHeight);
+    if (getComputedStyle(repDiv).display === "block") {
+        combinedHeight += parseInt(repDiv.offsetHeight);
     }
+
     iconContainer.style.bottom = (combinedHeight + 50) + "px";
 }
+
+// Reset the scroll flag when user scrolls
+textarea.addEventListener('scroll', () => {
+    if (textarea.scrollTop < textarea.scrollHeight - textarea.clientHeight) {
+        isUserScrolledUp = true;
+    } else {
+        isUserScrolledUp = false;
+    }
+});
+
 textarea.addEventListener('input', autoResize);
 textarea.addEventListener('paste', autoResize);
+
 textarea.addEventListener('keydown', function (event) {
     if ((event.key === 'Backspace' || event.key === 'Delete') && !textarea.value.trim()) {
         textarea.style.height = '44px';
         textarea.style.overflowY = 'hidden';
     }
 });
+
 
 // textarea.addEventListener('keydown', function (event) {
 //     if (event.key === 'Enter') {
@@ -3170,7 +3221,7 @@ textarea.addEventListener('keydown', function (event) {
 
 textarea.addEventListener('keydown', function (event) {
 
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !event.shiftKey) {
 
         const editReplyArea = document.getElementById('Editreply-area');
         const sendMessagebutton = document.getElementById('message-send-area');
@@ -3182,12 +3233,14 @@ textarea.addEventListener('keydown', function (event) {
                 chatIcons.style.display = "flex";
             }
         }
+
         if (window.getComputedStyle(editReplyArea).display === 'none') {
             event.preventDefault();
             sendMessage();
             textarea.style.height = '44px';
             textarea.style.overflowY = 'hidden';
             removeQuotedMessage();
+
             const chatActionElement = document.getElementById('chat_action');
             if (chatActionElement) {
                 chatActionElement.setAttribute('tabindex', '0');
@@ -3203,6 +3256,7 @@ textarea.addEventListener('keydown', function (event) {
         }
     }
 });
+
 
 
 // delete model
