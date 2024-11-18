@@ -908,9 +908,8 @@ function updateViewChatList(editedMessage) {
 
 let addMessageToMessageArea = (message, flag = false) => {
     let msgDate = mDate(message.time).getDate();
-    let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:50px; width:50px; margin-top:5px">`;
+    let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
-
     let messageContent;
     let oldMessageType = null;
     if (/<a[^>]+>/g.test(message.msg) || /<audio[^>]+>/g.test(message.msg)) {
@@ -1464,7 +1463,7 @@ function tinymce_init(callback) {
             toolbar: 'bold italic underline strikethrough',
             menubar: false,
             branding: false,
-            height: 140,
+            height: 250,
             width: 1000,
             plugins: 'lists',
             toolbar_mode: 'wrap',
@@ -1500,9 +1499,14 @@ function CorrectionMessage(message_id, senderName) {
     if (window.getComputedStyle(replyDiv).display === 'block') {
         removeQuotedMessage();
     }
-
+    const sendMessagebutton = document.getElementById('message-send-area');
+    if (window.getComputedStyle(sendMessagebutton).display === 'block') {
+        sendMessagebutton.style.display="none";
+    }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
-    var messagebody = message.msg;
+    var messagebody = message.msg.replace(/\n/g, "<br>").trim();
+
+
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
     });
@@ -1510,29 +1514,30 @@ function CorrectionMessage(message_id, senderName) {
 
 function correction_call(message_id, messagebody, senderName) {
 
+
     if (tinymce.get('input')) {
         tinymce.get('input').setContent(messagebody);
     } else {
         console.error("TinyMCE editor not initialized for #input");
     }
+    console.log("this is the message after the tiny get set content",messagebody);
 
     const correction_message_id = document.getElementById('correction_message_id');
     correction_message_id.value = message_id;
 
     const messageContent = tinymce.get('input').getContent();
+    console.log("after setting now getting content",messageContent);
 
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
 
     const existingReplyDiv = messageContentDiv.querySelector('.reply-message-area');
 
-    if (existingReplyDiv) {
-        existingReplyDiv.innerHTML = messagebody;
-    } else {
-        messageContentDiv.innerHTML = messagebody;
-    }
-
-
+    // if (existingReplyDiv) {
+    //     existingReplyDiv.innerHTML = messagebody;
+    // } else {
+    //     messageContentDiv.innerHTML = messagebody;
+    // }
     const chat_actionss = document.getElementById('chat_action');
     chat_actionss.style.display = 'none';
     const Editreplyarea = document.getElementById('correctionreply-area');
@@ -1555,7 +1560,7 @@ function correction_call(message_id, messagebody, senderName) {
     }
 
     if (quotedNameElement) {
-        quotedNameElement.innerHTML = messagebody;
+        quotedNameElement.innerHTML = messagebody.substring(0,200)+".....";
 
         // quotedNameElement.textContent = messagebody;
     } else {
@@ -1683,6 +1688,7 @@ function removecorrectionMessage() {
         correctionreplyarea.style.display = 'none';
         const textarea = document.getElementById('input');
         textarea.value = '';
+        textarea.focus();
 
     }
 
@@ -1706,7 +1712,10 @@ function editMessage(messageId) {
     if (window.getComputedStyle(replyDiv).display === 'block') {
         removeQuotedMessage();
     }
-
+    const sendMessagebutton = document.getElementById('message-send-area');
+    if (window.getComputedStyle(sendMessagebutton).display === 'block') {
+        sendMessagebutton.style.display="none";
+    }
     let editMessage = null;
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
@@ -1750,7 +1759,10 @@ function editMessage(messageId) {
 
         const Editreplyarea = document.getElementById('Editreply-area');
         const chat_action = document.getElementById('chat_action');
-
+        if(getComputedStyle(chat_action).display == "none")
+        {
+            chat_action.style.display="flex";
+        }
         if ((getComputedStyle(chat_action).display === "flex" || getComputedStyle(chat_action).display === "block") &&
             getComputedStyle(Editreplyarea).display === "none") {
 
@@ -1822,6 +1834,7 @@ function handleSendMessage() {
         document.getElementById('editMessageDiv').style.display = 'none';
         const textarea = document.getElementById('input');
         textarea.value = '';
+        textarea.focus();
         const messageDiv = document.getElementById('messages');
         messageDiv.classList.remove('blur');
         const chat_action = document.getElementById('chat_action');
@@ -1885,7 +1898,7 @@ function showReply(message_id, senderName, type) {
     if (selectedMessageIds > 0) {
         return;
     }
-
+    document.querySelector("#input").value="";
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
     var messagebody = message.msg;
@@ -3131,7 +3144,17 @@ textarea.addEventListener('keydown', function (event) {
 textarea.addEventListener('keydown', function (event) {
 
     if (event.key === 'Enter') {
+
         const editReplyArea = document.getElementById('Editreply-area');
+        const sendMessagebutton = document.getElementById('message-send-area');
+
+        if (window.getComputedStyle(sendMessagebutton).display === 'block') {
+        sendMessagebutton.style.display="none";
+        const chatIcons=document.querySelector('#chat_action');
+        if (chatIcons.style.display !== "flex") {
+            chatIcons.style.display = "flex";
+        }
+        }
         if (window.getComputedStyle(editReplyArea).display === 'none') {
             event.preventDefault();
             sendMessage();
@@ -3955,14 +3978,15 @@ let update_user_profile = async (elem, file) => {
             }),
         });
         const res = await response.json();
-        if (res.status == 200) {
-            const profileDiv = document.getElementsByClassName("profile-icons")[0];
-            const activeImage = profileDiv.getElementsByClassName("choose-profile-images active")[0];
-            activeImage.classList.remove("active");
-            DOM.profilePic.src = "assets/profile_pics/" + file;
-            DOM.displayPic.src = "assets/profile_pics/" + file;
-            elem.classList.add('active');
-        }
+       if(res.status == 200){
+        const profileDiv=document.getElementsByClassName("profile-icons")[0];
+        const activeImage = profileDiv.getElementsByClassName("choose-profile-images active")[0];
+        if(activeImage)
+        activeImage.classList.remove("active");
+        DOM.profilePic.src="assets/profile_pics/"+file;
+        DOM.displayPic.src="assets/profile_pics/"+file;
+        elem.classList.add('active');
+       }
     } catch (error) {
         console.error('Error updating User Profile:', error);
     }
@@ -3991,6 +4015,8 @@ DOM.inputName.addEventListener("blur", async (e) => {
 });
 let dragableIcon = () => {
     const draggableIcon = document.querySelector('.onesignal-bell-container');
+    if(!draggableIcon)
+        return;
     draggableIcon.setAttribute('draggable', 'true');
 
     draggableIcon.addEventListener('dragstart', (event) => {
@@ -4027,3 +4053,25 @@ let dragableIcon = () => {
 }
 
 setTimeout(dragableIcon, 2000);
+let sendMessageFunc=()=>{
+    const sendMessagebutton = document.getElementById('message-send-area');
+
+    if (window.getComputedStyle(sendMessagebutton).display === 'block') {
+    sendMessagebutton.style.display="none";
+    const chatIcons=document.querySelector('#chat_action');
+    if (chatIcons.style.display !== "flex") {
+        chatIcons.style.display = "flex";
+    }
+}
+
+sendMessage();
+            textarea.style.height = '44px';
+            textarea.style.overflowY = 'hidden';
+            removeQuotedMessage();
+            const chatActionElement = document.getElementById('chat_action');
+            if (chatActionElement) {
+                chatActionElement.setAttribute('tabindex', '0');
+                chatActionElement.focus();
+            }
+            textarea.focus();
+};
