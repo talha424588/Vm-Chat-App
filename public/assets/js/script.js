@@ -195,7 +195,11 @@ let viewChatList = () => {
                         messageText = getOldMessageMediaName(latestMessage);
                     }
                     else {
-                        messageText = latestMessage.msg;
+                        // messageText = latestMessage.msg; // Old Way Of Displying Message
+                        let partialText = removeTags(latestMessage.msg.split("\n")[0]);
+                        messageText = partialText.replace(/<br\s*\/?>/gi, '')
+                            .replace(/<\/?p>/gi, '')
+                            .replace(/\n/g, ' ');
                     }
                 }
                 else {
@@ -1110,9 +1114,10 @@ let addMessageToMessageArea = (message, flag = false) => {
                 </a>
             </div>`;
             } else if (message.reply.type === 'Audio' || /<audio[^>]+>/g.test(message.reply.msg)) {
-                let audioTag = null;
+                let audioTag = message.reply.msg.startsWith("https://")
+                    ? message.reply.msg
+                    : message.reply.msg.match(/<audio[^>]+>/g)[0];
 
-                audioTag = message.reply.msg.startsWith("https://") ?? message.reply.msg.match(/<audio[^>]+>/g)[0];
                 audioSrc = message.reply.msg.startsWith("https://") ? message.reply.msg : audioTag.match(/src="([^"]+)"/)[1];
                 var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
             <div class="avatar">
@@ -1189,6 +1194,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     `;
     }
     if (!message.is_privacy_breach && !message.is_deleted) {
+        console.log("last message", message);
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -1276,11 +1282,11 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
-                                        ${(message.type == "Message" || message.is_compose === 1 || message.is_compose == true) && (oldMessageType !== 'document' && oldMessageType !== 'image') ? `
-                                        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                                        ${(message.type === "Message" || message.type === null) && (message.is_compose === 1 || message.is_compose == true) ? `
+                                        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit 1</a>
                                         ` : ''}
-                                    ${((oldMessageType !== 'document' && oldMessageType !== 'image') && message.type === "Message" && message.is_compose === 1) || (message.is_compose == true && (oldMessageType !== 'document' && oldMessageType !== 'image')) ? `
-                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+                                    ${(message.type === "Message" || message.type === null) && (message.is_compose === 1 || message.is_compose == true) ? `
+                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction </a>
                                     ` : ''}
                                     ${message.is_compose === 1 && message.type === "Message" && !message.reply ? `
                                     <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
@@ -1772,19 +1778,19 @@ function editMessage(messageId) {
 
         }
 
-// <<<<<<< hassanraza
-//        const msgElem= DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-//        const replyMessageArea = msgElem.querySelector('.reply-message-area');
-      
-    
-//        if(replyMessageArea)
-//        {
-//         DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
-//        }
-//        else{
-//         DOM.messageInput.style.height = msgElem.offsetHeight + "px";
-//        }
-// =======
+        // <<<<<<< hassanraza
+        //        const msgElem= DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+        //        const replyMessageArea = msgElem.querySelector('.reply-message-area');
+
+
+        //        if(replyMessageArea)
+        //        {
+        //         DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
+        //        }
+        //        else{
+        //         DOM.messageInput.style.height = msgElem.offsetHeight + "px";
+        //        }
+        // =======
         const msgElem = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
         const replyMessageArea = msgElem.querySelector('.reply-message-area');
 
@@ -2954,7 +2960,7 @@ OneSignal.push(function () {
             }
         },
         allowLocalhostAsSecureOrigin: true,
-        persistNotification:false,
+        persistNotification: false,
     });
     OneSignal.on('subscriptionChange', function (isSubscribed) {
         if (isSubscribed) {
@@ -3159,8 +3165,8 @@ function autoResize() {
             textarea.style.overflowY = 'hidden';
             textarea.scrollTop = textarea.scrollTop;  // Maintain current scroll position
 
-//             textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
-//             textarea.scrollTop = scrollTop;
+            //             textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
+            //             textarea.scrollTop = scrollTop;
 
         }
     });
