@@ -653,28 +653,20 @@ socket.on('sendChatToClient', (message) => {
 socket.on('moveMessage', (moveMessages, newGroupId, groupId) => {
 
     if (DOM.groupId == null || DOM.groupId !== newGroupId) {
-        console.log("moveMessages", moveMessages);;
-        console.log("group is close");
-
         let newGroup = chatList.find(group => group.group.group_id == newGroupId);
         if (newGroup) {
             console.log(newGroup);
             if (moveMessages.messages.length > 1) {
                 moveMessages.messages.sort((a, b) => b.id = a.id);
-                console.log("sorted", moveMessages.messages[0]);
                 moveMessages.messages.forEach(message => {
                     newGroup.time = new Date(moveMessages.messages[0].time * 1000);
                     newGroup.group.group_messages.push(message);
                 });
-                console.log("chat list group after push", newGroup);
 
             }
             else {
-                console.log("newGroup msg", newGroup.msg);
                 newGroup.time = new Date(moveMessages.messages[0].time * 1000);
                 newGroup.group.group_messages.push(moveMessages.messages[0])
-                console.log("chat list group after push", newGroup);
-
             }
 
             chatList.sort((a, b) => {
@@ -688,7 +680,6 @@ socket.on('moveMessage', (moveMessages, newGroupId, groupId) => {
                     return 0;
                 }
             });
-            console.log("chat list after sort", chatList);
             viewChatList();
         }
 
@@ -696,9 +687,6 @@ socket.on('moveMessage', (moveMessages, newGroupId, groupId) => {
     else {
         console.log("group is open");
     }
-
-
-    // console.log("selectedMessageIds", selectedMessageIds, "new group id", newGroupId, "group id", groupId);
     // generateChatList();
 });
 
