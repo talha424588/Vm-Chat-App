@@ -1897,6 +1897,7 @@ function removeEditMessage() {
 }
 
 function showReply(message_id, senderName, type) {
+    console.log(message_id, senderName, type);
 
     var correctionDiv = document.getElementById('correction-div');
 
@@ -3954,7 +3955,7 @@ async function restoreMessage(id) {
                 const restoreButton = $(`#restore-button-${id}`);
                 if (restoreButton.length > 0) {
 
-                    restoreButton.replaceWith(`<span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.sender}','${message.type}')">Reply</span>`);
+                    restoreButton.replaceWith(`<span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.message.user.name}','${message.message.type}')">Reply</span>`);
                 }
                 // messageElement.removeClass('deleted');
 
