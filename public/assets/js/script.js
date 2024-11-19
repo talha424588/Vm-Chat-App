@@ -1194,7 +1194,6 @@ let addMessageToMessageArea = (message, flag = false) => {
     `;
     }
     if (!message.is_privacy_breach && !message.is_deleted) {
-        console.log("last message", message);
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -1523,14 +1522,10 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("TinyMCE editor not initialized for #input");
     }
-    console.log("this is the message after the tiny get set content", messagebody);
 
     const correction_message_id = document.getElementById('correction_message_id');
     correction_message_id.value = message_id;
-
     const messageContent = tinymce.get('input').getContent();
-    console.log("after setting now getting content", messageContent);
-
     const messageElement = DOM.messages.querySelector(`[data-message-id="${message_id}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
 
@@ -1796,11 +1791,9 @@ function editMessage(messageId) {
 
 
         if (replyMessageArea) {
-            console.log("replyed message height", replyMessageArea.offsetHeight);
             DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
         }
         else {
-            console.log("Normal message height", msgElem.offsetHeight);
             DOM.messageInput.style.height = msgElem.offsetHeight + "px";
         }
         autoResize();
@@ -2860,11 +2853,8 @@ let init = () => {
     // if (DOM.notification_group_id != null && DOM.notification_group_id !== "" &&
     //     DOM.notification_message_id != null && DOM.notification_message_id !== "") {
     //     setTimeout(() => {
-    //         console.log("init function", chatList);
     //         const elem = document.querySelector(`[data-group-id="${DOM.notification_group_id}"]`);
-    //         console.log("init elem", elem);
     //         const newIndex = chatList.findIndex(group => group.group.group_id === DOM.notification_group_id);
-    //         console.log("init newIndex", newIndex);
     //         generateMessageArea(elem, newIndex, null, DOM.notification_group_id, DOM.notification_message_id);
     //     }, 4000);
     // }
@@ -3308,21 +3298,17 @@ $('#deleteModal .btn-delete').on('click', function () {
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
             // let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
-            // console.log("last message", paginateArrayLastMessage);
 
 
             // messageElement.remove();
             // messageElement.parent().parent().removeClass("msg_deleted");
             // messageElement.parent().parent().addClass("msg_deleted");
             // let deletedMessage = findMessageById(messageId);
-            // console.log("delete message for current user",deletedMessage);
             // const deletedMessage = findMessageById(messageId);
             //     if (pagnicateChatList.data.length > 0) {
             //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
-            //         console.log("currentUsergroup", currentUsergroup);
             //         if (currentUsergroup) {
             //             currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
-            //             console.log("currentUsergroup", currentUsergroup);
             //             viewChatList();
             //         }
             //     }
