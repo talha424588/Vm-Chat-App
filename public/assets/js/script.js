@@ -152,6 +152,7 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
+    console.log("chat list", chatList);
     if (chatList.length === 0) {
         return;
     }
@@ -649,8 +650,56 @@ socket.on('sendChatToClient', (message) => {
     }
 });
 
-socket.on('moveMessage', () => {
-    generateChatList();
+socket.on('moveMessage', (moveMessages, newGroupId, groupId) => {
+
+    if (DOM.groupId == null || DOM.groupId !== newGroupId) {
+        console.log("moveMessages", moveMessages);;
+        console.log("group is close");
+
+        let newGroup = chatList.find(group => group.group.group_id == newGroupId);
+        if (newGroup) {
+            console.log(newGroup);
+            if (moveMessages.messages.length > 1) {
+                moveMessages.messages.sort((a, b) => b.id = a.id);
+                console.log("sorted", moveMessages.messages[0]);
+                moveMessages.messages.forEach(message => {
+                    newGroup.time = new Date(moveMessages.messages[0].time * 1000);
+                    newGroup.group.group_messages.push(message);
+                });
+                console.log("chat list group after push", newGroup);
+
+            }
+            else {
+                console.log("newGroup msg", newGroup.msg);
+                newGroup.time = new Date(moveMessages.messages[0].time * 1000);
+                newGroup.group.group_messages.push(moveMessages.messages[0])
+                console.log("chat list group after push", newGroup);
+
+            }
+
+            chatList.sort((a, b) => {
+                if (a.time && b.time) {
+                    return new Date(b.time) - new Date(a.time);
+                } else if (a.time) {
+                    return -1;
+                } else if (b.time) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+            console.log("chat list after sort", chatList);
+            viewChatList();
+        }
+
+    }
+    else {
+        console.log("group is open");
+    }
+
+
+    // console.log("selectedMessageIds", selectedMessageIds, "new group id", newGroupId, "group id", groupId);
+    // generateChatList();
 });
 
 socket.on('updateEditedMessage', (editedMessage) => {
@@ -1197,9 +1246,6 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
-
-
-
             <div class="" ${message.user.id == user.id ? '' : 'style="display:flex"'}>
             ${message.user.id == user.id ? '' : profileImage}
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
@@ -1281,8 +1327,8 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
-                                        ${(message.type === "Message" || message.type === null) && (message.is_compose === 1 || message.is_compose == true) ? `
-                                        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit 1</a>
+                                        ${(message.type === "Message" || message.type === null) ? `
+                                        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         ` : ''}
                                     ${(message.type === "Message" || message.type === null) && (message.is_compose === 1 || message.is_compose == true) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction </a>
@@ -1295,7 +1341,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     ${user.role === '0' || user.role === '2' ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     ` : ''}---->
-                                    ${user.role === '0' || user.role === '2' ? `
+                                    ${(message.is_compose !== 1 && message.is_compose !== true) && user.role === '0' || user.role === '2' ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     ` : ''}
                                     ${user.role === '3' && message.sender === user.unique_id ? `
@@ -2110,6 +2156,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
     })
         .then(response => response.json())
         .then(data => {
+            let moveMessageResponse = data;
             const previousGroupId = DOM.groupId;
             const previousGroupIndex = chatList.findIndex(group => group.group.group_id === previousGroupId);
             if (previousGroupIndex !== -1) {
@@ -2161,7 +2208,6 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
                 });
             }
 
-
             chatList.sort((a, b) => {
                 if (a.time && b.time) {
                     return new Date(b.time) - new Date(a.time);
@@ -2178,7 +2224,8 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
 
             viewChatList();
 
-            socket.emit('moveMessage', selectedMessageIds, newGroupId, DOM.groupId);
+            console.log("moveMessageResponse", moveMessageResponse);
+            socket.emit('moveMessage', moveMessageResponse, newGroupId, DOM.groupId);
 
             const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
             generateMessageArea(newGroupChatListItem, newIndex, false, null);
@@ -2690,6 +2737,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         scroll_to_unread_div();
     }
 };
+
 function scroll_to_unread_div() {
 
     const unreadCountDiv = document.getElementById('unread-wrapper');
@@ -2729,7 +2777,9 @@ let showChatList = () => {
         DOM.activeChatIndex = null;
     }
 };
+
 let subsIds = [];
+
 let sendMessage = (type = 'Message', mediaName = null) => {
     if (socket.connected) {
         let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -2851,14 +2901,6 @@ let init = () => {
     // DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
 
     generateChatList();
-    // if (DOM.notification_group_id != null && DOM.notification_group_id !== "" &&
-    //     DOM.notification_message_id != null && DOM.notification_message_id !== "") {
-    //     setTimeout(() => {
-    //         const elem = document.querySelector(`[data-group-id="${DOM.notification_group_id}"]`);
-    //         const newIndex = chatList.findIndex(group => group.group.group_id === DOM.notification_group_id);
-    //         generateMessageArea(elem, newIndex, null, DOM.notification_group_id, DOM.notification_message_id);
-    //     }, 4000);
-    // }
 
     const waitForChatList = setInterval(() => {
         if (chatList.length > 1) {
@@ -2965,8 +3007,6 @@ OneSignal.push(function () {
         }
     });
 });
-
-
 
 function oneSignalSubscription(userId) {
 
@@ -3119,8 +3159,6 @@ fileInput.addEventListener('change', (event) => {
     }
 });
 
-
-
 const textarea = document.getElementById('input');
 const maxHeight = 200;
 let isUserScrolledUp = false;
@@ -3254,8 +3292,6 @@ textarea.addEventListener('keydown', function (event) {
         }
     }
 });
-
-
 
 // delete model
 $('#deleteModal').on('show.bs.modal', function (event) {
@@ -4038,6 +4074,7 @@ function ImageViewer(elem) {
         });
     });
 }
+
 let update_user_profile = async (elem, file) => {
 
     try {
@@ -4066,6 +4103,7 @@ let update_user_profile = async (elem, file) => {
         console.error('Error updating User Profile:', error);
     }
 }
+
 DOM.inputName.addEventListener("blur", async (e) => {
     const name = e.target.value;
     try {
@@ -4088,6 +4126,7 @@ DOM.inputName.addEventListener("blur", async (e) => {
         console.error('Error updating User Profile:', error);
     }
 });
+
 let dragableIcon = () => {
     const draggableIcon = document.querySelector('.onesignal-bell-container');
     if (!draggableIcon)
