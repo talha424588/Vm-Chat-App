@@ -116,12 +116,18 @@ class FirebaseService
 
     public function getGroupUsers($groupId)
     {
+        $accessList = Group::where('group_id', $groupId)->pluck('access');
+        Log::info('Access List: ', ['accessList' => $accessList]);
         $userIds = Group::where('group_id', $groupId)
             ->pluck('access')
             ->flatMap(fn($item) => explode(',', $item))
-            ->map('trim')
+            ->map(fn($item) => trim($item))
+            ->filter(fn($item) => is_numeric($item))
             ->unique()
+            ->values()
             ->toArray();
+        Log::info('User  IDs: ', ['userIds' => $userIds]);
+        return $userIds;
         $users_with_access = User::whereIn('id', $userIds)->pluck('fcm_token');
 
         return $users_with_access;

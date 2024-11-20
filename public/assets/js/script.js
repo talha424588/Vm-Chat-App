@@ -685,6 +685,42 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
                 viewChatList();
             }
         }
+        else {
+            let newGroup = chatList.find(group => group.group.group_id == newGroupId);
+            if (newGroup) {
+                console.log("new group", newGroup);
+                if (moveMessages.messages.length > 1) {
+                    moveMessages.messages.sort((a, b) => b.id = a.id);
+                    moveMessages.messages.forEach(message => {
+                        newGroup.time = new Date(moveMessages.messages[0].time * 1000);
+                        newGroup.group.group_messages.push(message);
+                        // newGroup.unread += 1
+                    });
+                }
+                else {
+                    newGroup.time = new Date(moveMessages.messages[0].time * 1000);
+                    newGroup.group.group_messages.push(moveMessages.messages[0])
+                    // newGroup.unread += 1
+                }
+
+                moveMessages.messages.forEach(message => {
+                    addMessageToMessageArea(message, true);
+                });
+
+                chatList.sort((a, b) => {
+                    if (a.time && b.time) {
+                        return new Date(b.time) - new Date(a.time);
+                    } else if (a.time) {
+                        return -1;
+                    } else if (b.time) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                viewChatList();
+            }
+        }
     }
     else if (user.unique_id == uniqueId) {
         console.log("else part");
