@@ -127,9 +127,7 @@ class FirebaseService
             ->values()
             ->toArray();
         Log::info('User  IDs: ', ['userIds' => $userIds]);
-        return $userIds;
         $users_with_access = User::whereIn('id', $userIds)->pluck('fcm_token');
-
         return $users_with_access;
     }
 }

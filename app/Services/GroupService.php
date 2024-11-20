@@ -136,6 +136,7 @@ class GroupService implements GroupRepository
                     ->orWhere("type", "");
             })
             ->whereIn('group_id', $userGroups)
+            -> whereRaw("NOT (msg REGEXP '<a[^>]*>|<audio[^>]*>')")
             ->with("user", "group")
             ->paginate($perPageMessages, ['*'], 'page', $pageMessages);
 
