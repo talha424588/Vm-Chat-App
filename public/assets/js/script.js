@@ -152,7 +152,6 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
-    console.log("chat list", chatList);
     if (chatList.length === 0) {
         return;
     }
@@ -3485,8 +3484,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 const groups = response.data.groups.data;
                 const messages = response.data.messages.data;
 
-
-                if (!groups || !groups.data || groups.data.length === 0) {
+                if (!groups || groups.length === 0) {
                     if (!loadMore) {
                         DOM.chatList.innerHTML += ` <div class="no-groups-found">No Groups Found.</div>`;
                     }
@@ -3510,7 +3508,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     viewChatList();
                 }
 
-                if (messages.length === 0) {
+                if (messages == undefined) {
                     if (!loadMore) {
                         DOM.chatList2.innerHTML += `<div class="no-messages-found">No messages found.</div>`;
                     }
@@ -3521,8 +3519,8 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     viewMessageList();
                 }
 
-                if (loadMore && groups.length === 0 && messages.length === 0) {
-                    // Handle no more data case if needed
+                if (loadMore && !groups  && messages == undefined) {
+                    DOM.chatList2.innerHTML += `<div class="no-messages-found">No more data found.</div>`;
                 }
             }
         } catch (error) {
