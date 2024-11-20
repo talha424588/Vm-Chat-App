@@ -152,6 +152,7 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
+    console.log("chat list", chatList);
     if (chatList.length === 0) {
         return;
     }
@@ -3484,6 +3485,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 const groups = response.data.groups.data;
                 const messages = response.data.messages.data;
 
+
                 if (!groups || groups.length === 0) {
                     if (!loadMore) {
                         DOM.chatList.innerHTML += ` <div class="no-groups-found">No Groups Found.</div>`;
@@ -3500,6 +3502,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                         if (group.group_messages && group.group_messages.length > 0) {
                             group.group_messages.reverse().forEach((msg) => {
                                 chat.unread += (msg.sender !== unique_id && !msg.seen_by.split(",").map(s => s.trim()).includes(unique_id)) ? 1 : 0;
+                                chat.time = new Date(msg.time * 1000);
                             });
                         }
 
