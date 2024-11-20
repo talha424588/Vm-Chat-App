@@ -650,42 +650,87 @@ socket.on('sendChatToClient', (message) => {
     }
 });
 
-socket.on('moveMessage', (moveMessages, newGroupId, groupId) => {
+socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
 
-    if (DOM.groupId == null || DOM.groupId !== newGroupId) {
+    if (user.unique_id != uniqueId) {
+        if (DOM.groupId == null || DOM.groupId !== newGroupId) {
+            let newGroup = chatList.find(group => group.group.group_id == newGroupId);
+            if (newGroup) {
+                console.log("new group", newGroup);
+                if (moveMessages.messages.length > 1) {
+                    moveMessages.messages.sort((a, b) => b.id = a.id);
+                    moveMessages.messages.forEach(message => {
+                        newGroup.time = new Date(moveMessages.messages[0].time * 1000);
+                        newGroup.group.group_messages.push(message);
+                        newGroup.unread += 1
+                    });
+                }
+                else {
+                    newGroup.time = new Date(moveMessages.messages[0].time * 1000);
+                    newGroup.group.group_messages.push(moveMessages.messages[0])
+                    newGroup.unread += 1
+                }
+
+                chatList.sort((a, b) => {
+                    if (a.time && b.time) {
+                        return new Date(b.time) - new Date(a.time);
+                    } else if (a.time) {
+                        return -1;
+                    } else if (b.time) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                viewChatList();
+            }
+        }
+    }
+    else if (user.unique_id == uniqueId) {
+        console.log("else part");
+        const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
+        const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
+        generateMessageArea(newGroupChatListItem, newIndex, false, null);
+
         let newGroup = chatList.find(group => group.group.group_id == newGroupId);
         if (newGroup) {
-            console.log(newGroup);
+            console.log("new group", newGroup);
             if (moveMessages.messages.length > 1) {
                 moveMessages.messages.sort((a, b) => b.id = a.id);
                 moveMessages.messages.forEach(message => {
                     newGroup.time = new Date(moveMessages.messages[0].time * 1000);
                     newGroup.group.group_messages.push(message);
+                    const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
+                    newGroup.unread += (message.sender !== user.unique_id && !seenBy.includes(user.unique_id)) ? 1 : 0;
                 });
-
             }
             else {
                 newGroup.time = new Date(moveMessages.messages[0].time * 1000);
                 newGroup.group.group_messages.push(moveMessages.messages[0])
+                const seenBy = moveMessages.messages[0].seen_by ? moveMessages.messages[0].seen_by.split(",").map(s => s.trim()) : [];
+                newGroup.unread += (moveMessages.messages[0].sender !== user.unique_id && !seenBy.includes(user.unique_id)) ? 1 : 0;
+                // newGroup.unread += 1
             }
-
-            chatList.sort((a, b) => {
-                if (a.time && b.time) {
-                    return new Date(b.time) - new Date(a.time);
-                } else if (a.time) {
-                    return -1;
-                } else if (b.time) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
-            viewChatList();
         }
-
+        chatList.sort((a, b) => {
+            if (a.time && b.time) {
+                return new Date(b.time) - new Date(a.time);
+            } else if (a.time) {
+                return -1;
+            } else if (b.time) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        viewChatList();
     }
     else {
-        console.log("group is open");
+        if (user.unique_id != uniqueId) {
+            moveMessages.messages.forEach(message => {
+                addMessageToMessageArea(message, true);
+            });
+        }
     }
     // generateChatList();
 });
@@ -1844,7 +1889,6 @@ function change_icon_height(element) {
 }
 
 function handleSendMessage() {
-
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
     const messageId = document.getElementById('edit_message_id').value;
@@ -2167,56 +2211,57 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
                 socket.emit('deleteMessage', oldMessage.id, true);
             });
 
-            const newGroupIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
+            // const newGroupIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
 
-            if (newGroupIndex !== -1) {
-                data.messages.forEach(newMessage => {
-                    const messageIndex = chatList[newGroupIndex].group.group_messages.findIndex(message => message.time > newMessage.time);
-                    if (messageIndex === -1) {
-                        chatList[newGroupIndex].group.group_messages.push(newMessage);
-                    } else {
-                        chatList[newGroupIndex].group.group_messages.splice(messageIndex, 0, newMessage);
-                    }
-                    chatList[newGroupIndex].msg = newMessage;
-                    chatList[newGroupIndex].time = new Date(newMessage.time * 1000);
+            // if (newGroupIndex !== -1) {
+            //     data.messages.forEach(newMessage => {
+            //         const messageIndex = chatList[newGroupIndex].group.group_messages.findIndex(message => message.time > newMessage.time);
+            //         if (messageIndex === -1) {
+            //             chatList[newGroupIndex].group.group_messages.push(newMessage);
+            //         } else {
+            //             chatList[newGroupIndex].group.group_messages.splice(messageIndex, 0, newMessage);
+            //         }
+            //         chatList[newGroupIndex].msg = newMessage;
+            //         chatList[newGroupIndex].time = new Date(newMessage.time * 1000);
 
-                    // Update the last message text
-                    const senderName = newMessage.user.name;
-                    let messageText = '';
-                    if (newMessage.type === 'File') {
-                        messageText = newMessage.media_name;
-                    } else if (newMessage.type === 'Image') {
-                        messageText = '[Image]';
-                    } else if (newMessage.type === 'Audio') {
-                        messageText = '[Audio]';
-                    } else {
-                        messageText = newMessage.msg;
-                    }
-                    chatList[newGroupIndex].lastMessage = `${senderName}: ${messageText}`;
-                });
-            }
+            //         // Update the last message text
+            //         const senderName = newMessage.user.name;
+            //         let messageText = '';
+            //         if (newMessage.type === 'File') {
+            //             messageText = newMessage.media_name;
+            //         } else if (newMessage.type === 'Image') {
+            //             messageText = '[Image]';
+            //         } else if (newMessage.type === 'Audio') {
+            //             messageText = '[Audio]';
+            //         } else {
+            //             messageText = newMessage.msg;
+            //         }
+            //         chatList[newGroupIndex].lastMessage = `${senderName}: ${messageText}`;
+            //     });
+            // }
 
-            chatList.sort((a, b) => {
-                if (a.time && b.time) {
-                    return new Date(b.time) - new Date(a.time);
-                } else if (a.time) {
-                    return -1;
-                } else if (b.time) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
+            // chatList.sort((a, b) => {
+            //     if (a.time && b.time) {
+            //         return new Date(b.time) - new Date(a.time);
+            //     } else if (a.time) {
+            //         return -1;
+            //     } else if (b.time) {
+            //         return 1;
+            //     } else {
+            //         return 0;
+            //     }
+            // });
 
-            const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
 
-            viewChatList();
 
-            console.log("moveMessageResponse", moveMessageResponse);
-            socket.emit('moveMessage', moveMessageResponse, newGroupId, DOM.groupId);
 
-            const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
-            generateMessageArea(newGroupChatListItem, newIndex, false, null);
+            // const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
+            // console.log("moveMessageResponse", moveMessageResponse);
+            socket.emit('moveMessage', moveMessageResponse, newGroupId, DOM.groupId, user.unique_id);
+
+            // const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
+            // generateMessageArea(newGroupChatListItem, newIndex, false, null);
+            // viewChatList();
             cancelMoveMessage();
             document.querySelector(".close").click();
         })

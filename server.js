@@ -37,8 +37,8 @@ io.on('connection', (socket) => {
         io.emit('updateGroupMessages', messageId);
     });
 
-    socket.on('moveMessage', (moveMessages, newGroupId, groupId) => {
-        io.emit('moveMessage', moveMessages, newGroupId, groupId);
+    socket.on('moveMessage', (moveMessages, newGroupId, groupId,uniqueId) => {
+        io.emit('moveMessage', moveMessages, newGroupId, groupId,uniqueId);
     });
 
     socket.on('updateEditedMessage', (editedMessage) => {
