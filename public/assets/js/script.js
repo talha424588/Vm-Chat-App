@@ -633,6 +633,8 @@ socket.on('sendChatToClient', (message) => {
         addMessageToMessageArea(message, true);
         get_voice_list();
     } else {
+        // if user is in search mood and other user message and search user mood user clear the search feild the message count
+        // did not got updated start from here
         groupToUpdate.group.group_messages.push(message);
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
@@ -662,7 +664,6 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
         if (DOM.groupId == null || DOM.groupId !== newGroupId) {
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
             if (newGroup) {
-                console.log("new group", newGroup);
                 if (moveMessages.messages.length > 1) {
                     moveMessages.messages.sort((a, b) => b.id = a.id);
                     moveMessages.messages.forEach(message => {
@@ -694,7 +695,6 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
         else {
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
             if (newGroup) {
-                console.log("new group", newGroup);
                 if (moveMessages.messages.length > 1) {
                     moveMessages.messages.sort((a, b) => b.id = a.id);
                     moveMessages.messages.forEach(message => {
@@ -729,14 +729,12 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
         }
     }
     else if (user.unique_id == uniqueId) {
-        console.log("else part");
         const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
         const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
         generateMessageArea(newGroupChatListItem, newIndex, false, null);
 
         let newGroup = chatList.find(group => group.group.group_id == newGroupId);
         if (newGroup) {
-            console.log("new group", newGroup);
             if (moveMessages.messages.length > 1) {
                 moveMessages.messages.sort((a, b) => b.id = a.id);
                 moveMessages.messages.forEach(message => {
@@ -2022,8 +2020,6 @@ function removeEditMessage() {
 }
 
 function showReply(message_id, senderName, type) {
-    console.log(message_id, senderName, type);
-
     var correctionDiv = document.getElementById('correction-div');
 
     if (correctionDiv && window.getComputedStyle(correctionDiv).display === 'block') {
@@ -2303,7 +2299,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
 
 
             // const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
-            // console.log("moveMessageResponse", moveMessageResponse);
+
             socket.emit('moveMessage', moveMessageResponse, newGroupId, DOM.groupId, user.unique_id);
 
             // const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
@@ -3014,7 +3010,6 @@ let init = () => {
         firebase.initializeApp(firebaseConfig);
     }
 
-    console.log("Click the Image at top-left to open settings.");
 
     // window.OneSignalDeferred = window.OneSignalDeferred || [];
     // OneSignalDeferred.push(async function (OneSignal) {
