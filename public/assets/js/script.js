@@ -48,6 +48,7 @@ const DOM = {
     isSubscribed: false,
     notification_message_id: document.getElementById("notification_message_id").value,
     notification_group_id: document.getElementById("notification_group_id").value,
+    groupSearch:false
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -90,6 +91,7 @@ let areaSwapped = false;
 let chat = null;
 let chatList = [];
 let chatList2 = [];
+let previousChatList = [];
 let messageList = [];
 let pagnicateChatList = [];
 let results = [];
@@ -152,6 +154,11 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
+    if(!DOM.groupSearch)
+    {
+        previousChatList = [...chatList]
+        console.log("previod",previousChatList);
+    }
     if (chatList.length === 0) {
         return;
     }
@@ -3477,6 +3484,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     }
 
     if (searchQuery.length > 0) {
+        DOM.groupSearch = true;
         DOM.messageSearchQuery = searchQuery;
         const url = `search-group-by-name/${searchQuery}?page_groups=${currentPageGroups}&page_messages=${currentPageMessages}`;
         const unique_id = document.getElementById("login_user_unique_id").value;
@@ -3534,9 +3542,24 @@ let searchGroups = async (searchQuery, loadMore = false) => {
             console.log(error);
         }
     } else {
+        DOM.groupSearch = false;
+        chatList = [...previousChatList];
+        chatList.sort((a, b) => {
+            if (a.time && b.time) {
+                return new Date(b.time) - new Date(a.time);
+            } else if (a.time) {
+                return -1;
+            } else if (b.time) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
         messageList = [];
         DOM.messagesList.innerHTML = '';
-        generateChatList();
+        viewChatList();
+
+        // generateChatList();
     }
 };
 
