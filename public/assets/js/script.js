@@ -1026,6 +1026,7 @@ function updateViewChatList(editedMessage) {
 
 
 let addMessageToMessageArea = (message, flag = false) => {
+    console.log(message);
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -1257,7 +1258,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');;
+                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0,200)+".....";
             }
 
             messageContent = `
@@ -1273,7 +1274,24 @@ let addMessageToMessageArea = (message, flag = false) => {
         <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
         `;
         } else {
-            messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
+            function processValue(value) {
+                value = value.replace(/<br\s*\/?>/gi, '\n');
+                value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                value = value.replace(/<[^>]*>/g, '');
+                value = value.trim();
+                return value.replace(/\r\n/g, '<br>')
+                .replace(/\n/g, '<br>')
+                .replace(/<i[^>]+>/g, '');;
+            }
+                if (message.is_compose === 1) {
+                    messageContent = processValue(message.msg || message.message);
+                } else {
+                    messageContent = (message.msg || message.message)
+                        .replace(/\r\n/g, '<br>')
+                        .replace(/\n/g, '<br>')
+                        .replace(/<i[^>]+>/g, ''); 
+                }
+           
         }
 
     }
@@ -1320,7 +1338,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                           ${messageContent}
+                          ${messageContent}
                            </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -2719,7 +2737,7 @@ function unread_settings(query_set) {
     let unseenCount = 0;
     query_set.data.forEach(message => {
         if (message.group_id === groupIdToCheck) {
-            if (message.seen_by.includes(userIdToCheck)) {
+            if (message.seen_by?.includes(userIdToCheck)) {
                 seenCount++;
             } else {
                 unseenCount++;

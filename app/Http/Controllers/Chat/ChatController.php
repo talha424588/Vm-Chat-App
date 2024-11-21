@@ -167,7 +167,6 @@ class ChatController extends Controller
         $messages = $request->input('messages');
         $newGroupId = $request->input('newGroupId');
         $messages = $request->input('messageList');
-
         $moveMessages = [];
 
         foreach ($messages as $message) {
@@ -184,6 +183,7 @@ class ChatController extends Controller
             $moveMessageClone->status = EnumMessageEnum::NEW;
             $moveMessageClone->is_compose = true;
             $moveMessageClone->is_privacy_breach = false;
+            $message['compose_id']?$moveMessageClone->compose_id=$message['compose_id']:'';   
             if ($moveMessageClone->save()) {
                 $moveMessageClone->user = User::where("unique_id", $message['user']['unique_id'])->first();
                 DB::table('group_messages')
