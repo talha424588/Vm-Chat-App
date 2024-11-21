@@ -13,7 +13,7 @@ class Group extends Model
 
     public function groupMessages()
     {
-        return $this->hasMany(GroupMessage::class, 'group_id', 'group_id');
+        return $this->hasOne(GroupMessage::class, 'group_id', 'group_id');
     }
 
     public function user()
