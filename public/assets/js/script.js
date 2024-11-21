@@ -152,7 +152,6 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
-    console.log("chat list", chatList);
     if (chatList.length === 0) {
         return;
     }
@@ -3745,6 +3744,10 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
     if (messageElement) {
         DOM.searchMessageClick = true;
         const messageTextElement = messageElement.querySelector(".shadow-sm");
+        let highlightElement = document.getElementsByClassName("highlight")[0];
+        if (highlightElement) {
+            highlightElement.classList.remove("highlight");
+        }
         switch (message.type) {
             case "Message":
                 if (message.reply) {
