@@ -1482,7 +1482,12 @@ let addMessageToMessageArea = (message, flag = false) => {
                                 <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                     <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
                                     <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span>
-                                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="markAsSeen('${message.id}')">Seen</span> |
+                                    <span>
+                                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+                                            data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
+                                            Seen
+                                        </a>
+                                    </span> |
                                     <span id="restore-button-${message.id}" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="restoreMessage('${message.id}')">Restore</span>                                    <!-- Additional logic for seen and reply links -->
                                 </div>
                             </div>
@@ -3436,7 +3441,7 @@ $('#deleteModal .btn-delete').on('click', function () {
 
 // Seen Model
 $("#seenModal").on("show.bs.modal", async function (event) {
-
+    console.log("seen model hit");
     let deleteBtn = $(event.relatedTarget);
     let messageId = deleteBtn.data("message-id");
     try {
