@@ -4191,28 +4191,28 @@ let update_user_profile = async (elem, file) => {
     }
 }
 
-DOM.inputName.addEventListener("blur", async (e) => {
-    const name = e.target.value;
-    try {
-        const response = await fetch("update_user_profile", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken,
-            },
-            body: JSON.stringify({
-                userId: user.id,
-                name: name
-            }),
-        });
-        const res = await response.json();
-        if (res.status == 200) {
-            user.name = name;
-        }
-    } catch (error) {
-        console.error('Error updating User Profile:', error);
-    }
-});
+// DOM.inputName.addEventListener("blur", async (e) => {
+//     const name = e.target.value;
+//     try {
+//         const response = await fetch("update_user_profile", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 "X-CSRF-Token": csrfToken,
+//             },
+//             body: JSON.stringify({
+//                 userId: user.id,
+//                 name: name
+//             }),
+//         });
+//         const res = await response.json();
+//         if (res.status == 200) {
+//             user.name = name;
+//         }
+//     } catch (error) {
+//         console.error('Error updating User Profile:', error);
+//     }
+// });
 
 let dragableIcon = () => {
     const draggableIcon = document.querySelector('.onesignal-bell-container');
@@ -4221,36 +4221,56 @@ let dragableIcon = () => {
     draggableIcon.setAttribute('draggable', 'true');
 
     draggableIcon.addEventListener('dragstart', (event) => {
-        event.dataTransfer.setData('text/plain', null); // For Firefox compatibility
+        event.dataTransfer.setData('text/plain', null); 
         event.dataTransfer.effectAllowed = 'move';
     });
 
     document.addEventListener('dragover', (event) => {
-        event.preventDefault(); // Prevent default to allow drop
+        event.preventDefault(); 
     });
 
     document.addEventListener('drop', (event) => {
         event.preventDefault();
-
-        const iconSize = 50; // Adjust this based on the actual icon size
+        const iconSize = 50; 
         const x = event.clientX;
         const y = event.clientY;
-
-        // Calculate the boundaries for the icon
         const minX = 0;
         const maxX = window.innerWidth - iconSize;
         const minY = 0;
         const maxY = window.innerHeight - iconSize;
-
-        // Ensure the new position is within the boundaries
         const newX = Math.max(minX, Math.min(x - iconSize / 2, maxX));
         const newY = Math.max(minY, Math.min(y - iconSize / 2, maxY));
-
-        // Set the position of the icon based on the adjusted drop location
         draggableIcon.style.position = 'absolute';
         draggableIcon.style.left = `${newX}px`;
         draggableIcon.style.top = `${newY}px`;
     });
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
+
+    draggableIcon.addEventListener('touchstart', (event) => {
+        const touch = event.touches[0];
+        const rect = draggableIcon.getBoundingClientRect();
+        touchOffsetX = touch.clientX - rect.left;
+        touchOffsetY = touch.clientY - rect.top;
+    });
+
+    document.addEventListener('touchmove', (event) => {
+        event.preventDefault();
+        const touch = event.touches[0];
+        const iconSize = 50; 
+        const x = touch.clientX - touchOffsetX;
+        const y = touch.clientY - touchOffsetY;
+        const minX = 0;
+        const maxX = window.innerWidth - iconSize;
+        const minY = 0;
+        const maxY = window.innerHeight - iconSize;
+        const newX = Math.max(minX, Math.min(x, maxX));
+        const newY = Math.max(minY, Math.min(y, maxY));
+        draggableIcon.style.position = 'absolute';
+        draggableIcon.style.left = `${newX}px`;
+        draggableIcon.style.top = `${newY}px`;
+    });
+
 }
 
 setTimeout(dragableIcon, 2000);
