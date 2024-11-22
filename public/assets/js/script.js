@@ -48,7 +48,7 @@ const DOM = {
     isSubscribed: false,
     notification_message_id: document.getElementById("notification_message_id").value,
     notification_group_id: document.getElementById("notification_group_id").value,
-    groupSearch:false
+    groupSearch: false
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -154,10 +154,9 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
-    if(!DOM.groupSearch)
-    {
+    if (!DOM.groupSearch) {
         previousChatList = [...chatList]
-        console.log("previod",previousChatList);
+        console.log("previod", previousChatList);
     }
     if (chatList.length === 0) {
         return;
@@ -193,7 +192,6 @@ let viewChatList = () => {
                         }
                     }
                 }
-                let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
                     if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
                         messageText = latestMessage.media_name;
@@ -233,7 +231,7 @@ let viewChatList = () => {
                     <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
                             <div class="name list-user-name">${elem.group.name.length > 23 ? elem.group.name.substring(0, 23) + "..." : elem.group.name}</div>
-                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${messageText}</div>
+                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${latestMessage.is_compose === 1?  processValue(messageText).concat("..."):messageText}</div>
                         </div>
 
                     <div class="flex-grow-1 text-right">
@@ -1028,6 +1026,15 @@ function updateViewChatList(editedMessage) {
     }
 }
 
+function processValue(value) {
+    value = value.replace(/<br\s*\/?>/gi, '\n');
+    value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+    value = value.replace(/<[^>]*>/g, '');
+    value = value.trim();
+    return value.replace(/\r\n/g, '<br>')
+        .replace(/\n/g, '<br>')
+        .replace(/<i[^>]+>/g, '').slice(0, 12);
+}
 
 let addMessageToMessageArea = (message, flag = false) => {
     console.log(message);
@@ -1262,7 +1269,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0,200)+".....";
+                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200) + ".....";
             }
 
             messageContent = `
@@ -1278,24 +1285,15 @@ let addMessageToMessageArea = (message, flag = false) => {
         <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
         `;
         } else {
-            function processValue(value) {
-                value = value.replace(/<br\s*\/?>/gi, '\n');
-                value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-                value = value.replace(/<[^>]*>/g, '');
-                value = value.trim();
-                return value.replace(/\r\n/g, '<br>')
-                .replace(/\n/g, '<br>')
-                .replace(/<i[^>]+>/g, '');;
+            if (message.is_compose === 1) {
+                messageContent = processValue(message.msg || message.message);
+            } else {
+                messageContent = (message.msg || message.message)
+                    .replace(/\r\n/g, '<br>')
+                    .replace(/\n/g, '<br>')
+                    .replace(/<i[^>]+>/g, '');
             }
-                if (message.is_compose === 1) {
-                    messageContent = processValue(message.msg || message.message);
-                } else {
-                    messageContent = (message.msg || message.message)
-                        .replace(/\r\n/g, '<br>')
-                        .replace(/\n/g, '<br>')
-                        .replace(/<i[^>]+>/g, ''); 
-                }
-           
+
         }
 
     }
@@ -3547,7 +3545,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     viewMessageList();
                 }
 
-                if (loadMore && !groups  && messages == undefined) {
+                if (loadMore && !groups && messages == undefined) {
                     DOM.chatList2.innerHTML += `<div class="no-messages-found">No more data found.</div>`;
                 }
             }
@@ -4248,17 +4246,17 @@ let dragableIcon = () => {
     draggableIcon.setAttribute('draggable', 'true');
 
     draggableIcon.addEventListener('dragstart', (event) => {
-        event.dataTransfer.setData('text/plain', null); 
+        event.dataTransfer.setData('text/plain', null);
         event.dataTransfer.effectAllowed = 'move';
     });
 
     document.addEventListener('dragover', (event) => {
-        event.preventDefault(); 
+        event.preventDefault();
     });
 
     document.addEventListener('drop', (event) => {
         event.preventDefault();
-        const iconSize = 50; 
+        const iconSize = 50;
         const x = event.clientX;
         const y = event.clientY;
         const minX = 0;
@@ -4284,7 +4282,7 @@ let dragableIcon = () => {
     document.addEventListener('touchmove', (event) => {
         event.preventDefault();
         const touch = event.touches[0];
-        const iconSize = 50; 
+        const iconSize = 50;
         const x = touch.clientX - touchOffsetX;
         const y = touch.clientY - touchOffsetY;
         const minX = 0;
