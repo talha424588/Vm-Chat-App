@@ -75,6 +75,7 @@ class MessageResourceCollection extends ResourceCollection
             'is_compose' => $message->is_compose,
             'is_privacy_breach' => $message->is_privacy_breach,
             'is_deleted' => $message->is_deleted,
+            'compose_id'=>$message->compose_id,
             'user' => [
                 'id' => $message->user->id,
                 'unique_id' => $message->user->unique_id,

@@ -28,6 +28,7 @@ class MessageResource extends JsonResource
             'is_compose' => $this->is_compose,
             'is_privacy_breach' => $this->is_privacy_breach,
             'is_deleted' => $this->is_deleted,
+            'compose_id' => $this->compose_id,
             'user' => [
                     'id' => $this->user->id,
                     'unique_id' => $this->user->unique_id,

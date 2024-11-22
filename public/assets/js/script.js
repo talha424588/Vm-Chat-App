@@ -1030,6 +1030,7 @@ function updateViewChatList(editedMessage) {
 
 
 let addMessageToMessageArea = (message, flag = false) => {
+    console.log(message);
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -1261,7 +1262,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');;
+                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0,200)+".....";
             }
 
             messageContent = `
@@ -1277,7 +1278,24 @@ let addMessageToMessageArea = (message, flag = false) => {
         <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
         `;
         } else {
-            messageContent = (message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
+            function processValue(value) {
+                value = value.replace(/<br\s*\/?>/gi, '\n');
+                value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                value = value.replace(/<[^>]*>/g, '');
+                value = value.trim();
+                return value.replace(/\r\n/g, '<br>')
+                .replace(/\n/g, '<br>')
+                .replace(/<i[^>]+>/g, '');;
+            }
+                if (message.is_compose === 1) {
+                    messageContent = processValue(message.msg || message.message);
+                } else {
+                    messageContent = (message.msg || message.message)
+                        .replace(/\r\n/g, '<br>')
+                        .replace(/\n/g, '<br>')
+                        .replace(/<i[^>]+>/g, ''); 
+                }
+           
         }
 
     }
@@ -1324,7 +1342,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             <div class="align-self-${message.user.id == user.id ? 'end self' : 'start'} d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? 'right-nidle' : 'left-nidle'}" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? '#dcf8c6' : 'white'};">
-                           ${messageContent}
+                          ${messageContent}
                            </div>
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
@@ -2726,7 +2744,7 @@ function unread_settings(query_set) {
     let unseenCount = 0;
     query_set.data.forEach(message => {
         if (message.group_id === groupIdToCheck) {
-            if (message.seen_by.includes(userIdToCheck)) {
+            if (message.seen_by?.includes(userIdToCheck)) {
                 seenCount++;
             } else {
                 unseenCount++;
@@ -4200,28 +4218,28 @@ let update_user_profile = async (elem, file) => {
     }
 }
 
-DOM.inputName.addEventListener("blur", async (e) => {
-    const name = e.target.value;
-    try {
-        const response = await fetch("update_user_profile", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken,
-            },
-            body: JSON.stringify({
-                userId: user.id,
-                name: name
-            }),
-        });
-        const res = await response.json();
-        if (res.status == 200) {
-            user.name = name;
-        }
-    } catch (error) {
-        console.error('Error updating User Profile:', error);
-    }
-});
+// DOM.inputName.addEventListener("blur", async (e) => {
+//     const name = e.target.value;
+//     try {
+//         const response = await fetch("update_user_profile", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 "X-CSRF-Token": csrfToken,
+//             },
+//             body: JSON.stringify({
+//                 userId: user.id,
+//                 name: name
+//             }),
+//         });
+//         const res = await response.json();
+//         if (res.status == 200) {
+//             user.name = name;
+//         }
+//     } catch (error) {
+//         console.error('Error updating User Profile:', error);
+//     }
+// });
 
 let dragableIcon = () => {
     const draggableIcon = document.querySelector('.onesignal-bell-container');
@@ -4230,36 +4248,56 @@ let dragableIcon = () => {
     draggableIcon.setAttribute('draggable', 'true');
 
     draggableIcon.addEventListener('dragstart', (event) => {
-        event.dataTransfer.setData('text/plain', null); // For Firefox compatibility
+        event.dataTransfer.setData('text/plain', null); 
         event.dataTransfer.effectAllowed = 'move';
     });
 
     document.addEventListener('dragover', (event) => {
-        event.preventDefault(); // Prevent default to allow drop
+        event.preventDefault(); 
     });
 
     document.addEventListener('drop', (event) => {
         event.preventDefault();
-
-        const iconSize = 50; // Adjust this based on the actual icon size
+        const iconSize = 50; 
         const x = event.clientX;
         const y = event.clientY;
-
-        // Calculate the boundaries for the icon
         const minX = 0;
         const maxX = window.innerWidth - iconSize;
         const minY = 0;
         const maxY = window.innerHeight - iconSize;
-
-        // Ensure the new position is within the boundaries
         const newX = Math.max(minX, Math.min(x - iconSize / 2, maxX));
         const newY = Math.max(minY, Math.min(y - iconSize / 2, maxY));
-
-        // Set the position of the icon based on the adjusted drop location
         draggableIcon.style.position = 'absolute';
         draggableIcon.style.left = `${newX}px`;
         draggableIcon.style.top = `${newY}px`;
     });
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
+
+    draggableIcon.addEventListener('touchstart', (event) => {
+        const touch = event.touches[0];
+        const rect = draggableIcon.getBoundingClientRect();
+        touchOffsetX = touch.clientX - rect.left;
+        touchOffsetY = touch.clientY - rect.top;
+    });
+
+    document.addEventListener('touchmove', (event) => {
+        event.preventDefault();
+        const touch = event.touches[0];
+        const iconSize = 50; 
+        const x = touch.clientX - touchOffsetX;
+        const y = touch.clientY - touchOffsetY;
+        const minX = 0;
+        const maxX = window.innerWidth - iconSize;
+        const minY = 0;
+        const maxY = window.innerHeight - iconSize;
+        const newX = Math.max(minX, Math.min(x, maxX));
+        const newY = Math.max(minY, Math.min(y, maxY));
+        draggableIcon.style.position = 'absolute';
+        draggableIcon.style.left = `${newX}px`;
+        draggableIcon.style.top = `${newY}px`;
+    });
+
 }
 
 setTimeout(dragableIcon, 2000);
