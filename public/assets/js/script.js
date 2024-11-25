@@ -1545,19 +1545,22 @@ let addMessageToMessageArea = (message, flag = false) => {
 };
 
 function scrollToMessage(messageId) {
-    DOM.groupReferenceMessageClick = true;
     const targetMessage = document.getElementById(`message-${messageId}`);
     if (targetMessage) {
+        DOM.groupReferenceMessageClick = false;
         const ml3Div = targetMessage.closest('.ml-3');
         if (ml3Div) {
-            ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            ml3Div.classList.add('selected-message');
             setTimeout(() => {
+                console.log("ml3Div", ml3Div);
+                ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                ml3Div.classList.add('selected-message');
+
                 ml3Div.classList.remove('selected-message');
-            }, 3000);
+            }, 100);
         }
     }
     else {
+        DOM.groupReferenceMessageClick = true;
         fetchPaginatedMessages(messageId, null, null);
     }
 }
@@ -2509,17 +2512,18 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 if (DOM.groupReferenceMessageClick) {
                     scrollToMessage(message.id);
                 }
-                const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
-                const messageTextElement = messageElement.querySelector(".shadow-sm");
-                const searchQuery = DOM.messageSearchQuery;
+                else if (!DOM.groupReferenceMessageClick) {
+                    const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
+                    const messageTextElement = messageElement.querySelector(".shadow-sm");
+                    const searchQuery = DOM.messageSearchQuery;
 
-                switch (message.type) {
-                    case "Message":
-                        if (message.reply) {
-                            messageTextElement.innerHTML = '';
-                            if (message.reply.type === "Audio") {
+                    switch (message.type) {
+                        case "Message":
+                            if (message.reply) {
+                                messageTextElement.innerHTML = '';
+                                if (message.reply.type === "Audio") {
 
-                                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
+                                    var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
                                     <div class="avatar">
                                         <!-- Avatar image here -->
                                     </div>
@@ -2539,7 +2543,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     </div>
                                     </div>`;
 
-                                newMessageDisplay = `
+                                    newMessageDisplay = `
                                     <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
@@ -2552,16 +2556,16 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                 <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
                                 `;
 
-                                const messageText = message.msg.toLowerCase();
-                                const index = messageText.indexOf(searchQuery);
+                                    const messageText = message.msg.toLowerCase();
+                                    const index = messageText.indexOf(searchQuery);
 
-                                if (index !== -1) {
-                                    const highlightedText = message.msg.substring(0, index) +
-                                        `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                        message.msg.substring(index + searchQuery.length);
+                                    if (index !== -1) {
+                                        const highlightedText = message.msg.substring(0, index) +
+                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                            message.msg.substring(index + searchQuery.length);
 
-                                    // Update the reply message area with highlighted text
-                                    newMessageDisplay = `
+                                        // Update the reply message area with highlighted text
+                                        newMessageDisplay = `
                                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
@@ -2572,12 +2576,12 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     </div>
                                     <div class="reply-message-area">${highlightedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
                                 `;
-                                }
-                                messageTextElement.innerHTML = newMessageDisplay;
+                                    }
+                                    messageTextElement.innerHTML = newMessageDisplay;
 
-                            }
-                            else if (message.reply.type === "File") {
-                                replyDisplay = `
+                                }
+                                else if (message.reply.type === "File") {
+                                    replyDisplay = `
                                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
                                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                         ${message.user.name}
@@ -2601,21 +2605,21 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                         </div>
                                     </div>
                                 </div>`;
-                                messageTextElement.innerHTML = replyDisplay +
-                                    `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+                                    messageTextElement.innerHTML = replyDisplay +
+                                        `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
 
-                                const messageText = message.msg.toLowerCase();
-                                const index = messageText.indexOf(searchQuery);
-                                if (index !== -1) {
-                                    const highlightedText = message.msg.substring(0, index) +
-                                        `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                        message.msg.substring(index + searchQuery.length);
-                                    messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                                    const messageText = message.msg.toLowerCase();
+                                    const index = messageText.indexOf(searchQuery);
+                                    if (index !== -1) {
+                                        const highlightedText = message.msg.substring(0, index) +
+                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                            message.msg.substring(index + searchQuery.length);
+                                        messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                                    }
                                 }
-                            }
-                            else if (message.reply.type === "Image") {
-                                var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
-                                replyDisplay = `
+                                else if (message.reply.type === "Image") {
+                                    var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                                    replyDisplay = `
                                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
@@ -2626,64 +2630,65 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     </div>
                                 `;
 
-                                messageTextElement.innerHTML = replyDisplay;
-                                const messageText = message.msg.toLowerCase();
+                                    messageTextElement.innerHTML = replyDisplay;
+                                    const messageText = message.msg.toLowerCase();
+                                    const index = messageText.indexOf(searchQuery);
+                                    if (index !== -1) {
+                                        const highlightedText = message.msg.substring(0, index) +
+                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                            message.msg.substring(index + searchQuery.length);
+                                        messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                                    }
+                                }
+
+                            }
+                            else {
+                                const messageText = messageTextElement.innerHTML;
                                 const index = messageText.indexOf(searchQuery);
                                 if (index !== -1) {
-                                    const highlightedText = message.msg.substring(0, index) +
-                                        `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                        message.msg.substring(index + searchQuery.length);
-                                    messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                                    const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                                    messageTextElement.innerHTML = highlightedText;
                                 }
                             }
+                            break;
+                        case "File":
+                            const fileNameElement = messageElement.querySelector(".file-name");
+                            if (fileNameElement) {
+                                const fileName = fileNameElement.textContent;
 
-                        }
-                        else {
-                            const messageText = messageTextElement.innerHTML;
-                            const index = messageText.indexOf(searchQuery);
-                            if (index !== -1) {
-                                const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
-                                messageTextElement.innerHTML = highlightedText;
+                                const trimmedSearchQuery = searchQuery;
+                                const index = fileName.toLowerCase().indexOf(trimmedSearchQuery.toLowerCase());
+                                if (index !== -1) {
+                                    const highlightedFileName = fileName.substring(0, index) +
+                                        `<span class="highlight">${fileName.substring(index, index + trimmedSearchQuery.length)}</span>` +
+                                        fileName.substring(index + trimmedSearchQuery.length);
+                                    fileNameElement.innerHTML = highlightedFileName;
+                                }
                             }
-                        }
-                        break;
-                    case "File":
-                        const fileNameElement = messageElement.querySelector(".file-name");
-                        if (fileNameElement) {
-                            const fileName = fileNameElement.textContent;
+                            break;
+                        default:
+                            const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
+                            if (nullTypemessageTextElement) {
+                                const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
 
-                            const trimmedSearchQuery = searchQuery;
-                            const index = fileName.toLowerCase().indexOf(trimmedSearchQuery.toLowerCase());
-                            if (index !== -1) {
-                                const highlightedFileName = fileName.substring(0, index) +
-                                    `<span class="highlight">${fileName.substring(index, index + trimmedSearchQuery.length)}</span>` +
-                                    fileName.substring(index + trimmedSearchQuery.length);
-                                fileNameElement.innerHTML = highlightedFileName;
+                                const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
+                                if (nullTypeIndex !== -1) {
+                                    const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
+                                        `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
+                                        nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
+
+                                    nullTypemessageTextElement.innerHTML = highlightedText;
+                                }
+                            } else {
+                                console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                             }
-                        }
-                        break;
-                    default:
-                        const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
-                        if (nullTypemessageTextElement) {
-                            const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
-
-                            const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
-                            if (nullTypeIndex !== -1) {
-                                const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
-                                    `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
-                                    nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
-
-                                nullTypemessageTextElement.innerHTML = highlightedText;
-                            }
-                        } else {
-                            console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
-                        }
-                        break;
-                        console.log("Unknown message type:", message.type);
+                            break;
+                            console.log("Unknown message type:", message.type);
+                    }
+                    setTimeout(() => {
+                        messageElement.scrollIntoView({ behavior: "smooth" });
+                    }, 100);
                 }
-                setTimeout(() => {
-                    messageElement.scrollIntoView({ behavior: "smooth" });
-                }, 100);
             }
         });
 
