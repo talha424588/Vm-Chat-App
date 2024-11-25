@@ -4223,64 +4223,88 @@ DOM.inputName.addEventListener("blur", async (e) => {
     }
 });
 
-let dragableIcon = () => {
-    const draggableIcon = document.querySelector('.onesignal-bell-container');
-    if (!draggableIcon) return;
+let draggableIcon = () => {
+    const icon = document.querySelector('.onesignal-bell-container');
+    if (!icon) return;
 
-    let isDragging = false; // Track if the icon is being dragged
-    let startX = 0, startY = 0; // Initial touch positions
-    let offsetX = 0, offsetY = 0; // Icon's offset from touch start
+    let isTouching = false; // Flag to track if the icon is being dragged
+    let offsetX = 0, offsetY = 0; // To store the touch offset
 
-    // Add touch event listeners
-    draggableIcon.addEventListener('touchstart', (event) => {
-        const touch = event.touches[0];
-        startX = touch.clientX;
-        startY = touch.clientY;
+    // Enable drag for desktop
+    icon.setAttribute('draggable', 'true');
 
-        // Get the icon's current position
-        const rect = draggableIcon.getBoundingClientRect();
-        offsetX = startX - rect.left;
-        offsetY = startY - rect.top;
-
-        isDragging = true;
-        event.preventDefault(); // Prevent scrolling
+    icon.addEventListener('dragstart', (event) => {
+        event.dataTransfer.setData('text/plain', null); // For Firefox compatibility
+        event.dataTransfer.effectAllowed = 'move';
     });
 
-    document.addEventListener('touchmove', (event) => {
-        if (!isDragging) return;
+    document.addEventListener('dragover', (event) => {
+        event.preventDefault();
+    });
 
-        const touch = event.touches[0];
-        const x = touch.clientX;
-        const y = touch.clientY;
+    document.addEventListener('drop', (event) => {
+        event.preventDefault();
 
         const iconSize = 50; // Adjust this based on the actual icon size
+        const x = event.clientX;
+        const y = event.clientY;
 
-        // Calculate the boundaries for the icon
         const minX = 0;
         const maxX = window.innerWidth - iconSize;
         const minY = 0;
         const maxY = window.innerHeight - iconSize;
 
-        // Ensure the new position is within the boundaries
-        const newX = Math.max(minX, Math.min(x - offsetX, maxX));
-        const newY = Math.max(minY, Math.min(y - offsetY, maxY));
+        const newX = Math.max(minX, Math.min(x - iconSize / 2, maxX));
+        const newY = Math.max(minY, Math.min(y - iconSize / 2, maxY));
 
-        // Smoothly update the position of the icon
-        draggableIcon.style.position = 'absolute';
-        draggableIcon.style.left = `${newX}px`;
-        draggableIcon.style.top = `${newY}px`;
-
-        event.preventDefault(); // Prevent default touch behavior
+        icon.style.position = 'absolute';
+        icon.style.left = `${newX}px`;
+        icon.style.top = `${newY}px`;
     });
 
-    document.addEventListener('touchend', () => {
-        isDragging = false; // Reset dragging state
+    // Touch handling for mobile
+    icon.addEventListener('touchstart', (event) => {
+        isTouching = true;
+
+        // Calculate offset from the touch point to the top-left corner of the icon
+        const touch = event.touches[0];
+        const rect = icon.getBoundingClientRect();
+        offsetX = touch.clientX - rect.left;
+        offsetY = touch.clientY - rect.top;
+
+        event.preventDefault();
     });
 
-    document.addEventListener('touchcancel', () => {
-        isDragging = false; // Reset dragging state
+    icon.addEventListener('touchmove', (event) => {
+        if (!isTouching) return;
+
+        const touch = event.touches[0];
+
+        const iconSize = 50; // Adjust this based on the actual icon size
+        const x = touch.clientX - offsetX;
+        const y = touch.clientY - offsetY;
+
+        const minX = 0;
+        const maxX = window.innerWidth - iconSize;
+        const minY = 0;
+        const maxY = window.innerHeight - iconSize;
+
+        const newX = Math.max(minX, Math.min(x, maxX));
+        const newY = Math.max(minY, Math.min(y, maxY));
+
+        icon.style.position = 'absolute';
+        icon.style.left = `${newX}px`;
+        icon.style.top = `${newY}px`;
+
+        event.preventDefault();
+    });
+
+    icon.addEventListener('touchend', () => {
+        isTouching = false; 
     });
 };
+
+
 
 setTimeout(dragableIcon, 2000);
 let sendMessageFunc = () => {
