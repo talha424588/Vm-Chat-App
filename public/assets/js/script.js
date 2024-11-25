@@ -48,7 +48,8 @@ const DOM = {
     isSubscribed: false,
     notification_message_id: document.getElementById("notification_message_id").value,
     notification_group_id: document.getElementById("notification_group_id").value,
-    groupSearch: false
+    groupSearch: false,
+    groupReferenceMessageClick: false,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -231,7 +232,7 @@ let viewChatList = () => {
                     <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
                             <div class="name list-user-name">${elem.group.name.length > 23 ? elem.group.name.substring(0, 23) + "..." : elem.group.name}</div>
-                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${latestMessage.is_compose === 1?  processValue(messageText).concat("..."):messageText}</div>
+                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${latestMessage.is_compose === 1 ? processValue(messageText).concat("...") : messageText}</div>
                         </div>
 
                     <div class="flex-grow-1 text-right">
@@ -1037,7 +1038,6 @@ function processValue(value) {
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
-    console.log(message);
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -1545,6 +1545,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 };
 
 function scrollToMessage(messageId) {
+    DOM.groupReferenceMessageClick = true;
     const targetMessage = document.getElementById(`message-${messageId}`);
     if (targetMessage) {
         const ml3Div = targetMessage.closest('.ml-3');
@@ -1555,6 +1556,9 @@ function scrollToMessage(messageId) {
                 ml3Div.classList.remove('selected-message');
             }, 3000);
         }
+    }
+    else {
+        fetchPaginatedMessages(messageId, null, null);
     }
 }
 
@@ -2410,7 +2414,7 @@ const displayedMessageIds = new Set();
 
 let isLoading = false;
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null) => {
-
+    console.log("message_d", message_id);
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
@@ -2494,12 +2498,17 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             return;
         }
         nextPageMessages.data.forEach((message) => {
+
             if (!displayedMessageIds.has(message.id)) {
                 addMessageToMessageArea(message);
                 displayedMessageIds.add(message.id);
             }
             if (message.id == notSeenById && !DOM.unreadDividerAdded) addUnread();
-            if (message.id === message_id) {
+
+            if (message.id == message_id) {
+                if (DOM.groupReferenceMessageClick) {
+                    scrollToMessage(message.id);
+                }
                 const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                 const messageTextElement = messageElement.querySelector(".shadow-sm");
                 const searchQuery = DOM.messageSearchQuery;
