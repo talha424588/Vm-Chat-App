@@ -25,10 +25,21 @@ class AuthService implements AuthRepository
 {
     public function authenticateUser(Request $request)
     {
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->intended(route('chat'));
+        $user = User::where("email", $request->email)->first();;
+        if ($user) {
+            if (password_verify($request->password,$user->password) && $user->is_deleted == 0) {
+                Auth::login($user);
+                return redirect()->intended(route('chat'));
+            } else {
+                return redirect()->back()->withErrors(['email' => 'Invalid email or password']);
+            }
         } else {
             return redirect()->back()->withErrors(['email' => 'Invalid email or password']);
         }
+        // if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        //     return redirect()->intended(route('chat'));
+        // } else {
+        //     return redirect()->back()->withErrors(['email' => 'Invalid email or password']);
+        // }
     }
 }

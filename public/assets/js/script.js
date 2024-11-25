@@ -48,6 +48,7 @@ const DOM = {
     isSubscribed: false,
     notification_message_id: document.getElementById("notification_message_id").value,
     notification_group_id: document.getElementById("notification_group_id").value,
+    groupSearch: false
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -90,6 +91,7 @@ let areaSwapped = false;
 let chat = null;
 let chatList = [];
 let chatList2 = [];
+let previousChatList = [];
 let messageList = [];
 let pagnicateChatList = [];
 let results = [];
@@ -152,7 +154,10 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
-    console.log("chat list", chatList);
+    if (!DOM.groupSearch) {
+        previousChatList = [...chatList]
+        console.log("previod", previousChatList);
+    }
     if (chatList.length === 0) {
         return;
     }
@@ -187,7 +192,6 @@ let viewChatList = () => {
                         }
                     }
                 }
-                let messageText = null;
                 if (latestMessage != undefined && 'type' in latestMessage) {
                     if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
                         messageText = latestMessage.media_name;
@@ -227,7 +231,7 @@ let viewChatList = () => {
                     <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
                             <div class="name list-user-name">${elem.group.name.length > 23 ? elem.group.name.substring(0, 23) + "..." : elem.group.name}</div>
-                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${messageText}</div>
+                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${latestMessage.is_compose === 1?  processValue(messageText).concat("..."):messageText}</div>
                         </div>
 
                     <div class="flex-grow-1 text-right">
@@ -627,6 +631,8 @@ socket.on('sendChatToClient', (message) => {
         addMessageToMessageArea(message, true);
         get_voice_list();
     } else {
+        // if user is in search mood and other user message and search user mood user clear the search feild the message count
+        // did not got updated start from here
         groupToUpdate.group.group_messages.push(message);
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
@@ -656,7 +662,6 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
         if (DOM.groupId == null || DOM.groupId !== newGroupId) {
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
             if (newGroup) {
-                console.log("new group", newGroup);
                 if (moveMessages.messages.length > 1) {
                     moveMessages.messages.sort((a, b) => b.id = a.id);
                     moveMessages.messages.forEach(message => {
@@ -688,7 +693,6 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
         else {
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
             if (newGroup) {
-                console.log("new group", newGroup);
                 if (moveMessages.messages.length > 1) {
                     moveMessages.messages.sort((a, b) => b.id = a.id);
                     moveMessages.messages.forEach(message => {
@@ -723,14 +727,12 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
         }
     }
     else if (user.unique_id == uniqueId) {
-        console.log("else part");
         const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
         const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
         generateMessageArea(newGroupChatListItem, newIndex, false, null);
 
         let newGroup = chatList.find(group => group.group.group_id == newGroupId);
         if (newGroup) {
-            console.log("new group", newGroup);
             if (moveMessages.messages.length > 1) {
                 moveMessages.messages.sort((a, b) => b.id = a.id);
                 moveMessages.messages.forEach(message => {
@@ -1024,6 +1026,15 @@ function updateViewChatList(editedMessage) {
     }
 }
 
+function processValue(value) {
+    value = value.replace(/<br\s*\/?>/gi, '\n');
+    value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+    value = value.replace(/<[^>]*>/g, '');
+    value = value.trim();
+    return value.replace(/\r\n/g, '<br>')
+        .replace(/\n/g, '<br>')
+        .replace(/<i[^>]+>/g, '').slice(0, 12);
+}
 
 let addMessageToMessageArea = (message, flag = false) => {
     console.log(message);
@@ -1258,7 +1269,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0,200)+".....";
+                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200) + ".....";
             }
 
             messageContent = `
@@ -1274,24 +1285,15 @@ let addMessageToMessageArea = (message, flag = false) => {
         <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
         `;
         } else {
-            function processValue(value) {
-                value = value.replace(/<br\s*\/?>/gi, '\n');
-                value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-                value = value.replace(/<[^>]*>/g, '');
-                value = value.trim();
-                return value.replace(/\r\n/g, '<br>')
-                .replace(/\n/g, '<br>')
-                .replace(/<i[^>]+>/g, '');;
+            if (message.is_compose === 1) {
+                messageContent = processValue(message.msg || message.message);
+            } else {
+                messageContent = (message.msg || message.message)
+                    .replace(/\r\n/g, '<br>')
+                    .replace(/\n/g, '<br>')
+                    .replace(/<i[^>]+>/g, '');
             }
-                if (message.is_compose === 1) {
-                    messageContent = processValue(message.msg || message.message);
-                } else {
-                    messageContent = (message.msg || message.message)
-                        .replace(/\r\n/g, '<br>')
-                        .replace(/\n/g, '<br>')
-                        .replace(/<i[^>]+>/g, ''); 
-                }
-           
+
         }
 
     }
@@ -1500,7 +1502,12 @@ let addMessageToMessageArea = (message, flag = false) => {
                                 <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                     <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
                                     <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span>
-                                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="markAsSeen('${message.id}')">Seen</span> |
+                                    <span>
+                                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+                                            data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
+                                            Seen
+                                        </a>
+                                    </span> |
                                     <span id="restore-button-${message.id}" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="restoreMessage('${message.id}')">Restore</span>                                    <!-- Additional logic for seen and reply links -->
                                 </div>
                             </div>
@@ -2029,8 +2036,6 @@ function removeEditMessage() {
 }
 
 function showReply(message_id, senderName, type) {
-    console.log(message_id, senderName, type);
-
     var correctionDiv = document.getElementById('correction-div');
 
     if (correctionDiv && window.getComputedStyle(correctionDiv).display === 'block') {
@@ -2310,7 +2315,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
 
 
             // const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
-            // console.log("moveMessageResponse", moveMessageResponse);
+
             socket.emit('moveMessage', moveMessageResponse, newGroupId, DOM.groupId, user.unique_id);
 
             // const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
@@ -3021,7 +3026,6 @@ let init = () => {
         firebase.initializeApp(firebaseConfig);
     }
 
-    console.log("Click the Image at top-left to open settings.");
 
     // window.OneSignalDeferred = window.OneSignalDeferred || [];
     // OneSignalDeferred.push(async function (OneSignal) {
@@ -3454,7 +3458,7 @@ $('#deleteModal .btn-delete').on('click', function () {
 
 // Seen Model
 $("#seenModal").on("show.bs.modal", async function (event) {
-
+    console.log("seen model hit");
     let deleteBtn = $(event.relatedTarget);
     let messageId = deleteBtn.data("message-id");
     try {
@@ -3491,6 +3495,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     }
 
     if (searchQuery.length > 0) {
+        DOM.groupSearch = true;
         DOM.messageSearchQuery = searchQuery;
         const url = `search-group-by-name/${searchQuery}?page_groups=${currentPageGroups}&page_messages=${currentPageMessages}`;
         const unique_id = document.getElementById("login_user_unique_id").value;
@@ -3504,7 +3509,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 const messages = response.data.messages.data;
 
 
-                if (!groups || !groups.data || groups.data.length === 0) {
+                if (!groups || groups.length === 0) {
                     if (!loadMore) {
                         DOM.chatList.innerHTML += ` <div class="no-groups-found">No Groups Found.</div>`;
                     }
@@ -3520,6 +3525,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                         if (group.group_messages && group.group_messages.length > 0) {
                             group.group_messages.reverse().forEach((msg) => {
                                 chat.unread += (msg.sender !== unique_id && !msg.seen_by.split(",").map(s => s.trim()).includes(unique_id)) ? 1 : 0;
+                                chat.time = new Date(msg.time * 1000);
                             });
                         }
 
@@ -3528,7 +3534,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     viewChatList();
                 }
 
-                if (messages.length === 0) {
+                if (messages == undefined) {
                     if (!loadMore) {
                         DOM.chatList2.innerHTML += `<div class="no-messages-found">No messages found.</div>`;
                     }
@@ -3539,17 +3545,32 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     viewMessageList();
                 }
 
-                if (loadMore && groups.length === 0 && messages.length === 0) {
-                    // Handle no more data case if needed
+                if (loadMore && !groups && messages == undefined) {
+                    DOM.chatList2.innerHTML += `<div class="no-messages-found">No more data found.</div>`;
                 }
             }
         } catch (error) {
             console.log(error);
         }
     } else {
+        DOM.groupSearch = false;
+        chatList = [...previousChatList];
+        chatList.sort((a, b) => {
+            if (a.time && b.time) {
+                return new Date(b.time) - new Date(a.time);
+            } else if (a.time) {
+                return -1;
+            } else if (b.time) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
         messageList = [];
         DOM.messagesList.innerHTML = '';
-        generateChatList();
+        viewChatList();
+
+        // generateChatList();
     }
 };
 
@@ -3757,6 +3778,10 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
     if (messageElement) {
         DOM.searchMessageClick = true;
         const messageTextElement = messageElement.querySelector(".shadow-sm");
+        let highlightElement = document.getElementsByClassName("highlight")[0];
+        if (highlightElement) {
+            highlightElement.classList.remove("highlight");
+        }
         switch (message.type) {
             case "Message":
                 if (message.reply) {
@@ -4224,8 +4249,10 @@ let draggableIcon = () => {
     // Enable drag for desktop
     icon.setAttribute('draggable', 'true');
 
+
     icon.addEventListener('dragstart', (event) => {
         event.dataTransfer.setData('text/plain', null); // For Firefox compatibility
+
         event.dataTransfer.effectAllowed = 'move';
     });
 
@@ -4237,6 +4264,7 @@ let draggableIcon = () => {
         event.preventDefault();
 
         const iconSize = 50; // Adjust this based on the actual icon size
+
         const x = event.clientX;
         const y = event.clientY;
 
@@ -4270,7 +4298,6 @@ let draggableIcon = () => {
         if (!isTouching) return;
 
         const touch = event.touches[0];
-
         const iconSize = 50; // Adjust this based on the actual icon size
         const x = touch.clientX - offsetX;
         const y = touch.clientY - offsetY;
