@@ -157,7 +157,6 @@ let populateGroupList = async () => {
 let viewChatList = () => {
     if (!DOM.groupSearch) {
         previousChatList = [...chatList]
-        console.log("previod", previousChatList);
     }
     if (chatList.length === 0) {
         return;
@@ -1095,7 +1094,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 var message_body = message.reply.msg;
             }
             var add_file_view = `
-            <div class="file-message"  onclick="scrollToMessage('${message.reply.id}')">
+            <div class="file-message" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
@@ -1207,7 +1206,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             var message_new = `<img src="${message.message ?? message.msg}" class="view-image" style="height:222px; width:100%;">`;
             messageContent = `
-                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
+                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
                     </div>
@@ -1276,7 +1275,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             }
 
             messageContent = `
-            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
+            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                   ${message.user?.id == user?.id ? message.user.name : message.user.name}
 
@@ -1289,7 +1288,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         `;
         } else {
             if (message.is_compose === 1) {
-                messageContent = processValue(message.msg || message.message,false);
+                messageContent = processValue(message.msg || message.message, false);
             } else {
                 messageContent = (message.msg || message.message)
                     .replace(/\r\n/g, '<br>')
@@ -1547,14 +1546,17 @@ let addMessageToMessageArea = (message, flag = false) => {
     ImageViewer(DOM.messages);
 };
 
-function scrollToMessage(messageId) {
-    const targetMessage = document.getElementById(`message-${messageId}`);
+let parentMessageIds = new Set();
+function scrollToMessage(replyId, messageId = null) {
+    addChildIdsInSet(messageId);
+
+    const targetMessage = document.getElementById(`message-${replyId}`);
     if (targetMessage) {
         DOM.groupReferenceMessageClick = false;
         const ml3Div = targetMessage.closest('.ml-3');
         if (ml3Div) {
             setTimeout(() => {
-                console.log("ml3Div", ml3Div);
+
                 ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 ml3Div.classList.add('selected-message');
 
@@ -1564,8 +1566,20 @@ function scrollToMessage(messageId) {
     }
     else {
         DOM.groupReferenceMessageClick = true;
-        fetchPaginatedMessages(messageId, null, null);
+        fetchPaginatedMessages(replyId, null, null);
     }
+}
+
+function addChildIdsInSet(messageId) {
+    if (messageId !== undefined && messageId !== null) {
+        if (!parentMessageIds.has(messageId)) {
+            parentMessageIds.add(messageId);
+        }
+        else {
+            parentMessageIds.delete(messageId);
+        }
+    }
+    console.log("parentMessageIds", parentMessageIds);
 }
 
 
@@ -1599,10 +1613,17 @@ function scroll_function() {
     });
 
     scrollBottomBtn.addEventListener('click', function () {
-        messageDiv.scrollTo({
-            top: messageDiv.scrollHeight,
-            behavior: 'smooth'
-        });
+        if (parentMessageIds.size > 0) {
+            console.log("scroll to parent message");
+            scrollToMessage(parentMessageIds.values().next().value, null)
+        }
+        else {
+            console.log("scroll to bottom");
+            messageDiv.scrollTo({
+                top: messageDiv.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
     });
 }
 
@@ -2420,7 +2441,6 @@ const displayedMessageIds = new Set();
 
 let isLoading = false;
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null) => {
-    console.log("message_d", message_id);
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
@@ -2547,7 +2567,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     </div>`;
 
                                     newMessageDisplay = `
-                                    <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
+                                    <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
 
@@ -2569,7 +2589,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
                                         // Update the reply message area with highlighted text
                                         newMessageDisplay = `
-                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
                                         </div>
@@ -2585,7 +2605,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                 }
                                 else if (message.reply.type === "File") {
                                     replyDisplay = `
-                                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                         ${message.user.name}
                                     </div>
@@ -2623,7 +2643,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                 else if (message.reply.type === "Image") {
                                     var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
                                     replyDisplay = `
-                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
+                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
                                         </div>
@@ -3826,7 +3846,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                             </div>`;
 
                         newMessageDisplay = `
-                            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
+                            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                 ${message.user?.id == user?.id ? message.user.name : message.user.name}
 
@@ -3849,7 +3869,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
 
                             // Update the reply message area with highlighted text
                             newMessageDisplay = `
-                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                     ${message.user?.id == user?.id ? message.user.name : message.user.name}
                                 </div>
@@ -3867,7 +3887,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                     }
                     else if (message.reply.type === "File") {
                         replyDisplay = `
-                        <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                        <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                 ${message.user.name}
                             </div>
@@ -3907,7 +3927,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                     else if (message.reply.type === "Image") {
                         var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
                         replyDisplay = `
-                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                     ${message.user?.id == user?.id ? message.user.name : message.user.name}
                                 </div>
@@ -3931,7 +3951,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
 
                     else if (message.reply.type === "Message") {
                         replyDisplay = `
-                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                     ${message.user?.id == user?.id ? message.user.name : message.user.name}
                                 </div>
