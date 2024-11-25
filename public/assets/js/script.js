@@ -4246,25 +4246,21 @@ let draggableIcon = () => {
     let isTouching = false; 
     let offsetX = 0, offsetY = 0; 
 
-
     icon.setAttribute('draggable', 'true');
-
 
     icon.addEventListener('dragstart', (event) => {
         event.dataTransfer.setData('text/plain', null); 
-
         event.dataTransfer.effectAllowed = 'move';
     });
 
     document.addEventListener('dragover', (event) => {
-        event.preventDefault();
+        event.preventDefault(); 
     });
 
     document.addEventListener('drop', (event) => {
         event.preventDefault();
 
-        const iconSize = 50;
-
+        const iconSize = 50; 
         const x = event.clientX;
         const y = event.clientY;
 
@@ -4281,19 +4277,18 @@ let draggableIcon = () => {
         icon.style.top = `${newY}px`;
     });
 
-    // Touch handling for mobile
+   
     icon.addEventListener('touchstart', (event) => {
         isTouching = true;
         const touch = event.touches[0];
         const rect = icon.getBoundingClientRect();
         offsetX = touch.clientX - rect.left;
         offsetY = touch.clientY - rect.top;
-
-        event.preventDefault();
+        event.preventDefault(); 
     });
 
-    icon.addEventListener('touchmove', (event) => {
-        if (!isTouching) return;
+    document.addEventListener('touchmove', (event) => {
+        if (!isTouching) return; 
 
         const touch = event.touches[0];
         const iconSize = 50; 
@@ -4312,16 +4307,17 @@ let draggableIcon = () => {
         icon.style.left = `${newX}px`;
         icon.style.top = `${newY}px`;
 
-        event.preventDefault();
+        event.preventDefault(); 
     });
 
-    icon.addEventListener('touchend', () => {
+    document.addEventListener('touchend', () => {
         isTouching = false; 
     });
 };
 
 
 setTimeout(draggableIcon, 2000);
+
 let sendMessageFunc = () => {
     const sendMessagebutton = document.getElementById('message-send-area');
 
