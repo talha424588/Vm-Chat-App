@@ -308,10 +308,10 @@ background-color: rgba(255, 255, 255, 0.5);
 	#sidebar.sidebar-closed {
 		right: -100%; /* Sidebar hidden */
 	}
-	.additional_style{
+	/* .additional_style{
 		padding:7px !important;
 
-	}
+	} */
 
 	.profile_img{
 		margin-left:6px !important;
