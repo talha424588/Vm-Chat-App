@@ -232,7 +232,7 @@ let viewChatList = () => {
                     <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
                             <div class="name list-user-name">${elem.group.name.length > 23 ? elem.group.name.substring(0, 23) + "..." : elem.group.name}</div>
-                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${latestMessage.is_compose === 1 ? processValue(messageText).concat("...") : messageText}</div>
+                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${latestMessage.is_compose === 1 ? processValue(messageText, true).concat("...") : messageText}</div>
                         </div>
 
                     <div class="flex-grow-1 text-right">
@@ -1027,14 +1027,17 @@ function updateViewChatList(editedMessage) {
     }
 }
 
-function processValue(value) {
+function processValue(value, isChatList = false) {
     value = value.replace(/<br\s*\/?>/gi, '\n');
     value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
     value = value.replace(/<[^>]*>/g, '');
     value = value.trim();
-    return value.replace(/\r\n/g, '<br>')
+    return isChatList ? value.replace(/\r\n/g, '<br>')
         .replace(/\n/g, '<br>')
-        .replace(/<i[^>]+>/g, '').slice(0, 12);
+        .replace(/<i[^>]+>/g, '').slice(0, 12) :
+        value.replace(/\r\n/g, '<br>')
+            .replace(/\n/g, '<br>')
+            .replace(/<i[^>]+>/g, '');
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
@@ -1286,7 +1289,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         `;
         } else {
             if (message.is_compose === 1) {
-                messageContent = processValue(message.msg || message.message);
+                messageContent = processValue(message.msg || message.message,false);
             } else {
                 messageContent = (message.msg || message.message)
                     .replace(/\r\n/g, '<br>')
