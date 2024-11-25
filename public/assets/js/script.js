@@ -4242,6 +4242,7 @@ let update_user_profile = async (elem, file) => {
 let draggableIcon = () => {
     const icon = document.querySelector('.onesignal-bell-container');
     if (!icon) return;
+    icon.style.transition = 'left 0.2s ease, top 0.2s ease';
 
     let isTouching = false; 
     let offsetX = 0, offsetY = 0; 
@@ -4284,32 +4285,31 @@ let draggableIcon = () => {
         const rect = icon.getBoundingClientRect();
         offsetX = touch.clientX - rect.left;
         offsetY = touch.clientY - rect.top;
-      
+        icon.style.transition = 'none';
+
     });
 
-    document.addEventListener('touchmove', (event) => {
+    icon.addEventListener('touchmove', (event) => {
         if (!isTouching) return; 
-
+        event.preventDefault();
         const touch = event.touches[0];
         const iconSize = 50; 
         const x = touch.clientX - offsetX;
         const y = touch.clientY - offsetY;
-
         const minX = 0;
         const maxX = window.innerWidth - iconSize;
         const minY = 0;
         const maxY = window.innerHeight - iconSize;
-
         const newX = Math.max(minX, Math.min(x, maxX));
         const newY = Math.max(minY, Math.min(y, maxY));
-
         icon.style.position = 'absolute';
         icon.style.left = `${newX}px`;
         icon.style.top = `${newY}px`; 
     });
 
-    document.addEventListener('touchend', () => {
+    icon.addEventListener('touchend', () => {
         isTouching = false; 
+        icon.style.transition = 'left 0.2s ease, top 0.2s ease';
     });
 };
 
