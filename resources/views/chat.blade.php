@@ -292,7 +292,7 @@
                                 <label for="input-name" class="profile-setting-name">Name</label>
                             </div>
                             <div class="profile-input-wrapper">
-                                <input type="text" name="name" id="input-name" class="py-2 profile-input">
+                                <input style="cursor:pointer" type="text" readonly name="name" id="input-name" class="py-2 profile-input">
                             </div>
                             <div class="mt-2 d-flex">
                                 <div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
