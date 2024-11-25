@@ -4243,15 +4243,15 @@ let draggableIcon = () => {
     const icon = document.querySelector('.onesignal-bell-container');
     if (!icon) return;
 
-    let isTouching = false; // Flag to track if the icon is being dragged
-    let offsetX = 0, offsetY = 0; // To store the touch offset
+    let isTouching = false; 
+    let offsetX = 0, offsetY = 0; 
 
-    // Enable drag for desktop
+
     icon.setAttribute('draggable', 'true');
 
 
     icon.addEventListener('dragstart', (event) => {
-        event.dataTransfer.setData('text/plain', null); // For Firefox compatibility
+        event.dataTransfer.setData('text/plain', null); 
 
         event.dataTransfer.effectAllowed = 'move';
     });
@@ -4263,7 +4263,7 @@ let draggableIcon = () => {
     document.addEventListener('drop', (event) => {
         event.preventDefault();
 
-        const iconSize = 50; // Adjust this based on the actual icon size
+        const iconSize = 50;
 
         const x = event.clientX;
         const y = event.clientY;
@@ -4284,8 +4284,6 @@ let draggableIcon = () => {
     // Touch handling for mobile
     icon.addEventListener('touchstart', (event) => {
         isTouching = true;
-
-        // Calculate offset from the touch point to the top-left corner of the icon
         const touch = event.touches[0];
         const rect = icon.getBoundingClientRect();
         offsetX = touch.clientX - rect.left;
@@ -4298,7 +4296,7 @@ let draggableIcon = () => {
         if (!isTouching) return;
 
         const touch = event.touches[0];
-        const iconSize = 50; // Adjust this based on the actual icon size
+        const iconSize = 50; 
         const x = touch.clientX - offsetX;
         const y = touch.clientY - offsetY;
 
@@ -4323,7 +4321,7 @@ let draggableIcon = () => {
 };
 
 
-setTimeout(dragableIcon, 2000);
+setTimeout(draggableIcon, 2000);
 let sendMessageFunc = () => {
     const sendMessagebutton = document.getElementById('message-send-area');
 
