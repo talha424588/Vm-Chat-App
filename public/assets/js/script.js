@@ -4284,7 +4284,7 @@ let draggableIcon = () => {
         const rect = icon.getBoundingClientRect();
         offsetX = touch.clientX - rect.left;
         offsetY = touch.clientY - rect.top;
-        event.preventDefault(); 
+      
     });
 
     document.addEventListener('touchmove', (event) => {
@@ -4305,9 +4305,7 @@ let draggableIcon = () => {
 
         icon.style.position = 'absolute';
         icon.style.left = `${newX}px`;
-        icon.style.top = `${newY}px`;
-
-        event.preventDefault(); 
+        icon.style.top = `${newY}px`; 
     });
 
     document.addEventListener('touchend', () => {
