@@ -4225,25 +4225,35 @@ DOM.inputName.addEventListener("blur", async (e) => {
 
 let dragableIcon = () => {
     const draggableIcon = document.querySelector('.onesignal-bell-container');
-    if (!draggableIcon)
-        return;
-    draggableIcon.setAttribute('draggable', 'true');
+    if (!draggableIcon) return;
 
-    draggableIcon.addEventListener('dragstart', (event) => {
-        event.dataTransfer.setData('text/plain', null); // For Firefox compatibility
-        event.dataTransfer.effectAllowed = 'move';
+    let isDragging = false; // Track if the icon is being dragged
+    let startX = 0, startY = 0; // Initial touch positions
+    let offsetX = 0, offsetY = 0; // Icon's offset from touch start
+
+    // Add touch event listeners
+    draggableIcon.addEventListener('touchstart', (event) => {
+        const touch = event.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+
+        // Get the icon's current position
+        const rect = draggableIcon.getBoundingClientRect();
+        offsetX = startX - rect.left;
+        offsetY = startY - rect.top;
+
+        isDragging = true;
+        event.preventDefault(); // Prevent scrolling
     });
 
-    document.addEventListener('dragover', (event) => {
-        event.preventDefault(); // Prevent default to allow drop
-    });
+    document.addEventListener('touchmove', (event) => {
+        if (!isDragging) return;
 
-    document.addEventListener('drop', (event) => {
-        event.preventDefault();
+        const touch = event.touches[0];
+        const x = touch.clientX;
+        const y = touch.clientY;
 
         const iconSize = 50; // Adjust this based on the actual icon size
-        const x = event.clientX;
-        const y = event.clientY;
 
         // Calculate the boundaries for the icon
         const minX = 0;
@@ -4252,15 +4262,25 @@ let dragableIcon = () => {
         const maxY = window.innerHeight - iconSize;
 
         // Ensure the new position is within the boundaries
-        const newX = Math.max(minX, Math.min(x - iconSize / 2, maxX));
-        const newY = Math.max(minY, Math.min(y - iconSize / 2, maxY));
+        const newX = Math.max(minX, Math.min(x - offsetX, maxX));
+        const newY = Math.max(minY, Math.min(y - offsetY, maxY));
 
-        // Set the position of the icon based on the adjusted drop location
+        // Smoothly update the position of the icon
         draggableIcon.style.position = 'absolute';
         draggableIcon.style.left = `${newX}px`;
         draggableIcon.style.top = `${newY}px`;
+
+        event.preventDefault(); // Prevent default touch behavior
     });
-}
+
+    document.addEventListener('touchend', () => {
+        isDragging = false; // Reset dragging state
+    });
+
+    document.addEventListener('touchcancel', () => {
+        isDragging = false; // Reset dragging state
+    });
+};
 
 setTimeout(dragableIcon, 2000);
 let sendMessageFunc = () => {
