@@ -4317,11 +4317,17 @@ let update_user_profile = async (elem, file) => {
 //     }
 // });
 
-let dragableIcon = () => {
-    const draggableIcon = document.querySelector('.onesignal-bell-container');
-    if (!draggableIcon)
-        return;
-    draggableIcon.setAttribute('draggable', 'true');
+
+let draggableIcon = () => {
+    const icon = document.querySelector('.onesignal-bell-container');
+    if (!icon) return;
+    icon.style.transition = 'left 0.2s ease, top 0.2s ease';
+
+    let isTouching = false; 
+    let offsetX = 0, offsetY = 0; 
+
+    icon.setAttribute('draggable', 'true');
+
 
     draggableIcon.addEventListener('dragstart', (event) => {
         event.dataTransfer.setData('text/plain', null);
@@ -4352,26 +4358,38 @@ let dragableIcon = () => {
 
     draggableIcon.addEventListener('touchstart', (event) => {
         const touch = event.touches[0];
-        const rect = draggableIcon.getBoundingClientRect();
-        touchOffsetX = touch.clientX - rect.left;
-        touchOffsetY = touch.clientY - rect.top;
+
+        const rect = icon.getBoundingClientRect();
+        offsetX = touch.clientX - rect.left;
+        offsetY = touch.clientY - rect.top;
+        icon.style.transition = 'none';
+
     });
 
-    document.addEventListener('touchmove', (event) => {
+    icon.addEventListener('touchmove', (event) => {
+        if (!isTouching) return; 
         event.preventDefault();
         const touch = event.touches[0];
-        const iconSize = 50;
-        const x = touch.clientX - touchOffsetX;
-        const y = touch.clientY - touchOffsetY;
+        const iconSize = 50; 
+        const x = touch.clientX - offsetX;
+        const y = touch.clientY - offsetY;
+
         const minX = 0;
         const maxX = window.innerWidth - iconSize;
         const minY = 0;
         const maxY = window.innerHeight - iconSize;
         const newX = Math.max(minX, Math.min(x, maxX));
         const newY = Math.max(minY, Math.min(y, maxY));
-        draggableIcon.style.position = 'absolute';
-        draggableIcon.style.left = `${newX}px`;
-        draggableIcon.style.top = `${newY}px`;
+
+        icon.style.position = 'absolute';
+        icon.style.left = `${newX}px`;
+        icon.style.top = `${newY}px`; 
+    });
+
+    icon.addEventListener('touchend', () => {
+        isTouching = false; 
+        icon.style.transition = 'left 0.2s ease, top 0.2s ease';
+
     });
 
 }
