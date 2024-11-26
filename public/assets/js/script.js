@@ -4241,25 +4241,20 @@ function get_voice_list() {
                 audioTotalDuration.innerHTML = '00:00';
             }
         }
-
-
-
-
         if (playButton) {
             playButton.addEventListener('click', function () {
                 if (audioPlayer.paused) {
+                    console.log(audioPlayer.paused,": audio is paused");
                     if (currentlyPlayingAudio && currentlyPlayingAudio !== audioPlayer) {
                         currentlyPlayingAudio.pause();
                         currentlyPlayingAudio.currentTime = 0;
-                        resetPlayButton(currentlyPlayingAudio);
                     }
-
                     audioPlayer.play();
-                    updatePlayButton(playButton, false);
+                    updatePlayButton(playButton, true);
                     currentlyPlayingAudio = audioPlayer;
                 } else {
                     audioPlayer.pause();
-                    updatePlayButton(playButton, true);
+                    updatePlayButton(playButton, false);
                     currentlyPlayingAudio = null;
                 }
             });
@@ -4272,10 +4267,10 @@ function get_voice_list() {
         });
 
         audioPlayer.addEventListener('ended', function () {
-            resetPlayButton(audioPlayer);
             progressFilled.style.width = '0%';
             audioDuration.textContent = '0:00';
             currentlyPlayingAudio = null;
+            updatePlayButton(playButton, false);
         });
 
         function formatTime(seconds) {
@@ -4313,14 +4308,6 @@ function updatePlayButton(playButton, isPaused) {
     }
 }
 
-function resetPlayButton(audioPlayer) {
-    const playButton = document.querySelector(`.play-button[data-audio-src="${audioPlayer.src}"]`);
-    if (playButton) {
-        playButton.innerHTML = `<svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0. 364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
-</svg>`;
-    }
-}
 async function restoreMessage(id) {
 
     try {
