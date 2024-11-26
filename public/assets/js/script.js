@@ -3685,8 +3685,6 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         messageList = [];
         DOM.messagesList.innerHTML = '';
         viewChatList();
-
-        // generateChatList();
     }
 };
 
@@ -3706,7 +3704,6 @@ searchInputField.addEventListener('scroll', () => {
     }
 });
 
-// Debounce search input
 groupSearchField.addEventListener('input', () => {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
@@ -3785,7 +3782,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 resultTextDiv.textContent = messageText;
                             }
                             else if (message.msg.includes("<p>")) {
-                                // resultTextDiv.textContent = message.msg.replace(/<\/?(p|s|em|strong)[^>]*>/gi, '')
                                 resultTextDiv.innerHTML = message.msg
                             }
                             else {
@@ -3862,7 +3858,6 @@ messageSidebar.addEventListener('scroll', function () {
                             resultTextDiv.textContent = messageText;
                         }
                         else if (message.msg.includes("<p>")) {
-                            // resultTextDiv.textContent = message.msg.replace(/<\/?(p|s|em|strong)[^>]*>/gi, '')
                             resultTextDiv.innerHTML = message.msg
                         }
                         else {
@@ -3883,7 +3878,7 @@ messageSidebar.addEventListener('scroll', function () {
                 })
                 .catch(error => {
                     console.error('Error:', "Not Found");
-                    isFetching = false; // Reset on error as well
+                    isFetching = false;
                 });
         }
     }
@@ -3912,8 +3907,8 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                                 <div class="audio-controls">
                                     <button class="playbutton">
                                       <svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
-                        </svg>
+                                        <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
+                                      </svg>
                                     </button>
                                     <div class="audio-progress">
                                         <div class="progress-filled"></div>
@@ -3948,7 +3943,6 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                                 `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
                                 message.msg.substring(index + searchQuery.length);
 
-                            // Update the reply message area with highlighted text
                             newMessageDisplay = `
                             <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -3962,7 +3956,6 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                         `;
                         }
 
-                        // Set the inner HTML to the newMessageDisplay
                         messageTextElement.innerHTML = newMessageDisplay;
 
                     }
@@ -4358,7 +4351,6 @@ async function restoreMessage(id) {
 
                     restoreButton.replaceWith(`<span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.message.user.name}','${message.message.type}')">Reply</span>`);
                 }
-                // messageElement.removeClass('deleted');
 
                 messageElement.removeClass("deleted_niddle");
                 messageElement.find(".additional_style").removeClass("msg_deleted");
@@ -4369,15 +4361,15 @@ async function restoreMessage(id) {
         // console.log("Error Restoring Message:", error);
     }
 }
-// Select the #reply-area element
+
 const actionBarParent = document.querySelector('#reply-area');
 const InputBar = document.querySelector('#input');
 const iconnContainer = document.querySelector('.icon-container');
 const editDiv = document.querySelector('#editMessageDiv');
-// Create a ResizeObserver instance
+
 const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
-        // Check if the height has changed
+
         const newHeight = entry.contentRect.height;
         if (newHeight > 200) {
             actionBarParent.style.height = "200px";
@@ -4417,7 +4409,7 @@ const resetChatArea = () => {
 function ImageViewer(elem) {
     const images = elem.querySelectorAll('.view-image');
     images.forEach(image => {
-        // Check if Viewer is already initialized
+
         if (!image.viewer) {
             image.viewer = new Viewer(image, {
                 url: 'data-original',
