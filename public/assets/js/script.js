@@ -1569,7 +1569,6 @@ function scrollToMessage(replyId, messageId = null) {
 
 
 function taggingMessages(messageId = null) {
-    console.log("messageid", messageId);
     addChildIdsInSet(messageId, false);
     const targetMessage = document.getElementById(`message-${messageId}`);
     if (targetMessage) {
@@ -1589,17 +1588,11 @@ function taggingMessages(messageId = null) {
 function addChildIdsInSet(messageId, addFlag = true) {
     if (messageId !== undefined && messageId !== null && addFlag) {
         if (!parentMessageIds.has(messageId)) {
-            console.log("addFlag", addFlag);
-            console.log("before add", parentMessageIds);
             parentMessageIds.add(messageId);
-            console.log("after add", parentMessageIds);
-
         }
     }
     else {
-        console.log("before delete", parentMessageIds);
         parentMessageIds.delete(messageId);
-        console.log("after delete", parentMessageIds);
     }
 }
 
