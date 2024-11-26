@@ -1547,15 +1547,13 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 let parentMessageIds = new Set();
 function scrollToMessage(replyId, messageId = null) {
-    addChildIdsInSet(messageId);
-
+    addChildIdsInSet(messageId, true);
     const targetMessage = document.getElementById(`message-${replyId}`);
     if (targetMessage) {
         DOM.groupReferenceMessageClick = false;
         const ml3Div = targetMessage.closest('.ml-3');
         if (ml3Div) {
             setTimeout(() => {
-
                 ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 ml3Div.classList.add('selected-message');
 
@@ -1569,16 +1567,40 @@ function scrollToMessage(replyId, messageId = null) {
     }
 }
 
-function addChildIdsInSet(messageId) {
-    if (messageId !== undefined && messageId !== null) {
-        if (!parentMessageIds.has(messageId)) {
-            parentMessageIds.add(messageId);
-        }
-        else {
-            parentMessageIds.delete(messageId);
+
+function taggingMessages(messageId = null) {
+    console.log("messageid", messageId);
+    addChildIdsInSet(messageId, false);
+    const targetMessage = document.getElementById(`message-${messageId}`);
+    if (targetMessage) {
+        DOM.groupReferenceMessageClick = false;
+        const ml3Div = targetMessage.closest('.ml-3');
+        if (ml3Div) {
+            setTimeout(() => {
+                ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                ml3Div.classList.add('selected-message');
+
+                ml3Div.classList.remove('selected-message');
+            }, 100);
         }
     }
-    console.log("parentMessageIds", parentMessageIds);
+}
+
+function addChildIdsInSet(messageId, addFlag = true) {
+    if (messageId !== undefined && messageId !== null && addFlag) {
+        if (!parentMessageIds.has(messageId)) {
+            console.log("addFlag", addFlag);
+            console.log("before add", parentMessageIds);
+            parentMessageIds.add(messageId);
+            console.log("after add", parentMessageIds);
+
+        }
+    }
+    else {
+        console.log("before delete", parentMessageIds);
+        parentMessageIds.delete(messageId);
+        console.log("after delete", parentMessageIds);
+    }
 }
 
 
@@ -1591,7 +1613,7 @@ function scroll_function() {
         return;
     }
 
-    messageDiv.scrollTop = messageDiv.scrollHeight;
+    // messageDiv.scrollTop = messageDiv.scrollHeight;
 
     messageDiv.addEventListener('scroll', function () {
         if (messageDiv.scrollTop < messageDiv.scrollHeight - messageDiv.clientHeight - 50) {
@@ -1610,21 +1632,40 @@ function scroll_function() {
             DOM.notificationDiv.style.display = "none";
         }
     });
-
-    scrollBottomBtn.addEventListener('click', function () {
-        if (parentMessageIds.size > 0) {
-            console.log("scroll to parent message");
-            scrollToMessage(parentMessageIds.values().next().value, null)
-        }
-        else {
-            console.log("scroll to bottom");
-            messageDiv.scrollTo({
-                top: messageDiv.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
+    messageDiv.scrollTo({
+        top: messageDiv.scrollHeight,
+        behavior: 'smooth'
     });
+
+
 }
+
+scrollBottomBtn.addEventListener('click', function () {
+    if (parentMessageIds.size) {
+        console.log("parentMessageIds", parentMessageIds);
+        let setToArray = [...parentMessageIds];
+        console.log("setToArray", setToArray);
+
+        parentMessageIds.clear();
+        console.log("set status", parentMessageIds);
+
+        let LastIndex = setToArray.pop();
+        console.log("LastIndex", LastIndex);
+
+        taggingMessages(LastIndex)
+        addChildIdsInSet(LastIndex, false);
+        console.log("setToArray", setToArray);
+        parentMessageIds = new Set(setToArray);
+        console.log("parentMessageIds", parentMessageIds);
+    }
+    else if (parentMessageIds.size < 1) {
+        const messageDiv = document.getElementById('messages');
+        messageDiv.scrollTo({
+            top: messageDiv.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+});
 
 let isTinyMCEInitialized = false;
 
