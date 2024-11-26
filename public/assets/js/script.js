@@ -48,7 +48,8 @@ const DOM = {
     isSubscribed: false,
     notification_message_id: document.getElementById("notification_message_id").value,
     notification_group_id: document.getElementById("notification_group_id").value,
-    groupSearch: false
+    groupSearch: false,
+    groupReferenceMessageClick: false,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
 
@@ -156,7 +157,6 @@ let populateGroupList = async () => {
 let viewChatList = () => {
     if (!DOM.groupSearch) {
         previousChatList = [...chatList]
-        console.log("previod", previousChatList);
     }
     if (chatList.length === 0) {
         return;
@@ -231,7 +231,7 @@ let viewChatList = () => {
                     <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
                             <div class="name list-user-name">${elem.group.name.length > 23 ? elem.group.name.substring(0, 23) + "..." : elem.group.name}</div>
-                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${latestMessage.is_compose === 1?  processValue(messageText).concat("..."):messageText}</div>
+                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${latestMessage.is_compose === 1 ? processValue(messageText, true).concat("...") : messageText}</div>
                         </div>
 
                     <div class="flex-grow-1 text-right">
@@ -1026,18 +1026,20 @@ function updateViewChatList(editedMessage) {
     }
 }
 
-function processValue(value) {
+function processValue(value, isChatList = false) {
     value = value.replace(/<br\s*\/?>/gi, '\n');
     value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
     value = value.replace(/<[^>]*>/g, '');
     value = value.trim();
-    return value.replace(/\r\n/g, '<br>')
+    return isChatList ? value.replace(/\r\n/g, '<br>')
         .replace(/\n/g, '<br>')
-        .replace(/<i[^>]+>/g, '').slice(0, 12);
+        .replace(/<i[^>]+>/g, '').slice(0, 12) :
+        value.replace(/\r\n/g, '<br>')
+            .replace(/\n/g, '<br>')
+            .replace(/<i[^>]+>/g, '');
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
-    console.log(message);
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -1092,7 +1094,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 var message_body = message.reply.msg;
             }
             var add_file_view = `
-            <div class="file-message"  onclick="scrollToMessage('${message.reply.id}')">
+            <div class="file-message" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
@@ -1204,7 +1206,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             var message_new = `<img src="${message.message ?? message.msg}" class="view-image" style="height:222px; width:100%;">`;
             messageContent = `
-                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
+                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
                     </div>
@@ -1273,7 +1275,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             }
 
             messageContent = `
-            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
+            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                   ${message.user?.id == user?.id ? message.user.name : message.user.name}
 
@@ -1286,7 +1288,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         `;
         } else {
             if (message.is_compose === 1) {
-                messageContent = processValue(message.msg || message.message);
+                messageContent = processValue(message.msg || message.message, false);
             } else {
                 messageContent = (message.msg || message.message)
                     .replace(/\r\n/g, '<br>')
@@ -1544,17 +1546,61 @@ let addMessageToMessageArea = (message, flag = false) => {
     ImageViewer(DOM.messages);
 };
 
-function scrollToMessage(messageId) {
-    const targetMessage = document.getElementById(`message-${messageId}`);
+let parentMessageIds = new Set();
+function scrollToMessage(replyId, messageId = null) {
+    addChildIdsInSet(messageId, true);
+    const targetMessage = document.getElementById(`message-${replyId}`);
     if (targetMessage) {
+        DOM.groupReferenceMessageClick = false;
         const ml3Div = targetMessage.closest('.ml-3');
         if (ml3Div) {
-            ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            ml3Div.classList.add('selected-message');
             setTimeout(() => {
+                ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                ml3Div.classList.add('selected-message');
+
                 ml3Div.classList.remove('selected-message');
-            }, 3000);
+            }, 100);
         }
+    }
+    else {
+        DOM.groupReferenceMessageClick = true;
+        fetchPaginatedMessages(replyId, null, null);
+    }
+}
+
+
+function taggingMessages(messageId = null) {
+    console.log("messageid", messageId);
+    addChildIdsInSet(messageId, false);
+    const targetMessage = document.getElementById(`message-${messageId}`);
+    if (targetMessage) {
+        DOM.groupReferenceMessageClick = false;
+        const ml3Div = targetMessage.closest('.ml-3');
+        if (ml3Div) {
+            setTimeout(() => {
+                ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                ml3Div.classList.add('selected-message');
+
+                ml3Div.classList.remove('selected-message');
+            }, 100);
+        }
+    }
+}
+
+function addChildIdsInSet(messageId, addFlag = true) {
+    if (messageId !== undefined && messageId !== null && addFlag) {
+        if (!parentMessageIds.has(messageId)) {
+            console.log("addFlag", addFlag);
+            console.log("before add", parentMessageIds);
+            parentMessageIds.add(messageId);
+            console.log("after add", parentMessageIds);
+
+        }
+    }
+    else {
+        console.log("before delete", parentMessageIds);
+        parentMessageIds.delete(messageId);
+        console.log("after delete", parentMessageIds);
     }
 }
 
@@ -1568,7 +1614,7 @@ function scroll_function() {
         return;
     }
 
-    messageDiv.scrollTop = messageDiv.scrollHeight;
+    // messageDiv.scrollTop = messageDiv.scrollHeight;
 
     messageDiv.addEventListener('scroll', function () {
         if (messageDiv.scrollTop < messageDiv.scrollHeight - messageDiv.clientHeight - 50) {
@@ -1587,14 +1633,40 @@ function scroll_function() {
             DOM.notificationDiv.style.display = "none";
         }
     });
+    messageDiv.scrollTo({
+        top: messageDiv.scrollHeight,
+        behavior: 'smooth'
+    });
 
-    scrollBottomBtn.addEventListener('click', function () {
+
+}
+
+scrollBottomBtn.addEventListener('click', function () {
+    if (parentMessageIds.size) {
+        console.log("parentMessageIds", parentMessageIds);
+        let setToArray = [...parentMessageIds];
+        console.log("setToArray", setToArray);
+
+        parentMessageIds.clear();
+        console.log("set status", parentMessageIds);
+
+        let LastIndex = setToArray.pop();
+        console.log("LastIndex", LastIndex);
+
+        taggingMessages(LastIndex)
+        addChildIdsInSet(LastIndex, false);
+        console.log("setToArray", setToArray);
+        parentMessageIds = new Set(setToArray);
+        console.log("parentMessageIds", parentMessageIds);
+    }
+    else if (parentMessageIds.size < 1) {
+        const messageDiv = document.getElementById('messages');
         messageDiv.scrollTo({
             top: messageDiv.scrollHeight,
             behavior: 'smooth'
         });
-    });
-}
+    }
+});
 
 let isTinyMCEInitialized = false;
 
@@ -2410,7 +2482,6 @@ const displayedMessageIds = new Set();
 
 let isLoading = false;
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null) => {
-
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
@@ -2494,23 +2565,29 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             return;
         }
         nextPageMessages.data.forEach((message) => {
+
             if (!displayedMessageIds.has(message.id)) {
                 addMessageToMessageArea(message);
                 displayedMessageIds.add(message.id);
             }
             if (message.id == notSeenById && !DOM.unreadDividerAdded) addUnread();
-            if (message.id === message_id) {
-                const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
-                const messageTextElement = messageElement.querySelector(".shadow-sm");
-                const searchQuery = DOM.messageSearchQuery;
 
-                switch (message.type) {
-                    case "Message":
-                        if (message.reply) {
-                            messageTextElement.innerHTML = '';
-                            if (message.reply.type === "Audio") {
+            if (message.id == message_id) {
+                if (DOM.groupReferenceMessageClick) {
+                    scrollToMessage(message.id);
+                }
+                else if (!DOM.groupReferenceMessageClick) {
+                    const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
+                    const messageTextElement = messageElement.querySelector(".shadow-sm");
+                    const searchQuery = DOM.messageSearchQuery;
 
-                                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
+                    switch (message.type) {
+                        case "Message":
+                            if (message.reply) {
+                                messageTextElement.innerHTML = '';
+                                if (message.reply.type === "Audio") {
+
+                                    var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
                                     <div class="avatar">
                                         <!-- Avatar image here -->
                                     </div>
@@ -2530,8 +2607,8 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     </div>
                                     </div>`;
 
-                                newMessageDisplay = `
-                                    <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
+                                    newMessageDisplay = `
+                                    <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
 
@@ -2543,17 +2620,17 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                 <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
                                 `;
 
-                                const messageText = message.msg.toLowerCase();
-                                const index = messageText.indexOf(searchQuery);
+                                    const messageText = message.msg.toLowerCase();
+                                    const index = messageText.indexOf(searchQuery);
 
-                                if (index !== -1) {
-                                    const highlightedText = message.msg.substring(0, index) +
-                                        `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                        message.msg.substring(index + searchQuery.length);
+                                    if (index !== -1) {
+                                        const highlightedText = message.msg.substring(0, index) +
+                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                            message.msg.substring(index + searchQuery.length);
 
-                                    // Update the reply message area with highlighted text
-                                    newMessageDisplay = `
-                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                                        // Update the reply message area with highlighted text
+                                        newMessageDisplay = `
+                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
                                         </div>
@@ -2563,13 +2640,13 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     </div>
                                     <div class="reply-message-area">${highlightedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
                                 `;
-                                }
-                                messageTextElement.innerHTML = newMessageDisplay;
+                                    }
+                                    messageTextElement.innerHTML = newMessageDisplay;
 
-                            }
-                            else if (message.reply.type === "File") {
-                                replyDisplay = `
-                                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                                }
+                                else if (message.reply.type === "File") {
+                                    replyDisplay = `
+                                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                         ${message.user.name}
                                     </div>
@@ -2592,22 +2669,22 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                         </div>
                                     </div>
                                 </div>`;
-                                messageTextElement.innerHTML = replyDisplay +
-                                    `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+                                    messageTextElement.innerHTML = replyDisplay +
+                                        `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
 
-                                const messageText = message.msg.toLowerCase();
-                                const index = messageText.indexOf(searchQuery);
-                                if (index !== -1) {
-                                    const highlightedText = message.msg.substring(0, index) +
-                                        `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                        message.msg.substring(index + searchQuery.length);
-                                    messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                                    const messageText = message.msg.toLowerCase();
+                                    const index = messageText.indexOf(searchQuery);
+                                    if (index !== -1) {
+                                        const highlightedText = message.msg.substring(0, index) +
+                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                            message.msg.substring(index + searchQuery.length);
+                                        messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                                    }
                                 }
-                            }
-                            else if (message.reply.type === "Image") {
-                                var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
-                                replyDisplay = `
-                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
+                                else if (message.reply.type === "Image") {
+                                    var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                                    replyDisplay = `
+                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
                                         </div>
@@ -2617,64 +2694,65 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     </div>
                                 `;
 
-                                messageTextElement.innerHTML = replyDisplay;
-                                const messageText = message.msg.toLowerCase();
+                                    messageTextElement.innerHTML = replyDisplay;
+                                    const messageText = message.msg.toLowerCase();
+                                    const index = messageText.indexOf(searchQuery);
+                                    if (index !== -1) {
+                                        const highlightedText = message.msg.substring(0, index) +
+                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                                            message.msg.substring(index + searchQuery.length);
+                                        messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                                    }
+                                }
+
+                            }
+                            else {
+                                const messageText = messageTextElement.innerHTML;
                                 const index = messageText.indexOf(searchQuery);
                                 if (index !== -1) {
-                                    const highlightedText = message.msg.substring(0, index) +
-                                        `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                        message.msg.substring(index + searchQuery.length);
-                                    messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                                    const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                                    messageTextElement.innerHTML = highlightedText;
                                 }
                             }
+                            break;
+                        case "File":
+                            const fileNameElement = messageElement.querySelector(".file-name");
+                            if (fileNameElement) {
+                                const fileName = fileNameElement.textContent;
 
-                        }
-                        else {
-                            const messageText = messageTextElement.innerHTML;
-                            const index = messageText.indexOf(searchQuery);
-                            if (index !== -1) {
-                                const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
-                                messageTextElement.innerHTML = highlightedText;
+                                const trimmedSearchQuery = searchQuery;
+                                const index = fileName.toLowerCase().indexOf(trimmedSearchQuery.toLowerCase());
+                                if (index !== -1) {
+                                    const highlightedFileName = fileName.substring(0, index) +
+                                        `<span class="highlight">${fileName.substring(index, index + trimmedSearchQuery.length)}</span>` +
+                                        fileName.substring(index + trimmedSearchQuery.length);
+                                    fileNameElement.innerHTML = highlightedFileName;
+                                }
                             }
-                        }
-                        break;
-                    case "File":
-                        const fileNameElement = messageElement.querySelector(".file-name");
-                        if (fileNameElement) {
-                            const fileName = fileNameElement.textContent;
+                            break;
+                        default:
+                            const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
+                            if (nullTypemessageTextElement) {
+                                const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
 
-                            const trimmedSearchQuery = searchQuery;
-                            const index = fileName.toLowerCase().indexOf(trimmedSearchQuery.toLowerCase());
-                            if (index !== -1) {
-                                const highlightedFileName = fileName.substring(0, index) +
-                                    `<span class="highlight">${fileName.substring(index, index + trimmedSearchQuery.length)}</span>` +
-                                    fileName.substring(index + trimmedSearchQuery.length);
-                                fileNameElement.innerHTML = highlightedFileName;
+                                const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
+                                if (nullTypeIndex !== -1) {
+                                    const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
+                                        `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
+                                        nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
+
+                                    nullTypemessageTextElement.innerHTML = highlightedText;
+                                }
+                            } else {
+                                console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                             }
-                        }
-                        break;
-                    default:
-                        const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
-                        if (nullTypemessageTextElement) {
-                            const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
-
-                            const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
-                            if (nullTypeIndex !== -1) {
-                                const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
-                                    `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
-                                    nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
-
-                                nullTypemessageTextElement.innerHTML = highlightedText;
-                            }
-                        } else {
-                            console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
-                        }
-                        break;
-                        console.log("Unknown message type:", message.type);
+                            break;
+                            console.log("Unknown message type:", message.type);
+                    }
+                    setTimeout(() => {
+                        messageElement.scrollIntoView({ behavior: "smooth" });
+                    }, 100);
                 }
-                setTimeout(() => {
-                    messageElement.scrollIntoView({ behavior: "smooth" });
-                }, 100);
             }
         });
 
@@ -3809,7 +3887,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                             </div>`;
 
                         newMessageDisplay = `
-                            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}')">
+                            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                 ${message.user?.id == user?.id ? message.user.name : message.user.name}
 
@@ -3832,7 +3910,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
 
                             // Update the reply message area with highlighted text
                             newMessageDisplay = `
-                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                     ${message.user?.id == user?.id ? message.user.name : message.user.name}
                                 </div>
@@ -3850,7 +3928,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                     }
                     else if (message.reply.type === "File") {
                         replyDisplay = `
-                        <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                        <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                 ${message.user.name}
                             </div>
@@ -3890,7 +3968,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                     else if (message.reply.type === "Image") {
                         var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
                         replyDisplay = `
-                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')"> <!-- Add onclick here -->
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                     ${message.user?.id == user?.id ? message.user.name : message.user.name}
                                 </div>
@@ -3914,7 +3992,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
 
                     else if (message.reply.type === "Message") {
                         replyDisplay = `
-                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}')">
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                     ${message.user?.id == user?.id ? message.user.name : message.user.name}
                                 </div>
@@ -4239,20 +4317,20 @@ let update_user_profile = async (elem, file) => {
 //     }
 // });
 
+
 let draggableIcon = () => {
     const icon = document.querySelector('.onesignal-bell-container');
     if (!icon) return;
+    icon.style.transition = 'left 0.2s ease, top 0.2s ease';
 
-    let isTouching = false; // Flag to track if the icon is being dragged
-    let offsetX = 0, offsetY = 0; // To store the touch offset
+    let isTouching = false; 
+    let offsetX = 0, offsetY = 0; 
 
-    // Enable drag for desktop
     icon.setAttribute('draggable', 'true');
 
 
-    icon.addEventListener('dragstart', (event) => {
-        event.dataTransfer.setData('text/plain', null); // For Firefox compatibility
-
+    draggableIcon.addEventListener('dragstart', (event) => {
+        event.dataTransfer.setData('text/plain', null);
         event.dataTransfer.effectAllowed = 'move';
     });
 
@@ -4262,43 +4340,37 @@ let draggableIcon = () => {
 
     document.addEventListener('drop', (event) => {
         event.preventDefault();
-
-        const iconSize = 50; // Adjust this based on the actual icon size
-
+        const iconSize = 50;
         const x = event.clientX;
         const y = event.clientY;
-
         const minX = 0;
         const maxX = window.innerWidth - iconSize;
         const minY = 0;
         const maxY = window.innerHeight - iconSize;
-
         const newX = Math.max(minX, Math.min(x - iconSize / 2, maxX));
         const newY = Math.max(minY, Math.min(y - iconSize / 2, maxY));
-
-        icon.style.position = 'absolute';
-        icon.style.left = `${newX}px`;
-        icon.style.top = `${newY}px`;
+        draggableIcon.style.position = 'absolute';
+        draggableIcon.style.left = `${newX}px`;
+        draggableIcon.style.top = `${newY}px`;
     });
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
 
-    // Touch handling for mobile
-    icon.addEventListener('touchstart', (event) => {
-        isTouching = true;
-
-        // Calculate offset from the touch point to the top-left corner of the icon
+    draggableIcon.addEventListener('touchstart', (event) => {
         const touch = event.touches[0];
+
         const rect = icon.getBoundingClientRect();
         offsetX = touch.clientX - rect.left;
         offsetY = touch.clientY - rect.top;
+        icon.style.transition = 'none';
 
-        event.preventDefault();
     });
 
     icon.addEventListener('touchmove', (event) => {
-        if (!isTouching) return;
-
+        if (!isTouching) return; 
+        event.preventDefault();
         const touch = event.touches[0];
-        const iconSize = 50; // Adjust this based on the actual icon size
+        const iconSize = 50; 
         const x = touch.clientX - offsetX;
         const y = touch.clientY - offsetY;
 
@@ -4306,22 +4378,21 @@ let draggableIcon = () => {
         const maxX = window.innerWidth - iconSize;
         const minY = 0;
         const maxY = window.innerHeight - iconSize;
-
         const newX = Math.max(minX, Math.min(x, maxX));
         const newY = Math.max(minY, Math.min(y, maxY));
 
         icon.style.position = 'absolute';
         icon.style.left = `${newX}px`;
-        icon.style.top = `${newY}px`;
-
-        event.preventDefault();
+        icon.style.top = `${newY}px`; 
     });
 
     icon.addEventListener('touchend', () => {
         isTouching = false; 
-    });
-};
+        icon.style.transition = 'left 0.2s ease, top 0.2s ease';
 
+    });
+
+}
 
 setTimeout(dragableIcon, 2000);
 let sendMessageFunc = () => {
