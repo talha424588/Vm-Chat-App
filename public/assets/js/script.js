@@ -2577,7 +2577,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 if (DOM.groupReferenceMessageClick) {
                     scrollToMessage(message.id);
                 }
-                else if (!DOM.groupReferenceMessageClick) {
+                else if (!DOM.groupReferenceMessageClick) {               
                     const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                     const messageTextElement = messageElement.querySelector(".shadow-sm");
                     const searchQuery = DOM.messageSearchQuery;
@@ -2754,6 +2754,9 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                     }
                     setTimeout(() => {
                         messageElement.scrollIntoView({ behavior: "smooth" });
+                        setTimeout(() => {
+                           hideSpinner();
+                        }, 300);
                     }, 100);
                 }
             }
@@ -2857,7 +2860,10 @@ let currentlyPlayingAudio = null;
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
-
+    if(searchMessage)
+    {
+        showSpinner();
+    }
     DOM.messages.innerHTML = '';
 
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessageId;
@@ -3233,44 +3239,36 @@ const startRecording = () => {
             mediaRecorder.ondataavailable = event => {
                 chunks.push(event.data);
             };
-
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'audio/wav' });
-
-                // Create a FileReader to read the blob
                 const reader = new FileReader();
                 reader.onload = function() {
                     const arrayBuffer = this.result;
-
-                    // Create an AudioContext to decode the audio data
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
                     audioContext.decodeAudioData(arrayBuffer, (buffer) => {
-                        const samples = buffer.getChannelData(0); // Get the audio samples from the first channel
-                        const mp3 = new lamejs.Mp3Encoder(1, 44100, 128); // Mono, 44.1kHz, 128kbps
+                        const samples = buffer.getChannelData(0);
+                        const mp3 = new lamejs.Mp3Encoder(1, audioContext.sampleRate, 128);
                         const mp3Data = [];
-                        const chunkSize = 1152; // Number of samples per frame
-
+                        const chunkSize = 1152;
                         for (let i = 0; i < samples.length; i += chunkSize) {
                             const chunk = samples.subarray(i, i + chunkSize);
                             const intSamples = new Int16Array(chunk.length);
                             for (let j = 0; j < chunk.length; j++) {
-                                intSamples[j] = chunk[j] * 32767; // Convert to 16-bit PCM
+                                intSamples[j] = Math.max(-32768, Math.min(32767, chunk[j] * 32767)); // Clamp values
                             }
                             const encodedChunk = mp3.encodeBuffer(intSamples);
                             if (encodedChunk.length > 0) {
                                 mp3Data.push(encodedChunk);
                             }
                         }
-
                         const endChunk = mp3.flush();
                         if (endChunk.length > 0) {
                             mp3Data.push(endChunk);
                         }
-
                         const mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
                         const audioUrl = URL.createObjectURL(mp3Blob);
                         const audio = new Audio(audioUrl);
-
                         const ref = firebase.storage().ref("audio/" + DOM.unique_id);
                         const mediaName = "recording.mp3";
                         const metadata = {
@@ -3284,8 +3282,6 @@ const startRecording = () => {
                                 sendMessage("Audio", mediaName);
                             })
                             .catch(error => console.error(error));
-
-                        // Reset UI states
                         chatInputContainer.classList.remove('recording-active');
                         voiceIcon.classList.remove('recording');
 
