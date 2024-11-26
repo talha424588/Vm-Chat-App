@@ -17,6 +17,7 @@ class GroupService implements GroupRepository
 {
     public function fetchUserChatGroups(Request $request)
     {
+        $groupWithMessagesArray = [];
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
             ->with(['groupMessages' => function ($query) {
                 $query->latest('time')
@@ -25,18 +26,9 @@ class GroupService implements GroupRepository
             }, 'groupMessages.user'])
             ->get();
 
-        foreach ($groups as $group) {
-            $message =  $group->groupMessages;
-            $group->group_messages = [];
-            $userIds = explode(',', $group->access);
-            $group->users_with_access = User::whereIn('id', $userIds)->get();
-            if (isset($group->groupMessages)) {
-                unset($group->groupMessages);
-                $group->group_messages = [$message];;
-            }
-        }
+        $groupWithMessagesArray =  $this->alterGroupMessageArray($groups);
 
-        if (count($groups) > 0)
+        if (count($groupWithMessagesArray) > 0)
             return new GroupResource($groups);
         else
             return response()->json(["status" => false, "groups" => "not found", "messages" => null], 404);
@@ -121,6 +113,7 @@ class GroupService implements GroupRepository
         $perPageMessages = 40;
         $pageGroups = $request->input('page_groups', 1);
         $pageMessages = $request->input('page_messages', 1);
+        $groupWithMessagesArray = [];
 
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
             ->where('name', 'LIKE', "%$name%")
@@ -128,6 +121,8 @@ class GroupService implements GroupRepository
                 $query->latest('time')->where('is_deleted', false);
             }, 'groupMessages.user', 'users_with_access'])
             ->paginate($perPageGroups, ['*'], 'page', $pageGroups);
+
+        $groupWithMessagesArray =  $this->alterGroupMessageArray($groups);
 
         $userGroups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
             ->pluck('group_id');
@@ -140,11 +135,11 @@ class GroupService implements GroupRepository
                     ->orWhere("type", "");
             })
             ->whereIn('group_id', $userGroups)
-            -> whereRaw("NOT (msg REGEXP '<a[^>]*>|<audio[^>]*>')")
+            ->whereRaw("NOT (msg REGEXP '<a[^>]*>|<audio[^>]*>')")
             ->with("user", "group")
             ->paginate($perPageMessages, ['*'], 'page', $pageMessages);
 
-        if ($groups->isEmpty() && $messages->isEmpty()) {
+        if ($groupWithMessagesArray->isEmpty() && $messages->isEmpty()) {
             return response()->json([
                 'status' => false,
                 'message' => 'No groups or messages found.',
@@ -163,6 +158,22 @@ class GroupService implements GroupRepository
                 "messages" => $messages
             ]
         ]);
+    }
+
+    private function alterGroupMessageArray($groups)
+    {
+        foreach ($groups as $group) {
+            $message =  $group->groupMessages;
+            $group->group_messages = [];
+            $userIds = explode(',', $group->access);
+            $group->users_with_access = User::whereIn('id', $userIds)->get();
+            if (isset($group->groupMessages)) {
+                unset($group->groupMessages);
+                $group->group_messages = [$message];;
+            }
+        }
+
+        return $groups;
     }
 
 

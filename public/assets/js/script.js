@@ -174,12 +174,15 @@ let viewChatList = () => {
         }
     })
         .forEach((elem, index) => {
+            console.log("elem",elem);
             let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
                 let latestMessage = null;
                 if (user.role == 0 || user.role == 2) {
                     latestMessage = elem.group.group_messages && elem.group.group_messages.length > 0 ? elem.group.group_messages[elem.group.group_messages.length - 1] : null;
+                    console.log("latestMessage",latestMessage);
+
                 }
                 else if (elem.group.group_messages && elem.group.group_messages.length > 0) {
                     for (let i = elem.group.group_messages.length - 1; i >= 0; i--) {
@@ -3577,6 +3580,8 @@ let searchGroups = async (searchQuery, loadMore = false) => {
 
                 const groups = response.data.groups.data;
                 const messages = response.data.messages.data;
+
+                console.log("response",response);
 
 
                 if (!groups || groups.length === 0) {
