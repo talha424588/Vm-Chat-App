@@ -62,51 +62,6 @@ class GroupService implements GroupRepository
             return response()->json(["status" => false, "message" => "Not Found", "groups" => null], 404);
     }
 
-    // working
-    // public function getGroupByName($name)
-    // {
-    //     $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
-    //         ->where('name', 'LIKE', "%$name%")
-    //         ->with(['groupMessages' => function ($query) {
-    //             $query->latest('time')
-    //                 ->where('is_deleted', false);
-    //         }, 'groupMessages.user', 'users_with_access'])
-    //         ->get();
-
-    //     $userGroups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
-    //         ->pluck('group_id');
-
-    //     // Now, search for messages in those groups
-    //     $messages = GroupMessage::where("msg", "LIKE", "%$name%")
-    //         ->where('is_deleted', false)
-    //         ->where(function ($query) {
-    //             $query->whereIn("type", ["File", "Message"])
-    //                 ->orWhereNull("type")
-    //                 ->orWhere("type", "");
-    //         })
-    //         ->whereIn('group_id', $userGroups)
-    //         ->with("user", "group")
-    //         ->get();
-
-    //     $groupMessageSearchArray = [
-    //         "groups" => $groups,
-    //         "messages" => $messages
-    //     ];
-    //     if ($groupMessageSearchArray) {
-    //         return response()->json([
-    //             "status" => true,
-    //             "message" => "success",
-    //             "data" => $groupMessageSearchArray
-    //         ]);
-    //     } else {
-    //         return response()->json([
-    //             "status" => false,
-    //             "message" => "Not Found",
-    //             "groups" => null
-    //         ]);
-    //     }
-    // }
-
     public function getGroupByName($name, $request)
     {
         $perPageGroups = 20;
