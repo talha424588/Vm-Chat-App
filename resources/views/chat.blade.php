@@ -26,7 +26,7 @@
         .audio-message {
             display: flex;
             align-items: center;
-            width: 239px;
+            width: 100%;
         }
 
         .avatar {
@@ -76,6 +76,7 @@
             height: 5px;
             cursor: pointer;
             position: relative;
+            margin-bottom:8px;
         }
 
         .progress-filled {
