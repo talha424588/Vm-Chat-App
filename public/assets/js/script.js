@@ -656,7 +656,6 @@ socket.on('sendChatToClient', (message) => {
 });
 
 socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
-
     if (user.unique_id != uniqueId) {
         if (DOM.groupId == null || DOM.groupId !== newGroupId) {
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
@@ -3670,21 +3669,23 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         }
     } else {
         DOM.groupSearch = false;
-        chatList = [...previousChatList];
-        chatList.sort((a, b) => {
-            if (a.time && b.time) {
-                return new Date(b.time) - new Date(a.time);
-            } else if (a.time) {
-                return -1;
-            } else if (b.time) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
+        // chatList = [...previousChatList];
+        // chatList.sort((a, b) => {
+        //     if (a.time && b.time) {
+        //         return new Date(b.time) - new Date(a.time);
+        //     } else if (a.time) {
+        //         return -1;
+        //     } else if (b.time) {
+        //         return 1;
+        //     } else {
+        //         return 0;
+        //     }
+        // });
         messageList = [];
         DOM.messagesList.innerHTML = '';
-        viewChatList();
+        // viewChatList();
+
+        generateChatList()
     }
 };
 
