@@ -2578,7 +2578,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 if (DOM.groupReferenceMessageClick) {
                     scrollToMessage(message.id);
                 }
-                else if (!DOM.groupReferenceMessageClick) {
+                else if (!DOM.groupReferenceMessageClick) {               
                     const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                     const messageTextElement = messageElement.querySelector(".shadow-sm");
                     const searchQuery = DOM.messageSearchQuery;
@@ -2755,6 +2755,9 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                     }
                     setTimeout(() => {
                         messageElement.scrollIntoView({ behavior: "smooth" });
+                        setTimeout(() => {
+                           hideSpinner();
+                        }, 300);
                     }, 100);
                 }
             }
@@ -2858,7 +2861,10 @@ let currentlyPlayingAudio = null;
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
-
+    if(searchMessage)
+    {
+        showSpinner();
+    }
     DOM.messages.innerHTML = '';
 
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessageId;
@@ -3236,7 +3242,6 @@ const startRecording = () => {
             };
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'audio/wav' });
-            
                 const reader = new FileReader();
                 reader.onload = function() {
                     const arrayBuffer = this.result;
