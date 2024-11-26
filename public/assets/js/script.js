@@ -52,7 +52,6 @@ const DOM = {
     groupReferenceMessageClick: false,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
-
     const search_div = getById('serach_div');
     search_div.style.display = "block";
 });
