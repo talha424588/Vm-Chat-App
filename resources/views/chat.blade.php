@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
         crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('assets/css/viewer.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
     <style>
         .audio-message {
             display: flex;
@@ -983,6 +984,7 @@
     {{-- One Signal --}}
     {{-- <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" async=""></script> --}}
     <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
 
     <!-- Include jQuery -->
     <!-- {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} -->

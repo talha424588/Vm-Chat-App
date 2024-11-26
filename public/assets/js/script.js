@@ -3204,6 +3204,66 @@ const fileInput = document.getElementById('file-input');
 let mediaRecorder;
 let chunks = [];
 
+// const startRecording = () => {
+//     chunks = [];
+
+//     navigator.mediaDevices.getUserMedia({ audio: true })
+//         .then(stream => {
+//             mediaRecorder = new MediaRecorder(stream);
+//             mediaRecorder.start();
+//             chatInputContainer.classList.add('recording-active');
+//             voiceIcon.classList.add('recording');
+
+//             voiceSvg.innerHTML = `
+// 				<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+// 				<path d="M11.6667 9C11.2246 9 10.8007 9.18061 10.4882 9.5021C10.1756 9.82359 10 10.2596 10 10.7143V19.2857C10 19.7404 10.1756 20.1764 10.4882 20.4979C10.8007 20.8194 11.2246 21 11.6667 21C12.1087 21 12.5326 20.8194 12.8452 20.4979C13.1577 20.1764 13.3333 19.7404 13.3333 19.2857V10.7143C13.3333 10.2596 13.1577 9.82359 12.8452 9.5021C12.5326 9.18061 12.1087 9 11.6667 9ZM18.3333 9C17.8913 9 17.4674 9.18061 17.1548 9.5021C16.8423 9.82359 16.6667 10.2596 16.6667 10.7143V19.2857C16.6667 19.7404 16.8423 20.1764 17.1548 20.4979C17.4674 20.8194 17.8913 21 18.3333 21C18.7754 21 19.1993 20.8194 19.5118 20.4979C19.8244 20.1764 20 19.7404 20 19.2857V10.7143C20 10.2596 19.8244 9.82359 19.5118 9.5021C19.1993 9.18061 18.7754 9 18.3333 9Z" fill="white"/>
+// 			`;
+
+//             mediaRecorder.ondataavailable = event => {
+//                 chunks.push(event.data);
+//             };
+
+//             mediaRecorder.onstop = () => {
+//                 const blob = new Blob(chunks, { type: 'audio/wav' });
+//                 const audioUrl = URL.createObjectURL(blob);
+//                 const audio = new Audio(audioUrl);
+
+
+//                 const ref = firebase.storage().ref("audio/" + DOM.unique_id);
+//                 const mediaName = "recording.wav";
+//                 const metadata = {
+//                     contentType: 'audio/wav'
+//                 };
+//                 const task = ref.child(mediaName).put(blob, metadata);
+//                 task
+//                     .then(snapshot => snapshot.ref.getDownloadURL())
+//                     .then(url => {
+//                         DOM.messageInput.value = url;
+//                         sendMessage("Audio", mediaName);
+//                     })
+//                     .catch(error => console.error(error));
+
+//                 // Reset UI states
+//                 chatInputContainer.classList.remove('recording-active');
+//                 voiceIcon.classList.remove('recording');
+
+//                 voiceSvg.innerHTML = `
+// 					<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+// 					<path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
+// 				`;
+//             };
+//         })
+//         .catch(error => {
+//             console.error('Error accessing media devices.', error);
+//             chatInputContainer.classList.remove('recording-active');
+//             voiceIcon.classList.remove('recording');
+//             voiceSvg.innerHTML = `
+// 				<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+// 				<path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
+// 			`;
+//         });
+// };
+
 const startRecording = () => {
     chunks = [];
 
@@ -3215,9 +3275,9 @@ const startRecording = () => {
             voiceIcon.classList.add('recording');
 
             voiceSvg.innerHTML = `
-				<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-				<path d="M11.6667 9C11.2246 9 10.8007 9.18061 10.4882 9.5021C10.1756 9.82359 10 10.2596 10 10.7143V19.2857C10 19.7404 10.1756 20.1764 10.4882 20.4979C10.8007 20.8194 11.2246 21 11.6667 21C12.1087 21 12.5326 20.8194 12.8452 20.4979C13.1577 20.1764 13.3333 19.7404 13.3333 19.2857V10.7143C13.3333 10.2596 13.1577 9.82359 12.8452 9.5021C12.5326 9.18061 12.1087 9 11.6667 9ZM18.3333 9C17.8913 9 17.4674 9.18061 17.1548 9.5021C16.8423 9.82359 16.6667 10.2596 16.6667 10.7143V19.2857C16.6667 19.7404 16.8423 20.1764 17.1548 20.4979C17.4674 20.8194 17.8913 21 18.3333 21C18.7754 21 19.1993 20.8194 19.5118 20.4979C19.8244 20.1764 20 19.7404 20 19.2857V10.7143C20 10.2596 19.8244 9.82359 19.5118 9.5021C19.1993 9.18061 18.7754 9 18.3333 9Z" fill="white"/>
-			`;
+                <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+                <path d="M11.6667 9C11.2246 9 10.8007 9.18061 10.4882 9.5021C10.1756 9.82359 10 10.2596 10 10.7143V19.2857C10 19.7404 10.1756 20.1764 10.4882 20.4979C10.8007 20.8194 11.2246 21 11.6667 21C12.1087 21 12.5326 20.8194 12.8452 20.4979C13.1577 20.1764 13.3333 19.7404 13.3333 19.2857V10.7143C13.3333 10.2596 13.1577 9.82359 12.8452 9.5021C12.5326 9.18061 12.1087 9 11.6667 9ZM18.3333 9C17.8913 9 17.4674 9.18061 17.1548 9.5021C16.8423 9.82359 16.6667 10.2596 16.6667 10.7143V19.2857C16.6667 19.7404 16.8423 20.1764 17.1548 20.4979C17.4674 20.8194 17.8913 21 18.3333 21C18.7754 21 19.1993 20.8194 19.5118 20.4979C19.8244 20.1764 20 19.7404 20 19.2857V10.7143C20 10.2596 19.8244 9.82359 19.5118 9.5021C19.1993 9.18061 18.7754 9 18.3333 9Z" fill="white"/>
+            `;
 
             mediaRecorder.ondataavailable = event => {
                 chunks.push(event.data);
@@ -3225,32 +3285,68 @@ const startRecording = () => {
 
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'audio/wav' });
-                const audioUrl = URL.createObjectURL(blob);
-                const audio = new Audio(audioUrl);
 
+                // Create a FileReader to read the blob
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const arrayBuffer = this.result;
 
-                const ref = firebase.storage().ref("audio/" + DOM.unique_id);
-                const mediaName = "recording.wav";
-                const metadata = {
-                    contentType: 'audio/wav'
+                    // Create an AudioContext to decode the audio data
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    audioContext.decodeAudioData(arrayBuffer, (buffer) => {
+                        const samples = buffer.getChannelData(0); // Get the audio samples from the first channel
+                        const mp3 = new lamejs.Mp3Encoder(1, 44100, 128); // Mono, 44.1kHz, 128kbps
+                        const mp3Data = [];
+                        const chunkSize = 1152; // Number of samples per frame
+
+                        for (let i = 0; i < samples.length; i += chunkSize) {
+                            const chunk = samples.subarray(i, i + chunkSize);
+                            const intSamples = new Int16Array(chunk.length);
+                            for (let j = 0; j < chunk.length; j++) {
+                                intSamples[j] = chunk[j] * 32767; // Convert to 16-bit PCM
+                            }
+                            const encodedChunk = mp3.encodeBuffer(intSamples);
+                            if (encodedChunk.length > 0) {
+                                mp3Data.push(encodedChunk);
+                            }
+                        }
+
+                        const endChunk = mp3.flush();
+                        if (endChunk.length > 0) {
+                            mp3Data.push(endChunk);
+                        }
+
+                        const mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
+                        const audioUrl = URL.createObjectURL(mp3Blob);
+                        const audio = new Audio(audioUrl);
+
+                        const ref = firebase.storage().ref("audio/" + DOM.unique_id);
+                        const mediaName = "recording.mp3";
+                        const metadata = {
+                            contentType: 'audio/mp3'
+                        };
+                        const task = ref.child(mediaName).put(mp3Blob, metadata);
+                        task
+                            .then(snapshot => snapshot.ref.getDownloadURL())
+                            .then(url => {
+                                DOM.messageInput.value = url;
+                                sendMessage("Audio", mediaName);
+                            })
+                            .catch(error => console.error(error));
+
+                        // Reset UI states
+                        chatInputContainer.classList.remove('recording-active');
+                        voiceIcon.classList.remove('recording');
+
+                        voiceSvg.innerHTML = `
+                            <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+                            <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
+                        `;
+                    }, error => {
+                        console.error('Error decoding audio data', error);
+                    });
                 };
-                const task = ref.child(mediaName).put(blob, metadata);
-                task
-                    .then(snapshot => snapshot.ref.getDownloadURL())
-                    .then(url => {
-                        DOM.messageInput.value = url;
-                        sendMessage("Audio", mediaName);
-                    })
-                    .catch(error => console.error(error));
-
-                // Reset UI states
-                chatInputContainer.classList.remove('recording-active');
-                voiceIcon.classList.remove('recording');
-
-                voiceSvg.innerHTML = `
-					<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-					<path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
-				`;
+                reader.readAsArrayBuffer(blob);
             };
         })
         .catch(error => {
@@ -3258,9 +3354,9 @@ const startRecording = () => {
             chatInputContainer.classList.remove('recording-active');
             voiceIcon.classList.remove('recording');
             voiceSvg.innerHTML = `
-				<circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-				<path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
-			`;
+                <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+                <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20. 5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
+            `;
         });
 };
 
