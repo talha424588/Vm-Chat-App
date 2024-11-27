@@ -3792,7 +3792,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
-                                mobilegroupSearchClose();
+                               
                             });
                         });
                         searchMessageOffset += searchMessageLimit;
@@ -4100,9 +4100,10 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                 break;
                 console.log("Unknown message type:", message.type);
         }
-
         messageElement.scrollIntoView({ behavior: "smooth" });
-       
+        setTimeout(function(){
+            mobilegroupSearchClose();
+        },700)
 
     } else {
         fetchPaginatedMessages(messageId, null, null);
