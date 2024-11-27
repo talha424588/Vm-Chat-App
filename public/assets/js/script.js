@@ -151,12 +151,11 @@ let populateGroupList = async () => {
             }
         });
     } catch (error) {
-        console.log("Error fetching chat groups:", error);
+        // console.log("Error fetching chat groups:", error);
     }
 };
 
 let viewChatList = () => {
-    console.log("chatlist",chatList);
     if (!DOM.groupSearch) {
         previousChatList = [...chatList]
     }
@@ -177,7 +176,7 @@ let viewChatList = () => {
         }
     })
         .forEach((elem, index) => {
-            let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
+            // let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
                 let latestMessage = null;
