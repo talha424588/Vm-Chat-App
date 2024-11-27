@@ -2822,48 +2822,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
     }
 };
 
-// update chat counter and remove generate chat list from move message event to update only chat list because currently getting refenrece issu to chatlist
-
-// function unread_settings(query_set) {
-//     console.log("query_set", query_set);
-//     var groupId = DOM.groupId;
-//     var groupIdToCheck = groupId;
-//     const userIdToCheck = user.unique_id;
-//     let seenCount = 0;
-//     let unseenCount = 0;
-//     query_set.data.forEach(message => {
-//         if (message.group_id === groupIdToCheck) {
-//             if (message.seen_by.includes(userIdToCheck)) {
-//                 seenCount++;
-//             } else {
-//                 unseenCount++;
-//             }
-//         }
-//     });
-
-//     var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
-//     var unseen = unseenCount;
-//     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
-//     var first_value = DOM.unreadMessagesPerGroup[DOM.groupId];
-//     var left_count = first_value - unseen;
-
-//     const groupElem = document.getElementsByClassName(groupId)[0];
-//     if (unseen > 0) {
-//         if (groupElem) {
-//             groupElem.innerHTML = left_count;
-//         }
-//         document.querySelector(`.${DOM.groupId}`).innerText = left_count;
-//         if (left_count == 0 || left_count < 0) {
-//             document.querySelector(`.${DOM.groupId}`).style.display = 'none';
-//         }
-//         if (groupToUpdate) {
-//             groupToUpdate.unread = left_count;
-//         }
-
-//         DOM.unreadMessagesPerGroup[DOM.groupId] = left_count;
-//     }
-// }
-
 function unread_settings(query_set) {
     var groupId = DOM.groupId;
     var groupIdToCheck = groupId;
@@ -2880,7 +2838,7 @@ function unread_settings(query_set) {
         }
     });
     const groupElem = document.getElementsByClassName(groupId)[0];
-    var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
+    // var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
     var first_value = DOM.unreadMessagesPerGroup[DOM.groupId];
@@ -3838,7 +3796,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
-                               
+
                             });
                         });
                         searchMessageOffset += searchMessageLimit;
