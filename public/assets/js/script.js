@@ -2902,6 +2902,7 @@ function unread_settings(query_set) {
 }
 
 let currentlyPlayingAudio = null;
+let currentPlaybutton = null;
 
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
     chat = chatList[chatIndex];
@@ -3837,6 +3838,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
+                               
                             });
                         });
                         searchMessageOffset += searchMessageLimit;
@@ -4144,8 +4146,10 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                 break;
                 console.log("Unknown message type:", message.type);
         }
-
         messageElement.scrollIntoView({ behavior: "smooth" });
+        setTimeout(function(){
+            mobilegroupSearchClose();
+        },700)
 
     } else {
         fetchPaginatedMessages(messageId, null, null);
@@ -4274,7 +4278,6 @@ function get_voice_list() {
         audioPlayer.preload = 'metadata';
         audioPlayer.src = audioSrc;
         audioPlayer.load();
-
         audioPlayer.addEventListener('loadedmetadata', updateDuration);
         audioPlayer.addEventListener('canplaythrough', updateDuration);
 
@@ -4289,14 +4292,16 @@ function get_voice_list() {
         if (playButton) {
             playButton.addEventListener('click', function () {
                 if (audioPlayer.paused) {
-                    console.log(audioPlayer.paused, ": audio is paused");
+
                     if (currentlyPlayingAudio && currentlyPlayingAudio !== audioPlayer) {
                         currentlyPlayingAudio.pause();
-                        currentlyPlayingAudio.currentTime = 0;
+                        // currentlyPlayingAudio.currentTime=0;
+                        updatePlayButton(currentPlaybutton, false);
                     }
                     audioPlayer.play();
                     updatePlayButton(playButton, true);
                     currentlyPlayingAudio = audioPlayer;
+                    currentPlaybutton=playButton;
                 } else {
                     audioPlayer.pause();
                     updatePlayButton(playButton, false);
@@ -4315,6 +4320,7 @@ function get_voice_list() {
             progressFilled.style.width = '0%';
             audioDuration.textContent = '0:00';
             currentlyPlayingAudio = null;
+            currentPlaybutton = null;
             updatePlayButton(playButton, false);
         });
 
@@ -4618,3 +4624,12 @@ let sendMessageFunc = () => {
     }
     textarea.focus();
 };
+function mobilegroupSearchClose() {
+    if (window.innerWidth <= 768) {
+        $("#search-icon").hasClass("d-none") ? $("#search-icon").removeClass("d-none") : '';
+        $("#sidebar").removeClass("sidebar-open").addClass("sidebar-closed");
+        $(".container-fluid").removeClass("sidebar-open");
+        $("#search-icon").removeClass("icon-move-left");
+        $("#message-area").toggleClass("col-md-4 col-md-8");
+    }
+}
