@@ -808,13 +808,10 @@ async function rerenderChatList(preGroupId) {
         }
     });
     let lastMessage = await response.json();
-    console.log("lastMessage", lastMessage);
     const prevGroup = chatList.find(group => group.group.group_id == preGroupId);
     if (prevGroup) {
-        console.log("pregroup", prevGroup);
         prevGroup.group.group_messages.push(lastMessage)
     }
-    console.log("pregroup", prevGroup);
     chatList.sort((a, b) => {
         if (a.time && b.time) {
             return new Date(b.time) - new Date(a.time);
@@ -826,8 +823,6 @@ async function rerenderChatList(preGroupId) {
             return 0;
         }
     });
-    console.log("chat list", chatList);
-
     viewChatList();
 }
 
