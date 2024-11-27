@@ -216,7 +216,7 @@ let viewChatList = () => {
                 DOM.chatList2.innerHTML += `
                 <div class="d-flex p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
                     <input type="radio" name="chatSelection" class="chat-radio" style="margin-left: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
-                    <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle pointerr" style="height:50px;">
+                    <img src="${elem.group.pic ? elem.group.pic : 'assets/img/group.svg'}" alt="Profile Photo" class="img-fluid rounded-circle pointerr" style="height:50px;">
                     <div class="ml-1">
                         <div class="name list-user-name">${elem.group.name}</div>
                     </div>
@@ -225,7 +225,7 @@ let viewChatList = () => {
                 DOM.chatList.innerHTML += `
                     <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
                     <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index},false)">
-                    <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                    <img src="${elem.group.pic ? elem.group.pic : 'assets/img/group.svg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
                             <div class="name list-user-name">${elem.group.name.length > 23 ? elem.group.name.substring(0, 23) + "..." : elem.group.name}</div>
                             <div class="small last-message">
@@ -304,7 +304,7 @@ let viewMessageList = () => {
                 DOM.messagesList.innerHTML += `
                 <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
                 <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true,${elem.id})">
-                  <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                  <img src="${elem.group.pic ? elem.group.pic : 'assets/img/group.svg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                   <div class="w-50">
                     <div class="name list-user-name">${elem.group.name}</div>
                     <div class="small last-message">${elem ? senderName + ": " : ""}${messageText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<a[^>]*>(.*?)<\/a>/g, '$1')}</div>
@@ -324,7 +324,7 @@ let viewMessageList = () => {
                     DOM.messagesList.innerHTML += `
                     <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
                     <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true,${elem.id})">
-                      <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                      <img src="${elem.group.pic ? elem.group.pic : 'assets/img/group.svg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                       <div class="w-50">
                         <div class="name list-user-name">${elem.group.name}</div>
                         <div class="small last-message">${elem ? senderName + ": " : ""}${messageText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<a[^>]*>(.*?)<\/a>/g, '$1')}</div>
