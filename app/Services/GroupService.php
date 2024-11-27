@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Enum\MessageEnum as EnumMessageEnum;
 
-
 class GroupService implements GroupRepository
 {
     public function fetchUserChatGroups(Request $request)
@@ -35,7 +34,6 @@ class GroupService implements GroupRepository
                 }
             }
         }
-
         if (count($groupWithMessagesArray) > 0)
             return new GroupResource($groupWithMessagesArray);
         else
@@ -135,10 +133,8 @@ class GroupService implements GroupRepository
                 $group->group_messages = [$message];;
             }
         }
-
         return $groups;
     }
-
 
     public function fetchGroupById($id)
     {
@@ -154,9 +150,9 @@ class GroupService implements GroupRepository
         return response()->json($lastestNotDeletedMessage);
     }
 
-    public function getUserUnreadMessageCount()
+    private function getUserUnreadMessageCount()
     {
-        $groupDetails = []; // Initialize an array to store all group details
+        $groupDetails = [];
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
             ->with(['UserAllgroupMessages' => function ($query) {
                 $query->latest('time')
@@ -165,11 +161,11 @@ class GroupService implements GroupRepository
             ->get();
 
         foreach ($groups as $group) {
-            $counter = 0; // Reset counter for each group
+            $counter = 0;
             foreach ($group->UserAllgroupMessages as $groupMessage) {
                 $seenBy = explode(",", $groupMessage->seen_by);
                 if (!in_array(Auth::user()->unique_id, $seenBy)) {
-                    $counter++; // Increment counter for each unread message
+                    $counter++;
                 }
             }
             $groupDetails[] = [
@@ -179,6 +175,6 @@ class GroupService implements GroupRepository
             ];
         }
 
-        return $groupDetails; // Return all group details
+        return $groupDetails;
     }
 }

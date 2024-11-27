@@ -48,7 +48,6 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::get('get-unread-chat-groups', [GroupController::class, 'getUnreadMessageGroups']);
     Route::get('get-group-by-id/{id}', [GroupController::class, 'getGroupById']);
     Route::get('get-group-last-message/{groupId}', [GroupController::class, 'getGroupLastMessage']);
-    Route::get('get-group-message-unread-count', [GroupController::class, 'getUserUnreadMessageCount']);
 
 
     //Chats Routes
