@@ -709,7 +709,7 @@ color: #666;
 	border-radius: 6px;
 	float: left;
 	left: -10px;
-	
+
   }
 
   .left-nidle::before {
@@ -881,7 +881,7 @@ body{
     border-radius: 50%;
     margin-right: 10px;
 	margin-left: 20px;
-	
+
 }
 
 /* Profile details styling */
@@ -1410,8 +1410,14 @@ body{
 	position: absolute !important;
 	bottom: 200px !important;
 	right: 60px !important;
-	
+
 }
-.play-button{
-	
+.group-imgg{
+margin-right:12px;
+border-radius: 50%;
+border:1px solid #ddd;
+width: 60px;
+}
+.group-imgg svg{
+    width: 100%;
 }
