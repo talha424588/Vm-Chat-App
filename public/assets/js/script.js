@@ -626,7 +626,6 @@ socket.on('sendChatToClient', (message) => {
 
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
-        console.log("update group",groupToUpdate);
         if (!groupToUpdate.group.group_messages) {
             groupToUpdate.group.group_messages = [];
         }
@@ -687,11 +686,8 @@ socket.on('sendChatToClient', (message) => {
 });
 
 socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) => {
-    console.log("move", moveMessages)
-    console.log("moveMessage event", chatList);
     if (user.unique_id != uniqueId) {
         if (DOM.groupId == null || DOM.groupId !== newGroupId) {
-            console.log("if part group not open");
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
             if (newGroup) {
                 if (moveMessages.messages.length > 1) {
