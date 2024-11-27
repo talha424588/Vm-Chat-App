@@ -11,4 +11,5 @@ interface GroupRepository
     public function fetchUnreadMessageGroups();
     public function getGroupByName($name,$request);
     public function fetchGroupById($id);
+    public function fetchGroupLastMessage($groupId);
 }

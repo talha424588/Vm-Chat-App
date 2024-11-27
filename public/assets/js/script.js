@@ -195,11 +195,9 @@ let viewChatList = () => {
                     if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
                         messageText = latestMessage.media_name;
                     } else if (/<a[^>]+>/g.test(latestMessage.msg) || /<audio[^>]+>/g.test(latestMessage.msg)) {
-
                         messageText = getOldMessageMediaName(latestMessage);
                     }
                     else {
-                        // messageText = latestMessage.msg; // Old Way Of Displying Message
                         let partialText = removeTags(latestMessage.msg.split("\n")[0]);
                         messageText = partialText.replace(/<br\s*\/?>/gi, '')
                             .replace(/<\/?p>/gi, '')
@@ -209,7 +207,7 @@ let viewChatList = () => {
                 else {
                     messageText = "No messages";
                 }
-                if (elem.group.group_messages.length > 0 && latestMessage != null) {
+                if (elem.group.group_messages && elem.group.group_messages.length > 0 && latestMessage != null) {
                     latestMessage.status == "Correction" ? messageText = removeTags(messageText) : messageText = getCleanedTextSnippet(messageText) + (messageText.length > 30 ? "..." : "")
                 }
 
@@ -230,7 +228,15 @@ let viewChatList = () => {
                     <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                         <div class="w-50">
                             <div class="name list-user-name">${elem.group.name.length > 23 ? elem.group.name.substring(0, 23) + "..." : elem.group.name}</div>
-                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${latestMessage.is_compose === 1 ? processValue(messageText, true).concat("...") : messageText}</div>
+                            <div class="small last-message">
+                                ${elem.isGroup ? (latestMessage ? senderName + ": " : "") : ""}
+                                ${latestMessage
+                                                    ? (latestMessage.is_compose === 1 || latestMessage.is_compose === true)
+                                                        ? processValue(messageText, true).concat("...")
+                                                        : messageText
+                                                    : "No Messages"
+                                                }
+                            </div>
                         </div>
 
                     <div class="flex-grow-1 text-right">
@@ -602,6 +608,10 @@ socket.on('sendChatToClient', (message) => {
 
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
+        console.log("update group",groupToUpdate);
+        if (!groupToUpdate.group.group_messages) {
+            groupToUpdate.group.group_messages = [];
+        }
         groupToUpdate.group.group_messages.push(message);
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
@@ -632,6 +642,9 @@ socket.on('sendChatToClient', (message) => {
     } else {
         // if user is in search mood and other user message and search user mood user clear the search feild the message count
         // did not got updated start from here
+        if (!groupToUpdate.group.group_messages) {
+            groupToUpdate.group.group_messages = [];
+        }
         groupToUpdate.group.group_messages.push(message);
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
@@ -655,9 +668,12 @@ socket.on('sendChatToClient', (message) => {
     }
 });
 
-socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
+socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) => {
+    console.log("move", moveMessages)
+    console.log("moveMessage event", chatList);
     if (user.unique_id != uniqueId) {
         if (DOM.groupId == null || DOM.groupId !== newGroupId) {
+            console.log("if part group not open");
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
             if (newGroup) {
                 if (moveMessages.messages.length > 1) {
@@ -674,21 +690,11 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
                     newGroup.unread += 1
                 }
 
-                chatList.sort((a, b) => {
-                    if (a.time && b.time) {
-                        return new Date(b.time) - new Date(a.time);
-                    } else if (a.time) {
-                        return -1;
-                    } else if (b.time) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                });
-                viewChatList();
+                rerenderChatList(preGroupId);
             }
         }
         else {
+            console.log("else part");
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
             if (newGroup) {
                 if (moveMessages.messages.length > 1) {
@@ -745,7 +751,6 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
                 newGroup.group.group_messages.push(moveMessages.messages[0])
                 const seenBy = moveMessages.messages[0].seen_by ? moveMessages.messages[0].seen_by.split(",").map(s => s.trim()) : [];
                 newGroup.unread += (moveMessages.messages[0].sender !== user.unique_id && !seenBy.includes(user.unique_id)) ? 1 : 0;
-                // newGroup.unread += 1
             }
         }
         chatList.sort((a, b) => {
@@ -770,6 +775,37 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
     }
     // generateChatList();
 });
+
+async function rerenderChatList(preGroupId) {
+    const response = await fetch(`get-group-last-message/${preGroupId}`, {
+        method: 'GET',
+        headers: {
+            'content-type': 'application/json'
+        }
+    });
+    let lastMessage = await response.json();
+    console.log("lastMessage", lastMessage);
+    const prevGroup = chatList.find(group => group.group.group_id == preGroupId);
+    if (prevGroup) {
+        console.log("pregroup", prevGroup);
+        prevGroup.group.group_messages.push(lastMessage)
+    }
+    console.log("pregroup", prevGroup);
+    chatList.sort((a, b) => {
+        if (a.time && b.time) {
+            return new Date(b.time) - new Date(a.time);
+        } else if (a.time) {
+            return -1;
+        } else if (b.time) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
+    console.log("chat list", chatList);
+
+    viewChatList();
+}
 
 socket.on('updateEditedMessage', (editedMessage) => {
 
@@ -2577,7 +2613,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 if (DOM.groupReferenceMessageClick) {
                     scrollToMessage(message.id);
                 }
-                else if (!DOM.groupReferenceMessageClick) {               
+                else if (!DOM.groupReferenceMessageClick) {
                     const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                     const messageTextElement = messageElement.querySelector(".shadow-sm");
                     const searchQuery = DOM.messageSearchQuery;
@@ -2755,7 +2791,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                     setTimeout(() => {
                         messageElement.scrollIntoView({ behavior: "smooth" });
                         setTimeout(() => {
-                           hideSpinner();
+                            hideSpinner();
                         }, 300);
                     }, 100);
                 }
@@ -2860,8 +2896,7 @@ let currentlyPlayingAudio = null;
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
-    if(searchMessage)
-    {
+    if (searchMessage) {
         showSpinner();
     }
     DOM.messages.innerHTML = '';
@@ -3242,10 +3277,10 @@ const startRecording = () => {
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'audio/wav' });
                 const reader = new FileReader();
-                reader.onload = function() {
+                reader.onload = function () {
                     const arrayBuffer = this.result;
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    
+
                     audioContext.decodeAudioData(arrayBuffer, (buffer) => {
                         const samples = buffer.getChannelData(0);
                         const mp3 = new lamejs.Mp3Encoder(1, audioContext.sampleRate, 128);
@@ -4244,7 +4279,7 @@ function get_voice_list() {
         if (playButton) {
             playButton.addEventListener('click', function () {
                 if (audioPlayer.paused) {
-                    console.log(audioPlayer.paused,": audio is paused");
+                    console.log(audioPlayer.paused, ": audio is paused");
                     if (currentlyPlayingAudio && currentlyPlayingAudio !== audioPlayer) {
                         currentlyPlayingAudio.pause();
                         currentlyPlayingAudio.currentTime = 0;

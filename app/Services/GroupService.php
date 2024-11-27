@@ -29,7 +29,7 @@ class GroupService implements GroupRepository
         $groupWithMessagesArray =  $this->alterGroupMessageArray($groups);
 
         if (count($groupWithMessagesArray) > 0)
-            return new GroupResource($groups);
+            return new GroupResource($groupWithMessagesArray);
         else
             return response()->json(["status" => false, "groups" => "not found", "messages" => null], 404);
     }
@@ -135,14 +135,14 @@ class GroupService implements GroupRepository
     public function fetchGroupById($id)
     {
         $group = Group::where("group_id", $id)->first();
-
-        // Extract the access column and split it into an array of user IDs
         $userIds = explode(",", $group->access);
-
-        // Fetch users with the specified user IDs
         $group->users_with_access = User::whereIn('id', $userIds)->get();
-
-        // Return the group with users attached
         return response()->json($group);
+    }
+
+    public function fetchGroupLastMessage($groupId)
+    {
+        $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id",$groupId)->where('is_deleted', 0)->orderBy("id","Desc")->first();
+        return response()->json($lastestNotDeletedMessage);
     }
 }

@@ -32,4 +32,9 @@ class GroupController extends Controller
     {
         return $this->groupRepository->fetchGroupById($id);
     }
+
+    public function getGroupLastMessage($groupId)
+    {
+        return $this->groupRepository->fetchGroupLastMessage($groupId);
+    }
 }
