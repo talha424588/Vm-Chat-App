@@ -711,7 +711,6 @@ socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) 
             }
         }
         else {
-            console.log("else part");
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
             if (newGroup) {
                 if (moveMessages.messages.length > 1) {
@@ -722,7 +721,6 @@ socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) 
                             newGroup.group.group_messages = [];
                         }
                         newGroup.group.group_messages.push(message);
-                        // newGroup.unread += 1
                     });
                 }
                 else {
@@ -731,7 +729,6 @@ socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) 
                         newGroup.group.group_messages = [];
                     }
                     newGroup.group.group_messages.push(moveMessages.messages[0])
-                    // newGroup.unread += 1
                 }
 
                 moveMessages.messages.forEach(message => {
