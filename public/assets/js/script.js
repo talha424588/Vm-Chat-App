@@ -1697,21 +1697,12 @@ function scroll_function() {
 
 scrollBottomBtn.addEventListener('click', function () {
     if (parentMessageIds.size) {
-        console.log("parentMessageIds", parentMessageIds);
         let setToArray = [...parentMessageIds];
-        console.log("setToArray", setToArray);
-
         parentMessageIds.clear();
-        console.log("set status", parentMessageIds);
-
         let LastIndex = setToArray.pop();
-        console.log("LastIndex", LastIndex);
-
         taggingMessages(LastIndex)
         addChildIdsInSet(LastIndex, false);
-        console.log("setToArray", setToArray);
         parentMessageIds = new Set(setToArray);
-        console.log("parentMessageIds", parentMessageIds);
     }
     else if (parentMessageIds.size < 1) {
         const messageDiv = document.getElementById('messages');
