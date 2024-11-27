@@ -1415,7 +1415,8 @@ body{
 .group-imgg{
 margin-right:12px;
 border-radius: 50%;
-border:1px solid #ddd;
+/* border:1px solid #ddd; */
+border:none;
 width: 60px;
 }
 .group-imgg svg{
