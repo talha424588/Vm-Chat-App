@@ -126,17 +126,19 @@ let populateGroupList = async () => {
             chat.group.access = [group.access];
             // chat.members = [group.access];
             chat.name = group.name;
-            chat.unread = 0;
+            chat.unread = group.unread_count.length > 0 ? group.unread_count : 0;;
 
             if (group.group_messages && group.group_messages.length > 0) {
                 group.group_messages.reverse().forEach(msg => {
                     chat.msg = msg;
                     chat.time = new Date(msg.time * 1000);
 
-                    const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
-                    chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
+                    // const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
+                    // chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
+                    chat.unread += group.unread_count;
                 });
             }
+
 
             DOM.unreadMessagesPerGroup[group.group_id] = chat.unread;
 
@@ -149,7 +151,7 @@ let populateGroupList = async () => {
             }
         });
     } catch (error) {
-        console.log("Error fetching chat groups:", error);
+        // console.log("Error fetching chat groups:", error);
     }
 };
 
@@ -174,7 +176,7 @@ let viewChatList = () => {
         }
     })
         .forEach((elem, index) => {
-            let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
+            // let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
                 let latestMessage = null;
@@ -195,11 +197,9 @@ let viewChatList = () => {
                     if (latestMessage.type === "File" || latestMessage.type === "Image" || latestMessage.type === "Audio") {
                         messageText = latestMessage.media_name;
                     } else if (/<a[^>]+>/g.test(latestMessage.msg) || /<audio[^>]+>/g.test(latestMessage.msg)) {
-
                         messageText = getOldMessageMediaName(latestMessage);
                     }
                     else {
-                        // messageText = latestMessage.msg; // Old Way Of Displying Message
                         let partialText = removeTags(latestMessage.msg.split("\n")[0]);
                         messageText = partialText.replace(/<br\s*\/?>/gi, '')
                             .replace(/<\/?p>/gi, '')
@@ -209,7 +209,7 @@ let viewChatList = () => {
                 else {
                     messageText = "No messages";
                 }
-                if (elem.group.group_messages.length > 0 && latestMessage != null) {
+                if (elem.group.group_messages && elem.group.group_messages.length > 0 && latestMessage != null) {
                     latestMessage.status == "Correction" ? messageText = removeTags(messageText) : messageText = getCleanedTextSnippet(messageText) + (messageText.length > 30 ? "..." : "")
                 }
 
@@ -218,7 +218,11 @@ let viewChatList = () => {
                 DOM.chatList2.innerHTML += `
                 <div class="d-flex p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
                     <input type="radio" name="chatSelection" class="chat-radio" style="margin-left: 10px;" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
-                    <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle pointerr" style="height:50px;">
+                    <span class='group-imgg'>
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
+</svg></span>
+
                     <div class="ml-1">
                         <div class="name list-user-name">${elem.group.name}</div>
                     </div>
@@ -227,10 +231,22 @@ let viewChatList = () => {
                 DOM.chatList.innerHTML += `
                     <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
                     <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this, ${index},false)">
-                    <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
-                        <div class="w-50">
+                  <span class='group-imgg'>
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
+</svg>
+</span>
+ <div class="w-50">
                             <div class="name list-user-name">${elem.group.name.length > 23 ? elem.group.name.substring(0, 23) + "..." : elem.group.name}</div>
-                            <div class="small last-message">${elem.isGroup ? senderName + ": " : ""}${latestMessage.is_compose === 1 ? processValue(messageText, true).concat("...") : messageText}</div>
+                            <div class="small last-message">
+                                ${elem.isGroup ? (latestMessage ? senderName + ": " : "") : ""}
+                                ${latestMessage
+                                                    ? (latestMessage.is_compose === 1 || latestMessage.is_compose === true)
+                                                        ? processValue(messageText, true).concat("...")
+                                                        : messageText
+                                                    : "No Messages"
+                                                }
+                            </div>
                         </div>
 
                     <div class="flex-grow-1 text-right">
@@ -298,7 +314,11 @@ let viewMessageList = () => {
                 DOM.messagesList.innerHTML += `
                 <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
                 <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true,${elem.id})">
-                  <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                  <img src="${elem.group.pic ? elem.group.pic : `<span class='group-imgg'>
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
+                    </svg>
+                    </span>`}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                   <div class="w-50">
                     <div class="name list-user-name">${elem.group.name}</div>
                     <div class="small last-message">${elem ? senderName + ": " : ""}${messageText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<a[^>]*>(.*?)<\/a>/g, '$1')}</div>
@@ -318,7 +338,11 @@ let viewMessageList = () => {
                     DOM.messagesList.innerHTML += `
                     <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
                     <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true,${elem.id})">
-                      <img src="${elem.group.pic ? elem.group.pic : 'https://static.vecteezy.com/system/resources/previews/012/574/694/non_2x/people-linear-icon-squad-illustration-team-pictogram-group-logo-icon-illustration-vector.jpg'}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
+                      <img src="${elem.group.pic ? elem.group.pic : `<span class='group-imgg'>
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
+</svg>
+</span>`}" alt="Profile Photo" class="img-fluid rounded-circle mr-2" style="height:50px;">
                       <div class="w-50">
                         <div class="name list-user-name">${elem.group.name}</div>
                         <div class="small last-message">${elem ? senderName + ": " : ""}${messageText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<a[^>]*>(.*?)<\/a>/g, '$1')}</div>
@@ -602,6 +626,9 @@ socket.on('sendChatToClient', (message) => {
 
     let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
+        if (!groupToUpdate.group.group_messages) {
+            groupToUpdate.group.group_messages = [];
+        }
         groupToUpdate.group.group_messages.push(message);
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
@@ -632,6 +659,9 @@ socket.on('sendChatToClient', (message) => {
     } else {
         // if user is in search mood and other user message and search user mood user clear the search feild the message count
         // did not got updated start from here
+        if (!groupToUpdate.group.group_messages) {
+            groupToUpdate.group.group_messages = [];
+        }
         groupToUpdate.group.group_messages.push(message);
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
@@ -655,8 +685,7 @@ socket.on('sendChatToClient', (message) => {
     }
 });
 
-socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
-
+socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) => {
     if (user.unique_id != uniqueId) {
         if (DOM.groupId == null || DOM.groupId !== newGroupId) {
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
@@ -671,22 +700,14 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
                 }
                 else {
                     newGroup.time = new Date(moveMessages.messages[0].time * 1000);
+                    if (!newGroup.group.group_messages) {
+                        newGroup.group.group_messages = [];
+                    }
                     newGroup.group.group_messages.push(moveMessages.messages[0])
                     newGroup.unread += 1
                 }
 
-                chatList.sort((a, b) => {
-                    if (a.time && b.time) {
-                        return new Date(b.time) - new Date(a.time);
-                    } else if (a.time) {
-                        return -1;
-                    } else if (b.time) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                });
-                viewChatList();
+                rerenderChatList(preGroupId);
             }
         }
         else {
@@ -696,14 +717,18 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
                     moveMessages.messages.sort((a, b) => b.id = a.id);
                     moveMessages.messages.forEach(message => {
                         newGroup.time = new Date(moveMessages.messages[0].time * 1000);
+                        if (!newGroup.group.group_messages) {
+                            newGroup.group.group_messages = [];
+                        }
                         newGroup.group.group_messages.push(message);
-                        // newGroup.unread += 1
                     });
                 }
                 else {
                     newGroup.time = new Date(moveMessages.messages[0].time * 1000);
+                    if (!newGroup.group.group_messages) {
+                        newGroup.group.group_messages = [];
+                    }
                     newGroup.group.group_messages.push(moveMessages.messages[0])
-                    // newGroup.unread += 1
                 }
 
                 moveMessages.messages.forEach(message => {
@@ -743,11 +768,14 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
             }
             else {
                 newGroup.time = new Date(moveMessages.messages[0].time * 1000);
+                if (!newGroup.group.group_messages) {
+                    newGroup.group.group_messages = [];
+                }
                 newGroup.group.group_messages.push(moveMessages.messages[0])
                 const seenBy = moveMessages.messages[0].seen_by ? moveMessages.messages[0].seen_by.split(",").map(s => s.trim()) : [];
                 newGroup.unread += (moveMessages.messages[0].sender !== user.unique_id && !seenBy.includes(user.unique_id)) ? 1 : 0;
-                // newGroup.unread += 1
             }
+            rerenderChatList(preGroupId);
         }
         chatList.sort((a, b) => {
             if (a.time && b.time) {
@@ -771,6 +799,32 @@ socket.on('moveMessage', (moveMessages, newGroupId, preGroupId, uniqueId) => {
     }
     // generateChatList();
 });
+
+async function rerenderChatList(preGroupId) {
+    const response = await fetch(`get-group-last-message/${preGroupId}`, {
+        method: 'GET',
+        headers: {
+            'content-type': 'application/json'
+        }
+    });
+    let lastMessage = await response.json();
+    const prevGroup = chatList.find(group => group.group.group_id == preGroupId);
+    if (prevGroup) {
+        prevGroup.group.group_messages.push(lastMessage)
+    }
+    chatList.sort((a, b) => {
+        if (a.time && b.time) {
+            return new Date(b.time) - new Date(a.time);
+        } else if (a.time) {
+            return -1;
+        } else if (b.time) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
+    viewChatList();
+}
 
 socket.on('updateEditedMessage', (editedMessage) => {
 
@@ -2578,7 +2632,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 if (DOM.groupReferenceMessageClick) {
                     scrollToMessage(message.id);
                 }
-                else if (!DOM.groupReferenceMessageClick) {               
+                else if (!DOM.groupReferenceMessageClick) {
                     const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                     const messageTextElement = messageElement.querySelector(".shadow-sm");
                     const searchQuery = DOM.messageSearchQuery;
@@ -2756,7 +2810,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                     setTimeout(() => {
                         messageElement.scrollIntoView({ behavior: "smooth" });
                         setTimeout(() => {
-                           hideSpinner();
+                            hideSpinner();
                         }, 300);
                     }, 100);
                 }
@@ -2862,8 +2916,7 @@ let currentPlaybutton = null;
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
-    if(searchMessage)
-    {
+    if (searchMessage) {
         showSpinner();
     }
     DOM.messages.innerHTML = '';
@@ -3244,10 +3297,10 @@ const startRecording = () => {
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'audio/wav' });
                 const reader = new FileReader();
-                reader.onload = function() {
+                reader.onload = function () {
                     const arrayBuffer = this.result;
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    
+
                     audioContext.decodeAudioData(arrayBuffer, (buffer) => {
                         const samples = buffer.getChannelData(0);
                         const mp3 = new lamejs.Mp3Encoder(1, audioContext.sampleRate, 128);
@@ -3667,21 +3720,23 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         }
     } else {
         DOM.groupSearch = false;
-        chatList = [...previousChatList];
-        chatList.sort((a, b) => {
-            if (a.time && b.time) {
-                return new Date(b.time) - new Date(a.time);
-            } else if (a.time) {
-                return -1;
-            } else if (b.time) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
+        // chatList = [...previousChatList];
+        // chatList.sort((a, b) => {
+        //     if (a.time && b.time) {
+        //         return new Date(b.time) - new Date(a.time);
+        //     } else if (a.time) {
+        //         return -1;
+        //     } else if (b.time) {
+        //         return 1;
+        //     } else {
+        //         return 0;
+        //     }
+        // });
         messageList = [];
         DOM.messagesList.innerHTML = '';
-        viewChatList();
+        // viewChatList();
+
+        generateChatList()
     }
 };
 
@@ -4246,6 +4301,7 @@ function get_voice_list() {
         if (playButton) {
             playButton.addEventListener('click', function () {
                 if (audioPlayer.paused) {
+
                     if (currentlyPlayingAudio && currentlyPlayingAudio !== audioPlayer) {
                         currentlyPlayingAudio.pause();
                         // currentlyPlayingAudio.currentTime=0;

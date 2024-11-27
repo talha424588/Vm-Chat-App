@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Enum\MessageEnum as EnumMessageEnum;
 
-
 class GroupService implements GroupRepository
 {
     public function fetchUserChatGroups(Request $request)
@@ -27,9 +26,16 @@ class GroupService implements GroupRepository
             ->get();
 
         $groupWithMessagesArray =  $this->alterGroupMessageArray($groups);
-
+        $groupUnreadCount = $this->getUserUnreadMessageCount();
+        foreach ($groupWithMessagesArray  as &$group) {
+            foreach ($groupUnreadCount as $groupCount) {
+                if ($group->group_id == $groupCount['group_id']) {
+                    $group->unread_count = $groupCount['unread_count'];
+                }
+            }
+        }
         if (count($groupWithMessagesArray) > 0)
-            return new GroupResource($groups);
+            return new GroupResource($groupWithMessagesArray);
         else
             return response()->json(["status" => false, "groups" => "not found", "messages" => null], 404);
     }
@@ -61,51 +67,6 @@ class GroupService implements GroupRepository
         } else
             return response()->json(["status" => false, "message" => "Not Found", "groups" => null], 404);
     }
-
-    // working
-    // public function getGroupByName($name)
-    // {
-    //     $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
-    //         ->where('name', 'LIKE', "%$name%")
-    //         ->with(['groupMessages' => function ($query) {
-    //             $query->latest('time')
-    //                 ->where('is_deleted', false);
-    //         }, 'groupMessages.user', 'users_with_access'])
-    //         ->get();
-
-    //     $userGroups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '' )) > 0", [Auth::user()->id])
-    //         ->pluck('group_id');
-
-    //     // Now, search for messages in those groups
-    //     $messages = GroupMessage::where("msg", "LIKE", "%$name%")
-    //         ->where('is_deleted', false)
-    //         ->where(function ($query) {
-    //             $query->whereIn("type", ["File", "Message"])
-    //                 ->orWhereNull("type")
-    //                 ->orWhere("type", "");
-    //         })
-    //         ->whereIn('group_id', $userGroups)
-    //         ->with("user", "group")
-    //         ->get();
-
-    //     $groupMessageSearchArray = [
-    //         "groups" => $groups,
-    //         "messages" => $messages
-    //     ];
-    //     if ($groupMessageSearchArray) {
-    //         return response()->json([
-    //             "status" => true,
-    //             "message" => "success",
-    //             "data" => $groupMessageSearchArray
-    //         ]);
-    //     } else {
-    //         return response()->json([
-    //             "status" => false,
-    //             "message" => "Not Found",
-    //             "groups" => null
-    //         ]);
-    //     }
-    // }
 
     public function getGroupByName($name, $request)
     {
@@ -172,22 +133,48 @@ class GroupService implements GroupRepository
                 $group->group_messages = [$message];;
             }
         }
-
         return $groups;
     }
-
 
     public function fetchGroupById($id)
     {
         $group = Group::where("group_id", $id)->first();
-
-        // Extract the access column and split it into an array of user IDs
         $userIds = explode(",", $group->access);
-
-        // Fetch users with the specified user IDs
         $group->users_with_access = User::whereIn('id', $userIds)->get();
-
-        // Return the group with users attached
         return response()->json($group);
+    }
+
+    public function fetchGroupLastMessage($groupId)
+    {
+        $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->where('is_deleted', 0)->orderBy("id", "Desc")->first();
+        return response()->json($lastestNotDeletedMessage);
+    }
+
+    private function getUserUnreadMessageCount()
+    {
+        $groupDetails = [];
+        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
+            ->with(['UserAllgroupMessages' => function ($query) {
+                $query->latest('time')
+                    ->whereNot('status', EnumMessageEnum::MOVE);
+            }, 'UserAllgroupMessages.user'])
+            ->get();
+
+        foreach ($groups as $group) {
+            $counter = 0;
+            foreach ($group->UserAllgroupMessages as $groupMessage) {
+                $seenBy = explode(",", $groupMessage->seen_by);
+                if (!in_array(Auth::user()->unique_id, $seenBy)) {
+                    $counter++;
+                }
+            }
+            $groupDetails[] = [
+                "name" => $group->name,
+                "group_id" => $group->group_id,
+                "unread_count" => $counter
+            ];
+        }
+
+        return $groupDetails;
     }
 }
