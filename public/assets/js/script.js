@@ -126,17 +126,19 @@ let populateGroupList = async () => {
             chat.group.access = [group.access];
             // chat.members = [group.access];
             chat.name = group.name;
-            chat.unread = 0;
+            chat.unread = group.unread_count.length > 0 ? group.unread_count : 0;;
 
             if (group.group_messages && group.group_messages.length > 0) {
                 group.group_messages.reverse().forEach(msg => {
                     chat.msg = msg;
                     chat.time = new Date(msg.time * 1000);
 
-                    const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
-                    chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
+                    // const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
+                    // chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
+                    chat.unread += group.unread_count;
                 });
             }
+
 
             DOM.unreadMessagesPerGroup[group.group_id] = chat.unread;
 
@@ -154,6 +156,7 @@ let populateGroupList = async () => {
 };
 
 let viewChatList = () => {
+    console.log("chatlist",chatList);
     if (!DOM.groupSearch) {
         previousChatList = [...chatList]
     }

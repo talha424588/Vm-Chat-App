@@ -37,4 +37,10 @@ class Group extends Model
         return $this->belongsToMany(User::class, 'groups', 'id', 'access')
             ->whereRaw("FIND_IN_SET(user.id, groups.access) > 0");
     }
+
+
+    public function UserAllgroupMessages()
+    {
+        return $this->hasMany(GroupMessage::class, 'group_id', 'group_id');
+    }
 }

@@ -27,6 +27,14 @@ class GroupService implements GroupRepository
             ->get();
 
         $groupWithMessagesArray =  $this->alterGroupMessageArray($groups);
+        $groupUnreadCount = $this->getUserUnreadMessageCount();
+        foreach ($groupWithMessagesArray  as &$group) {
+            foreach ($groupUnreadCount as $groupCount) {
+                if ($group->group_id == $groupCount['group_id']) {
+                    $group->unread_count = $groupCount['unread_count'];
+                }
+            }
+        }
 
         if (count($groupWithMessagesArray) > 0)
             return new GroupResource($groupWithMessagesArray);
@@ -142,7 +150,35 @@ class GroupService implements GroupRepository
 
     public function fetchGroupLastMessage($groupId)
     {
-        $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id",$groupId)->where('is_deleted', 0)->orderBy("id","Desc")->first();
+        $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->where('is_deleted', 0)->orderBy("id", "Desc")->first();
         return response()->json($lastestNotDeletedMessage);
+    }
+
+    public function getUserUnreadMessageCount()
+    {
+        $groupDetails = []; // Initialize an array to store all group details
+        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
+            ->with(['UserAllgroupMessages' => function ($query) {
+                $query->latest('time')
+                    ->whereNot('status', EnumMessageEnum::MOVE);
+            }, 'UserAllgroupMessages.user'])
+            ->get();
+
+        foreach ($groups as $group) {
+            $counter = 0; // Reset counter for each group
+            foreach ($group->UserAllgroupMessages as $groupMessage) {
+                $seenBy = explode(",", $groupMessage->seen_by);
+                if (!in_array(Auth::user()->unique_id, $seenBy)) {
+                    $counter++; // Increment counter for each unread message
+                }
+            }
+            $groupDetails[] = [
+                "name" => $group->name,
+                "group_id" => $group->group_id,
+                "unread_count" => $counter
+            ];
+        }
+
+        return $groupDetails; // Return all group details
     }
 }
