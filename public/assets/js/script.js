@@ -1902,7 +1902,7 @@ function checkPrivacyAndAlert(messageContent, messageId) {
             })
         })
             .then(response => {
-                console.log(response);
+                // console.log(response);
             })
             .catch(error => {
                 console.error(error);
@@ -2180,7 +2180,7 @@ function showReply(message_id, senderName, type) {
     else{
         var messagebody = message.msg;
     }
- 
+
     DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var quotedTextElement = document.querySelector('#quoted-message .sender-name');
@@ -2300,7 +2300,7 @@ function removeQuotedMessage() {
         chat_action.style.display = "flex";
     }
     document.getElementById("messages").style.marginBottom = "74px";
-  
+
     document.querySelector("#input").focus();
 
 
