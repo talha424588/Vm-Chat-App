@@ -250,7 +250,7 @@ class ChatService implements ChatRepository
         $message = GroupMessage::where('id', $messageId)->first();
         if ($message) {
             $message->msg = $messageContent;
-            $message->status = EnumMessageEnum::EDIT;
+            $message->status = EnumMessageEnum::NEW;
 
             if ($message->save()) {
                 return response()->json(["status" => true, "message" => "success", "message" => new MessageResource($message)]);
