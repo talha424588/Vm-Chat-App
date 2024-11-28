@@ -1126,7 +1126,7 @@ body{
     display: none;
 }
 .reply-message-div {
-
+	cursor:pointer;
     align-items: center;
     justify-content: space-between;
     background-color: #D1F4CC;
