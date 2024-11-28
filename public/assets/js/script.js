@@ -241,11 +241,11 @@ let viewChatList = () => {
                             <div class="small last-message">
                                 ${elem.isGroup ? (latestMessage ? senderName + ": " : "") : ""}
                                 ${latestMessage
-                                                    ? (latestMessage.is_compose === 1 || latestMessage.is_compose === true)
-                                                        ? processValue(messageText, true).concat("...")
-                                                        : messageText
-                                                    : "No Messages"
-                                                }
+                        ? (latestMessage.is_compose === 1 || latestMessage.is_compose === true)
+                            ? processValue(messageText, true).concat("...")
+                            : messageText
+                        : "No Messages"
+                    }
                             </div>
                         </div>
 
@@ -3620,8 +3620,8 @@ let searchGroups = async (searchQuery, loadMore = false) => {
             const groupResponse = await fetch(url);
             const response = await groupResponse.json();
             if (response) {
-
-                const groups = response.data.groups.data;
+                let groups = new Set();
+                groups = response.data.groups.data;
                 const messages = response.data.messages.data;
 
                 if (!groups || groups.length === 0) {
@@ -4105,9 +4105,9 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                 console.log("Unknown message type:", message.type);
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
-        setTimeout(function(){
+        setTimeout(function () {
             mobilegroupSearchClose();
-        },700)
+        }, 700)
 
     } else {
         fetchPaginatedMessages(messageId, null, null);
@@ -4259,7 +4259,7 @@ function get_voice_list() {
                     audioPlayer.play();
                     updatePlayButton(playButton, true);
                     currentlyPlayingAudio = audioPlayer;
-                    currentPlaybutton=playButton;
+                    currentPlaybutton = playButton;
                 } else {
                     audioPlayer.pause();
                     updatePlayButton(playButton, false);
