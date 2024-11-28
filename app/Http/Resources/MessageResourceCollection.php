@@ -57,7 +57,7 @@ class MessageResourceCollection extends ResourceCollection
             'reply_id' => $message->reply->reply_id,
             'seen_by' => $message->reply->seen_by,
             'time' => $message->reply->time,
-            'is_compose' => $message->is_compose,
+            'is_compose' => $message->reply->is_compose,
             'is_privacy_breach' => $message->is_privacy_breach,
             'is_deleted' => $message->is_deleted,
         ] : null;

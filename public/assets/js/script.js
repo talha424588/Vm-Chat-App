@@ -1095,7 +1095,7 @@ function processValue(value, isChatList = false) {
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
-    
+        console.log(message);
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -1331,15 +1331,15 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-               if(message.compose_id)
+               if(message.reply.is_compose == 1)
                {
+  
                 var message_body = processValue(message.reply.msg, false).substring(0, 200) + "....."; 
                }
                else{
                 var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
             }
             }
-
             messageContent = `
             <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
