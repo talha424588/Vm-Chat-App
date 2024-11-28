@@ -1330,7 +1330,13 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
+               if(message.compose_id)
+               {
+                var message_body = processValue(message.reply.msg, false).substring(0, 200) + "....."; 
+               }
+               else{
                 var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200) + ".....";
+               }
             }
 
             messageContent = `
@@ -1862,6 +1868,8 @@ function correction_send_handel() {
     chat_action.style.display = 'flex';
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(correction_message_id));
+    const old_message=pagnicateChatList.data.find((message) => message.id === parseInt(correction_message_id));
+    
     if (messageIndex !== -1) {
         pagnicateChatList.data[messageIndex].msg = messageContent;
     }
@@ -1876,7 +1884,8 @@ function correction_send_handel() {
             status: 'Correction',
             mediaName: null,
             time: Math.floor(Date.now() / 1000),
-            csrf_token: document.querySelector('meta[name="csrf-token"]').content
+            csrf_token: document.querySelector('meta[name="csrf-token"]').content,
+            compose_id:old_message.compose_id,
         };
 
         socket.emit('sendChatToServer', newMessage);
