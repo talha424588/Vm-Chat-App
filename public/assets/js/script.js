@@ -1095,7 +1095,7 @@ function processValue(value, isChatList = false) {
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
-    
+
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -1333,7 +1333,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             } else {
                if(message.compose_id)
                {
-                var message_body = processValue(message.reply.msg, false).substring(0, 200) + "....."; 
+                var message_body = processValue(message.reply.msg, false).substring(0, 200) + ".....";
                }
                else{
                 var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
@@ -1861,7 +1861,7 @@ function correction_send_handel() {
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(correction_message_id));
     const old_message=pagnicateChatList.data.find((message) => message.id === parseInt(correction_message_id));
-    
+
     if (messageIndex !== -1) {
         pagnicateChatList.data[messageIndex].msg = messageContent;
     }
@@ -3803,7 +3803,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             else if (message.msg.includes("<p>")) {
                                 resultTextDiv.innerHTML = message.msg
                             }
-                            else if (message.is_compose === 1 || message.is_compose === true) {
+                            else if (message.is_compose == 1 || message.is_compose == true) {
                                 let vmMessage = processValue(message.msg, false);
                                 resultTextDiv.textContent = vmMessage.replace(/<br\s*\/?>/gi, '\n');;
                             }
