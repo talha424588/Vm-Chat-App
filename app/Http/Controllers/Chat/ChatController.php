@@ -92,6 +92,7 @@ class ChatController extends Controller
         $message->status = $request->status ?? EnumMessageEnum::NEW;
         $message->is_compose = false;
         $message->is_privacy_breach = $request->privacy_breach ?? false;
+        $message->compose_id=$request->compose_id ?? null;
         if ($message->save()) {
             $message->user = User::where("unique_id", $uniqueId)->first();
             if ($message->reply_id) {

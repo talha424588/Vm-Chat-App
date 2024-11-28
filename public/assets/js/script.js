@@ -848,7 +848,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                                 ${editedMessage.user.name}
                             </div>
                             <div class="reply-details">
-                                <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</p>
+                                <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0,200)}.....</p>
                             </div>
                         </div>
                         ${newMessageDisplay}`;
@@ -1095,6 +1095,7 @@ function processValue(value, isChatList = false) {
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
+    
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -1330,7 +1331,13 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200) + ".....";
+               if(message.compose_id)
+               {
+                var message_body = processValue(message.reply.msg, false).substring(0, 200) + "....."; 
+               }
+               else{
+                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
+            }
             }
 
             messageContent = `
@@ -1352,7 +1359,8 @@ let addMessageToMessageArea = (message, flag = false) => {
                 messageContent = (message.msg || message.message)
                     .replace(/\r\n/g, '<br>')
                     .replace(/\n/g, '<br>')
-                    .replace(/<i[^>]+>/g, '');
+                    .replace(/<i[^>]+>/g, '')
+                    ;
             }
 
         }
@@ -1853,6 +1861,8 @@ function correction_send_handel() {
     chat_action.style.display = 'flex';
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(correction_message_id));
+    const old_message=pagnicateChatList.data.find((message) => message.id === parseInt(correction_message_id));
+    
     if (messageIndex !== -1) {
         pagnicateChatList.data[messageIndex].msg = messageContent;
     }
@@ -1867,7 +1877,8 @@ function correction_send_handel() {
             status: 'Correction',
             mediaName: null,
             time: Math.floor(Date.now() / 1000),
-            csrf_token: document.querySelector('meta[name="csrf-token"]').content
+            csrf_token: document.querySelector('meta[name="csrf-token"]').content,
+            compose_id:old_message.compose_id,
         };
 
         socket.emit('sendChatToServer', newMessage);
@@ -2009,11 +2020,11 @@ function editMessage(messageId) {
         });
 
         const textarea = document.getElementById('input');
-
+        console.log("this is the message to be edited :",editMessage);
         if (editMessage.includes("<br>") || editMessage.includes("<br />")) {
-            textarea.value = editMessage.replace(/<br\s*\/?>/gi, '\n');
+            textarea.value = editMessage.replace(/<br\s*\/?>/gi, '\n').replace(/<\/?[^>]+(>|$)/g, "").trim();
         } else {
-            textarea.value = editMessage.replace(/<\/?[^>]+(>|$)/g, "").trim();
+            textarea.value = editMessage.replace(/<\/?[^>]+(>|$)/g, "").replace(/<\/?[^>]+(>|$)/g, "").trim();
         }
 
 
