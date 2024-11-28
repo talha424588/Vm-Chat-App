@@ -1764,13 +1764,12 @@ function CorrectionMessage(message_id, senderName) {
     }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
 
-    if(message.is_compose == 1)
-        {
-            var messagebody=processValue(message.msg || message.message, false);
-        }
-        else{
-            var messagebody = message.msg.replace(/\n/g, "<br>").trim();
-        }
+    if (message.is_compose == 1) {
+        var messagebody = processValue(message.msg || message.message, false);
+    }
+    else {
+        var messagebody = message.msg.replace(/\n/g, "<br>").trim();
+    }
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
     });
@@ -1979,13 +1978,12 @@ function editMessage(messageId) {
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
     if (message) {
-        if(message.is_compose == 1)
-            {
-                 editMessage=processValue(message.msg || message.message, false);
-            }
-            else{
-                editMessage = message.msg || message.message;
-            }
+        if (message.is_compose == 1) {
+            editMessage = processValue(message.msg || message.message, false);
+        }
+        else {
+            editMessage = message.msg || message.message;
+        }
     }
     else {
         const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
@@ -2173,11 +2171,10 @@ function showReply(message_id, senderName, type) {
     }
     document.querySelector("#input").value = "";
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
-    if(message.is_compose == 1)
-    {
-        var messagebody=processValue(message.msg || message.message, false);
+    if (message.is_compose == 1) {
+        var messagebody = processValue(message.msg || message.message, false);
     }
-    else{
+    else {
         var messagebody = message.msg;
     }
 
@@ -2265,7 +2262,7 @@ function removeQuotedMessage() {
     document.querySelector("#input").value = "";
     document.querySelector("#input").focus();
     // <<<<<<< local-dev
-        // const chat_action = document.getElementById('chat_action');
+    // const chat_action = document.getElementById('chat_action');
     //     if (getComputedStyle(chat_action).display == "none") {
     //         const Editreplyarea = document.getElementById('message-reply-area');
     //         Editreplyarea.style.display = 'none';
@@ -2274,14 +2271,14 @@ function removeQuotedMessage() {
     //     }
     // =======
 
-        // const chat_action = document.getElementById('chat_action');
-        // if(getComputedStyle(chat_action).display == "none")
-        // {
-        //     const Editreplyarea = document.getElementById('message-reply-area');
-        //     Editreplyarea.style.display = 'none';
-        //     chat_action.style.display="";
-        //     const fileicon = document.querySelector('.chat_action_file');
-        // }
+    // const chat_action = document.getElementById('chat_action');
+    // if(getComputedStyle(chat_action).display == "none")
+    // {
+    //     const Editreplyarea = document.getElementById('message-reply-area');
+    //     Editreplyarea.style.display = 'none';
+    //     chat_action.style.display="";
+    //     const fileicon = document.querySelector('.chat_action_file');
+    // }
 
     // >>>>>>> master
 
@@ -2294,7 +2291,7 @@ function removeQuotedMessage() {
     const chat_action = document.getElementById('chat_action');
     const Editreplyarea = document.getElementById('message-reply-area');
     if (getComputedStyle(chat_action).display == "none" || getComputedStyle(chat_action).display == "flex"
-     && getComputedStyle(Editreplyarea).display == "block") {
+        && getComputedStyle(Editreplyarea).display == "block") {
 
         Editreplyarea.style.display = 'none';
         chat_action.style.display = "flex";
@@ -3734,6 +3731,10 @@ async function unreadGrouChat() {
     }
 }
 
+function replaceBrWithNewline(value) {
+    return value.replace(/<br\s*\/?>/gi, '\n'); // Replaces all <br> tags with \n
+}
+
 let searchMessageOffset = 0;
 const searchMessageLimit = 40;
 let previousSearchQuery = "";
@@ -3790,6 +3791,10 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             }
                             else if (message.msg.includes("<p>")) {
                                 resultTextDiv.innerHTML = message.msg
+                            }
+                            else if (message.is_compose === 1 || message.is_compose === true) {
+                                let vmMessage = processValue(message.msg, false);
+                                resultTextDiv.textContent = vmMessage.replace(/<br\s*\/?>/gi, '\n');;
                             }
                             else {
                                 resultTextDiv.textContent = message.msg;
