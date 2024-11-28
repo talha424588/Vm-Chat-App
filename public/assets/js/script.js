@@ -2875,12 +2875,17 @@ function unread_settings(query_set) {
 
 let currentlyPlayingAudio = null;
 let currentPlaybutton = null;
+async function showloader() {
+    showSpinner();
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
 
+}
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
     if (searchMessage) {
-        showSpinner();
+        
+        await showloader();
     }
     DOM.messages.innerHTML = '';
 
@@ -3814,7 +3819,8 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultItemDiv.appendChild(resultTextDiv);
                             searchResultsDiv.appendChild(resultItemDiv);
 
-                            resultItemDiv.addEventListener("click", function () {
+                            resultItemDiv.addEventListener("click",async function () {
+                                 await showloader()
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
@@ -4127,6 +4133,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                 console.log("Unknown message type:", message.type);
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
+        hideSpinner()
         setTimeout(function () {
             mobilegroupSearchClose();
         }, 700)
