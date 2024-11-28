@@ -1763,9 +1763,14 @@ function CorrectionMessage(message_id, senderName) {
         sendMessagebutton.style.display = "none";
     }
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
-    var messagebody = message.msg.replace(/\n/g, "<br>").trim();
 
-
+    if(message.is_compose == 1)
+        {
+            var messagebody=processValue(message.msg || message.message, false);
+        }
+        else{
+            var messagebody = message.msg.replace(/\n/g, "<br>").trim();
+        }
     tinymce_init(function () {
         correction_call(message_id, messagebody, senderName);
     });
@@ -1963,7 +1968,6 @@ function editMessage(messageId) {
         DOM.displayed_message_div = !DOM.displayed_message_div;
     }
     var replyDiv = document.getElementById('reply-div');
-
     if (window.getComputedStyle(replyDiv).display === 'block') {
         removeQuotedMessage();
     }
@@ -1975,7 +1979,13 @@ function editMessage(messageId) {
 
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
     if (message) {
-        editMessage = message.msg
+        if(message.is_compose == 1)
+            {
+                 editMessage=processValue(message.msg || message.message, false);
+            }
+            else{
+                editMessage = message.msg || message.message;
+            }
     }
     else {
         const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
@@ -2162,23 +2172,19 @@ function showReply(message_id, senderName, type) {
         return;
     }
     document.querySelector("#input").value = "";
-
     const message = pagnicateChatList.data.find((message) => message.id === parseInt(message_id));
-    var messagebody = message.msg;
+    if(message.is_compose == 1)
+    {
+        var messagebody=processValue(message.msg || message.message, false);
+    }
+    else{
+        var messagebody = message.msg;
+    }
+ 
     DOM.replyId = message_id;
-
-
-
-
     var replyDiv = document.getElementById('reply-div');
-
-
-
-
-
     var quotedTextElement = document.querySelector('#quoted-message .sender-name');
     quotedTextElement.textContent = senderName;
-
     var quotedNameElement = document.querySelector('#quoted-message .quoted-text');
     if (type === 'Image') {
         var message_body = `<img  src="${messagebody}" style="height:125px; width:125px;">`;
@@ -2244,8 +2250,6 @@ function showReply(message_id, senderName, type) {
 
         document.getElementById('chat_action').style.display = "none";
         Editreplyarea.style.display = 'block';
-
-
     }
     change_icon_height(replyDiv);
 }
@@ -2259,8 +2263,9 @@ function removeQuotedMessage() {
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
     document.querySelector("#input").value = "";
+    document.querySelector("#input").focus();
     // <<<<<<< local-dev
-    //     const chat_action = document.getElementById('chat_action');
+        // const chat_action = document.getElementById('chat_action');
     //     if (getComputedStyle(chat_action).display == "none") {
     //         const Editreplyarea = document.getElementById('message-reply-area');
     //         Editreplyarea.style.display = 'none';
@@ -2269,14 +2274,14 @@ function removeQuotedMessage() {
     //     }
     // =======
 
-    // //     const chat_action = document.getElementById('chat_action');
-    // //     if(getComputedStyle(chat_action).display == "none")
-    // //     {
-    // //         const Editreplyarea = document.getElementById('message-reply-area');
-    // //         Editreplyarea.style.display = 'none';
-    // //         chat_action.style.display="";
-    // //         const fileicon = document.querySelector('.chat_action_file');
-    // //     }
+        // const chat_action = document.getElementById('chat_action');
+        // if(getComputedStyle(chat_action).display == "none")
+        // {
+        //     const Editreplyarea = document.getElementById('message-reply-area');
+        //     Editreplyarea.style.display = 'none';
+        //     chat_action.style.display="";
+        //     const fileicon = document.querySelector('.chat_action_file');
+        // }
 
     // >>>>>>> master
 
@@ -2288,14 +2293,15 @@ function removeQuotedMessage() {
 
     const chat_action = document.getElementById('chat_action');
     const Editreplyarea = document.getElementById('message-reply-area');
-    if (getComputedStyle(chat_action).display == "none" && getComputedStyle(Editreplyarea).display == "block") {
+    if (getComputedStyle(chat_action).display == "none" || getComputedStyle(chat_action).display == "flex"
+     && getComputedStyle(Editreplyarea).display == "block") {
 
         Editreplyarea.style.display = 'none';
         chat_action.style.display = "flex";
     }
-
     document.getElementById("messages").style.marginBottom = "74px";
-
+  
+    document.querySelector("#input").focus();
 
 
 }
