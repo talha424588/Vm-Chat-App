@@ -46,7 +46,10 @@ class FirebaseService
     public function sendNotification($message)
     {
         $senderName = $message->user->name;
-        $messageContent = $message->msg;
+        $cleanedMessageContent = preg_replace('/[^A-Za-z0-9 ]/', '', $message->msg);
+        $messageContent = substr($cleanedMessageContent, 0, 60) . (strlen($cleanedMessageContent) > 60 ? '...' : '');
+
+        // $messageContent = $message->msg;
         $subsIdsArray = [];
         $subsIdsArray =  $this->getGroupUsers($message->group_id);
         Log::info('subsIdsArray: ' . json_encode($subsIdsArray));
