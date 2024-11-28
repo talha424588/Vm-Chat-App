@@ -46,7 +46,7 @@ class FirebaseService
     public function sendNotification($message)
     {
         $senderName = $message->user->name;
-        $cleanedMessageContent = preg_replace('/[^A-Za-z0-9 ]/', '', $message->msg);
+        $cleanedMessageContent = strip_tags($message->msg);
         $messageContent = substr($cleanedMessageContent, 0, 60) . (strlen($cleanedMessageContent) > 60 ? '...' : '');
 
         // $messageContent = $message->msg;
