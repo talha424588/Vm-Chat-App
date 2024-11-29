@@ -2536,7 +2536,7 @@ function hideSpinner() {
     spinner.classList.add('hide-spinner');
     DOM.messages.classList.remove("over_lay_loader");
 }
-// Listen for the scroll event
+
 DOM.messages.addEventListener('scroll', async () => {
     if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
