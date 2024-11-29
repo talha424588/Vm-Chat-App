@@ -112,13 +112,12 @@ class ChatService implements ChatRepository
 
     private function fetchMessagesFromSpecificId($request, $perPage)
     {
-        return $request;
         $messageId = $request->lastMessageId;
         $groupId = $request->groupId;
         $currentPage = $request->get('page', 1);
 
         $messages = GroupMessage::where('group_id', $groupId)
-            ->where('id', '<', $messageId)
+            ->where('id', '<', $messageId + 10)
             ->where('is_deleted', false)
             ->orderBy('id', 'asc')
             ->paginate($perPage, ['*'], 'page', $currentPage);
