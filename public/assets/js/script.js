@@ -1337,7 +1337,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 var message_body = processValue(message.reply.msg, false).substring(0, 200) + "....."; 
                }
                else{
-                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
+                var message_body = message.reply.msg.replace(/<br\s*\/?>/gi, '\n').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
             }
             }
             messageContent = `
