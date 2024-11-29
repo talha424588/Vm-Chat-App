@@ -663,8 +663,6 @@ socket.on('sendChatToClient', (message) => {
         addMessageToMessageArea(message, true);
         get_voice_list();
     } else {
-        // if user is in search mood and other user message and search user mood user clear the search feild the message count
-        // did not got updated start from here
         if (DOM.groupSearch) {
             groupToUpdate = previousChatList.find(chat => chat.group.group_id === message.group_id);
         }
@@ -2576,7 +2574,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
-        console.log("not found elemnt", nextPageMessages);
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
