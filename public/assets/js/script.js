@@ -2023,7 +2023,6 @@ function editMessage(messageId) {
         });
 
         const textarea = document.getElementById('input');
-        console.log("this is the message to be edited :", editMessage);
         if (editMessage.includes("<br>") || editMessage.includes("<br />")) {
             textarea.value = editMessage.replace(/<br\s*\/?>/gi, '\n').replace(/<\/?[^>]+(>|$)/g, "").replace(/<br\s*\/?>/gi, '\n').replace(/\s+/g, ' ').trim();
         } else {
@@ -2551,18 +2550,18 @@ const displayedMessageIds = new Set();
 
 let isLoading = false;
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null) => {
-    console.log("message_id", message_id);
+
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
         let url = ''
         if (DOM.searchMessageClick && DOM.lastMessageId) {
-            console.log("first");
+
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${DOM.searchMessageClick && DOM.lastMessageId ? `&lastMessageId=${encodeURIComponent(DOM.lastMessageId)}` : ''}`;
         }
         else if (message_id || DOM.lastMessageId) {
-            console.log("second");
+
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&messageId=${encodeURIComponent(message_id)}`;
         }
         else {
@@ -2576,7 +2575,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
-        console.log("element not found", nextPageMessages);
+
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
@@ -2645,10 +2644,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             }
             if (message.id == notSeenById && !DOM.unreadDividerAdded) addUnread();
 
-            console.log(message.id, message_id);
-
             if (message.id == message_id) {
-                console.log("check pass", message.id == message_id);
 
                 if (DOM.groupReferenceMessageClick) {
                     scrollToMessage(message.id);
@@ -2823,10 +2819,10 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                     nullTypemessageTextElement.innerHTML = highlightedText;
                                 }
                             } else {
-                                console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
+                                // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                             }
                             break;
-                            console.log("Unknown message type:", message.type);
+                            // console.log("Unknown message type:", message.type);
                     }
                     setTimeout(() => {
                         messageElement.scrollIntoView({ behavior: "smooth", block: "center"});
@@ -3036,10 +3032,10 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                     })
                 })
                     .then(response => {
-                        console.log(response);
+                        // console.log(response);
                     })
                     .catch(error => {
-                        console.error(error);
+                        // console.error(error);
                     });
 
                 // Send "Alert!!!" to the backend to save in DB
@@ -3244,13 +3240,13 @@ function oneSignalSubscription(userId) {
             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
         },
     }).then(updateUserFcmToken => {
-        console.log("user cubs cription response", updateUserFcmToken);
+        // console.log("user cubs cription response", updateUserFcmToken);
         if (!updateUserFcmToken.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         document.getElementById("login_user_fcm_token").value = userId;
     }).catch(error => {
-        console.log(error);
+        // console.log(error);
     }
     )
 }
@@ -3538,7 +3534,7 @@ textarea.addEventListener('keydown', function (event) {
             textarea.style.height = '44px';
             textarea.style.overflowY = 'hidden';
         } else {
-            console.log('The div has a different display property.');
+            // console.log('The div has a different display property.');
         }
     }
 });
@@ -3714,7 +3710,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 }
             }
         } catch (error) {
-            console.log(error);
+            // console.log(error);
         }
     } else {
         DOM.groupSearch = false;
@@ -3773,7 +3769,7 @@ async function unreadGrouChat() {
         const response = await unreadConversationGroupResponse.json();
     }
     catch (error) {
-        console.log(error);
+        // console.log(error);
     }
 }
 
@@ -3867,7 +3863,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                         console.error('Error:', "Not Found");
                     });
             } catch (error) {
-                console.log(error);
+                // console.log(error);
             }
         }, 500)
     }
@@ -3949,7 +3945,6 @@ messageSidebar.addEventListener('scroll', function () {
 });
 
 function handleMessageResponse(messageElement, message, messageId, searchQuery) {
-    console.log("handle search message response", messageElement, message, messageId, searchQuery);
     let replyDisplay = '';
     if (messageElement) {
         // DOM.searchMessageClick = true;
@@ -4162,10 +4157,10 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                         nullTypemessageTextElement.innerHTML = highlightedText;
                     }
                 } else {
-                    console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
+                    // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                 }
                 break;
-                console.log("Unknown message type:", message.type);
+                // console.log("Unknown message type:", message.type);
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
         setTimeout(function () {
@@ -4173,7 +4168,6 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
         }, 700)
 
     } else {
-        console.log("msg id", messageId);
         fetchPaginatedMessages(messageId, null, null);
     }
 }
