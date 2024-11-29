@@ -2552,15 +2552,18 @@ const displayedMessageIds = new Set();
 
 let isLoading = false;
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null) => {
+    console.log("message_id",message_id);
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
         let url = ''
         if (DOM.searchMessageClick && DOM.lastMessageId) {
+            console.log("first");
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${DOM.searchMessageClick && DOM.lastMessageId ? `&lastMessageId=${encodeURIComponent(DOM.lastMessageId)}` : ''}`;
         }
         else if (message_id) {
+            console.log("second");
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&messageId=${encodeURIComponent(message_id)}`;
         }
         else {
@@ -2574,6 +2577,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
+        console.log("element not found",nextPageMessages);
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
@@ -2642,7 +2646,11 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             }
             if (message.id == notSeenById && !DOM.unreadDividerAdded) addUnread();
 
+            console.log(message.id, message_id);
+
             if (message.id == message_id) {
+                console.log("check pass",message.id == message_id);
+
                 if (DOM.groupReferenceMessageClick) {
                     scrollToMessage(message.id);
                 }
@@ -3629,13 +3637,19 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     if (loadMore) {
         currentPageGroups++;
         currentPageMessages++;
-    } else {
+    }
+    // else {
+    //     currentPageGroups = 1;
+    //     currentPageMessages = 1;
+    //     DOM.chatList.innerHTML = `<div class="heading"><h2>Groups</h2></div>`;
+    //     DOM.chatList2.innerHTML = `<h2>Messages</h2>`;
+    // }
+    else {
         currentPageGroups = 1;
         currentPageMessages = 1;
-        DOM.chatList.innerHTML = `<div class="heading">
-        <h2>Groups</h2>
-    </div>`;
-        DOM.chatList2.innerHTML = `<h2>Messages</h2>`;
+        // Clear previous results
+        DOM.chatList.innerHTML = ''; // Clear previous groups
+        DOM.chatList2.innerHTML = ''; // Clear previous messages
     }
 
     if (searchQuery.length > 0) {
@@ -3657,6 +3671,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                         DOM.chatList.innerHTML += ` <div class="no-groups-found">No Groups Found.</div>`;
                     }
                 } else {
+                    DOM.chatList.innerHTML = `<div class="heading"><h2>Groups</h2></div>`;
                     groups.forEach((group) => {
                         let chat = {
                             isGroup: true,
@@ -3805,7 +3820,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultDateDiv.textContent = new Date(message.time * 1000).toLocaleDateString();
                             const resultTextDiv = document.createElement("div");
                             resultTextDiv.className = "result-text";
-                            DOM.searchMessageClick = true;
+                            DOM.searchMessageClick = false;
 
                             if (message.msg.startsWith("https://")) {
                                 resultTextDiv.textContent = message.media_name;
@@ -3829,13 +3844,9 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             searchResultsDiv.appendChild(resultItemDiv);
 
                             resultItemDiv.addEventListener("click", async function () {
-                                await showloader()
+                                // await showloader()
                                 let messageId = message.id;
-                                console.log("msg id", messageId);
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-                                console.log("msg element", messageElement);
-                                console.log(messageElement, message, messageId, searchQuery);
-
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
 
                             });
@@ -3928,9 +3939,10 @@ messageSidebar.addEventListener('scroll', function () {
 });
 
 function handleMessageResponse(messageElement, message, messageId, searchQuery) {
+    console.log("handle search message response",messageElement, message, messageId, searchQuery);
     let replyDisplay = '';
     if (messageElement) {
-        DOM.searchMessageClick = true;
+        // DOM.searchMessageClick = true;
         const messageTextElement = messageElement.querySelector(".shadow-sm");
         let highlightElement = document.getElementsByClassName("highlight")[0];
         if (highlightElement) {
