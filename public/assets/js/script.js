@@ -1683,8 +1683,6 @@ function scroll_function() {
         return;
     }
 
-    // messageDiv.scrollTop = messageDiv.scrollHeight;
-
     messageDiv.addEventListener('scroll', function () {
         if (messageDiv.scrollTop < messageDiv.scrollHeight - messageDiv.clientHeight - 50) {
             scrollBottomBtn.style.display = 'block';
