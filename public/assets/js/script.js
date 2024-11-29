@@ -623,8 +623,14 @@ socket.on('sendChatToClient', (message) => {
         scroll_function();
     }
 
+    let groupToUpdate = null;
 
-    let groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
+    if (DOM.groupSearch) {
+        groupToUpdate = previousChatList.find(chat => chat.group.group_id === message.group_id);
+    }
+    else {
+        groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
+    }
     if (groupToUpdate && groupToUpdate.group.group_id === DOM.groupId) {
         if (!groupToUpdate.group.group_messages) {
             groupToUpdate.group.group_messages = [];
@@ -659,6 +665,12 @@ socket.on('sendChatToClient', (message) => {
     } else {
         // if user is in search mood and other user message and search user mood user clear the search feild the message count
         // did not got updated start from here
+        if (DOM.groupSearch) {
+            groupToUpdate = previousChatList.find(chat => chat.group.group_id === message.group_id);
+        }
+        else {
+            groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
+        }
         if (!groupToUpdate.group.group_messages) {
             groupToUpdate.group.group_messages = [];
         }
@@ -848,7 +860,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                                 ${editedMessage.user.name}
                             </div>
                             <div class="reply-details">
-                                <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0,200)}.....</p>
+                                <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200)}.....</p>
                             </div>
                         </div>
                         ${newMessageDisplay}`;
@@ -1331,14 +1343,13 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-               if(message.reply.is_compose == 1)
-               {
+                if (message.reply.is_compose == 1) {
 
-                var message_body = processValue(message.reply.msg, false).substring(0, 200) + ".....";
-               }
-               else{
-                var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
-            }
+                    var message_body = processValue(message.reply.msg, false).substring(0, 200) + ".....";
+                }
+                else {
+                    var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
+                }
             }
             messageContent = `
             <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
@@ -1860,7 +1871,7 @@ function correction_send_handel() {
     chat_action.style.display = 'flex';
 
     const messageIndex = pagnicateChatList.data.findIndex((message) => message.id === parseInt(correction_message_id));
-    const old_message=pagnicateChatList.data.find((message) => message.id === parseInt(correction_message_id));
+    const old_message = pagnicateChatList.data.find((message) => message.id === parseInt(correction_message_id));
 
     if (messageIndex !== -1) {
         pagnicateChatList.data[messageIndex].msg = messageContent;
@@ -1877,7 +1888,7 @@ function correction_send_handel() {
             mediaName: null,
             time: Math.floor(Date.now() / 1000),
             csrf_token: document.querySelector('meta[name="csrf-token"]').content,
-            compose_id:old_message.compose_id,
+            compose_id: old_message.compose_id,
         };
 
         socket.emit('sendChatToServer', newMessage);
@@ -2018,7 +2029,7 @@ function editMessage(messageId) {
         });
 
         const textarea = document.getElementById('input');
-        console.log("this is the message to be edited :",editMessage);
+        console.log("this is the message to be edited :", editMessage);
         if (editMessage.includes("<br>") || editMessage.includes("<br />")) {
             textarea.value = editMessage.replace(/<br\s*\/?>/gi, '\n').replace(/<\/?[^>]+(>|$)/g, "").trim();
         } else {
@@ -2565,6 +2576,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
+        console.log("not found elemnt", nextPageMessages);
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
@@ -3704,7 +3716,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         DOM.messagesList.innerHTML = '';
         // viewChatList();
 
-        generateChatList()
+        generateChatList();
     }
 };
 
@@ -3819,10 +3831,14 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultItemDiv.appendChild(resultTextDiv);
                             searchResultsDiv.appendChild(resultItemDiv);
 
-                            resultItemDiv.addEventListener("click",async function () {
+                            resultItemDiv.addEventListener("click", async function () {
                                 await showloader()
                                 let messageId = message.id;
+                                console.log("msg id", messageId);
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+                                console.log("msg element", messageElement);
+                                console.log(messageElement, message, messageId, searchQuery);
+
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
 
                             });
@@ -4139,6 +4155,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
         }, 700)
 
     } else {
+        console.log("msg id", messageId);
         fetchPaginatedMessages(messageId, null, null);
     }
 }
