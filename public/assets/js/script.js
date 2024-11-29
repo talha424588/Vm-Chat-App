@@ -1623,12 +1623,11 @@ function scrollToMessage(replyId, messageId = null) {
         DOM.groupReferenceMessageClick = false;
         const ml3Div = targetMessage.closest('.ml-3');
         if (ml3Div) {
+            ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            ml3Div.classList.add('selected-message');
             setTimeout(() => {
-                ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                ml3Div.classList.add('selected-message');
-
                 ml3Div.classList.remove('selected-message');
-            }, 100);
+            }, 2000);
         }
     }
     else {
@@ -1645,12 +1644,11 @@ function taggingMessages(messageId = null) {
         DOM.groupReferenceMessageClick = false;
         const ml3Div = targetMessage.closest('.ml-3');
         if (ml3Div) {
+            ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            ml3Div.classList.add('selected-message');
             setTimeout(() => {
-                ml3Div.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                ml3Div.classList.add('selected-message');
-
                 ml3Div.classList.remove('selected-message');
-            }, 100);
+            }, 2000);
         }
     }
 }
@@ -2880,7 +2878,7 @@ let currentlyPlayingAudio = null;
 let currentPlaybutton = null;
 async function showloader() {
     showSpinner();
-    await new Promise(resolve => setTimeout(resolve, 1000)); 
+    await new Promise(resolve => setTimeout(resolve, 300)); 
 
 }
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
@@ -2935,6 +2933,9 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
 
     if (groupSearchMessageId && !notificationMessageId) {
         await fetchPaginatedMessages(groupSearchMessageId, null, DOM.groupId);
+        get_voice_list();
+        removeEditMessage();
+        removeQuotedMessage();
         setTimeout(()=>{
             hideSpinner();
             DOM.loader_showing=false;
