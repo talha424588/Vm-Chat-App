@@ -1096,7 +1096,6 @@ function processValue(value, isChatList = false) {
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
-        console.log(message);
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -2534,14 +2533,11 @@ function hideSpinner() {
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
     const spinner = document.getElementById('spinner');
-    if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
+    if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages &&  !DOM.loader_showing) {
         isLoadingMessages = true;
         showSpinner();
         await fetchPaginatedMessages(null, null, null);
-        if(!DOM.loader_showing)
-        {
-            hideSpinner();
-        }
+         hideSpinner();
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
