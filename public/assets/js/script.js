@@ -50,6 +50,7 @@ const DOM = {
     notification_group_id: document.getElementById("notification_group_id").value,
     groupSearch: false,
     groupReferenceMessageClick: false,
+    loader_showing:false,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
     const search_div = getById('serach_div');
@@ -1105,7 +1106,6 @@ function processValue(value, isChatList = false) {
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
-
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -2029,11 +2029,14 @@ function editMessage(messageId) {
         const textarea = document.getElementById('input');
         console.log("this is the message to be edited :", editMessage);
         if (editMessage.includes("<br>") || editMessage.includes("<br />")) {
-            textarea.value = editMessage.replace(/<br\s*\/?>/gi, '\n').replace(/<\/?[^>]+(>|$)/g, "").trim();
+            textarea.value = editMessage.replace(/<br\s*\/?>/gi, '\n').replace(/<\/?[^>]+(>|$)/g, "").replace(/<br\s*\/?>/gi, '\n').replace(/\s+/g, ' ').trim();
         } else {
-            textarea.value = editMessage.replace(/<\/?[^>]+(>|$)/g, "").replace(/<\/?[^>]+(>|$)/g, "").trim();
+            textarea.value = editMessage.replace(/<\/?[^>]+(>|$)/g, "").replace(/<\/?[^>]+(>|$)/g, "").replace(/<br\s*\/?>/gi, '\n').replace(/\s+/g, ' ').trim();
         }
-
+        // textarea.value = editMessage
+        // .replace(/<br\s*\/?>/gi, '\n') // Replace <br> with newlines
+        // .replace(/\s{2,}/g, ' ') // Replace 2 or more spaces with a single space
+        // .trim();
 
         textarea.scrollTop = textarea.scrollHeight;
 
@@ -2536,11 +2539,11 @@ function hideSpinner() {
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
     const spinner = document.getElementById('spinner');
-    if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
+    if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages &&  !DOM.loader_showing) {
         isLoadingMessages = true;
         showSpinner();
         await fetchPaginatedMessages(null, null, null);
-        hideSpinner();
+         hideSpinner();
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
@@ -2831,9 +2834,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                     }
                     setTimeout(() => {
                         messageElement.scrollIntoView({ behavior: "smooth" });
-                        setTimeout(() => {
-                            hideSpinner();
-                        }, 300);
                     }, 100);
                 }
             }
@@ -2903,6 +2903,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     if (searchMessage) {
 
         await showloader();
+        DOM.loader_showing=true;
     }
     DOM.messages.innerHTML = '';
 
@@ -2946,7 +2947,13 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     }
 
     if (groupSearchMessageId && !notificationMessageId) {
+        console.log("in search mode");
         await fetchPaginatedMessages(groupSearchMessageId, null, DOM.groupId);
+        console.log("message scrolled and i am back");
+        setTimeout(()=>{
+            hideSpinner();
+            DOM.loader_showing=false;
+        },1000);
     }
     else {
         await fetchPaginatedMessages(null, null, null);
@@ -3843,12 +3850,16 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             resultItemDiv.appendChild(resultTextDiv);
                             searchResultsDiv.appendChild(resultItemDiv);
 
-                            resultItemDiv.addEventListener("click", async function () {
-                                // await showloader()
+                            resultItemDiv.addEventListener("click",async function () {
+                                 await showloader()
+                                 DOM.loader_showing=true;
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
-
+                                setTimeout(()=>{
+                                    hideSpinner();
+                                    DOM.loader_showing=false;
+                                },1000);
                             });
                         });
                         searchMessageOffset += searchMessageLimit;
@@ -4158,7 +4169,6 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                 console.log("Unknown message type:", message.type);
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
-        hideSpinner()
         setTimeout(function () {
             mobilegroupSearchClose();
         }, 700)
