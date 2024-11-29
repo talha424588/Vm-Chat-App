@@ -2826,8 +2826,8 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                             // console.log("Unknown message type:", message.type);
                     }
                     setTimeout(() => {
-                        messageElement.scrollIntoView({ behavior: "smooth", block: "center"});
-                    }, 1000);
+                        messageElement.scrollIntoView();
+                    }, 200);
                 }
             }
         });
