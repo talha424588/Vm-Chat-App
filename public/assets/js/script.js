@@ -2532,11 +2532,11 @@ function hideSpinner() {
 }
 // Listen for the scroll event
 DOM.messages.addEventListener('scroll', async () => {
-    const spinner = document.getElementById('spinner');
-    if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages &&  !DOM.loader_showing) {
+    if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
         showSpinner();
         await fetchPaginatedMessages(null, null, null);
+        if(!DOM.loader_showing)
          hideSpinner();
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
@@ -2933,9 +2933,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     }
 
     if (groupSearchMessageId && !notificationMessageId) {
-        console.log("in search mode");
         await fetchPaginatedMessages(groupSearchMessageId, null, DOM.groupId);
-        console.log("message scrolled and i am back");
         setTimeout(()=>{
             hideSpinner();
             DOM.loader_showing=false;
