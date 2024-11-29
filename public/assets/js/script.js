@@ -1341,13 +1341,14 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-                if (message.reply.is_compose == 1) {
+               if(message.reply.is_compose == 1)
+               {
 
-                    var message_body = processValue(message.reply.msg, false).substring(0, 200) + ".....";
-                }
-                else {
-                    var message_body = message.reply.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
-                }
+                var message_body = processValue(message.reply.msg, false).substring(0, 200) + ".....";
+               }
+               else{
+                var message_body = message.reply.msg.replace(/<br\s*\/?>/gi, '\n').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
+            }
             }
             messageContent = `
             <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
