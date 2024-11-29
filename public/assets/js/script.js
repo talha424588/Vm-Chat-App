@@ -2898,6 +2898,7 @@ async function showloader() {
 
 }
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
+    change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
     if (searchMessage) {
@@ -2951,6 +2952,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         setTimeout(()=>{
             hideSpinner();
             DOM.loader_showing=false;
+            
         },1000);
     }
     else {
