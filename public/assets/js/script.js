@@ -1341,14 +1341,13 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-               if(message.reply.is_compose == 1)
-               {
+                if (message.reply.is_compose == 1) {
 
-                var message_body = processValue(message.reply.msg, false).substring(0, 200) + ".....";
-               }
-               else{
-                var message_body = message.reply.msg.replace(/<br\s*\/?>/gi, '\n').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
-            }
+                    var message_body = processValue(message.reply.msg, false).substring(0, 200) + ".....";
+                }
+                else {
+                    var message_body = message.reply.msg.replace(/<br\s*\/?>/gi, '\n').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
+                }
             }
             messageContent = `
             <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
@@ -2823,7 +2822,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                                 // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                             }
                             break;
-                            // console.log("Unknown message type:", message.type);
+                        // console.log("Unknown message type:", message.type);
                     }
                     setTimeout(() => {
                         messageElement.scrollIntoView();
@@ -2945,11 +2944,11 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
-        setTimeout(()=>{
+        setTimeout(() => {
             hideSpinner();
-            DOM.loader_showing=false;
+            DOM.loader_showing = false;
 
-        },1000);
+        }, 1000);
     }
     else {
         await fetchPaginatedMessages(null, null, null);
@@ -4161,7 +4160,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                     // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                 }
                 break;
-                // console.log("Unknown message type:", message.type);
+            // console.log("Unknown message type:", message.type);
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
         setTimeout(function () {
