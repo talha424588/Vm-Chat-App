@@ -1983,7 +1983,6 @@ function editMessage(messageId) {
     if ($('#action-bar').is(':visible')) {
         cancelMoveMessage();
     }
-
     if (DOM.displayed_message_div) {
         removecorrectionMessage();
     }
@@ -1999,53 +1998,22 @@ function editMessage(messageId) {
         sendMessagebutton.style.display = "none";
     }
     let editMessage = null;
-
-    const message = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
-    if (message) {
-        if (message.is_compose == 1) {
-            editMessage = processValue(message.msg || message.message, false);
-        }
-        else {
-            editMessage = message.msg || message.message;
-        }
-    }
-    else {
-        const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-        const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-        editMessage = messageContentDiv.innerHTML;
-    }
+    const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+    const messageContentDiv = messageElement.querySelector('div.shadow-sm');
+    editMessage = messageContentDiv.innerText || messageContentDiv.textContent;
     if (editMessage) {
         const element = document.getElementById('editMessageDiv');
         element.style.display = 'block';
-
         const editMessageIdField = document.getElementById('edit_message_id');
         if (editMessageIdField) {
             editMessageIdField.value = messageId;
         }
-
         const editMessageContents = document.querySelectorAll('.EditmessageContent');
-
-        editMessageContents.forEach((content) => {
-            const sanitizedMessage = editMessage.replace(/\n/g, "<br>").trim();
-            content.innerHTML = sanitizedMessage.length > 100 ? sanitizedMessage.substring(0, 100) + "..." : sanitizedMessage;
-        });
-
         const textarea = document.getElementById('input');
-        if (editMessage.includes("<br>") || editMessage.includes("<br />")) {
-            textarea.value = editMessage.replace(/<br\s*\/?>/gi, '\n').replace(/<\/?[^>]+(>|$)/g, "").replace(/<br\s*\/?>/gi, '\n').replace(/\s+/g, ' ').trim();
-        } else {
-            textarea.value = editMessage.replace(/<\/?[^>]+(>|$)/g, "").replace(/<\/?[^>]+(>|$)/g, "").replace(/<br\s*\/?>/gi, '\n').replace(/\s+/g, ' ').trim();
-        }
-        // textarea.value = editMessage
-        // .replace(/<br\s*\/?>/gi, '\n') // Replace <br> with newlines
-        // .replace(/\s{2,}/g, ' ') // Replace 2 or more spaces with a single space
-        // .trim();
-
+        textarea.value = editMessage;
         textarea.scrollTop = textarea.scrollHeight;
-
         const messageDiv = document.getElementById('messages');
         messageDiv.classList.add('blur');
-
         const Editreplyarea = document.getElementById('Editreply-area');
         const chat_action = document.getElementById('chat_action');
         if (getComputedStyle(chat_action).display == "none") {
@@ -2053,34 +2021,14 @@ function editMessage(messageId) {
         }
         if ((getComputedStyle(chat_action).display === "flex" || getComputedStyle(chat_action).display === "block") &&
             getComputedStyle(Editreplyarea).display === "none") {
-
-
             document.getElementById('chat_action').style.display = 'none';
             Editreplyarea.style.display = 'block';
-
             if (getComputedStyle(chat_action).display == "flex") {
                 document.getElementById('chat_action').style.display = 'none';
             }
-
         }
-
-        // <<<<<<< hassanraza
-        //        const msgElem= DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-        //        const replyMessageArea = msgElem.querySelector('.reply-message-area');
-
-
-        //        if(replyMessageArea)
-        //        {
-        //         DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
-        //        }
-        //        else{
-        //         DOM.messageInput.style.height = msgElem.offsetHeight + "px";
-        //        }
-        // =======
         const msgElem = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
         const replyMessageArea = msgElem.querySelector('.reply-message-area');
-
-
         if (replyMessageArea) {
             DOM.messageInput.style.height = replyMessageArea.offsetHeight + "px";
         }
@@ -2583,7 +2531,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
-
+        console.log("this is the new message get response",nextPageMessages);
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
@@ -2641,7 +2589,15 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
-            console.log('No more messages to load');
+            const span = document.createElement('span');
+            span.innerHTML = `
+            <div id="unread-wrapper" class="notification-wrapper">
+                <div class="unread-messages">
+                   No Messages To Load
+                </div>
+            </div>
+             `;
+            DOM.messages.appendChild(span);
             return;
         }
         nextPageMessages.data.forEach((message) => {
