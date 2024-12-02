@@ -2000,7 +2000,8 @@ function editMessage(messageId) {
         if (editMessageIdField) {
             editMessageIdField.value = messageId;
         }
-        const editMessageContents = document.querySelectorAll('.EditmessageContent');
+        const editMessageContent = document.querySelector('.EditmessageContent');
+        editMessageContent.innerText=editMessage.substring(0,100)+'....';
         const textarea = document.getElementById('input');
         textarea.value = editMessage;
         textarea.scrollTop = textarea.scrollHeight;
