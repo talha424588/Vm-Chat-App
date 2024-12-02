@@ -76,7 +76,7 @@
             height: 5px;
             cursor: pointer;
             position: relative;
-            margin-bottom:8px;
+            margin-bottom: 8px;
         }
 
         .progress-filled {
@@ -275,8 +275,9 @@
                     </div>
 
                     <div class="d-flex flex-column" style="overflow:auto;">
-                        <img src="{{ asset('assets/profile_pics/' . auth()->user()->profile_img) }}" alt="Profile Photo"
-                            class="img-fluid rounded-circle my-4 justify-self-center mx-auto" id="profile-pic">
+                        <img src="{{ asset('assets/profile_pics/' . auth()->user()->profile_img) }}"
+                            alt="Profile Photo" class="img-fluid rounded-circle my-4 justify-self-center mx-auto"
+                            id="profile-pic">
                         <input type="file" id="profile-pic-input" class="d-none">
                         <div class="profile-name-container">
 
@@ -294,7 +295,8 @@
                                 <label for="input-name" class="profile-setting-name">Name</label>
                             </div>
                             <div class="profile-input-wrapper">
-                                <input style="cursor:pointer" type="text" readonly name="name" id="input-name" class="py-2 profile-input">
+                                <input style="cursor:pointer" type="text" readonly name="name" id="input-name"
+                                    class="py-2 profile-input">
                             </div>
                             <div class="mt-2 d-flex">
                                 <div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -307,10 +309,11 @@
                             </div>
                         </div>
                         <div class="profile-icons">
-                    @for($i=1;$i<=10;$i++)
-                    <img onclick="update_user_profile(this, '<?= $i ?>.png')" src="{{ asset('assets/profile_pics/'.$i.'.png') }}" alt="profile-img"
-                     class="choose-profile-images {{pathinfo(auth()->user()->profile_img, PATHINFO_FILENAME) == $i ? 'active':''}}" />
-                    @endfor
+                            @for ($i = 1; $i <= 10; $i++)
+                                <img onclick="update_user_profile(this, '<?= $i ?>.png')"
+                                    src="{{ asset('assets/profile_pics/' . $i . '.png') }}" alt="profile-img"
+                                    class="choose-profile-images {{ pathinfo(auth()->user()->profile_img, PATHINFO_FILENAME) == $i ? 'active' : '' }}" />
+                            @endfor
 
 
                         </div>
@@ -334,10 +337,13 @@
 
 
                     <a href="#"><span class=' profile-pic' id="pic">
-                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
-    </svg>
-    </span></a>
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                    d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z"
+                                    fill="#58595D" />
+                            </svg>
+                        </span></a>
 
                     <div class="profile-details">
                         <div class="name" id="name">User Name</div>
@@ -555,15 +561,15 @@
 
                                 </svg></i>
                             <i id="voice-icon" class="chat-icon chat_action_voice">
-
-
-                                <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
-                                    viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
-                                    <path
-                                        d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z"
-                                        fill="white" />
-                                </svg>
+                                @if (Auth::user()->seen_privacy)
+                                    <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
+                                        viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
+                                        <path
+                                            d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z"
+                                            fill="white" />
+                                    </svg>
+                                @endif
                             </i>
                         </div>
                         <div class="chat-action-icons" id="Editreply-area" style="display:none; margin-left: 5px;">
@@ -780,8 +786,9 @@
     <input type="hidden" value="{{ Auth::user()->fcm_token }}" id="login_user_fcm_token">
     <input type="hidden" value="{{ Auth::user()->seen_privacy }}" id="login_user_seen_privacy">
     <input type="hidden" value="{{ Auth::user()->role }}" id="login_user_role">
-    <input type="hidden" value="{{$group_id}}" id="notification_group_id">
-    <input type="hidden" value="{{$message_id}}" id="notification_message_id">
+    <input type="hidden" value="{{ Auth::user()->seen_privacy }}" id="login_user_seen_privacy">
+    <input type="hidden" value="{{ $group_id }}" id="notification_group_id">
+    <input type="hidden" value="{{ $message_id }}" id="notification_message_id">
 
     <style>
         .hidden {
@@ -907,38 +914,39 @@
             const textarea = document.querySelector('.chat-input');
             const fileIcon = document.querySelector('#file-icon');
             const chaticon = document.querySelector('#captureid');
-            const chatIcons=document.querySelector('#chat_action');
-            const sendButton=document.querySelector('#message-send-area');
+            const chatIcons = document.querySelector('#chat_action');
+            const sendButton = document.querySelector('#message-send-area');
             const replyDiv = document.querySelector('#reply-div');
             const editMessageDiv = document.querySelector('#editMessageDiv');
 
-    // Check if #reply-div is not displayed
-    function updateFileIconVisibility() {
-    // Check if #reply-div or #editMessageDiv is not displayed
-    if (window.getComputedStyle(replyDiv).display !== "block" && window.getComputedStyle(editMessageDiv).display !== "block") {
-        if (textarea.value.trim() === "") {
-            if (chatIcons.style.display !== "flex") {
-                chatIcons.style.display = "flex";
+            // Check if #reply-div is not displayed
+            function updateFileIconVisibility() {
+                // Check if #reply-div or #editMessageDiv is not displayed
+                if (window.getComputedStyle(replyDiv).display !== "block" && window.getComputedStyle(editMessageDiv)
+                    .display !== "block") {
+                    if (textarea.value.trim() === "") {
+                        if (chatIcons.style.display !== "flex") {
+                            chatIcons.style.display = "flex";
+                        }
+                        if (sendButton.style.display !== "none") {
+                            sendButton.style.display = "none";
+                        }
+                        if (fileIcon.style.display !== "initial") {
+                            fileIcon.style.display = "initial";
+                        }
+                    } else {
+                        if (fileIcon.style.display !== "none") {
+                            fileIcon.style.display = "none";
+                        }
+                        if (chatIcons.style.display !== "none") {
+                            chatIcons.style.display = "none";
+                        }
+                        if (sendButton.style.display !== "block") {
+                            sendButton.style.display = "block";
+                        }
+                    }
+                }
             }
-            if (sendButton.style.display !== "none") {
-                sendButton.style.display = "none";
-            }
-            if (fileIcon.style.display !== "initial") {
-                fileIcon.style.display = "initial";
-            }
-        } else {
-            if (fileIcon.style.display !== "none") {
-                fileIcon.style.display = "none";
-            }
-            if (chatIcons.style.display !== "none") {
-                chatIcons.style.display = "none";
-            }
-            if (sendButton.style.display !== "block") {
-                sendButton.style.display = "block";
-            }
-        }
-    }
-}
 
             textarea.addEventListener('input', function() {
 
@@ -958,7 +966,6 @@
                 updateFileIconVisibility();
             });
         });
-
     </script>
     <script src="{{ asset('assets/js/filesize-aleart.js') }}"></script>
     <script src="{{ asset('assets/js/sidemodel.js') }}"></script>
