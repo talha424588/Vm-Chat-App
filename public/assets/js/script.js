@@ -2000,7 +2000,15 @@ function editMessage(messageId) {
     let editMessage = null;
     const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    editMessage = messageContentDiv.innerText || messageContentDiv.textContent;
+    const reply = messageContentDiv.querySelector('.reply-message-area');
+    if(reply)
+    {
+        editMessage=reply.innerText || reply.textContent;
+    }
+    else{
+        editMessage = messageContentDiv.innerText || messageContentDiv.textContent;
+    }
+
     if (editMessage) {
         const element = document.getElementById('editMessageDiv');
         element.style.display = 'block';
@@ -2008,7 +2016,8 @@ function editMessage(messageId) {
         if (editMessageIdField) {
             editMessageIdField.value = messageId;
         }
-        const editMessageContents = document.querySelectorAll('.EditmessageContent');
+        const editMessageContent = document.querySelector('.EditmessageContent');
+        editMessageContent.innerText=editMessage.substring(0,100)+'....';
         const textarea = document.getElementById('input');
         textarea.value = editMessage;
         textarea.scrollTop = textarea.scrollHeight;
