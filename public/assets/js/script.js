@@ -1992,7 +1992,15 @@ function editMessage(messageId) {
     let editMessage = null;
     const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
-    editMessage = messageContentDiv.innerText || messageContentDiv.textContent;
+    const reply = messageContentDiv.querySelector('.reply-message-area');
+    if(reply)
+    {
+        editMessage=reply.innerText || reply.textContent;
+    }
+    else{
+        editMessage = messageContentDiv.innerText || messageContentDiv.textContent;
+    }
+
     if (editMessage) {
         const element = document.getElementById('editMessageDiv');
         element.style.display = 'block';
