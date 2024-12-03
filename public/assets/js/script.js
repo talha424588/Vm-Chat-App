@@ -1504,7 +1504,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
                             ${user.role != '1' && user.role != '3' && message.sender != user.unique_id ? `
-                                <div class="dropdown ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ?'':'d-none'}" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
+                                <div class="dropdown ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? '' : 'd-none'}" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
@@ -2946,49 +2946,50 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         elem.classList.add("active");
     }
     DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
-    if (groupSearchMessage &&  groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
+    if (groupSearchMessage && groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
 
-    fetch(`/get-group-by-id/${DOM.groupId}`)
-        .then(response => response.json())
-        .then(data => {
-            let memberNames = data.users_with_access.map(member => member.id === user.id ? "You" : member.name);
-            DOM.messageAreaDetails.innerHTML = `${memberNames}`;
-            DOM.messageAreaName.innerHTML = data.name;
-        })
-        .catch(error => {
-            console.error('Error fetching group data:', error);
-        });
-    // }
-    // else {
-    //     let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
-    //     DOM.messageAreaDetails.innerHTML = `${memberNames}`;
-    // }
-    console.log("search message status", DOM.groupSearchMessageFound);
+        fetch(`/get-group-by-id/${DOM.groupId}`)
+            .then(response => response.json())
+            .then(data => {
+                let memberNames = data.users_with_access.map(member => member.id === user.id ? "You" : member.name);
+                DOM.messageAreaDetails.innerHTML = `${memberNames}`;
+                DOM.messageAreaName.innerHTML = data.name;
+            })
+            .catch(error => {
+                console.error('Error fetching group data:', error);
+            });
+        // }
+        // else {
+        //     let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
+        //     DOM.messageAreaDetails.innerHTML = `${memberNames}`;
+        // }
+        console.log("search message status", DOM.groupSearchMessageFound);
 
-    if (DOM.groupSearchMessageFound == false) {
-        if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
-            console.log("first");
-            await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
-            get_voice_list();
-            removeEditMessage();
-            removeQuotedMessage();
-            setTimeout(() => {
-                hideSpinner();
-                DOM.loader_showing = false;
+        if (DOM.groupSearchMessageFound == false) {
+            if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
+                console.log("first");
+                await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
+                get_voice_list();
+                removeEditMessage();
+                removeQuotedMessage();
+                setTimeout(() => {
+                    hideSpinner();
+                    DOM.loader_showing = false;
 
-            }, 1000);
+                }, 1000);
+            }
+            else {
+                console.log("second");
+                await fetchPaginatedMessages(null, null, null);
+                get_voice_list();
+                removeEditMessage();
+                removeQuotedMessage();
+                scroll_to_unread_div();
+            }
         }
-        else {
-            console.log("second");
-            await fetchPaginatedMessages(null, null, null);
-            get_voice_list();
-            removeEditMessage();
-            removeQuotedMessage();
-            scroll_to_unread_div();
-        }
-    }
 
-};
+    };
+}
 
 function scroll_to_unread_div() {
 
@@ -4402,12 +4403,12 @@ function get_voice_list() {
 function updatePlayButton(playButton, isPaused) {
     if (isPaused) {
         playButton.innerHTML = `<svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M3 21C4.65 21 6 19.65 6 18V3C6 1.35 4.65 0 3 0C1.35 0 0 1.35 0 3V18C0 19.65 1.35 21 3 21ZM12 3V18C12 19.65 13.35 21 15 21C16.65 21 18 19.65 18 18V3C18 1.35 16.65 0 15 0C13.35 0 12 1.35 12 3Z" fill="#687780"/>
-</svg>`;
+                <path d="M3 21C4.65 21 6 19.65 6 18V3C6 1.35 4.65 0 3 0C1.35 0 0 1.35 0 3V18C0 19.65 1.35 21 3 21ZM12 3V18C12 19.65 13.35 21 15 21C16.65 21 18 19.65 18 18V3C18 1.35 16.65 0 15 0C13.35 0 12 1.35 12 3Z" fill="#687780"/>
+                </svg>`;
     } else {
         playButton.innerHTML = `<svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
-</svg>`;
+                <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
+                </svg>`;
     }
 }
 
