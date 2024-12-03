@@ -51,6 +51,7 @@ const DOM = {
     groupSearch: false,
     groupReferenceMessageClick: false,
     loader_showing: false,
+    groupSearchMessageFound: false,
     // groupSearchCounter: 0,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
@@ -97,6 +98,8 @@ let previousChatList = [];
 let messageList = [];
 let pagnicateChatList = [];
 let results = [];
+
+let searchMessageSet = new Set();
 
 let lastDate = "";
 let offset = 0;
@@ -309,12 +312,12 @@ let viewMessageList = () => {
         .forEach((elem, index) => {
             let unreadClass = elem.unread ? "unread" : "";
             const messageObject = JSON.stringify(elem)
-            .replace(/\\/g, '\\\\') // Escape backslashes
-            .replace(/'/g, '\\\'')  // Escape single quotes
-            .replace(/"/g, '&quot;') // Escape double quotes
-            .replace(/\n/g, '\\n')   // Escape newlines
-            .replace(/\r/g, '\\r')   // Escape carriage returns
-            .replace(/\t/g, '\\t');
+                .replace(/\\/g, '\\\\') // Escape backslashes
+                .replace(/'/g, '\\\'')  // Escape single quotes
+                .replace(/"/g, '&quot;') // Escape double quotes
+                .replace(/\n/g, '\\n')   // Escape newlines
+                .replace(/\r/g, '\\r')   // Escape carriage returns
+                .replace(/\t/g, '\\t');
             const senderName = elem.user.name;
             let time = new Date(elem.time * 1000)
             const timeText = elem.time ? mDate(time).chatListFormat() : "No messages";
@@ -1499,7 +1502,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
                                 <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id  && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)? `
+                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) ? `
 
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
@@ -2001,11 +2004,10 @@ function editMessage(messageId) {
     const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
     const messageContentDiv = messageElement.querySelector('div.shadow-sm');
     const reply = messageContentDiv.querySelector('.reply-message-area');
-    if(reply)
-    {
-        editMessage=reply.innerText || reply.textContent;
+    if (reply) {
+        editMessage = reply.innerText || reply.textContent;
     }
-    else{
+    else {
         editMessage = messageContentDiv.innerText || messageContentDiv.textContent;
     }
 
@@ -2017,7 +2019,7 @@ function editMessage(messageId) {
             editMessageIdField.value = messageId;
         }
         const editMessageContent = document.querySelector('.EditmessageContent');
-        editMessageContent.innerText=editMessage.substring(0,100)+'....';
+        editMessageContent.innerText = editMessage.substring(0, 100) + '....';
         const textarea = document.getElementById('input');
         textarea.value = editMessage;
         textarea.scrollTop = textarea.scrollHeight;
@@ -2537,6 +2539,12 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
+        if (DOM.groupSearch) {
+            nextPageMessages.data.forEach(item => searchMessageSet.add(item))
+        }
+        else {
+            searchMessageSet.clear();
+        }
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
@@ -2863,12 +2871,44 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
-    if (searchMessage) {
+    if (searchMessage && !searchMessageSet.size > 0) {
         // DOM.groupSearchCounter ++;
         await showloader();
         DOM.loader_showing = true;
     }
-    DOM.messages.innerHTML = '';
+
+
+    if (searchMessageSet.size > 0 && DOM.groupId == groupSearchMessage.group_id) {
+
+        console.log(groupSearchMessage.id);
+        // console.log("check", Array.from(searchMessageSet).find(e => e.id == groupSearchMessage.id));
+        if (Array.from(searchMessageSet).find(e => e.id == groupSearchMessage.id)) {
+            // console.log("groupSearchMessage", groupSearchMessage);
+            // setTimeout(() => {
+            //     scrollToMessage(groupSearchMessage.id);
+            // }, 100);
+            DOM.groupSearchMessageFound = true;
+
+            const targetMessage = document.getElementById(`message-${groupSearchMessage.id}`);
+            if (targetMessage) {
+                const ml3Div = targetMessage.closest('.ml-3');
+                if (ml3Div) {
+                    ml3Div.scrollIntoView();
+                    ml3Div.classList.add('selected-message');
+                    setTimeout(() => {
+                        ml3Div.classList.remove('selected-message');
+                    }, 2000);
+                }
+            }
+            DOM.groupSearchMessageFound = false;
+        }
+        return;
+    }
+    else {
+        console.log("clear html");
+        DOM.messages.innerHTML = '';
+    }
+    // DOM.messages.innerHTML = '';
 
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
     DOM.currentPage = 1;
@@ -2891,61 +2931,48 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         mClassList(elem).add("active");
     }
 
-    DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
-    if (groupSearchMessage &&  groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
+    // if (groupSearchMessage && groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
 
-        fetch(`/get-group-by-id/${DOM.groupId}`)
-            .then(response => response.json())
-            .then(data => {
-                let memberNames = data.users_with_access.map(member => member.id === user.id ? "You" : member.name);
-                DOM.messageAreaDetails.innerHTML = `${memberNames}`;
-            })
-            .catch(error => {
-                console.error('Error fetching group data:', error);
-            });
+    fetch(`/get-group-by-id/${DOM.groupId}`)
+        .then(response => response.json())
+        .then(data => {
+            let memberNames = data.users_with_access.map(member => member.id === user.id ? "You" : member.name);
+            DOM.messageAreaDetails.innerHTML = `${memberNames}`;
+            DOM.messageAreaName.innerHTML = data.name;
+        })
+        .catch(error => {
+            console.error('Error fetching group data:', error);
+        });
+    // }
+    // else {
+    //     let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
+    //     DOM.messageAreaDetails.innerHTML = `${memberNames}`;
+    // }
+    console.log("search message status", DOM.groupSearchMessageFound);
+
+    if (DOM.groupSearchMessageFound == false) {
+        if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
+            console.log("first");
+            await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
+            get_voice_list();
+            removeEditMessage();
+            removeQuotedMessage();
+            setTimeout(() => {
+                hideSpinner();
+                DOM.loader_showing = false;
+
+            }, 1000);
+        }
+        else {
+            console.log("second");
+            await fetchPaginatedMessages(null, null, null);
+            get_voice_list();
+            removeEditMessage();
+            removeQuotedMessage();
+            scroll_to_unread_div();
+        }
     }
-    else {
-        let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
-        DOM.messageAreaDetails.innerHTML = `${memberNames}`;
-    }
 
-    // if(DOM.groupSearch && DOM.groupSearchCounter > 1)
-    //     {
-    //         console.log("counter updated");
-    //         // let message = groupSearchMessage;
-    //         if (groupSearchMessage.group_id == DOM.groupId) {
-    //             console.log("counter updated");
-    //             console.log(groupSearchMessage);
-    //             const messageElement = null;
-    //             setTimeout(() => {
-    //                  messageElement = document.querySelector(`[data-message-id="${groupSearchMessage.id}"]`);
-    //             }, 1000);
-
-    //             console.log("elemnt ",messageElement);
-
-    //             handleMessageResponse(messageElement, groupSearchMessage, groupSearchMessage.id, DOM.messageSearchQuery);
-    //         }
-    //     }
-
-    // else
-    if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
-        await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
-        get_voice_list();
-        removeEditMessage();
-        removeQuotedMessage();
-        setTimeout(() => {
-            hideSpinner();
-            DOM.loader_showing = false;
-
-        }, 1000);
-    }
-    else {
-        await fetchPaginatedMessages(null, null, null);
-        get_voice_list();
-        removeEditMessage();
-        removeQuotedMessage();
-        scroll_to_unread_div();
-    }
 };
 
 function scroll_to_unread_div() {
@@ -3337,8 +3364,7 @@ const startRecording = () => {
             `;
         });
 };
-if(voiceIcon)
-{
+if (voiceIcon) {
     voiceIcon.addEventListener('click', () => {
         if (!mediaRecorder || mediaRecorder.state !== 'recording') {
             startRecording();
