@@ -2904,7 +2904,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
                     ml3Div.classList.add('selected-message');
                     setTimeout(() => {
                         ml3Div.classList.remove('selected-message');
-                    }, 200);
+                    }, 2000);
                 }
             }
             DOM.groupSearchMessageFound = false;
