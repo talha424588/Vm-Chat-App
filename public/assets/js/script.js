@@ -2958,7 +2958,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
             .catch(error => {
                 console.error('Error fetching group data:', error);
             });
-        // }
+        }
         // else {
         //     let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
         //     DOM.messageAreaDetails.innerHTML = `${memberNames}`;
@@ -2989,7 +2989,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         }
 
     };
-}
+
 
 function scroll_to_unread_div() {
 
