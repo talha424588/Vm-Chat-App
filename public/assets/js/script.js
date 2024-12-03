@@ -1504,7 +1504,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
                             ${user.role != '1' && user.role != '3' && message.sender != user.unique_id ? `
-                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;">
+                                <div class="dropdown ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ?'':'d-none'}" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
@@ -2196,7 +2196,7 @@ function showReply(message_id, senderName, type) {
                 </a>
             </div>`;
     } else if (type === 'Audio') {
-        var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+        var message_body = `<div class="audio-message w-25 mb-2" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
@@ -2904,7 +2904,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
                     ml3Div.classList.add('selected-message');
                     setTimeout(() => {
                         ml3Div.classList.remove('selected-message');
-                    }, 2000);
+                    }, 200);
                 }
             }
             DOM.groupSearchMessageFound = false;
@@ -2930,15 +2930,23 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
 
     [...DOM.chatListItem].forEach((elem) => mClassList(elem).remove("active"));
 
+    // if (window.innerWidth <= 575) {
+    //     mClassList(DOM.chatListArea).remove("d-flex ").add("d-none");
+    //     mClassList(DOM.messageArea).remove("d-none").add("d-flex");
+    //     areaSwapped = true;
+    // } else {
+    //     mClassList(elem).add("active");
+    // }
     if (window.innerWidth <= 575) {
-        mClassList(DOM.chatListArea).remove("d-flex ").add("d-none");
-        mClassList(DOM.messageArea).remove("d-none").add("d-flex");
+
+        DOM.chatListArea.classList.replace("d-flex", "d-none");
+        DOM.messageArea.classList.replace("d-none", "d-flex");
         areaSwapped = true;
     } else {
-        mClassList(elem).add("active");
+        elem.classList.add("active");
     }
-
-    // if (groupSearchMessage && groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
+    DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
+    if (groupSearchMessage &&  groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
 
     fetch(`/get-group-by-id/${DOM.groupId}`)
         .then(response => response.json())
