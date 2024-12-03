@@ -2945,50 +2945,50 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     } else {
         elem.classList.add("active");
     }
-    DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
-    if (groupSearchMessage && groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
+    // DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
+    // if (groupSearchMessage && groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
 
-        fetch(`/get-group-by-id/${DOM.groupId}`)
-            .then(response => response.json())
-            .then(data => {
-                let memberNames = data.users_with_access.map(member => member.id === user.id ? "You" : member.name);
-                DOM.messageAreaDetails.innerHTML = `${memberNames}`;
-                DOM.messageAreaName.innerHTML = data.name;
-            })
-            .catch(error => {
-                console.error('Error fetching group data:', error);
-            });
+    fetch(`/get-group-by-id/${DOM.groupId}`)
+        .then(response => response.json())
+        .then(data => {
+            let memberNames = data.users_with_access.map(member => member.id === user.id ? "You" : member.name);
+            DOM.messageAreaDetails.innerHTML = `${memberNames}`;
+            DOM.messageAreaName.innerHTML = data.name;
+        })
+        .catch(error => {
+            console.error('Error fetching group data:', error);
+        });
+    // }
+    // else {
+    //     let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
+    //     DOM.messageAreaDetails.innerHTML = `${memberNames}`;
+    // }
+    console.log("search message status", DOM.groupSearchMessageFound);
+
+    if (DOM.groupSearchMessageFound == false) {
+        if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
+            console.log("first");
+            await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
+            get_voice_list();
+            removeEditMessage();
+            removeQuotedMessage();
+            setTimeout(() => {
+                hideSpinner();
+                DOM.loader_showing = false;
+
+            }, 1000);
         }
-        // else {
-        //     let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
-        //     DOM.messageAreaDetails.innerHTML = `${memberNames}`;
-        // }
-        console.log("search message status", DOM.groupSearchMessageFound);
-
-        if (DOM.groupSearchMessageFound == false) {
-            if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
-                console.log("first");
-                await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
-                get_voice_list();
-                removeEditMessage();
-                removeQuotedMessage();
-                setTimeout(() => {
-                    hideSpinner();
-                    DOM.loader_showing = false;
-
-                }, 1000);
-            }
-            else {
-                console.log("second");
-                await fetchPaginatedMessages(null, null, null);
-                get_voice_list();
-                removeEditMessage();
-                removeQuotedMessage();
-                scroll_to_unread_div();
-            }
+        else {
+            console.log("second");
+            await fetchPaginatedMessages(null, null, null);
+            get_voice_list();
+            removeEditMessage();
+            removeQuotedMessage();
+            scroll_to_unread_div();
         }
+    }
 
-    };
+};
 
 
 function scroll_to_unread_div() {
