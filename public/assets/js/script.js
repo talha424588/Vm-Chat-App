@@ -51,6 +51,7 @@ const DOM = {
     groupSearch: false,
     groupReferenceMessageClick: false,
     loader_showing: false,
+    // groupSearchCounter: 0,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
     const search_div = getById('serach_div');
@@ -307,6 +308,13 @@ let viewMessageList = () => {
     })
         .forEach((elem, index) => {
             let unreadClass = elem.unread ? "unread" : "";
+            const messageObject = JSON.stringify(elem)
+            .replace(/\\/g, '\\\\') // Escape backslashes
+            .replace(/'/g, '\\\'')  // Escape single quotes
+            .replace(/"/g, '&quot;') // Escape double quotes
+            .replace(/\n/g, '\\n')   // Escape newlines
+            .replace(/\r/g, '\\r')   // Escape carriage returns
+            .replace(/\t/g, '\\t');
             const senderName = elem.user.name;
             let time = new Date(elem.time * 1000)
             const timeText = elem.time ? mDate(time).chatListFormat() : "No messages";
@@ -314,7 +322,7 @@ let viewMessageList = () => {
                 let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
                 DOM.messagesList.innerHTML += `
                 <input type="hidden" id="group-id" value="${elem.group.group_id}"></input>
-                <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true,${elem.id})">
+                <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true,${messageObject})">
                  <span class='group-imgg'>
                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
@@ -1493,20 +1501,20 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
                             ${user.role != '1' && user.role != '3' && message.sender != user.unique_id ? `
-                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;">
+                                <div class="dropdown ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ?'':'d-none'}" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
                                 <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id ? `
+                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id  && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)? `
 
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
-                                        ${(message.type === "Message" || message.type === null) ? `
+                                        ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) ? `
                                         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         ` : ''}
-                                    ${(message.type === "Message" || message.type === null) && (message.is_compose === 1 || message.is_compose == true) ? `
+                                    ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction </a>
                                     ` : ''}
                                     ${message.is_compose === 1 && message.type === "Message" && !message.reply ? `
@@ -2243,7 +2251,6 @@ function removeQuotedMessage() {
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
     document.querySelector("#input").value = "";
     document.querySelector("#input").focus();
-    // <<<<<<< local-dev
     // const chat_action = document.getElementById('chat_action');
     //     if (getComputedStyle(chat_action).display == "none") {
     //         const Editreplyarea = document.getElementById('message-reply-area');
@@ -2251,7 +2258,6 @@ function removeQuotedMessage() {
     //         chat_action.style.display = "";
     //         const fileicon = document.querySelector('.chat_action_file');
     //     }
-    // =======
 
     // const chat_action = document.getElementById('chat_action');
     // if(getComputedStyle(chat_action).display == "none")
@@ -2262,7 +2268,6 @@ function removeQuotedMessage() {
     //     const fileicon = document.querySelector('.chat_action_file');
     // }
 
-    // >>>>>>> master
 
     const correctionarea = document.getElementById('correction-div');
     if (getComputedStyle(correctionarea).display == "block") {
@@ -2539,7 +2544,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         });
         let nextPageMessages = [];
         nextPageMessages = await response.json();
-        console.log("this is the new message get response",nextPageMessages);
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
@@ -2861,18 +2865,19 @@ async function showloader() {
     await new Promise(resolve => setTimeout(resolve, 300));
 
 }
-let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessageId = null, notificationMessageId = null) => {
+let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessage = null, notificationMessageId = null) => {
+    // console.log("groupSearchMessage",groupSearchMessage);
     change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
     if (searchMessage) {
-
+        // DOM.groupSearchCounter ++;
         await showloader();
         DOM.loader_showing = true;
     }
     DOM.messages.innerHTML = '';
 
-    DOM.groupId = elem.dataset.groupId ?? groupSearchMessageId;
+    DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
     DOM.currentPage = 1;
     displayedMessageIds.clear();
 
@@ -2885,22 +2890,22 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
 
     [...DOM.chatListItem].forEach((elem) => mClassList(elem).remove("active"));
 
-    if (window.innerWidth <= 575) {
-        mClassList(DOM.chatListArea).remove("d-flex").add("d-none");
-        mClassList(DOM.messageArea).remove("d-none").add("d-flex");
-        areaSwapped = true;
-    } else {
-        mClassList(elem).add("active");
-    }
     // if (window.innerWidth <= 575) {
-    //     DOM.chatListArea.classList.replace("d-flex", "d-none");
-    //     DOM.messageArea.classList.replace("d-none", "d-flex");
+    //     mClassList(DOM.chatListArea).remove("d-flex ").add("d-none");
+    //     mClassList(DOM.messageArea).remove("d-none").add("d-flex");
     //     areaSwapped = true;
     // } else {
-    //     elem.classList.add("active");
+    //     mClassList(elem).add("active");
     // }
+    if (window.innerWidth <= 575) {
+        DOM.chatListArea.classList.replace("d-flex", "d-none");
+        DOM.messageArea.classList.replace("d-none", "d-flex");
+        areaSwapped = true;
+    } else {
+        elem.classList.add("active");
+    }
     DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
-    if (groupSearchMessageId || (groupSearchMessageId && notificationMessageId)) {
+    if (groupSearchMessage &&  groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
 
         fetch(`/get-group-by-id/${DOM.groupId}`)
             .then(response => response.json())
@@ -2917,8 +2922,27 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         DOM.messageAreaDetails.innerHTML = `${memberNames}`;
     }
 
-    if (groupSearchMessageId && !notificationMessageId) {
-        await fetchPaginatedMessages(groupSearchMessageId, null, DOM.groupId);
+    // if(DOM.groupSearch && DOM.groupSearchCounter > 1)
+    //     {
+    //         console.log("counter updated");
+    //         // let message = groupSearchMessage;
+    //         if (groupSearchMessage.group_id == DOM.groupId) {
+    //             console.log("counter updated");
+    //             console.log(groupSearchMessage);
+    //             const messageElement = null;
+    //             setTimeout(() => {
+    //                  messageElement = document.querySelector(`[data-message-id="${groupSearchMessage.id}"]`);
+    //             }, 1000);
+
+    //             console.log("elemnt ",messageElement);
+
+    //             handleMessageResponse(messageElement, groupSearchMessage, groupSearchMessage.id, DOM.messageSearchQuery);
+    //         }
+    //     }
+
+    // else
+    if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
+        await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
         get_voice_list();
         removeEditMessage();
         removeQuotedMessage();
@@ -3326,14 +3350,16 @@ const startRecording = () => {
             `;
         });
 };
-
-voiceIcon.addEventListener('click', () => {
-    if (!mediaRecorder || mediaRecorder.state !== 'recording') {
-        startRecording();
-    } else {
-        mediaRecorder.stop();
-    }
-});
+if(voiceIcon)
+{
+    voiceIcon.addEventListener('click', () => {
+        if (!mediaRecorder || mediaRecorder.state !== 'recording') {
+            startRecording();
+        } else {
+            mediaRecorder.stop();
+        }
+    });
+}
 
 document.getElementById('captureid').addEventListener('click', function () {
     document.getElementById('hidden-file-input').click();
@@ -3923,8 +3949,11 @@ messageSidebar.addEventListener('scroll', function () {
 });
 
 function handleMessageResponse(messageElement, message, messageId, searchQuery) {
+    console.log("here");
     let replyDisplay = '';
     if (messageElement) {
+        console.log("message element");;
+
         // DOM.searchMessageClick = true;
         const messageTextElement = messageElement.querySelector(".shadow-sm");
         let highlightElement = document.getElementsByClassName("highlight")[0];
@@ -4146,6 +4175,7 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
         }, 700)
 
     } else {
+        console.log("else");
         fetchPaginatedMessages(messageId, null, null);
     }
 }
