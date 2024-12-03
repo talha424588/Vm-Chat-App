@@ -2186,7 +2186,7 @@ function showReply(message_id, senderName, type) {
                 <div class="file-details">
                     <p class="file-name">${message.media_name}</p>
 
-                </div>
+                </div> 
                 <a href="#"  class="download-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
@@ -2194,7 +2194,7 @@ function showReply(message_id, senderName, type) {
                 </a>
             </div>`;
     } else if (type === 'Audio') {
-        var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+        var message_body = `<div class="audio-message w-25 mb-2" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
