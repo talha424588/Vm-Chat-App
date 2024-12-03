@@ -846,7 +846,6 @@ async function rerenderChatList(preGroupId) {
 }
 
 socket.on('updateEditedMessage', (editedMessage) => {
-
     const messageElement = document.querySelector(`[data-message-id="${editedMessage.id}"]`);
     if (messageElement) {
         updateViewChatList(editedMessage);
@@ -858,7 +857,9 @@ socket.on('updateEditedMessage', (editedMessage) => {
         let newMessageDisplay = '';
         if (messageElement) {
             if (editedMessage.reply) {
-                if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null) {
+       
+                if (editedMessage.reply.type === "Message" && !/<a[^>]+>/g.test(editedMessage.msg) && !/<audio[^>]+>/g.test(editedMessage.msg) || editedMessage.type === null || editedMessage.reply.type === null) {
+    
                     newMessageDisplay = `<div class="reply-message-area">${formatMessageForDisplay(editedMessage.msg)}</div>`;
                     const replyMessage = editedMessage.reply.msg;
                     newMessageDisplay = `
@@ -999,6 +1000,8 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 }
             }
             else {
+              
+
                 const editMessageDiv = document.getElementById('editMessageDiv');
                 const editMessageContentDiv = editMessageDiv.querySelector('.EditmessageContent');
                 editMessageContentDiv.innerHTML = editedMessage.msg;
@@ -1006,6 +1009,8 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     newMessageDisplay = formatMessageForDisplay(editedMessage.msg);
                 }
                 else {
+            
+
                     messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
                 }
             }
@@ -1048,6 +1053,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     newMessageDisplay = formatMessageForDisplay(editedMessage.msg);
                 }
                 else {
+           
                     messageContentDiv.innerHTML = editedMessage.msg.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '');
                 }
                 if (messageContentDiv) {
@@ -1065,6 +1071,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
         }
     }
     else {
+
         updateViewChatList(editedMessage);
     }
 });
@@ -2067,7 +2074,7 @@ function handleSendMessage() {
         if (messageIndex !== -1) {
             pagnicateChatList.data[messageIndex].msg = messageContent.replace(/\n/g, "<br>");
         }
-
+        
         const messageToUpdate = pagnicateChatList.data.find((message) => message.id === parseInt(messageId));
         socket.emit('updateEditedMessage', messageToUpdate);
 
@@ -2890,7 +2897,13 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     } else {
         mClassList(elem).add("active");
     }
-
+    // if (window.innerWidth <= 575) {
+    //     DOM.chatListArea.classList.replace("d-flex", "d-none");
+    //     DOM.messageArea.classList.replace("d-none", "d-flex");
+    //     areaSwapped = true;
+    // } else {
+    //     elem.classList.add("active");
+    // }
     DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
     if (groupSearchMessage &&  groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
 
