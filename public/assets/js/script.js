@@ -2874,7 +2874,6 @@ async function showloader() {
 
 }
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessage = null, notificationMessageId = null) => {
-    // console.log("groupSearchMessage",groupSearchMessage);
     change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
@@ -2886,14 +2885,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
 
 
     if (searchMessageSet.size > 0 && DOM.groupId == groupSearchMessage.group_id) {
-
-        console.log(groupSearchMessage.id);
-        // console.log("check", Array.from(searchMessageSet).find(e => e.id == groupSearchMessage.id));
         if (Array.from(searchMessageSet).find(e => e.id == groupSearchMessage.id)) {
-            // console.log("groupSearchMessage", groupSearchMessage);
-            // setTimeout(() => {
-            //     scrollToMessage(groupSearchMessage.id);
-            // }, 100);
             DOM.groupSearchMessageFound = true;
 
             const targetMessage = document.getElementById(`message-${groupSearchMessage.id}`);
