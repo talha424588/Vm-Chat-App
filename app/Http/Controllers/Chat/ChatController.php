@@ -20,9 +20,9 @@ class ChatController extends Controller
 
     public function index(Request $request)
     {
-            $group_id = $request->group_id ?? null;
-            $message_id = $request->message_id ?? null;
-            return view('chat', compact("group_id","message_id"));
+        $group_id = $request->group_id ?? null;
+        $message_id = $request->message_id ?? null;
+        return view('chat', compact("group_id", "message_id"));
     }
     //
     public function searchGroupMessages(Request $request)
@@ -92,7 +92,7 @@ class ChatController extends Controller
         $message->status = $request->status ?? EnumMessageEnum::NEW;
         $message->is_compose = false;
         $message->is_privacy_breach = $request->privacy_breach ?? false;
-        $message->compose_id=$request->compose_id ?? null;
+        $message->compose_id = isset($request->compose_id) ?? null;
         if ($message->save()) {
             $message->user = User::where("unique_id", $uniqueId)->first();
             if ($message->reply_id) {
@@ -184,7 +184,7 @@ class ChatController extends Controller
             $moveMessageClone->status = EnumMessageEnum::NEW;
             $moveMessageClone->is_compose = true;
             $moveMessageClone->is_privacy_breach = false;
-            $message['compose_id']?$moveMessageClone->compose_id=$message['compose_id']:'';
+            $message['compose_id'] ? $moveMessageClone->compose_id = $message['compose_id'] : '';
             if ($moveMessageClone->save()) {
                 $moveMessageClone->user = User::where("unique_id", $message['user']['unique_id'])->first();
                 DB::table('group_messages')
