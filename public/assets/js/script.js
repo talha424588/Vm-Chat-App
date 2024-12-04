@@ -2549,9 +2549,11 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         if (DOM.groupSearch) {
             nextPageMessages.data.forEach(item => searchMessageSet.add(item))
         }
-        else {
-            searchMessageSet.clear();
-        }
+        // else {
+        //     console.log("i am being clear",searchMessageSet);
+        //     searchMessageSet.clear();
+        //     console.log("i am after being clear",searchMessageSet);
+        // }
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
@@ -2875,13 +2877,18 @@ async function showloader() {
 }
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessage = null, notificationMessageId = null) => {
     // console.log("groupSearchMessage",groupSearchMessage);
+    if(DOM.groupId != groupSearchMessage?.group_id)
+        searchMessageSet.clear();
     change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
-    if (searchMessage && !searchMessageSet.size > 0) {
-        // DOM.groupSearchCounter ++;
+    if (searchMessage) {
+         // DOM.groupSearchCounter ++;
+        if(!searchMessageSet.size > 0)
+       {
         await showloader();
         DOM.loader_showing = true;
+       }
     }
 
 
@@ -2904,7 +2911,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
                     ml3Div.classList.add('selected-message');
                     setTimeout(() => {
                         ml3Div.classList.remove('selected-message');
-                    }, 200);
+                    }, 2000);
                 }
             }
             DOM.groupSearchMessageFound = false;
@@ -2912,7 +2919,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         return;
     }
     else {
-        console.log("clear html");
+       
         DOM.messages.innerHTML = '';
     }
     // DOM.messages.innerHTML = '';
