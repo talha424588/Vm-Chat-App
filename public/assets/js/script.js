@@ -2936,8 +2936,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     } else {
         elem.classList.add("active");
     }
-    // DOM.messageAreaName.innerHTML = chat ? chat.name : elem.querySelector('.list-user-name')?.textContent;
-    // if (groupSearchMessage && groupSearchMessage.id || (groupSearchMessage && groupSearchMessage.id && notificationMessageId)) {
 
     fetch(`/get-group-by-id/${DOM.groupId}`)
         .then(response => response.json())
@@ -2949,12 +2947,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         .catch(error => {
             console.error('Error fetching group data:', error);
         });
-    // }
-    // else {
-    //     let memberNames = chat.group.users_with_access.map(member => member.id === user.id ? "You" : member.name);
-    //     DOM.messageAreaDetails.innerHTML = `${memberNames}`;
-    // }
-    console.log("search message status", DOM.groupSearchMessageFound);
 
     if (DOM.groupSearchMessageFound == false) {
         if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
