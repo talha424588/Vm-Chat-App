@@ -2179,6 +2179,7 @@ function showReply(message_id, senderName, type) {
         var messagebody = message.msg;
     }
 
+    
     DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var quotedTextElement = document.querySelector('#quoted-message .sender-name');
