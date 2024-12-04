@@ -162,6 +162,7 @@ let populateGroupList = async () => {
 
 let viewChatList = () => {
     if (!DOM.groupSearch) {
+        console.log("sarch mood");
         previousChatList = [...chatList]
     }
     if (chatList.length === 0) {
@@ -3687,9 +3688,8 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     else {
         currentPageGroups = 1;
         currentPageMessages = 1;
-        // Clear previous results
-        DOM.chatList.innerHTML = ''; // Clear previous groups
-        DOM.chatList2.innerHTML = ''; // Clear previous messages
+        DOM.chatList.innerHTML = '';
+        DOM.chatList2.innerHTML = '';
     }
 
     if (searchQuery.length > 0) {
@@ -3888,6 +3888,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 DOM.loader_showing = true;
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+                                console.log("element",messageElement);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
                                 setTimeout(() => {
                                     hideSpinner();
