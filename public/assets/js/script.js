@@ -3720,12 +3720,16 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 let groups = new Set();
                 groups = response.data.groups.data;
                 const messages = response.data.messages.data;
-
+                console.log(groups,messages);
                 if (!groups || groups.length === 0) {
+                    console.log('no group is found');
                     if (!loadMore) {
-                        // DOM.chatList.innerHTML += ` <div class="no-groups-found">No Groups Found.</div>`;
+                        console.log("no group is found and not loading more message");
+                        DOM.chatList.innerHTML = '';
+                        DOM.chatList.style.display= 'none';
                     }
                 } else {
+                    DOM.chatList.style.display= 'block';
                     DOM.chatList.innerHTML += `<div class="heading"><h2>Groups</h2></div>`;
                     groups.forEach((group) => {
                         let chat = {
@@ -3762,9 +3766,9 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     viewMessageList();
                 }
 
-                if (loadMore && !groups && messages == undefined) {
-                    DOM.chatList2.innerHTML += `<div class="no-messages-found">No more data found.</div>`;
-                }
+                // if (loadMore && !groups && messages == undefined) {
+                //     DOM.chatList2.innerHTML += `<div class="no-messages-found">No more data found.</div>`;
+                // }
             }
         } catch (error) {
             // console.log(error);
@@ -3787,7 +3791,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         messageList = [];
         DOM.messagesList.innerHTML = '';
         // viewChatList();
-
+        DOM.chatList.style.display= 'block';
         generateChatList();
     }
 };
