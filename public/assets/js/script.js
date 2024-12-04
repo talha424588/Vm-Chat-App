@@ -375,6 +375,7 @@ let viewMessageList = () => {
 };
 
 let generateChatList = async () => {
+    DOM.chatList.innerHTML='';
     await populateGroupList();
     viewChatList();
 };
