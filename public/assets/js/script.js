@@ -1811,6 +1811,10 @@ function correction_call(message_id, messagebody, senderName) {
 
     if (tinymce.get('input')) {
         tinymce.get('input').setContent(messagebody);
+        tinymce.get('input').focus();
+        const editor = tinymce.get('input');
+        editor.selection.select(editor.getBody(), true); 
+        editor.selection.collapse(false); 
     } else {
         console.error("TinyMCE editor not initialized for #input");
     }
@@ -1863,6 +1867,7 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("Element 'correction-div' not found");
     }
+    
 }
 
 function correction_send_handel() {
@@ -2027,6 +2032,9 @@ function editMessage(messageId) {
         }
         const editMessageContent = document.querySelector('.EditmessageContent');
         editMessageContent.innerText = editMessage.substring(0, 100) + '....';
+        if (editMessage.split('\n').filter(line => line.trim() === '').length > 3) {
+        editMessageContent.innerText = editMessageContent.innerText.replace(/(\n){3,}/g, '\n\n');
+        }
         const textarea = document.getElementById('input');
         textarea.value = editMessage;
         textarea.scrollTop = textarea.scrollHeight;
@@ -2055,6 +2063,7 @@ function editMessage(messageId) {
         }
         autoResize();
         change_icon_height(element);
+        document.querySelector("#input").focus();
     }
 }
 
@@ -2170,6 +2179,7 @@ function showReply(message_id, senderName, type) {
         var messagebody = message.msg;
     }
 
+    
     DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var quotedTextElement = document.querySelector('#quoted-message .sender-name');
@@ -2219,7 +2229,10 @@ function showReply(message_id, senderName, type) {
         </div>`;
     } else {
 
-        var message_body = messagebody.substring(0, 100).replace(/\r\n|\n/g, '<br>') + ".....";
+        var message_body = messagebody
+        .replace(/(\r\n|\n){3,}/g, '\n\n')
+        .substring(0, 100) 
+        .replace(/\r\n|\n/g, '<br>') + "....."; 
 
     }
     quotedNameElement.innerHTML = message_body;
@@ -2241,6 +2254,8 @@ function showReply(message_id, senderName, type) {
         Editreplyarea.style.display = 'block';
     }
     change_icon_height(replyDiv);
+    document.querySelector("#input").value = "";
+    document.querySelector("#input").focus();
 }
 
 function removeQuotedMessage() {
@@ -2549,9 +2564,11 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         if (DOM.groupSearch) {
             nextPageMessages.data.forEach(item => searchMessageSet.add(item))
         }
-        else {
-            searchMessageSet.clear();
-        }
+        // else {
+        //     console.log("i am being clear",searchMessageSet);
+        //     searchMessageSet.clear();
+        //     console.log("i am after being clear",searchMessageSet);
+        // }
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
@@ -2874,12 +2891,21 @@ async function showloader() {
 
 }
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessage = null, notificationMessageId = null) => {
+
+    // console.log("groupSearchMessage",groupSearchMessage);
+    if(DOM.groupId != groupSearchMessage?.group_id)
+        searchMessageSet.clear();
     change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
-    if (searchMessage && !searchMessageSet.size > 0) {
+    if (searchMessage) {
+         // DOM.groupSearchCounter ++;
+        if(!searchMessageSet.size > 0)
+       {
+
         await showloader();
         DOM.loader_showing = true;
+       }
     }
 
 
@@ -2903,6 +2929,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         return;
     }
     else {
+
         DOM.messages.innerHTML = '';
     }
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
