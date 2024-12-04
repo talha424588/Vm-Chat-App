@@ -1811,6 +1811,10 @@ function correction_call(message_id, messagebody, senderName) {
 
     if (tinymce.get('input')) {
         tinymce.get('input').setContent(messagebody);
+        tinymce.get('input').focus();
+        const editor = tinymce.get('input');
+        editor.selection.select(editor.getBody(), true); 
+        editor.selection.collapse(false); 
     } else {
         console.error("TinyMCE editor not initialized for #input");
     }
@@ -1863,6 +1867,7 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("Element 'correction-div' not found");
     }
+    
 }
 
 function correction_send_handel() {
@@ -2055,6 +2060,7 @@ function editMessage(messageId) {
         }
         autoResize();
         change_icon_height(element);
+        document.querySelector("#input").focus();
     }
 }
 
@@ -2241,6 +2247,8 @@ function showReply(message_id, senderName, type) {
         Editreplyarea.style.display = 'block';
     }
     change_icon_height(replyDiv);
+    document.querySelector("#input").value = "";
+    document.querySelector("#input").focus();
 }
 
 function removeQuotedMessage() {
