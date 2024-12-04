@@ -2904,7 +2904,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         return;
     }
     else {
-        console.log("clear html");
         DOM.messages.innerHTML = '';
     }
     // DOM.messages.innerHTML = '';
