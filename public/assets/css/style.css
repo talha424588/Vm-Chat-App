@@ -242,7 +242,9 @@ margin-bottom: 30px;
 padding: 10px;
 margin-top:20px;
 }
-
+.no-messages-found{
+	text-align: center;
+}
 .notification-wrapper svg {
 position: absolute;
 top: 0;
@@ -382,7 +384,10 @@ background-color: rgba(255, 255, 255, 0.5);
 
 .result-text {
 	font-size: 14px;
-	color: #333;
+    color: #333;
+    overflow-wrap: break-word; 
+    white-space: normal; 
+    overflow: visible;
 }
 .search-header {
 display: flex;
@@ -794,7 +799,7 @@ body{
 }
 .chat-row {
 	overflow-y:auto;
-	height: 480px;
+	height: 520px;
     box-sizing: border-box;
 	scrollbar-width: thin;
     scrollbar-color: #ccc transparent;
@@ -1374,6 +1379,9 @@ body{
 	#side_navbar{
 		width: 67%;
 	}
+	.search-results{
+		height: 580px;
+	}
 }
 
 /* For very large screens (over 1600px) */
@@ -1384,6 +1392,12 @@ body{
 	}
 	#side_navbar{
 		width: 67%;
+	}
+	.chat-row{
+		height: 710px;
+	}
+	.search-results{
+		height: 765px;
 	}
 }
 
