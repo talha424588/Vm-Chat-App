@@ -1813,8 +1813,8 @@ function correction_call(message_id, messagebody, senderName) {
         tinymce.get('input').setContent(messagebody);
         tinymce.get('input').focus();
         const editor = tinymce.get('input');
-        editor.selection.select(editor.getBody(), true); 
-        editor.selection.collapse(false); 
+        editor.selection.select(editor.getBody(), true);
+        editor.selection.collapse(false);
     } else {
         console.error("TinyMCE editor not initialized for #input");
     }
@@ -1867,7 +1867,7 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("Element 'correction-div' not found");
     }
-    
+
 }
 
 function correction_send_handel() {
@@ -2179,7 +2179,7 @@ function showReply(message_id, senderName, type) {
         var messagebody = message.msg;
     }
 
-    
+
     DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var quotedTextElement = document.querySelector('#quoted-message .sender-name');
@@ -2231,8 +2231,8 @@ function showReply(message_id, senderName, type) {
 
         var message_body = messagebody
         .replace(/(\r\n|\n){3,}/g, '\n\n')
-        .substring(0, 100) 
-        .replace(/\r\n|\n/g, '<br>') + "....."; 
+        .substring(0, 100)
+        .replace(/\r\n|\n/g, '<br>') + ".....";
 
     }
     quotedNameElement.innerHTML = message_body;
@@ -2986,7 +2986,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
             }, 1000);
         }
         else {
-            console.log("second");
             await fetchPaginatedMessages(null, null, null);
             get_voice_list();
             removeEditMessage();
@@ -3279,7 +3278,6 @@ function oneSignalSubscription(userId) {
             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
         },
     }).then(updateUserFcmToken => {
-        // console.log("user cubs cription response", updateUserFcmToken);
         if (!updateUserFcmToken.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -3985,10 +3983,8 @@ messageSidebar.addEventListener('scroll', function () {
 });
 
 function handleMessageResponse(messageElement, message, messageId, searchQuery) {
-    console.log("here");
     let replyDisplay = '';
     if (messageElement) {
-        console.log("message element");;
 
         // DOM.searchMessageClick = true;
         const messageTextElement = messageElement.querySelector(".shadow-sm");
@@ -4211,7 +4207,6 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
         }, 700)
 
     } else {
-        console.log("else");
         fetchPaginatedMessages(messageId, null, null);
     }
 }
