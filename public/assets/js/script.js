@@ -2032,6 +2032,9 @@ function editMessage(messageId) {
         }
         const editMessageContent = document.querySelector('.EditmessageContent');
         editMessageContent.innerText = editMessage.substring(0, 100) + '....';
+        if (editMessage.split('\n').filter(line => line.trim() === '').length > 3) {
+        editMessageContent.innerText = editMessageContent.innerText.replace(/(\n){3,}/g, '\n\n');
+        }
         const textarea = document.getElementById('input');
         textarea.value = editMessage;
         textarea.scrollTop = textarea.scrollHeight;
@@ -2176,6 +2179,7 @@ function showReply(message_id, senderName, type) {
         var messagebody = message.msg;
     }
 
+    
     DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var quotedTextElement = document.querySelector('#quoted-message .sender-name');
@@ -2225,7 +2229,10 @@ function showReply(message_id, senderName, type) {
         </div>`;
     } else {
 
-        var message_body = messagebody.substring(0, 100).replace(/\r\n|\n/g, '<br>') + ".....";
+        var message_body = messagebody
+        .replace(/(\r\n|\n){3,}/g, '\n\n')
+        .substring(0, 100) 
+        .replace(/\r\n|\n/g, '<br>') + "....."; 
 
     }
     quotedNameElement.innerHTML = message_body;
