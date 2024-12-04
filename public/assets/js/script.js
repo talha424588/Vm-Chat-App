@@ -2878,7 +2878,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
     if (searchMessage && !searchMessageSet.size > 0) {
-        // DOM.groupSearchCounter ++;
         await showloader();
         DOM.loader_showing = true;
     }
@@ -2906,8 +2905,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     else {
         DOM.messages.innerHTML = '';
     }
-    // DOM.messages.innerHTML = '';
-
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
     DOM.currentPage = 1;
     displayedMessageIds.clear();

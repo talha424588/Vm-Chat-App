@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string("media_name",256)->default(null)->nullable();
             $table->string("type",100)->default(null)->nullable();
             $table->boolean('is_deleted')->default(0);
+            $table->integer('compose_id')->default(null);
         });
     }
 
