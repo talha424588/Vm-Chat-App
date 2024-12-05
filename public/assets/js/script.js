@@ -2608,21 +2608,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         DOM.unreadCounter = Notseenby.length;
         const notSeenById = Notseenby.at(-1);
 
-        // try {
-        //     const response = await fetch("message/seen-by/update", {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //             "X-CSRF-Token": csrfToken,
-        //         },
-        //         body: JSON.stringify({ ids }),
-        //     });
-
-        //     const readMessageResponse = await response.json();
-        // } catch (error) {
-        //     console.error('Error updating seen messages:', error);
-        // }
-
         (async () => {
             try {
                 await fetch("message/seen-by/update", {
