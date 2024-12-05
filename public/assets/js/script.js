@@ -160,7 +160,7 @@ let populateGroupList = async () => {
     }
 };
 
-let viewChatList = (flag=false) => {
+let viewChatList = (flag = false) => {
     if (!DOM.groupSearch) {
         console.log("sarch mood");
         previousChatList = [...chatList]
@@ -168,8 +168,8 @@ let viewChatList = (flag=false) => {
     if (chatList.length === 0) {
         return;
     }
-    if(!flag)
-    DOM.chatList.innerHTML = "";
+    if (!flag)
+        DOM.chatList.innerHTML = "";
     DOM.chatList2.innerHTML = "";
     chatList.sort((a, b) => {
         if (a.time && b.time) {
@@ -376,7 +376,7 @@ let viewMessageList = () => {
 };
 
 let generateChatList = async () => {
-    DOM.chatList.innerHTML='';
+    DOM.chatList.innerHTML = '';
     await populateGroupList();
     viewChatList();
 };
@@ -874,7 +874,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                                 ${editedMessage.user.name}
                             </div>
                             <div class="reply-details">
-                                <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200)}${replyMessage.length>100?'....':'' }</p>
+                                <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200)}${replyMessage.length > 100 ? '....' : ''}</p>
                             </div>
                         </div>
                         ${newMessageDisplay}`;
@@ -1362,15 +1362,15 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-                const dots=message.reply.msg.length>100?'...':'';
+                const dots = message.reply.msg.length > 100 ? '...' : '';
                 if (message.reply.is_compose == 1) {
-                  
-                
-                 
+
+
+
                     var message_body = processValue(message.reply.msg, false).substring(0, 200) + dots;
                 }
                 else {
-                    
+
                     var message_body = message.reply.msg.replace(/<br\s*\/?>/gi, '\n').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + dots;
                 }
             }
@@ -2038,10 +2038,10 @@ function editMessage(messageId) {
             editMessageIdField.value = messageId;
         }
         const editMessageContent = document.querySelector('.EditmessageContent');
-        const dots=editMessage.length>100?'...':'';
+        const dots = editMessage.length > 100 ? '...' : '';
         editMessageContent.innerText = editMessage.substring(0, 100) + dots;
         if (editMessage.split('\n').filter(line => line.trim() === '').length > 3) {
-        editMessageContent.innerText = editMessageContent.innerText.replace(/(\n){3,}/g, '\n\n');
+            editMessageContent.innerText = editMessageContent.innerText.replace(/(\n){3,}/g, '\n\n');
         }
         const textarea = document.getElementById('input');
         textarea.value = editMessage;
@@ -2236,13 +2236,13 @@ function showReply(message_id, senderName, type) {
             </div>
         </div>`;
     } else {
-        
-        const dots=messagebody.length>100?'...':'';
-        
+
+        const dots = messagebody.length > 100 ? '...' : '';
+
         var message_body = messagebody
-        .replace(/(\r\n|\n){3,}/g, '\n\n')
-        .substring(0, 100) 
-        .replace(/\r\n|\n/g, '<br>') + dots; 
+            .replace(/(\r\n|\n){3,}/g, '\n\n')
+            .substring(0, 100)
+            .replace(/\r\n|\n/g, '<br>') + dots;
 
 
     }
@@ -2637,19 +2637,18 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
-            if(DOM.currentPage == 1)
-               {
-            const span = document.createElement('span');
-            span.innerHTML = `
+            if (DOM.currentPage == 1) {
+                const span = document.createElement('span');
+                span.innerHTML = `
             <div class="notification-wrapper">
                 <div class="unread-messages">
                    No Messages To Load
                 </div>
             </div>
              `;
-            DOM.messages.appendChild(span);
-               }
-            return;             
+                DOM.messages.appendChild(span);
+            }
+            return;
         }
         nextPageMessages.data.forEach((message) => {
 
@@ -2906,19 +2905,18 @@ async function showloader() {
 }
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessage = null, notificationMessageId = null) => {
     // console.log("groupSearchMessage",groupSearchMessage);
-    if(DOM.groupId != groupSearchMessage?.group_id)
+    if (DOM.groupId != groupSearchMessage?.group_id)
         searchMessageSet.clear();
     change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
     if (searchMessage) {
-         // DOM.groupSearchCounter ++;
-        if(!searchMessageSet.size > 0)
-       {
+        // DOM.groupSearchCounter ++;
+        if (!searchMessageSet.size > 0) {
 
-        await showloader();
-        DOM.loader_showing = true;
-       }
+            await showloader();
+            DOM.loader_showing = true;
+        }
     }
 
 
@@ -3688,12 +3686,12 @@ let isFetchingMessages = false;
 // group here
 let searchGroups = async (searchQuery, loadMore = false) => {
 
-    const buttons=document.querySelector('.buttons');
+    const buttons = document.querySelector('.buttons');
     if (loadMore) {
         currentPageGroups++;
         currentPageMessages++;
     }
-   
+
     // else {
     //     currentPageGroups = 1;
     //     currentPageMessages = 1;
@@ -3708,7 +3706,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     }
 
     if (searchQuery.trim().length > 0) {
-        buttons.style.display='none';
+        buttons.style.display = 'none';
         DOM.groupSearch = true;
         DOM.messageSearchQuery = searchQuery;
         const url = `search-group-by-name/${searchQuery}?page_groups=${currentPageGroups}&page_messages=${currentPageMessages}`;
@@ -3721,16 +3719,16 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 let groups = new Set();
                 groups = response.data.groups.data;
                 const messages = response.data.messages.data;
-                console.log(groups,messages);
+                console.log(groups, messages);
                 if (!groups || groups.length === 0) {
                     console.log('no group is found');
                     if (!loadMore) {
                         console.log("no group is found and not loading more message");
                         DOM.chatList.innerHTML = '';
-                        DOM.chatList.style.display= 'none';
+                        DOM.chatList.style.display = 'none';
                     }
                 } else {
-                    DOM.chatList.style.display= 'block';
+                    DOM.chatList.style.display = 'block';
                     DOM.chatList.innerHTML += `<div class="heading"><h2>Groups</h2></div>`;
                     groups.forEach((group) => {
                         let chat = {
@@ -3751,13 +3749,13 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     });
                     viewChatList(true);
                 }
-            
+
                 if (messages == undefined) {
-                    console.log("is loading",loadMore);
+                    console.log("is loading", loadMore);
                     if (!loadMore) {
                         console.log("in condition");
                         // DOM.chatList2.innerHTML = `<div class="no-messages-found">No messages found.</div>`;
-                        document.getElementById('messagesList').innerHTML='<div class="no-messages-found">No messages found.</div>' ;
+                        document.getElementById('messagesList').innerHTML = '<div class="no-messages-found">No messages found.</div>';
                         return;
                     }
                 } else {
@@ -3776,7 +3774,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         }
     } else {
         DOM.groupSearch = false;
-        buttons.style.display='block';
+        buttons.style.display = 'block';
         // chatList = [...previousChatList];
         // chatList.sort((a, b) => {
         //     if (a.time && b.time) {
@@ -3792,7 +3790,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         messageList = [];
         DOM.messagesList.innerHTML = '';
         // viewChatList();
-        DOM.chatList.style.display= 'block';
+        DOM.chatList.style.display = 'block';
         generateChatList();
     }
 };
@@ -3913,7 +3911,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 DOM.loader_showing = true;
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-                                console.log("element",messageElement);
+                                console.log("element", messageElement);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
                                 setTimeout(() => {
                                     hideSpinner();
