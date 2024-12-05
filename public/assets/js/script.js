@@ -2546,8 +2546,7 @@ DOM.messages.addEventListener('scroll', async () => {
 const displayedMessageIds = new Set();
 
 let isLoading = false;
-const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null) => {
-
+const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null,unreadCounter = null) => {
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
@@ -2560,6 +2559,13 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         else if (message_id || DOM.lastMessageId) {
 
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&messageId=${encodeURIComponent(message_id)}`;
+        }
+        if(unreadCounter)
+        {
+            console.log("unreadCounter",unreadCounter);
+            DOM.currentPage = Math.ceil(unreadCounter / 50);
+            console.log("current page",DOM.currentPage);
+            url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&unreadCount=${unreadCounter}`;
         }
         else {
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}`;
@@ -2588,6 +2594,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             DOM.lastMessageId = nextPageMessages.data.at(-1).id;
         }
         // here
+        console.log("before unread:",nextPageMessages);
         unread_settings(nextPageMessages);
 
         if (pagnicateChatList && pagnicateChatList.data && DOM.currentPage != 1) {
@@ -2650,6 +2657,9 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             }
             return;
         }
+        console.log("storeing",pagnicateChatList)
+        console.log("data",nextPageMessages);
+
         nextPageMessages.data.forEach((message) => {
 
             if (!displayedMessageIds.has(message.id)) {
@@ -2847,10 +2857,12 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         const newScrollHeight = DOM.messages.scrollHeight;
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
-
+        console.log("current page now",DOM.currentPage);
         if (!message_id) {
+            console.log("current page in body",DOM.currentPage);
             DOM.currentPage += 1;
         }
+        console.log("current page after body",DOM.currentPage);
     } catch (error) {
         console.error('Error fetching messages:', error);
     }
@@ -2946,6 +2958,17 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
     DOM.currentPage = 1;
     displayedMessageIds.clear();
+    console.log("gene",DOM.unreadCounter);
+    console.log("per group",DOM.unreadMessagesPerGroup[DOM.groupId]);
+
+    if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
+        console.log("counter mote then 50");
+        await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
+        get_voice_list();
+        removeEditMessage();
+        removeQuotedMessage();
+        scroll_to_unread_div();
+    }
 
 
     resetChatArea();
