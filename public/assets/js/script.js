@@ -2637,16 +2637,19 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
+            if(DOM.currentPage == 1)
+               {
             const span = document.createElement('span');
             span.innerHTML = `
-            <div id="unread-wrapper" class="notification-wrapper">
+            <div class="notification-wrapper">
                 <div class="unread-messages">
                    No Messages To Load
                 </div>
             </div>
              `;
             DOM.messages.appendChild(span);
-            return;
+               }
+            return;             
         }
         nextPageMessages.data.forEach((message) => {
 
@@ -2902,7 +2905,6 @@ async function showloader() {
 
 }
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessage = null, notificationMessageId = null) => {
-
     // console.log("groupSearchMessage",groupSearchMessage);
     if(DOM.groupId != groupSearchMessage?.group_id)
         searchMessageSet.clear();
