@@ -2896,21 +2896,18 @@ async function showloader() {
 
 }
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessage = null, notificationMessageId = null) => {
-    // console.log("groupSearchMessage",groupSearchMessage);
     if (DOM.groupId != groupSearchMessage?.group_id)
         searchMessageSet.clear();
     change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
     if (searchMessage) {
-        // DOM.groupSearchCounter ++;
         if (!searchMessageSet.size > 0) {
 
             await showloader();
             DOM.loader_showing = true;
         }
     }
-
 
     if (searchMessageSet.size > 0 && DOM.groupId == groupSearchMessage.group_id) {
         if (Array.from(searchMessageSet).find(e => e.id == groupSearchMessage.id)) {
