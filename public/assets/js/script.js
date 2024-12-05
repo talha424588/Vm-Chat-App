@@ -160,7 +160,7 @@ let populateGroupList = async () => {
     }
 };
 
-let viewChatList = (flag=false) => {
+let viewChatList = (flag = false) => {
     if (!DOM.groupSearch) {
         console.log("sarch mood");
         previousChatList = [...chatList]
@@ -168,8 +168,8 @@ let viewChatList = (flag=false) => {
     if (chatList.length === 0) {
         return;
     }
-    if(!flag)
-    DOM.chatList.innerHTML = "";
+    if (!flag)
+        DOM.chatList.innerHTML = "";
     DOM.chatList2.innerHTML = "";
     chatList.sort((a, b) => {
         if (a.time && b.time) {
@@ -402,7 +402,7 @@ let viewMessageList = () => {
 };
 
 let generateChatList = async () => {
-    DOM.chatList.innerHTML='';
+    DOM.chatList.innerHTML = '';
     await populateGroupList();
     viewChatList();
 };
@@ -900,7 +900,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                                 ${editedMessage.user.name}
                             </div>
                             <div class="reply-details">
-                                <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200)}${replyMessage.length>100?'....':'' }</p>
+                                <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200)}${replyMessage.length > 100 ? '....' : ''}</p>
                             </div>
                         </div>
                         ${newMessageDisplay}`;
@@ -1509,15 +1509,15 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
-                const dots=message.reply.msg.length>100?'...':'';
+                const dots = message.reply.msg.length > 100 ? '...' : '';
                 if (message.reply.is_compose == 1) {
-                  
-                
-                 
+
+
+
                     var message_body = processValue(message.reply.msg, false).substring(0, 200) + dots;
                 }
                 else {
-                    
+
                     var message_body = message.reply.msg.replace(/<br\s*\/?>/gi, '\n').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + dots;
                 }
             }
@@ -2185,10 +2185,10 @@ function editMessage(messageId) {
             editMessageIdField.value = messageId;
         }
         const editMessageContent = document.querySelector('.EditmessageContent');
-        const dots=editMessage.length>100?'...':'';
+        const dots = editMessage.length > 100 ? '...' : '';
         editMessageContent.innerText = editMessage.substring(0, 100) + dots;
         if (editMessage.split('\n').filter(line => line.trim() === '').length > 3) {
-        editMessageContent.innerText = editMessageContent.innerText.replace(/(\n){3,}/g, '\n\n');
+            editMessageContent.innerText = editMessageContent.innerText.replace(/(\n){3,}/g, '\n\n');
         }
         const textarea = document.getElementById('input');
         textarea.value = editMessage;
@@ -2383,13 +2383,13 @@ function showReply(message_id, senderName, type) {
             </div>
         </div>`;
     } else {
-        
-        const dots=messagebody.length>100?'...':'';
-        
+
+        const dots = messagebody.length > 100 ? '...' : '';
+
         var message_body = messagebody
-        .replace(/(\r\n|\n){3,}/g, '\n\n')
-        .substring(0, 100) 
-        .replace(/\r\n|\n/g, '<br>') + dots; 
+            .replace(/(\r\n|\n){3,}/g, '\n\n')
+            .substring(0, 100)
+            .replace(/\r\n|\n/g, '<br>') + dots;
 
 
     }
@@ -2693,8 +2693,7 @@ DOM.messages.addEventListener('scroll', async () => {
 const displayedMessageIds = new Set();
 
 let isLoading = false;
-const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null) => {
-
+const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null, unreadCounter = null) => {
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
@@ -2707,6 +2706,12 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         else if (message_id || DOM.lastMessageId) {
 
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&messageId=${encodeURIComponent(message_id)}`;
+        }
+        if (unreadCounter) {
+            console.log("unreadCounter", unreadCounter);
+            DOM.currentPage = Math.ceil(unreadCounter / 50);
+            console.log("current page", DOM.currentPage);
+            url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&unreadCount=${unreadCounter}`;
         }
         else {
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}`;
@@ -2722,11 +2727,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         if (DOM.groupSearch) {
             nextPageMessages.data.forEach(item => searchMessageSet.add(item))
         }
-        // else {
-        //     console.log("i am being clear",searchMessageSet);
-        //     searchMessageSet.clear();
-        //     console.log("i am after being clear",searchMessageSet);
-        // }
+
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
@@ -2735,6 +2736,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             DOM.lastMessageId = nextPageMessages.data.at(-1).id;
         }
         // here
+        console.log("before unread:", nextPageMessages);
         unread_settings(nextPageMessages);
 
         if (pagnicateChatList && pagnicateChatList.data && DOM.currentPage != 1) {
@@ -2751,21 +2753,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             .map(item => item.id);
         DOM.unreadCounter = Notseenby.length;
         const notSeenById = Notseenby.at(-1);
-
-        // try {
-        //     const response = await fetch("message/seen-by/update", {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //             "X-CSRF-Token": csrfToken,
-        //         },
-        //         body: JSON.stringify({ ids }),
-        //     });
-
-        //     const readMessageResponse = await response.json();
-        // } catch (error) {
-        //     console.error('Error updating seen messages:', error);
-        // }
 
         (async () => {
             try {
@@ -2784,20 +2771,22 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
-            if(DOM.currentPage == 1)
-               {
-            const span = document.createElement('span');
-            span.innerHTML = `
+            if (DOM.currentPage == 1) {
+                const span = document.createElement('span');
+                span.innerHTML = `
             <div class="notification-wrapper">
                 <div class="unread-messages">
                    No Messages To Load
                 </div>
             </div>
              `;
-            DOM.messages.appendChild(span);
-               }
-            return;             
+                DOM.messages.appendChild(span);
+            }
+            return;
         }
+        console.log("storeing", pagnicateChatList)
+        console.log("data", nextPageMessages);
+
         nextPageMessages.data.forEach((message) => {
 
             if (!displayedMessageIds.has(message.id)) {
@@ -2995,10 +2984,12 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         const newScrollHeight = DOM.messages.scrollHeight;
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
-
+        console.log("current page now", DOM.currentPage);
         if (!message_id) {
+            console.log("current page in body", DOM.currentPage);
             DOM.currentPage += 1;
         }
+        console.log("current page after body", DOM.currentPage);
     } catch (error) {
         console.error('Error fetching messages:', error);
     }
@@ -3023,7 +3014,6 @@ function unread_settings(query_set) {
         }
     });
     const groupElem = document.getElementsByClassName(groupId)[0];
-    // var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
     var first_value = DOM.unreadMessagesPerGroup[DOM.groupId];
@@ -3052,22 +3042,18 @@ async function showloader() {
 
 }
 let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, groupSearchMessage = null, notificationMessageId = null) => {
-    // console.log("groupSearchMessage",groupSearchMessage);
-    if(DOM.groupId != groupSearchMessage?.group_id)
+    if (DOM.groupId != groupSearchMessage?.group_id)
         searchMessageSet.clear();
     change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
     if (searchMessage) {
-         // DOM.groupSearchCounter ++;
-        if(!searchMessageSet.size > 0)
-       {
+        if (!searchMessageSet.size > 0) {
 
-        await showloader();
-        DOM.loader_showing = true;
-       }
+            await showloader();
+            DOM.loader_showing = true;
+        }
     }
-
 
     if (searchMessageSet.size > 0 && DOM.groupId == groupSearchMessage.group_id) {
         if (Array.from(searchMessageSet).find(e => e.id == groupSearchMessage.id)) {
@@ -3095,6 +3081,17 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
     DOM.currentPage = 1;
     displayedMessageIds.clear();
+    console.log("gene", DOM.unreadCounter);
+    console.log("per group", DOM.unreadMessagesPerGroup[DOM.groupId]);
+
+    if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
+        console.log("counter mote then 50");
+        await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
+        get_voice_list();
+        removeEditMessage();
+        removeQuotedMessage();
+        scroll_to_unread_div();
+    }
 
 
     resetChatArea();
@@ -3105,13 +3102,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
 
     [...DOM.chatListItem].forEach((elem) => mClassList(elem).remove("active"));
 
-    // if (window.innerWidth <= 575) {
-    //     mClassList(DOM.chatListArea).remove("d-flex ").add("d-none");
-    //     mClassList(DOM.messageArea).remove("d-none").add("d-flex");
-    //     areaSwapped = true;
-    // } else {
-    //     mClassList(elem).add("active");
-    // }
     if (window.innerWidth <= 575) {
 
         DOM.chatListArea.classList.replace("d-flex", "d-none");
@@ -3268,10 +3258,6 @@ let sendMessage = (type = 'Message', mediaName = null) => {
             DOM.replyId = null;
         }
         else {
-            const fileIcon = document.querySelector('#file-icon');
-            const chaticon = document.querySelector('#captureid');
-            // fileIcon.style.visibility = 'visible';
-            // chaticon.style.visibility = 'visible';
             let value = DOM.messageInput.value;
             if (value === "") return;
             let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -3312,12 +3298,6 @@ window.addEventListener("resize", e => {
 
 let init = () => {
     DOM.username.innerHTML = user.name;
-
-    // DOM.displayPic.src = user.pic;
-    // DOM.profilePic.src = user.pic;
-    // DOM.profilePic.addEventListener("click", () => DOM.profilePicInput.click());
-    // DOM.profilePicInput.addEventListener("change", () => console.log(DOM.profilePicInput.files[0]));
-    // DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
 
     generateChatList();
 
@@ -3835,12 +3815,12 @@ let isFetchingMessages = false;
 // group here
 let searchGroups = async (searchQuery, loadMore = false) => {
 
-    const buttons=document.querySelector('.buttons');
+    const buttons = document.querySelector('.buttons');
     if (loadMore) {
         currentPageGroups++;
         currentPageMessages++;
     }
-   
+
     // else {
     //     currentPageGroups = 1;
     //     currentPageMessages = 1;
@@ -3855,7 +3835,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     }
 
     if (searchQuery.trim().length > 0) {
-        buttons.style.display='none';
+        buttons.style.display = 'none';
         DOM.groupSearch = true;
         DOM.messageSearchQuery = searchQuery;
         const url = `search-group-by-name/${searchQuery}?page_groups=${currentPageGroups}&page_messages=${currentPageMessages}`;
@@ -3868,16 +3848,16 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 let groups = new Set();
                 groups = response.data.groups.data;
                 const messages = response.data.messages.data;
-                console.log(groups,messages);
+                console.log(groups, messages);
                 if (!groups || groups.length === 0) {
                     console.log('no group is found');
                     if (!loadMore) {
                         console.log("no group is found and not loading more message");
                         DOM.chatList.innerHTML = '';
-                        DOM.chatList.style.display= 'none';
+                        DOM.chatList.style.display = 'none';
                     }
                 } else {
-                    DOM.chatList.style.display= 'block';
+                    DOM.chatList.style.display = 'block';
                     DOM.chatList.innerHTML += `<div class="heading"><h2>Groups</h2></div>`;
                     groups.forEach((group) => {
                         let chat = {
@@ -3898,13 +3878,13 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     });
                     viewChatList(true);
                 }
-            
+
                 if (messages == undefined) {
-                    console.log("is loading",loadMore);
+                    console.log("is loading", loadMore);
                     if (!loadMore) {
                         console.log("in condition");
                         // DOM.chatList2.innerHTML = `<div class="no-messages-found">No messages found.</div>`;
-                        document.getElementById('messagesList').innerHTML='<div class="no-messages-found">No messages found.</div>' ;
+                        document.getElementById('messagesList').innerHTML = '<div class="no-messages-found">No messages found.</div>';
                         return;
                     }
                 } else {
@@ -3923,7 +3903,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         }
     } else {
         DOM.groupSearch = false;
-        buttons.style.display='block';
+        buttons.style.display = 'block';
         // chatList = [...previousChatList];
         // chatList.sort((a, b) => {
         //     if (a.time && b.time) {
@@ -3939,7 +3919,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         messageList = [];
         DOM.messagesList.innerHTML = '';
         // viewChatList();
-        DOM.chatList.style.display= 'block';
+        DOM.chatList.style.display = 'block';
         generateChatList();
     }
 };
@@ -4060,7 +4040,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 DOM.loader_showing = true;
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-                                console.log("element",messageElement);
+                                console.log("element", messageElement);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
                                 setTimeout(() => {
                                     hideSpinner();

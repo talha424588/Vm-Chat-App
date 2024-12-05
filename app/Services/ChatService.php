@@ -39,7 +39,7 @@ class ChatService implements ChatRepository
     public function fetchUserAllGroupsMessages($request)
     {
         $perPage = 50;
-        if (!$request->messageId) {
+        if (!$request->messageId && !$request->unreadCount) {
             $page = (int)($request->get('page', 1));
 
             $paginator = GroupMessage::where('group_id', $request->groupId)
@@ -79,6 +79,49 @@ class ChatService implements ChatRepository
             return $this->fetchMessagesUpToSearched($request);
         } else if ($request->lastMessageId) {
             return $this->fetchMessagesFromSpecificId($request, 50);
+        } else if ($request->unreadCount) {
+            return $this->fetchAllUnreadMessages($request);
+        }
+    }
+    private function fetchAllUnreadMessages($request)
+    {
+        $currentPage = $request->get('page');
+        $count = $request->get('unreadCount');
+        $count = $request->get('unreadCount');
+        $messages = GroupMessage::where('group_id', $request->groupId)
+            ->whereNot('status', EnumMessageEnum::MOVE)
+            ->with('user', 'reply')
+            ->orderBy('id', 'desc')
+            ->take($count) // Limit the number of messages
+            ->get();
+
+
+
+
+        if ($messages->isNotEmpty()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Messages found',
+                'data' => new MessageResourceCollection($messages),
+                // 'pagination' => [
+                //     'current_page' => $messages->currentPage(),
+                //     'total_pages' => $messages->lastPage(),
+                //     'total_count' => $messages->total(),
+                //     'per_page' => $messages->perPage()
+                // ]
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'No more messages to load',
+                'data' => null,
+                'pagination' => [
+                    'current_page' => $currentPage,
+                    'total_pages' => 0,
+                    'total_count' => 0,
+                    'per_page' => $currentPage,
+                ]
+            ], 404);
         }
     }
     private function fetchMessagesUpToSearched($request)
