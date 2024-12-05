@@ -36,7 +36,14 @@ $(document).ready(function () {
                 // removeHighlight(); // remove highlight message on click ousite the sidebar/cancel icon
                 const MessageInput=document.getElementById("messsage_search_query").value="";
                 const SerachResults=document.getElementById("search-results").innerHTML='';
+                const highlightedMessages = DOM.messages.querySelectorAll(".highlight");
+                const searchResultsDiv = document.querySelector(".search-results");
+                 searchResultsDiv.innerHTML = "";
+                highlightedMessages.forEach((element) => {
+                    element.classList.remove("highlight");
+                });
             }
+         
         }
     });
 });

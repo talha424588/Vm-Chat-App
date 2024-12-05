@@ -160,7 +160,7 @@ let populateGroupList = async () => {
     }
 };
 
-let viewChatList = () => {
+let viewChatList = (flag=false) => {
     if (!DOM.groupSearch) {
         console.log("sarch mood");
         previousChatList = [...chatList]
@@ -168,6 +168,7 @@ let viewChatList = () => {
     if (chatList.length === 0) {
         return;
     }
+    if(!flag)
     DOM.chatList.innerHTML = "";
     DOM.chatList2.innerHTML = "";
     chatList.sort((a, b) => {
@@ -375,6 +376,7 @@ let viewMessageList = () => {
 };
 
 let generateChatList = async () => {
+    DOM.chatList.innerHTML='';
     await populateGroupList();
     viewChatList();
 };
@@ -872,7 +874,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                                 ${editedMessage.user.name}
                             </div>
                             <div class="reply-details">
-                                <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200)}.....</p>
+                                <p class="file-name">${replyMessage.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').substring(0, 200)}${replyMessage.length>100?'....':'' }</p>
                             </div>
                         </div>
                         ${newMessageDisplay}`;
@@ -1360,12 +1362,16 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>
         </div>`;
             } else {
+                const dots=message.reply.msg.length>100?'...':'';
                 if (message.reply.is_compose == 1) {
-
-                    var message_body = processValue(message.reply.msg, false).substring(0, 200) + ".....";
+                  
+                
+                 
+                    var message_body = processValue(message.reply.msg, false).substring(0, 200) + dots;
                 }
                 else {
-                    var message_body = message.reply.msg.replace(/<br\s*\/?>/gi, '\n').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + ".....";
+                    
+                    var message_body = message.reply.msg.replace(/<br\s*\/?>/gi, '\n').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + dots;
                 }
             }
             messageContent = `
@@ -2032,7 +2038,8 @@ function editMessage(messageId) {
             editMessageIdField.value = messageId;
         }
         const editMessageContent = document.querySelector('.EditmessageContent');
-        editMessageContent.innerText = editMessage.substring(0, 100) + '....';
+        const dots=editMessage.length>100?'...':'';
+        editMessageContent.innerText = editMessage.substring(0, 100) + dots;
         if (editMessage.split('\n').filter(line => line.trim() === '').length > 3) {
         editMessageContent.innerText = editMessageContent.innerText.replace(/(\n){3,}/g, '\n\n');
         }
@@ -2229,11 +2236,14 @@ function showReply(message_id, senderName, type) {
             </div>
         </div>`;
     } else {
-
+        
+        const dots=messagebody.length>100?'...':'';
+        
         var message_body = messagebody
         .replace(/(\r\n|\n){3,}/g, '\n\n')
-        .substring(0, 100)
-        .replace(/\r\n|\n/g, '<br>') + ".....";
+        .substring(0, 100) 
+        .replace(/\r\n|\n/g, '<br>') + dots; 
+
 
     }
     quotedNameElement.innerHTML = message_body;
@@ -2965,8 +2975,8 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     fetch(`/get-group-by-id/${DOM.groupId}`)
         .then(response => response.json())
         .then(data => {
-            let memberNames = data.users_with_access.map(member => member.id === user.id ? "You" : member.name);
-            DOM.messageAreaDetails.innerHTML = `${memberNames}`;
+            let memberNames = data.users_with_access.map(member => member.id === user.id ? "" : member.name);
+            DOM.messageAreaDetails.innerHTML = `${memberNames},You`;
             DOM.messageAreaName.innerHTML = data.name;
         })
         .catch(error => {
@@ -3675,10 +3685,13 @@ let isFetchingMessages = false;
 
 // group here
 let searchGroups = async (searchQuery, loadMore = false) => {
+
+    const buttons=document.querySelector('.buttons');
     if (loadMore) {
         currentPageGroups++;
         currentPageMessages++;
     }
+   
     // else {
     //     currentPageGroups = 1;
     //     currentPageMessages = 1;
@@ -3692,7 +3705,8 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         DOM.chatList2.innerHTML = '';
     }
 
-    if (searchQuery.length > 0) {
+    if (searchQuery.trim().length > 0) {
+        buttons.style.display='none';
         DOM.groupSearch = true;
         DOM.messageSearchQuery = searchQuery;
         const url = `search-group-by-name/${searchQuery}?page_groups=${currentPageGroups}&page_messages=${currentPageMessages}`;
@@ -3705,13 +3719,17 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 let groups = new Set();
                 groups = response.data.groups.data;
                 const messages = response.data.messages.data;
-
+                console.log(groups,messages);
                 if (!groups || groups.length === 0) {
+                    console.log('no group is found');
                     if (!loadMore) {
-                        DOM.chatList.innerHTML += ` <div class="no-groups-found">No Groups Found.</div>`;
+                        console.log("no group is found and not loading more message");
+                        DOM.chatList.innerHTML = '';
+                        DOM.chatList.style.display= 'none';
                     }
                 } else {
-                    DOM.chatList.innerHTML = `<div class="heading"><h2>Groups</h2></div>`;
+                    DOM.chatList.style.display= 'block';
+                    DOM.chatList.innerHTML += `<div class="heading"><h2>Groups</h2></div>`;
                     groups.forEach((group) => {
                         let chat = {
                             isGroup: true,
@@ -3729,12 +3747,16 @@ let searchGroups = async (searchQuery, loadMore = false) => {
 
                         chatList.push(chat);
                     });
-                    viewChatList();
+                    viewChatList(true);
                 }
-
+            
                 if (messages == undefined) {
+                    console.log("is loading",loadMore);
                     if (!loadMore) {
-                        DOM.chatList2.innerHTML += `<div class="no-messages-found">No messages found.</div>`;
+                        console.log("in condition");
+                        // DOM.chatList2.innerHTML = `<div class="no-messages-found">No messages found.</div>`;
+                        document.getElementById('messagesList').innerHTML='<div class="no-messages-found">No messages found.</div>' ;
+                        return;
                     }
                 } else {
                     messages.forEach((msg) => {
@@ -3743,15 +3765,16 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     viewMessageList();
                 }
 
-                if (loadMore && !groups && messages == undefined) {
-                    DOM.chatList2.innerHTML += `<div class="no-messages-found">No more data found.</div>`;
-                }
+                // if (loadMore && !groups && messages == undefined) {
+                //     DOM.chatList2.innerHTML += `<div class="no-messages-found">No more data found.</div>`;
+                // }
             }
         } catch (error) {
             // console.log(error);
         }
     } else {
         DOM.groupSearch = false;
+        buttons.style.display='block';
         // chatList = [...previousChatList];
         // chatList.sort((a, b) => {
         //     if (a.time && b.time) {
@@ -3767,7 +3790,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         messageList = [];
         DOM.messagesList.innerHTML = '';
         // viewChatList();
-
+        DOM.chatList.style.display= 'block';
         generateChatList();
     }
 };
