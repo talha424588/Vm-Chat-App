@@ -3152,12 +3152,6 @@ window.addEventListener("resize", e => {
 let init = () => {
     DOM.username.innerHTML = user.name;
 
-    // DOM.displayPic.src = user.pic;
-    // DOM.profilePic.src = user.pic;
-    // DOM.profilePic.addEventListener("click", () => DOM.profilePicInput.click());
-    // DOM.profilePicInput.addEventListener("change", () => console.log(DOM.profilePicInput.files[0]));
-    // DOM.inputName.addEventListener("blur", (e) => user.name = e.target.value);
-
     generateChatList();
 
     const waitForChatList = setInterval(() => {
