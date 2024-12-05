@@ -2868,7 +2868,6 @@ function unread_settings(query_set) {
         }
     });
     const groupElem = document.getElementsByClassName(groupId)[0];
-    // var first_get_value = DOM.unreadMessagesPerGroup[DOM.groupId];
     var unseen = unseenCount;
     let groupToUpdate = chatList.find(chat => chat.group.group_id === groupId);
     var first_value = DOM.unreadMessagesPerGroup[DOM.groupId];
