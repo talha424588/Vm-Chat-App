@@ -272,7 +272,7 @@ function getOldMessageMediaName(message) {
     return mediaName
 }
 
-function getOldMessageType(message) {
+function getOldMessageType1(message) {
 
     if (/<audio[^>]+>/g.test(message.msg)) {
         return "Audio"
@@ -284,7 +284,33 @@ function getOldMessageType(message) {
     const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
     return mediaType
 }
+function getOldMessageType(message) {
+    // Check if the message contains an audio tag
+    if (/<audio[^>]+>/g.test(message.msg)) {
+        return "Audio";
+    }
 
+    // Check if the message contains a link tag
+    const linkTags = message.msg.match(/<a[^>]+>/g);
+    if (linkTags && linkTags.length > 0) {
+        const linkTag = linkTags[0];
+        const fileLink = linkTag.match(/href="([^"]+)"/)[1];
+        const mediaName = fileLink.split('uploads/')[1];
+        const displayMediaName = message.media_name || mediaName;
+        const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
+        return mediaType;
+    }
+
+    // Check for simple HTML tags (like <p>, <h2>, etc.)
+    if (/<(p|h[1-6])[^>]*>.*?<\/(p|h[1-6])>/g.test(message.msg)) {
+        return "Text"; // or any other type you want to return for simple HTML tags
+    }
+    if (/[\s\n]+/.test(message.msg) && !/<[^>]+>/.test(message.msg)) {
+        return "Message"; // or any other type you want to return for messages with spaces and newlines
+    }
+    // If none of the above conditions are met, return a default type
+    return "Unknown";
+}
 function removeTags(messageText) {
     return messageText.replace(/<\/?p>/g, '')
 }
@@ -1133,7 +1159,11 @@ let addMessageToMessageArea = (message, flag = false) => {
     let messageContent;
     let oldMessageType = null;
     if (/<a[^>]+>/g.test(message.msg) || /<audio[^>]+>/g.test(message.msg)) {
+        // console.log("this is the old message",message);
         oldMessageType = getOldMessageType(message);
+        message.type=oldMessageType;
+        // console.log("this is the old message type :",oldMessageType);
+        // console.log("this is the old message after assgining type",message);
     }
     if (message.type === 'File') {
         if (message.reply) {
@@ -1249,6 +1279,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     }
     else if (/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) && !message.reply) {
         let fileLink;
+        console.log("this is the message that is old");
         // if (/<a[^>]+>/g.test(message.msg)) {
         const linkTag = message.msg.match(/<a[^>]+>/g)[0];
         fileLink = linkTag.match(/href="([^"]+)"/)[1];
@@ -1280,6 +1311,122 @@ let addMessageToMessageArea = (message, flag = false) => {
             <img src="${fileLink}" style="height:222px; width:100%;">
         `;
         }
+    }
+    else if (message.type === 'document') {
+        let fileLink;
+        // if (/<a[^>]+>/g.test(message.msg)) {
+            const linkTag = message.msg.match(/<a[^>]+>/g)[0];
+            fileLink = linkTag.match(/href="([^"]+)"/)[1];
+            const mediaName = fileLink.split('uploads/')[1];
+            const displayMediaName = message.media_name || mediaName;
+            const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
+            if (message.reply) {
+                message.reply.type=getOldMessageType(message.reply);
+                if(message.reply.type == "Message")
+                {
+                    
+                    messageContent=`
+                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
+                    <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                        ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                    </div>
+                    <div class="reply-details">
+                        <p class="file-name">${message.reply.msg}</p>
+                    </div>
+                </div>
+               <div class="file-message bg-white mt-2 shadow">
+                    <div class="file-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <p class="file-name">${displayMediaName}</p>
+
+                    </div>
+                    <a href="${fileLink}" target="_blank" download="${displayMediaName}" class="download-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                        </svg>
+                    </a>
+                </div>
+                    
+                    `
+                }
+                else if(message.reply.type == "Image"){
+                    messageContent=`
+                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
+                    <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                        ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                    </div>
+                    <div class="reply-details">
+                        <p class="file-name">${message.reply.msg}</p>
+                    </div>
+                </div>
+               <div class="file-message bg-white mt-2 shadow">
+                    <img src="${fileLink}" style="height:222px; width:100%;">
+                </div>
+                    `
+                }
+                else if(message.reply.type == "Aidio"){
+                    const audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
+                    audioSrc = audioTag.match(/src="([^"]+)"/)[1];
+                    messageContent=`
+                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
+                    <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                        ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                    </div>
+                    <div class="reply-details">
+                        <p class="file-name">${message.reply.msg}</p>
+                    </div>
+                </div>
+              
+        <div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
+            <div class="avatar">
+                <!-- Avatar image here -->
+            </div>
+            <div class="audio-content">
+                <div class="audio-controls">
+                    <button class="play-button">
+                       <svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
+                        </svg>
+                    </button>
+                    <div class="audio-progress">
+                        <div class="progress-filled"></div>
+                    </div>
+                </div>
+                <div class="audio-time-container">
+                    <span class="audio-duration">0:00</span>
+                    <span class="audio-time">12:27 PM</span>
+                </div>
+            </div>
+        </div>
+                    `
+                }
+            }
+            else{
+                messageContent = `
+                <div class="file-message">
+                    <div class="file-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <p class="file-name">${displayMediaName}</p>
+
+                    </div>
+                    <a href="${fileLink}" target="_blank" download="${displayMediaName}" class="download-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                        </svg>
+                    </a>
+                </div>
+            `;
+            }
     }
     else if (message.type === 'Image') {
         if (message.reply) {
@@ -4011,13 +4158,13 @@ messageSidebar.addEventListener('scroll', function () {
 function handleMessageResponse(messageElement, message, messageId, searchQuery) {
     let replyDisplay = '';
     if (messageElement) {
-
         // DOM.searchMessageClick = true;
         const messageTextElement = messageElement.querySelector(".shadow-sm");
         let highlightElement = document.getElementsByClassName("highlight")[0];
         if (highlightElement) {
             highlightElement.classList.remove("highlight");
         }
+        console.log("this is the message",message);
         switch (message.type) {
             case "Message":
                 if (message.reply) {
