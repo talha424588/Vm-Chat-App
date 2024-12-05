@@ -2956,13 +2956,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
 
     [...DOM.chatListItem].forEach((elem) => mClassList(elem).remove("active"));
 
-    // if (window.innerWidth <= 575) {
-    //     mClassList(DOM.chatListArea).remove("d-flex ").add("d-none");
-    //     mClassList(DOM.messageArea).remove("d-none").add("d-flex");
-    //     areaSwapped = true;
-    // } else {
-    //     mClassList(elem).add("active");
-    // }
     if (window.innerWidth <= 575) {
 
         DOM.chatListArea.classList.replace("d-flex", "d-none");
