@@ -162,7 +162,6 @@ let populateGroupList = async () => {
 
 let viewChatList = (flag = false) => {
     if (!DOM.groupSearch) {
-        console.log("sarch mood");
         previousChatList = [...chatList]
     }
     if (chatList.length === 0) {
@@ -1279,7 +1278,6 @@ let addMessageToMessageArea = (message, flag = false) => {
     }
     else if (/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) && !message.reply) {
         let fileLink;
-        console.log("this is the message that is old");
         // if (/<a[^>]+>/g.test(message.msg)) {
         const linkTag = message.msg.match(/<a[^>]+>/g)[0];
         fileLink = linkTag.match(/href="([^"]+)"/)[1];
@@ -2708,9 +2706,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&messageId=${encodeURIComponent(message_id)}`;
         }
         if (unreadCounter) {
-            console.log("unreadCounter", unreadCounter);
             DOM.currentPage = Math.ceil(unreadCounter / 50);
-            console.log("current page", DOM.currentPage);
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&unreadCount=${unreadCounter}`;
         }
         else {
@@ -2735,8 +2731,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         if (message_id) {
             DOM.lastMessageId = nextPageMessages.data.at(-1).id;
         }
-        // here
-        console.log("before unread:", nextPageMessages);
         unread_settings(nextPageMessages);
 
         if (pagnicateChatList && pagnicateChatList.data && DOM.currentPage != 1) {
@@ -2784,11 +2778,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             }
             return;
         }
-        console.log("storeing", pagnicateChatList)
-        console.log("data", nextPageMessages);
-
-        nextPageMessages.data.forEach((message) => {
-
+        nextPageMessages.data.forEach((message) => {   
             if (!displayedMessageIds.has(message.id)) {
                 addMessageToMessageArea(message);
                 displayedMessageIds.add(message.id);
@@ -2981,17 +2971,12 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 }
             }
         });
-
         const newScrollHeight = DOM.messages.scrollHeight;
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
-        console.log("current page now", DOM.currentPage);
         if (!message_id) {
-            console.log("current page in body", DOM.currentPage);
             DOM.currentPage += 1;
         }
-        console.log("current page after body", DOM.currentPage);
     } catch (error) {
-        console.error('Error fetching messages:', error);
     }
     finally {
         isLoading = false;
@@ -3081,19 +3066,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
     DOM.currentPage = 1;
     displayedMessageIds.clear();
-    console.log("gene", DOM.unreadCounter);
-    console.log("per group", DOM.unreadMessagesPerGroup[DOM.groupId]);
-
-    if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
-        console.log("counter mote then 50");
-        await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
-        get_voice_list();
-        removeEditMessage();
-        removeQuotedMessage();
-        scroll_to_unread_div();
-    }
-
-
     resetChatArea();
     cancelMoveMessage();
 
@@ -3121,7 +3093,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         .catch(error => {
             console.error('Error fetching group data:', error);
         });
-
     if (DOM.groupSearchMessageFound == false) {
         if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
             console.log("first");
@@ -3134,13 +3105,27 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
                 DOM.loader_showing = false;
 
             }, 1000);
+            return;
         }
-        else {
+
+        
+    else if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
+        console.log("counter mote then 50");
+        await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
+        get_voice_list();
+        removeEditMessage();
+        removeQuotedMessage();
+        scroll_to_unread_div();
+        return;
+        
+        } else {
+            console.log("else me chal rha hon bhai");
             await fetchPaginatedMessages(null, null, null);
             get_voice_list();
             removeEditMessage();
             removeQuotedMessage();
             scroll_to_unread_div();
+            return;
         }
     }
 
@@ -4005,7 +3990,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 DOM.loader_showing = true;
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
-                                console.log("element", messageElement);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
                                 setTimeout(() => {
                                     hideSpinner();
@@ -4109,7 +4093,6 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
         if (highlightElement) {
             highlightElement.classList.remove("highlight");
         }
-        console.log("this is the message",message);
         switch (message.type) {
             case "Message":
                 if (message.reply) {
