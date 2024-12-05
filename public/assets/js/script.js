@@ -3332,16 +3332,6 @@ let init = () => {
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
-
-
-    // window.OneSignalDeferred = window.OneSignalDeferred || [];
-    // OneSignalDeferred.push(async function (OneSignal) {
-    //     await OneSignal.init({
-    //         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-    //     });
-    //     user.fcm_token = OneSignal.User.PushSubscription.id;
-    //     DOM.fcmToken = OneSignal.User.PushSubscription.id;
-    // });
 };
 
 init();
@@ -3616,11 +3606,7 @@ function autoResize() {
             }
         } else {
             textarea.style.overflowY = 'hidden';
-            textarea.scrollTop = textarea.scrollTop;  // Maintain current scroll position
-
-            //             textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
-            //             textarea.scrollTop = scrollTop;
-
+            textarea.scrollTop = textarea.scrollTop;
         }
     });
 
@@ -3657,27 +3643,6 @@ textarea.addEventListener('keydown', function (event) {
         textarea.style.overflowY = 'hidden';
     }
 });
-
-
-// textarea.addEventListener('keydown', function (event) {
-//     if (event.key === 'Enter') {
-//         const editReplyArea = document.getElementById('Editreply-area');
-//         if (window.getComputedStyle(editReplyArea).display === 'none') {
-//             event.preventDefault();
-//             sendMessage();
-//             textarea.style.height = '44px';
-//             textarea.style.overflowY = 'hidden';
-//         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
-//             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
-//             textarea.style.height = '44px';
-//             textarea.style.overflowY = 'hidden';
-//         } else {
-//             console.log('The div has a different display property.');
-//         }
-//         removeQuotedMessage();
-//     }
-// });
-
 
 textarea.addEventListener('keydown', function (event) {
 
