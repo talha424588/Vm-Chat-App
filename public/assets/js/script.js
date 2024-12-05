@@ -3459,11 +3459,7 @@ function autoResize() {
             }
         } else {
             textarea.style.overflowY = 'hidden';
-            textarea.scrollTop = textarea.scrollTop;  // Maintain current scroll position
-
-            //             textarea.style.overflowY = newHeight >= maxHeight ? 'scroll' : 'hidden';
-            //             textarea.scrollTop = scrollTop;
-
+            textarea.scrollTop = textarea.scrollTop;
         }
     });
 
