@@ -162,6 +162,7 @@ let populateGroupList = async () => {
 
 let viewChatList = (flag=false) => {
     if (!DOM.groupSearch) {
+        console.log("sarch mood");
         previousChatList = [...chatList]
     }
     if (chatList.length === 0) {
@@ -1819,8 +1820,8 @@ function correction_call(message_id, messagebody, senderName) {
         tinymce.get('input').setContent(messagebody);
         tinymce.get('input').focus();
         const editor = tinymce.get('input');
-        editor.selection.select(editor.getBody(), true); 
-        editor.selection.collapse(false); 
+        editor.selection.select(editor.getBody(), true);
+        editor.selection.collapse(false);
     } else {
         console.error("TinyMCE editor not initialized for #input");
     }
@@ -1873,7 +1874,7 @@ function correction_call(message_id, messagebody, senderName) {
     } else {
         console.error("Element 'correction-div' not found");
     }
-    
+
 }
 
 function correction_send_handel() {
@@ -2186,7 +2187,7 @@ function showReply(message_id, senderName, type) {
         var messagebody = message.msg;
     }
 
-    
+
     DOM.replyId = message_id;
     var replyDiv = document.getElementById('reply-div');
     var quotedTextElement = document.querySelector('#quoted-message .sender-name');
@@ -2242,6 +2243,7 @@ function showReply(message_id, senderName, type) {
         .replace(/(\r\n|\n){3,}/g, '\n\n')
         .substring(0, 100) 
         .replace(/\r\n|\n/g, '<br>') + dots; 
+
 
     }
     quotedNameElement.innerHTML = message_body;
@@ -2995,7 +2997,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
             }, 1000);
         }
         else {
-            console.log("second");
             await fetchPaginatedMessages(null, null, null);
             get_voice_list();
             removeEditMessage();
@@ -3288,7 +3289,6 @@ function oneSignalSubscription(userId) {
             "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
         },
     }).then(updateUserFcmToken => {
-        // console.log("user cubs cription response", updateUserFcmToken);
         if (!updateUserFcmToken.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -3701,9 +3701,8 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     else {
         currentPageGroups = 1;
         currentPageMessages = 1;
-        // Clear previous results
-        DOM.chatList.innerHTML = ''; // Clear previous groups
-        DOM.chatList2.innerHTML = ''; // Clear previous messages
+        DOM.chatList.innerHTML = '';
+        DOM.chatList2.innerHTML = '';
     }
 
     if (searchQuery.trim().length > 0) {
@@ -3912,6 +3911,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                                 DOM.loader_showing = true;
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
+                                console.log("element",messageElement);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
                                 setTimeout(() => {
                                     hideSpinner();
@@ -4007,10 +4007,8 @@ messageSidebar.addEventListener('scroll', function () {
 });
 
 function handleMessageResponse(messageElement, message, messageId, searchQuery) {
-    console.log("here");
     let replyDisplay = '';
     if (messageElement) {
-        console.log("message element");;
 
         // DOM.searchMessageClick = true;
         const messageTextElement = messageElement.querySelector(".shadow-sm");
@@ -4233,7 +4231,6 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
         }, 700)
 
     } else {
-        console.log("else");
         fetchPaginatedMessages(messageId, null, null);
     }
 }
