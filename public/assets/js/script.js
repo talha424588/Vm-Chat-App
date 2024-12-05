@@ -3497,27 +3497,6 @@ textarea.addEventListener('keydown', function (event) {
     }
 });
 
-
-// textarea.addEventListener('keydown', function (event) {
-//     if (event.key === 'Enter') {
-//         const editReplyArea = document.getElementById('Editreply-area');
-//         if (window.getComputedStyle(editReplyArea).display === 'none') {
-//             event.preventDefault();
-//             sendMessage();
-//             textarea.style.height = '44px';
-//             textarea.style.overflowY = 'hidden';
-//         } else if (window.getComputedStyle(editReplyArea).display === 'block') {
-//             document.getElementById('send-message-btn').addEventListener('click', handleSendMessage);
-//             textarea.style.height = '44px';
-//             textarea.style.overflowY = 'hidden';
-//         } else {
-//             console.log('The div has a different display property.');
-//         }
-//         removeQuotedMessage();
-//     }
-// });
-
-
 textarea.addEventListener('keydown', function (event) {
 
     if (event.key === 'Enter' && !event.shiftKey) {
