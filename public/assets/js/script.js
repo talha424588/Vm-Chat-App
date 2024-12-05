@@ -2581,11 +2581,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         if (DOM.groupSearch) {
             nextPageMessages.data.forEach(item => searchMessageSet.add(item))
         }
-        // else {
-        //     console.log("i am being clear",searchMessageSet);
-        //     searchMessageSet.clear();
-        //     console.log("i am after being clear",searchMessageSet);
-        // }
+
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
         }
