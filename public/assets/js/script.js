@@ -3185,16 +3185,6 @@ let init = () => {
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
-
-
-    // window.OneSignalDeferred = window.OneSignalDeferred || [];
-    // OneSignalDeferred.push(async function (OneSignal) {
-    //     await OneSignal.init({
-    //         appId: "d9ec86fd-fc8c-4567-8573-0428916eb93e",
-    //     });
-    //     user.fcm_token = OneSignal.User.PushSubscription.id;
-    //     DOM.fcmToken = OneSignal.User.PushSubscription.id;
-    // });
 };
 
 init();
