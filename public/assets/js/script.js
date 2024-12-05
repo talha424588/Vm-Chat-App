@@ -1324,7 +1324,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 message.reply.type=getOldMessageType(message.reply);
                 if(message.reply.type == "Message")
                 {
-                    
+
                     messageContent=`
                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -1351,7 +1351,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         </svg>
                     </a>
                 </div>
-                    
+
                     `
                 }
                 else if(message.reply.type == "Image"){
@@ -1381,7 +1381,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         <p class="file-name">${message.reply.msg}</p>
                     </div>
                 </div>
-              
+
         <div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
             <div class="avatar">
                 <!-- Avatar image here -->
@@ -3724,28 +3724,6 @@ $('#deleteModal .btn-delete').on('click', function () {
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
             // let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
-
-
-            // messageElement.remove();
-            // messageElement.parent().parent().removeClass("msg_deleted");
-            // messageElement.parent().parent().addClass("msg_deleted");
-            // let deletedMessage = findMessageById(messageId);
-            // const deletedMessage = findMessageById(messageId);
-            //     if (pagnicateChatList.data.length > 0) {
-            //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
-            //         if (currentUsergroup) {
-            //             currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
-            //             viewChatList();
-            //         }
-            //     }
-            //     else {
-            //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
-            //         if (currentUsergroup) {
-            //             currentUsergroup.group.group_messages.push(message);
-            //             viewChatList();
-            //         }
-            //     }
-
 
             socket.emit('deleteMessage', messageId, false);
         })
