@@ -4168,6 +4168,8 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
         switch (message.type) {
             case "Message":
                 if (message.reply) {
+                    if(!message.reply.type)
+                        message.reply.type=getOldMessageType(message.reply);
                     messageTextElement.innerHTML = '';
                     if (message.reply.type === "Audio") {
 
