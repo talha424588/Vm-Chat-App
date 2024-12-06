@@ -463,7 +463,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
     else {
 
         var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
-
+        console.log("user.role",user.role);
         if (user.role != 0 && user.role != 2) {
 
             if (messageElement) {
@@ -484,9 +484,9 @@ socket.on('deleteMessage', (messageId, isMove) => {
             }
         }
         else {
-
+            console.log("element",messageElement.parent());
             var replyLink = messageElement.find('#reply-link');
-
+            messageElement.find('.dropdown').remove();
             if (replyLink.length) {
                 replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
@@ -1121,10 +1121,56 @@ socket.on('restoreMessage', (incomingMessage) => {
         if (restoreButton.length > 0) {
             restoreButton.replaceWith(`
                 <span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666; "
-                      onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.sender}','${incomingMessage.message.type}')">
+                      onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.user.name}','${incomingMessage.message.type}')">
                     Reply
                 </span>
             `);
+
+            const dropdownHTML = `
+            <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-angle-down text-muted px-2"></i>
+                </a>
+                <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                    ${user.role !== '0' && user.role !== '2' ? `
+                        <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+                    ` : ''}
+                    ${(user.role === '0' || user.role === '2') && incomingMessage.message.type === "Message" ? `
+                        <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+                    ` : ''}
+
+                    ${(user.role === '0' || user.role === '2') && (incomingMessage.message.is_compose !== 1 && incomingMessage.message.is_compose !== true) ? `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+
+
+        // const dropdownHTML = `
+        //         <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+        //             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        //                 <i class="fas fa-angle-down text-muted px-2"></i>
+        //             </a>
+        //             <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+        //                 ${(user.role !== '0' && user.role !== '2') || (incomingMessage.message.type === "Message") ? `
+        //                     <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+        //                 ` : ''}
+        //                 ${(user.role === '0' || user.role === '2') && incomingMessage.message.type === "Message" && incomingMessage.message.is_compose ? `
+        //                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${incomingMessage.message.id}', '${incomingMessage.message.user.name}')">Correction</a>
+        //                 ` : ''}
+        //                 ${(user.role === '0' || user.role === '2') && incomingMessage.message.is_compose && incomingMessage.message.type === "Message" ? `
+        //                     <a class="dropdown-item" href="#" onclick="moveMessage('${incomingMessage.message.id}')">Move</a>
+        //                 ` : ''}
+        //                 ${(user.role === '0' || user.role === '2') && !incomingMessage.message.is_compose ? `
+        //                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
+        //                 ` : ''}
+        //             </div>
+        //         </div>
+        //     `;
+
+        // Append the dropdown to the message
+        mainDiv.append(dropdownHTML);
         }
     }
 });
@@ -1322,7 +1368,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 message.reply.type=getOldMessageType(message.reply);
                 if(message.reply.type == "Message")
                 {
-                    
+
                     messageContent=`
                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
@@ -1349,7 +1395,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         </svg>
                     </a>
                 </div>
-                    
+
                     `
                 }
                 else if(message.reply.type == "Image"){
@@ -1379,7 +1425,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         <p class="file-name">${message.reply.msg}</p>
                     </div>
                 </div>
-              
+
         <div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
             <div class="avatar">
                 <!-- Avatar image here -->
@@ -1581,8 +1627,10 @@ let addMessageToMessageArea = (message, flag = false) => {
         </div>
     `;
     }
-
      if (!message.is_privacy_breach && !message.is_deleted) {
+        // ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? '' : 'd-none'}
+        console.log("simple message",message);
+
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -1656,40 +1704,48 @@ let addMessageToMessageArea = (message, flag = false) => {
                             ` : ``}
 
 
-                            ${user.role != '1' && user.role != '3' && message.sender != user.unique_id ? `
-                                <div class="dropdown ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? '' : 'd-none'}" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
-                                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-angle-down text-muted px-2"></i>
-                                </a>
-                                <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) ? `
-
-                                    <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-                                    ` : ''}
-                                    ${user.role === '0' || user.role === '2' ? `
-                                        ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) ? `
-                                        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                            ${user.role !== '1' && user.role !== '3' && message.sender !== user.unique_id ? `
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;">
+                                    <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-angle-down text-muted px-2"></i>
+                                    </a>
+                                    <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                                        ${(user.role !== '0' && user.role !== '2') &&
+                                          message.sender !== user.unique_id &&
+                                          !/<a[^>]+>/g.test(message.msg) &&
+                                          !/<audio[^>]+>/g.test(message.msg) ? `
+                                            <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         ` : ''}
-                                    ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? `
-                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction </a>
-                                    ` : ''}
-                                    ${message.is_compose === 1 && message.type === "Message" && !message.reply ? `
-                                    <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-                                    ` : ''}
-                                    ` : ''}
-                                    <!---
-                                    ${user.role === '0' || user.role === '2' ? `
-                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-                                    ` : ''}---->
-                                    ${(message.is_compose !== 1 && message.is_compose !== true) && user.role === '0' || user.role === '2' ? `
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                                    ` : ''}
-                                    ${user.role === '3' && message.sender === user.unique_id ? `
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                                    ` : ''}
-                                </div>
+
+                                        ${(user.role === '0' || user.role === '2') ? `
+                                            ${(message.type === "Message" || message.type === null) &&
+                                              !/<a[^>]+>/g.test(message.msg) &&
+                                              !/<audio[^>]+>/g.test(message.msg) ? `
+                                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                                            ` : ''}
+
+                                            ${(message.type === "Message" || message.type === null) &&
+                                              (message.is_compose === 1 || message.is_compose === true) ? `
+                                                <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}', '${senderName}')">Correction</a>
+                                            ` : ''}
+
+                                            ${(message.type === "Message" || message.type === null) &&
+                                              (message.is_compose === 1 || message.is_compose === true) ? `
+                                                <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+                                            ` : ''}
+
+                                            ${(message.is_compose !== 1 && message.is_compose !== true) ? `
+                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                            ` : ''}
+                                        ` : ''}
+
+                                        ${user.role === '3' && message.sender === user.unique_id ? `
+                                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                        ` : ''}
+                                    </div>
                                 </div>
                             ` : ''}
+
                        </div>
                     </div>
                 </div>
@@ -1701,7 +1757,8 @@ let addMessageToMessageArea = (message, flag = false) => {
             DOM.messages.insertBefore(messageElement, DOM.messages.firstChild);
         }
     }
-    else if (message.is_privacy_breach == 1 && user.role == 0 || user.role == 2) {
+    else if (message.is_privacy_breach && user.role == 0 || user.role == 2) {
+        console.log("privacy message",message);
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -1735,6 +1792,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         }
     }
     else if (message.is_deleted && user.role == 0 || user.role == 2) {
+        console.log("message delete",message);
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -2695,24 +2753,28 @@ const displayedMessageIds = new Set();
 
 let isLoading = false;
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null, unreadCounter = null) => {
+
+    console.log("message id",message_id);
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
         let url = ''
         if (DOM.searchMessageClick && DOM.lastMessageId) {
-
+            console.log("search click  last emssage");;
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${DOM.searchMessageClick && DOM.lastMessageId ? `&lastMessageId=${encodeURIComponent(DOM.lastMessageId)}` : ''}`;
         }
         else if (message_id || DOM.lastMessageId) {
-                // console.log("these are the params hitting :",DOM.lastMessageId,message_id);
+            console.log("message inside",message_id);
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&messageId=${encodeURIComponent(message_id)}`;
         }
         else if (unreadCounter) {
+            console.log("unread counter");
             DOM.currentPage = Math.ceil(unreadCounter / 50);
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&unreadCount=${unreadCounter}`;
         }
         else {
+            console.log("last resor");
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}`;
         }
         const response = await fetch(url, {
@@ -2793,7 +2855,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             }
             return;
         }
-        nextPageMessages.data.forEach((message) => {   
+        nextPageMessages.data.forEach((message) => {
             if (!displayedMessageIds.has(message.id)) {
                 addMessageToMessageArea(message);
                 displayedMessageIds.add(message.id);
@@ -3108,6 +3170,8 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         .catch(error => {
             console.error('Error fetching group data:', error);
         });
+
+        console.log("search found",DOM.groupSearchMessageFound);
     if (DOM.groupSearchMessageFound == false) {
         if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
             console.log("first");
@@ -3123,7 +3187,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
             return;
         }
 
-        
+
     else if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
         console.log("counter mote then 50");
         await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
@@ -3132,7 +3196,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         removeQuotedMessage();
         scroll_to_unread_div();
         return;
-        
+
         } else {
             await fetchPaginatedMessages(null, null, null);
             get_voice_list();
@@ -3722,28 +3786,6 @@ $('#deleteModal .btn-delete').on('click', function () {
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
             // let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
-
-
-            // messageElement.remove();
-            // messageElement.parent().parent().removeClass("msg_deleted");
-            // messageElement.parent().parent().addClass("msg_deleted");
-            // let deletedMessage = findMessageById(messageId);
-            // const deletedMessage = findMessageById(messageId);
-            //     if (pagnicateChatList.data.length > 0) {
-            //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
-            //         if (currentUsergroup) {
-            //             currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
-            //             viewChatList();
-            //         }
-            //     }
-            //     else {
-            //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
-            //         if (currentUsergroup) {
-            //             currentUsergroup.group.group_messages.push(message);
-            //             viewChatList();
-            //         }
-            //     }
-
 
             socket.emit('deleteMessage', messageId, false);
         })
@@ -4549,18 +4591,18 @@ async function restoreMessage(id) {
         }).then(message => {
             socket.emit('restoreMessage', message);
 
-            var messageElement = $(`[data-message-id="${id}"]`);
+            // var messageElement = $(`[data-message-id="${id}"]`);
 
-            if (messageElement.length > 0) {
-                const restoreButton = $(`#restore-button-${id}`);
-                if (restoreButton.length > 0) {
+            // if (messageElement.length > 0) {
+            //     const restoreButton = $(`#restore-button-${id}`);
+            //     if (restoreButton.length > 0) {
 
-                    restoreButton.replaceWith(`<span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.message.user.name}','${message.message.type}')">Reply</span>`);
-                }
+            //         restoreButton.replaceWith(`<span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.message.user.name}','${message.message.type}')">Reply</span>`);
+            //     }
 
-                messageElement.removeClass("deleted_niddle");
-                messageElement.find(".additional_style").removeClass("msg_deleted");
-            }
+            //     messageElement.removeClass("deleted_niddle");
+            //     messageElement.find(".additional_style").removeClass("msg_deleted");
+            // }
         })
     }
     catch (error) {
