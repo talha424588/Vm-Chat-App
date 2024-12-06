@@ -1729,6 +1729,11 @@ let addMessageToMessageArea = (message, flag = false) => {
                                                 <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}', '${senderName}')">Correction</a>
                                             ` : ''}
 
+                                            ${(message.type === "Message" || message.type === null) &&
+                                              (message.is_compose === 1 || message.is_compose === true) ? `
+                                                <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+                                            ` : ''}
+
                                             ${(message.is_compose !== 1 && message.is_compose !== true) ? `
                                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                             ` : ''}
