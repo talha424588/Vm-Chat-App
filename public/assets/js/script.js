@@ -1627,10 +1627,10 @@ let addMessageToMessageArea = (message, flag = false) => {
         </div>
     `;
     }
-    if (!message.is_privacy_breach && !message.is_deleted) {
-
+     if (!message.is_privacy_breach && !message.is_deleted) {
         // ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? '' : 'd-none'}
         console.log("simple message",message);
+
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -1854,9 +1854,9 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 let parentMessageIds = new Set();
 function scrollToMessage(replyId, messageId = null) {
-    addChildIdsInSet(messageId, true);
     const targetMessage = document.getElementById(`message-${replyId}`);
     if (targetMessage) {
+        addChildIdsInSet(messageId, true);
         DOM.groupReferenceMessageClick = false;
         const ml3Div = targetMessage.closest('.ml-3');
         if (ml3Div) {
@@ -1941,7 +1941,9 @@ scrollBottomBtn.addEventListener('click', function () {
         let setToArray = [...parentMessageIds];
         parentMessageIds.clear();
         let LastIndex = setToArray.pop();
-        taggingMessages(LastIndex)
+        
+        taggingMessages(LastIndex);
+
         addChildIdsInSet(LastIndex, false);
         parentMessageIds = new Set(setToArray);
     }
@@ -2702,6 +2704,7 @@ function selectUsertosend(username, postgroup_id) {
     document.getElementById('selected-usertosend').style.setProperty('display', 'flex', 'important');
 }
 
+
 $(document).ready(function () {
     $('#MoveMessagetoGroup').on('click', function () {
         var messagesIds = $('#messages_ids').val();
@@ -2733,7 +2736,7 @@ function hideSpinner() {
 }
 
 DOM.messages.addEventListener('scroll', async () => {
-    if (DOM.messages.scrollTop <= 5 && !isLoadingMessages && hasMoreMessages) {
+    if (DOM.messages.scrollTop == 0 && !isLoadingMessages && hasMoreMessages) {
         isLoadingMessages = true;
         showSpinner();
         await fetchPaginatedMessages(null, null, null);
@@ -2788,6 +2791,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         if (DOM.currentPage == 1) {
             pagnicateChatList = nextPageMessages;
+            hasMoreMessages = true;
         }
         // here
         if (message_id) {
@@ -2832,11 +2836,22 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 span.innerHTML = `
             <div class="notification-wrapper">
                 <div class="unread-messages">
-                   No Messages To Load
+                   No Messages
                 </div>
             </div>
              `;
                 DOM.messages.appendChild(span);
+            }
+            else{
+                const span = document.createElement('span');
+                span.innerHTML = `
+                <div class="notification-wrapper">
+                <div class="unread-messages">
+                  No More Messages To Load
+                </div>
+            </div>
+             `;
+             DOM.messages.insertBefore(span, DOM.messages.firstChild);
             }
             return;
         }
@@ -3033,8 +3048,10 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 }
             }
         });
-        const newScrollHeight = DOM.messages.scrollHeight;
-        DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
+        
+            const newScrollHeight = DOM.messages.scrollHeight;
+            DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
+            
         if (!message_id) {
             DOM.currentPage += 1;
         }
@@ -3096,7 +3113,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     DOM.activeChatIndex = chatIndex;
     if (searchMessage) {
         if (!searchMessageSet.size > 0) {
-
             await showloader();
             DOM.loader_showing = true;
         }
@@ -3105,7 +3121,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     if (searchMessageSet.size > 0 && DOM.groupId == groupSearchMessage.group_id) {
         if (Array.from(searchMessageSet).find(e => e.id == groupSearchMessage.id)) {
             DOM.groupSearchMessageFound = true;
-
             const targetMessage = document.getElementById(`message-${groupSearchMessage.id}`);
             if (targetMessage) {
                 const ml3Div = targetMessage.closest('.ml-3');
@@ -3183,7 +3198,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         return;
 
         } else {
-            console.log("else me chal rha hon bhai");
             await fetchPaginatedMessages(null, null, null);
             get_voice_list();
             removeEditMessage();
@@ -3649,7 +3663,6 @@ function autoResize() {
         if (newHeight >= maxHeight) {
 
             textarea.style.overflowY = 'scroll';
-            // Only scroll to bottom if the user hasn't manually scrolled up
             if (!isUserScrolledUp) {
                 textarea.scrollTop = textarea.scrollHeight;
             }
@@ -4833,3 +4846,5 @@ function mobilegroupSearchClose() {
         $("#message-area").toggleClass("col-md-4 col-md-8");
     }
 }
+
+
