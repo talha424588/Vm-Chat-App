@@ -107,39 +107,40 @@
         }
 
         .selected-message {
-            background-color: #E8E9EA;/ Change background color / padding: 2px;
-            transition: background-color 0.3s ease;/ Smooth transition effect /
+            background-color: #E8E9EA;padding: 2px;
+            transition: background-color 0.3s ease;
         }
 
         #action-bar {
             display: flex;
-            justify-content: space-between;/ Distributes space between items / align-items: center;/ Vertically centers items / height: 62px;
+            justify-content: space-between; align-items: center;height: 62px;
         }
 
         #selected-count {
-            margin-right: auto;/ Pushes the SVG to the right / font-size: 16px;
+            margin-right: auto;
+             font-size: 16px;
         }
 
 
         .selected-message {
-            background-color: #E8E9EA;/ Change background color / padding: 2px;
-            transition: background-color 0.3s ease;/ Smooth transition effect /
+            background-color: #E8E9EA;padding: 2px;
+            transition: background-color 0.3s ease;
         }
 
         #action-bar {
             display: flex;
-            justify-content: space-between;/ Distributes space between items / align-items: center;/ Vertically centers items / height: 62px;
+            justify-content: space-between; align-items: center;height: 62px;
         }
 
         #selected-count {
-            margin-right: auto;/ Pushes the SVG to the right / font-size: 16px;
+            margin-right: auto;font-size: 16px;
         }
 
         .selected-user {
             background-color: #f8f9fa;
             border-top: 1px solid #ddd;
             padding: 10px;
-            display: none !important;/ Initially hidden /
+            display: none !important;
         }
 
 
@@ -160,7 +161,8 @@
         .chat-list-item {
             cursor: pointer;
             display: flex;
-            align-items: center;/ This will vertically center the radio button / transition: background-color 0.3s ease;
+            align-items: center;
+            transition:background-color 0.3s ease;
         }
 
         .chat-list-item:hover {
@@ -168,7 +170,7 @@
         }
 
         .chat-radio {
-            margin-right: 10px;/ Space between radio button and profile image / width: 18px;/ Adjust size of radio button / height: 18px;
+            margin-right: 10px; width: 18px;height: 18px;
         }
 
         .name {
@@ -987,7 +989,7 @@
 
     <script>
         var csrfToken = '{{ csrf_token() }}';
-        var broadcastChatRoute = '{{ route('broadcast.chat') }}';
+        var broadcastChatRoute = "{{ route('broadcast.chat') }}";
     </script>
     <script></script>
 
