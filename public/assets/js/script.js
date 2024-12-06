@@ -1582,6 +1582,9 @@ let addMessageToMessageArea = (message, flag = false) => {
     `;
     }
     if (!message.is_privacy_breach && !message.is_deleted) {
+
+        // ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? '' : 'd-none'}
+        console.log("simple message",message);
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -1656,7 +1659,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
                             ${user.role != '1' && user.role != '3' && message.sender != user.unique_id ? `
-                                <div class="dropdown ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? '' : 'd-none'}" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
+                                <div class="dropdown " style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
@@ -1701,7 +1704,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         }
     }
     else if (message.is_privacy_breach && user.role == 0 || user.role == 2) {
-
+        console.log("privacy message",message);
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -1735,6 +1738,7 @@ let addMessageToMessageArea = (message, flag = false) => {
         }
     }
     else if (message.is_deleted && user.role == 0 || user.role == 2) {
+        console.log("message delete",message);
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
