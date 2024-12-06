@@ -2692,24 +2692,28 @@ const displayedMessageIds = new Set();
 
 let isLoading = false;
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null, unreadCounter = null) => {
+
+    console.log("message id",message_id);
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
         let url = ''
         if (DOM.searchMessageClick && DOM.lastMessageId) {
-
+            console.log("search click  last emssage");;
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${DOM.searchMessageClick && DOM.lastMessageId ? `&lastMessageId=${encodeURIComponent(DOM.lastMessageId)}` : ''}`;
         }
         else if (message_id || DOM.lastMessageId) {
-
+            console.log("message inside",message_id);
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&messageId=${encodeURIComponent(message_id)}`;
         }
-        if (unreadCounter) {
+        else if (unreadCounter) {
+            console.log("unread counter");
             DOM.currentPage = Math.ceil(unreadCounter / 50);
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&unreadCount=${unreadCounter}`;
         }
         else {
+            console.log("last resor");
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}`;
         }
         const response = await fetch(url, {
@@ -2778,7 +2782,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             }
             return;
         }
-        nextPageMessages.data.forEach((message) => {   
+        nextPageMessages.data.forEach((message) => {
             if (!displayedMessageIds.has(message.id)) {
                 addMessageToMessageArea(message);
                 displayedMessageIds.add(message.id);
@@ -3093,6 +3097,8 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         .catch(error => {
             console.error('Error fetching group data:', error);
         });
+
+        console.log("search found",DOM.groupSearchMessageFound);
     if (DOM.groupSearchMessageFound == false) {
         if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
             console.log("first");
@@ -3108,7 +3114,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
             return;
         }
 
-        
+
     else if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
         console.log("counter mote then 50");
         await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
@@ -3117,7 +3123,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         removeQuotedMessage();
         scroll_to_unread_div();
         return;
-        
+
         } else {
             console.log("else me chal rha hon bhai");
             await fetchPaginatedMessages(null, null, null);
