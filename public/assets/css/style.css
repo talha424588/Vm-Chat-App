@@ -1358,6 +1358,9 @@ body{
 	#side_navbar{
 		width: 68%;
 	}
+	.chat-row{
+		height: 710px;
+	}
 }
 
 /* Large devices (large desktops, 992px and up) */
@@ -1368,6 +1371,9 @@ body{
     }
 	#side_navbar{
 		width: 67%;
+	}
+	.chat-row{
+		height: 710px;
 	}
 }
 
@@ -1382,6 +1388,9 @@ body{
 	}
 	.search-results{
 		height: 580px;
+	}
+	.chat-row{
+		height: 710px;
 	}
 }
 
