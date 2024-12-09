@@ -1124,9 +1124,6 @@ socket.on('restoreMessage', (incomingMessage) => {
             if (incomingMessage.message.sender !== user.unique_id && !hasUserSeenMessage) {
                 groupToUpdate.unread += 1;
             }
-
-
-            // groupToUpdate.unread += 1;
         }
         // updateChatList(incomingMessage.message);
         rerenderChatList(incomingMessage.message.group_id);
