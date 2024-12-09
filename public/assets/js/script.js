@@ -1110,17 +1110,10 @@ socket.on('updateEditedMessage', (editedMessage) => {
 socket.on('restoreMessage', (incomingMessage) => {
 
     if (user.role != 0 && user.role != 2) {
-        console.log("incomingMessage.group_id", incomingMessage)
         let groupToUpdate = chatList.find(chat => chat.group.group_id === incomingMessage.message.group_id);
-        console.log("chatList", chatList);
-
-        console.log("groupToUpdate", groupToUpdate);
         if (groupToUpdate) {
-
             const seenBy = incomingMessage.message.seen_by.split(", ").map(s => s.trim());
-
             const hasUserSeenMessage = seenBy.includes(user.unique_id);
-
             if (incomingMessage.message.sender !== user.unique_id && !hasUserSeenMessage) {
                 groupToUpdate.unread += 1;
             }
