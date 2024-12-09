@@ -1212,11 +1212,8 @@ let addMessageToMessageArea = (message, flag = false) => {
     let messageContent;
     let oldMessageType = null;
     if (/<a[^>]+>/g.test(message.msg) || /<audio[^>]+>/g.test(message.msg)) {
-        // console.log("this is the old message",message);
         oldMessageType = getOldMessageType(message);
         message.type = oldMessageType;
-        // console.log("this is the old message type :",oldMessageType);
-        // console.log("this is the old message after assgining type",message);
     }
     if (message.type === 'File') {
         if (message.reply) {
@@ -1764,7 +1761,6 @@ let addMessageToMessageArea = (message, flag = false) => {
         }
     }
     else if (message.is_privacy_breach && user.role == 0 || user.role == 2) {
-        console.log("privacy message", message);
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
