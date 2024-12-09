@@ -11,6 +11,8 @@ use App\Services\AuthService;
 use App\Services\ChatService;
 use App\Services\GroupService;
 use App\Services\UserService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +32,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        //Listner for query
+        DB::listen(function ($query) {
+            Log::info('Query executed:', [
+                'sql' => $query->sql,
+                // 'bindings' => $query->bindings,
+                'time' => $query->time,
+            ]);
+        });
     }
 }
