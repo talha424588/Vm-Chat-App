@@ -52,6 +52,7 @@ const DOM = {
     groupReferenceMessageClick: false,
     loader_showing: false,
     groupSearchMessageFound: false,
+    NormalLoading:true,
     // groupSearchCounter: 0,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
@@ -2513,7 +2514,7 @@ function removeQuotedMessage() {
     document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
     document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
     document.querySelector("#input").value = "";
-    document.querySelector("#input").focus();
+    // document.querySelector("#input").focus();
     // const chat_action = document.getElementById('chat_action');
     //     if (getComputedStyle(chat_action).display == "none") {
     //         const Editreplyarea = document.getElementById('message-reply-area');
@@ -2535,6 +2536,7 @@ function removeQuotedMessage() {
     const correctionarea = document.getElementById('correction-div');
     if (getComputedStyle(correctionarea).display == "block") {
         correctionarea.style.display = 'none';
+        document.querySelector("#input").focus();
     }
 
 
@@ -2545,10 +2547,11 @@ function removeQuotedMessage() {
 
         Editreplyarea.style.display = 'none';
         chat_action.style.display = "flex";
+        document.querySelector("#input").focus();
     }
     document.getElementById("messages").style.marginBottom = "74px";
 
-    document.querySelector("#input").focus();
+    
 
 
 }
@@ -2766,11 +2769,10 @@ function hideSpinner() {
 }
 
 DOM.messages.addEventListener('scroll', async () => {
-    if (DOM.messages.scrollTop == 0 && !isLoadingMessages && hasMoreMessages) {
+    if (DOM.messages.scrollTop == 0 && !isLoadingMessages && hasMoreMessages && DOM.NormalLoading) {
         isLoadingMessages = true;
         showSpinner();
         await fetchPaginatedMessages(null, null, null);
-        if (!DOM.loader_showing)
             hideSpinner();
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
@@ -2783,18 +2785,16 @@ const displayedMessageIds = new Set();
 
 let isLoading = false;
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null, unreadCounter = null) => {
-
+    console.log("this is the message id i got in fetch message area : ",message_id);
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
         let url = ''
         if (DOM.searchMessageClick && DOM.lastMessageId) {
-
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}${DOM.searchMessageClick && DOM.lastMessageId ? `&lastMessageId=${encodeURIComponent(DOM.lastMessageId)}` : ''}`;
         }
         else if (message_id || DOM.lastMessageId) {
-
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&messageId=${encodeURIComponent(message_id)}`;
         }
         else if (unreadCounter) {
@@ -2802,7 +2802,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}&unreadCount=${unreadCounter}`;
         }
         else {
-
             url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(DOM.groupId)}&page=${DOM.currentPage}`;
         }
         const response = await fetch(url, {
@@ -2833,10 +2832,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         const u_id = user.unique_id;
         // const ids = nextPageMessages.data.map(item => item.id);
-
-
-        console.log("messages", user.unique_id);
-        console.log("messages", nextPageMessages.data);
         const ids = nextPageMessages.data
             .filter(item =>
                 item.sender !== user.unique_id &&
@@ -2844,7 +2839,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             )
             .map(item => item.id);
         // const ids = nextPageMessages.data.filter(item => item.sender != user.unique_id && !item.seen_by.split(",").includes(user.unique_id)).map(item => item.id);
-        console.log("ids", ids);
 
         const Notseenby = nextPageMessages.data
             .filter(item => {
@@ -2854,7 +2848,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             .map(item => item.id);
         DOM.unreadCounter = Notseenby.length;
         const notSeenById = Notseenby.at(-1);
-        console.log("fetchPaginatedMessages update message");
         if (ids.length > 0) {
             (async () => {
                 try {
@@ -2874,10 +2867,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         else {
             console.log("ids length less then 1");
         }
-
-
-        console.log("after update");
-
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
             if (DOM.currentPage == 1) {
@@ -2910,12 +2899,17 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 displayedMessageIds.add(message.id);
             }
             if (message.id == notSeenById && !DOM.unreadDividerAdded) addUnread();
-
             if (message.id == message_id) {
-
-                if (DOM.groupReferenceMessageClick) {
-                    scrollToMessage(message.id);
-                }
+                const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
+                const searchQuery = DOM.messageSearchQuery;
+                setTimeout(()=>handleMessageResponse(messageElement,message,message,searchQuery),1000);
+            }
+                // if (DOM.groupReferenceMessageClick) {
+                //     console.log("refrence clicked");
+                //     scrollToMessage(message.id);
+                // }
+                // else if (!DOM.groupReferenceMessageClick) {
+                // }
                 // else if (!DOM.groupReferenceMessageClick) {
                 //     const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                 //     const messageTextElement = messageElement.querySelector(".shadow-sm");
@@ -3095,199 +3089,10 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 //         messageElement.scrollIntoView();
                 //     }, 200);
                 // }
-                else if (!DOM.groupReferenceMessageClick) {
-                    const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
-                    const messageTextElement = messageElement.querySelector(".shadow-sm");
-                    const searchQuery = DOM.messageSearchQuery;
 
-                    switch (message.type) {
-                        case "Message":
-                            if (message.reply) {
-                                messageTextElement.innerHTML = '';
-                                if (message.reply.type === "Audio") {
-
-                                    var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
-                                    <div class="avatar">
-                                        <!-- Avatar image here -->
-                                    </div>
-                                    <div class="audio-content">
-                                        <div class="audio-controls">
-                                            <button class="playbutton">
-                                               <svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
-                        </svg>
-                                            </button>
-                                            <div class="audio-progress">
-                                                <div class="progress-filled"></div>
-                                            </div>
-                                        </div>
-                                        <div class="audio-time-container">
-                                            <span class="audio-duration">0:00</span>
-                                            <span class="audio-time">12:27 PM</span>
-                                        </div>
-                                    </div>
-                                    </div>`;
-
-                                    newMessageDisplay = `
-                                    <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
-                                        <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                        ${message.user?.id == user?.id ? message.user.name : message.user.name}
-
-                                        </div>
-                                        <div class="reply-details">
-                                            <p class="file-name">${message_body}</p>
-                                        </div>
-                                    </div>
-                                <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
-                                `;
-
-                                    const messageText = message.msg.toLowerCase();
-                                    const index = messageText.indexOf(searchQuery);
-
-                                    if (index !== -1) {
-                                        const highlightedText = message.msg.substring(0, index) +
-                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                            message.msg.substring(index + searchQuery.length);
-
-                                        // Update the reply message area with highlighted text
-                                        newMessageDisplay = `
-                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
-                                        <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                            ${message.user?.id == user?.id ? message.user.name : message.user.name}
-                                        </div>
-                                        <div class="reply-details">
-                                            <p class="file-name">${message_body}</p>
-                                        </div>
-                                    </div>
-                                    <div class="reply-message-area">${highlightedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
-                                `;
-                                    }
-                                    messageTextElement.innerHTML = newMessageDisplay;
-
-                                }
-                                else if (message.reply.type === "File") {
-                                    replyDisplay = `
-                                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
-                                    <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                        ${message.user.name}
-                                    </div>
-                                    <div class="reply-details">
-                                        <div class="file-message">
-                                            <div class="file-icon">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"></path>
-                                                    <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"></path>
-                                                </svg>
-                                            </div>
-                                            <div class="file-details">
-                                                <p class="file-name">${message.reply.media_name}</p>
-                                            </div>
-                                            <a href="${message.reply.msg}" class="download-icon" download="${message.reply.media_name}">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"></path>
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>`;
-                                    messageTextElement.innerHTML = replyDisplay +
-                                        `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
-
-                                    const messageText = message.msg.toLowerCase();
-                                    const index = messageText.indexOf(searchQuery);
-                                    if (index !== -1) {
-                                        const highlightedText = message.msg.substring(0, index) +
-                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                            message.msg.substring(index + searchQuery.length);
-                                        messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
-                                    }
-                                }
-                                else if (message.reply.type === "Image") {
-                                    var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
-                                    replyDisplay = `
-                                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
-                                        <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                            ${message.user?.id == user?.id ? message.user.name : message.user.name}
-                                        </div>
-                                        <div class="reply-details">
-                                            <p class="file-name">${message_body}</p>
-                                        </div>
-                                    </div>
-                                `;
-
-                                    messageTextElement.innerHTML = replyDisplay;
-                                    const messageText = message.msg.toLowerCase();
-                                    const index = messageText.indexOf(searchQuery);
-                                    if (index !== -1) {
-                                        const highlightedText = message.msg.substring(0, index) +
-                                            `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                                            message.msg.substring(index + searchQuery.length);
-                                        messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
-                                    }
-                                }
-
-                            }
-                            else {
-                                const messageText = messageTextElement.innerHTML;
-                                const index = messageText.indexOf(searchQuery);
-                                if (index !== -1) {
-                                    const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
-                                    messageTextElement.innerHTML = highlightedText;
-                                }
-                            }
-                            break;
-                        case "File":
-                            const fileNameElement = messageElement.querySelector(".file-name");
-                            if (fileNameElement) {
-                                const fileName = fileNameElement.textContent;
-
-                                const trimmedSearchQuery = searchQuery;
-                                const index = fileName.toLowerCase().indexOf(trimmedSearchQuery.toLowerCase());
-                                if (index !== -1) {
-                                    const highlightedFileName = fileName.substring(0, index) +
-                                        `<span class="highlight">${fileName.substring(index, index + trimmedSearchQuery.length)}</span>` +
-                                        fileName.substring(index + trimmedSearchQuery.length);
-                                    fileNameElement.innerHTML = highlightedFileName;
-                                }
-                            }
-                            break;
-                        default:
-                            const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
-                            if (nullTypemessageTextElement) {
-                                const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
-
-                                const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
-                                if (nullTypeIndex !== -1) {
-                                    const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
-                                        `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
-                                        nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
-
-                                    nullTypemessageTextElement.innerHTML = highlightedText;
-                                }
-                            } else {
-                                // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
-                            }
-                            break;
-                        // console.log("Unknown message type:", message.type);
-                    }
-                    setTimeout(() => {
-                        messageElement.scrollIntoView();
-                        const ml3Div = messageElement.closest('.ml-3');
-                if (ml3Div) {
-                    ml3Div.scrollIntoView();
-                    ml3Div.classList.add('selected-message');
-                    setTimeout(() => {
-                        ml3Div.classList.remove('selected-message');
-                    }, 2000);
-                }
-                    }, 200);
-                }
-            }
         });
-
         const newScrollHeight = DOM.messages.scrollHeight;
         DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
-
         if (!message_id) {
             DOM.currentPage += 1;
         }
@@ -3347,33 +3152,25 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
-    if (searchMessage) {
-        if (!searchMessageSet.size > 0) {
-            await showloader();
-            DOM.loader_showing = true;
-        }
+    if(searchMessage)
+    {
+        DOM.NormalLoading=false;
     }
 
     if (searchMessageSet.size > 0 && DOM.groupId == groupSearchMessage.group_id) {
         if (Array.from(searchMessageSet).find(e => e.id == groupSearchMessage.id)) {
-            DOM.groupSearchMessageFound = true;
+            // DOM.groupSearchMessageFound = true;
             const targetMessage = document.getElementById(`message-${groupSearchMessage.id}`);
             if (targetMessage) {
-                const ml3Div = targetMessage.closest('.ml-3');
-                if (ml3Div) {
-                    ml3Div.scrollIntoView();
-                    ml3Div.classList.add('selected-message');
-                    setTimeout(() => {
-                        ml3Div.classList.remove('selected-message');
-                    }, 2000);
-                }
+                handleMessageResponse(targetMessage,groupSearchMessage,groupSearchMessage.id,groupSearchField.value)
             }
-            DOM.groupSearchMessageFound = false;
+            // DOM.groupSearchMessageFound = false;
+        }else{
+            handleMessageResponse(null,null,groupSearchMessage.id,null);
         }
         return;
     }
     else {
-
         DOM.messages.innerHTML = '';
     }
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
@@ -3409,24 +3206,21 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         });
 
     if (DOM.groupSearchMessageFound == false) {
+    
         if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
-            console.log("first");
+            if (!searchMessageSet.size > 0) {
+                await showloader();
+            }
             await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
             get_voice_list();
             removeEditMessage();
             removeQuotedMessage();
-            setTimeout(() => {
-                hideSpinner();
-                DOM.loader_showing = false;
-
-            }, 1000);
             return;
         }
 
 
 
         else if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
-            console.log("counter mote then 50");
             await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
             get_voice_list();
             removeEditMessage();
@@ -4143,9 +3937,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 }
 
                 if (messages == undefined) {
-                    console.log("is loading", loadMore);
                     if (!loadMore) {
-                        console.log("in condition");
                         // DOM.chatList2.innerHTML = `<div class="no-messages-found">No messages found.</div>`;
                         document.getElementById('messagesList').innerHTML = '<div class="no-messages-found">No messages found.</div>';
                         return;
@@ -4299,15 +4091,10 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             searchResultsDiv.appendChild(resultItemDiv);
 
                             resultItemDiv.addEventListener("click", async function () {
-                                await showloader()
                                 DOM.loader_showing = true;
                                 let messageId = message.id;
                                 const messageElement = DOM.messages.querySelector(`[data-message-id="${messageId}"]`);
                                 handleMessageResponse(messageElement, message, messageId, searchQuery);
-                                setTimeout(() => {
-                                    hideSpinner();
-                                    DOM.loader_showing = false;
-                                }, 1000);
                             });
                         });
                         searchMessageOffset += searchMessageLimit;
@@ -4396,7 +4183,7 @@ messageSidebar.addEventListener('scroll', function () {
         }
     }
 });
-function handleMessageResponse(messageElement, message, messageId, searchQuery) {
+async function handleMessageResponse(messageElement, message, messageId, searchQuery) {
     if (messageElement && searchQuery) {
         if(getOldMessageType(message) == 'document') {
             const contentDiv = messageElement.querySelector(".additional_style");
@@ -4409,14 +4196,15 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                     const regex = new RegExp(`(${escapedSearchQuery})`, 'gi');
                     content = content.replace(regex, '<span class="highlight">$1</span>');
                     fileName.innerHTML = content;
+                    hideSpinner();
                 }
-                messageElement.scrollIntoView({ behavior: "smooth" });
+                messageElement.scrollIntoView({block: 'center' });
                 const ml3Div = messageElement.closest('.ml-3');
                 if (ml3Div) {
-                    ml3Div.scrollIntoView();
                     ml3Div.classList.add('selected-message');
                     setTimeout(() => {
                         ml3Div.classList.remove('selected-message');
+                        DOM.NormalLoading=true;
                     }, 2000);
                 }
             }
@@ -4432,21 +4220,26 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
                 const regex = new RegExp(`(${escapedSearchQuery})`, 'gi');
                 content = content.replace(regex, '<span class="highlight">$1</span>');
                 targetDiv.innerHTML = content;
+                hideSpinner();
             }
-            messageElement.scrollIntoView({ behavior: "smooth" });
-            messageElement.scrollIntoView({ behavior: "smooth" });
+            messageElement.scrollIntoView({block: 'center' });
                 const ml3Div = messageElement.closest('.ml-3');
                 if (ml3Div) {
-                    ml3Div.scrollIntoView();
                     ml3Div.classList.add('selected-message');
                     setTimeout(() => {
                         ml3Div.classList.remove('selected-message');
+                        DOM.NormalLoading=true;
                     }, 2000);
                 }
         }
     }
-    else {
-        fetchPaginatedMessages(messageId, null, null);
+    else{
+        console.log("not found fetching");
+    showloader();
+    await fetchPaginatedMessages(messageId, null, null);
+    setTimeout(()=>{
+        hideSpinner();
+    },1000);
     }
 }
 
@@ -5190,6 +4983,6 @@ function formatTimestampToDate(timestamp) {
 document.getElementById('messages').addEventListener('scroll', function() {
     const divElement = this;
     if (divElement.scrollHeight - divElement.scrollTop === divElement.clientHeight) {
-        console.log('Scrolled to the bottom');
+        // console.log('Scrolled to the bottom');
     }
 });
