@@ -1366,17 +1366,16 @@ let addMessageToMessageArea = (message, flag = false) => {
         // if (/<a[^>]+>/g.test(message.msg)) {
 
 
-            const linkTag = message.msg.match(/<a[^>]+>/g)[0];
-            fileLink = linkTag.match(/href="([^"]+)"/)[1];
-            const mediaName = fileLink.split('uploads/')[1];
-            const displayMediaName = message.media_name || mediaName;
-            const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
-            if (message.reply) {
-                message.reply.type=getOldMessageType(message.reply);
-                if(message.reply.type == "Message")
-                {
-                    
-                    messageContent=`
+        const linkTag = message.msg.match(/<a[^>]+>/g)[0];
+        fileLink = linkTag.match(/href="([^"]+)"/)[1];
+        const mediaName = fileLink.split('uploads/')[1];
+        const displayMediaName = message.media_name || mediaName;
+        const mediaType = displayMediaName.split('.').pop().toLowerCase() === 'pdf' ? 'document' : 'image';
+        if (message.reply) {
+            message.reply.type = getOldMessageType(message.reply);
+            if (message.reply.type == "Message") {
+
+                messageContent = `
                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
@@ -1402,7 +1401,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         </svg>
                     </a>
                 </div>
-                    
+
                     `
             }
             else if (message.reply.type == "Image") {
@@ -1432,7 +1431,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         <p class="file-name">${message.reply.msg}</p>
                     </div>
                 </div>
-              
+
         <div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${audioSrc}">
             <div class="avatar">
                 <!-- Avatar image here -->
@@ -1636,7 +1635,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     }
 
 
-     if (!message.is_privacy_breach && !message.is_deleted) {
+    if (!message.is_privacy_breach && !message.is_deleted) {
         let messageElement = document.createElement('div');
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -1745,11 +1744,11 @@ let addMessageToMessageArea = (message, flag = false) => {
                                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                             ` : ''}
                                         ` : ''}
-                                        
-//                                       inside here   
+
+//                                       inside here
 
 // inside here
-
+                            ${user.role !== '1' && user.role !== '3' && message.sender !== user.unique_id ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
@@ -1971,7 +1970,7 @@ scrollBottomBtn.addEventListener('click', function () {
         let setToArray = [...parentMessageIds];
         parentMessageIds.clear();
         let LastIndex = setToArray.pop();
-        
+
         taggingMessages(LastIndex);
 
         addChildIdsInSet(LastIndex, false);
@@ -2891,7 +2890,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
              `;
                 DOM.messages.appendChild(span);
             }
-            else{
+            else {
                 const span = document.createElement('span');
                 span.innerHTML = `
                 <div class="notification-wrapper">
@@ -2900,11 +2899,11 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 </div>
             </div>
              `;
-             DOM.messages.insertBefore(span, DOM.messages.firstChild);
+                DOM.messages.insertBefore(span, DOM.messages.firstChild);
             }
             return;
         }
-        nextPageMessages.data.forEach((message) => {   
+        nextPageMessages.data.forEach((message) => {
             if (!displayedMessageIds.has(message.id)) {
                 addMessageToMessageArea(message);
                 displayedMessageIds.add(message.id);
@@ -3097,10 +3096,10 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 }
             }
         });
-        
-            const newScrollHeight = DOM.messages.scrollHeight;
-            DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
-            
+
+        const newScrollHeight = DOM.messages.scrollHeight;
+        DOM.messages.scrollTop = newScrollHeight - currentScrollHeight;
+
         if (!message_id) {
             DOM.currentPage += 1;
         }
@@ -3236,16 +3235,16 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         }
 
 
-        
-    else if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
-        console.log("counter mote then 50");
-        await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
-        get_voice_list();
-        removeEditMessage();
-        removeQuotedMessage();
-        scroll_to_unread_div();
-        return;
-        
+
+        else if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
+            console.log("counter mote then 50");
+            await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
+            get_voice_list();
+            removeEditMessage();
+            removeQuotedMessage();
+            scroll_to_unread_div();
+            return;
+
         } else {
             await fetchPaginatedMessages(null, null, null);
             get_voice_list();
