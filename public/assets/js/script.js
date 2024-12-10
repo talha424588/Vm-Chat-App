@@ -635,6 +635,14 @@ socket.on('updateGroupMessages', (messageId) => {
 });
 
 socket.on('sendChatToClient', (message) => {
+    console.log("new message", message);
+    if (nextPageMessages && nextPageMessages.data.length == 0 && document.getElementById("no-message-found-div") && message) {
+
+        let noMessageDiv = document.getElementById("no-message-found-div");
+        if (noMessageDiv) {
+            noMessageDiv.remove();
+        }
+    }
 
     if (pagnicateChatList && pagnicateChatList.data) {
         pagnicateChatList.data.push(message);
@@ -643,13 +651,15 @@ socket.on('sendChatToClient', (message) => {
     let unique_id = document.getElementById("login_user_unique_id").value;
 
     const groupId = message.group_id;
-    if (message.sender !== unique_id) {
+    if (message.sender !== user.unique_id) {
         DOM.counter += 1;
         if (DOM.groupId == groupId) {
             const notificationWrapper = document.querySelector('.notification-wrapper');
             if (notificationWrapper && notificationWrapper.style.display !== 'none') {
-                const previousCount = document.getElementById('unread-counter-div').innerHTML.trim();
-                document.getElementById('unread-counter-div').innerHTML = parseInt(previousCount) + 1;
+                if (document.getElementById('unread-counter-div')) {
+                    const previousCount = document.getElementById('unread-counter-div').innerHTML.trim();
+                    document.getElementById('unread-counter-div').innerHTML = parseInt(previousCount) + 1;
+                }
             }
         }
     }
@@ -2780,6 +2790,7 @@ DOM.messages.addEventListener('scroll', async () => {
 const displayedMessageIds = new Set();
 
 let isLoading = false;
+let nextPageMessages = [];
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null, unreadCounter = null) => {
 
     if (isLoading) return;
@@ -2809,7 +2820,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 'content-type': 'application/json'
             }
         });
-        let nextPageMessages = [];
         nextPageMessages = await response.json();
         if (DOM.groupSearch) {
             nextPageMessages.data.forEach(item => searchMessageSet.add(item))
@@ -2881,7 +2891,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             if (DOM.currentPage == 1) {
                 const span = document.createElement('span');
                 span.innerHTML = `
-            <div class="notification-wrapper">
+            <div class="notification-wrapper" id= "no-message-found-div">
                 <div class="unread-messages">
                    No Messages
                 </div>
