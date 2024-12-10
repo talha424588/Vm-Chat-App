@@ -2792,7 +2792,6 @@ const displayedMessageIds = new Set();
 let isLoading = false;
 let nextPageMessages = [];
 const fetchPaginatedMessages = async (message_id = null, current_Page = null, group_id = null, unreadCounter = null) => {
-    console.log("this is the message id i got in fetch message area : ",message_id);
     if (isLoading) return;
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
@@ -4240,7 +4239,7 @@ async function handleMessageResponse(messageElement, message, messageId, searchQ
         }
     }
     else{
-        console.log("not found fetching");
+        DOM.NormalLoading=false;
     showloader();
     await fetchPaginatedMessages(messageId, null, null);
     setTimeout(()=>{
