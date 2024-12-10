@@ -120,6 +120,7 @@
             margin-right: auto;
              font-size: 16px;
         }
+        
 
 
         .selected-message {
