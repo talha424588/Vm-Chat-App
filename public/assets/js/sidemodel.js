@@ -1,9 +1,12 @@
 $(document).ready(function () {
     // Toggle sidebar on search icon click
     $("#search-icon").on("click", function () {
-        const searchResultsDiv = document.querySelector(".search-results");
-        searchResultsDiv.innerHTML = "";
-        document.getElementById("messsage_search_query").value = "";
+        if (window.innerWidth > 768) 
+            {
+                const searchResultsDiv = document.querySelector(".search-results");
+                searchResultsDiv.innerHTML = "";
+                document.getElementById("messsage_search_query").value = "";
+            }
         $("#sidebar").toggleClass("sidebar-open sidebar-closed");
         $(".container-fluid").toggleClass("sidebar-open");
         $("#search-icon").toggleClass("icon-move-left");
@@ -21,10 +24,7 @@ $(document).ready(function () {
         document.getElementById("messsage_search_query").value = "";
         const searchResultsDiv = document.querySelector(".search-results");
         searchResultsDiv.innerHTML = "";
-        const highlightedMessages = DOM.messages.querySelectorAll(".highlight");
-        highlightedMessages.forEach((element) => {
-            element.classList.remove("highlight");
-        });
+        removeSearchedHighlights();
     });
 
     // Close sidebar on clicking outside of it
@@ -32,19 +32,15 @@ $(document).ready(function () {
         if (!$(event.target).closest("#sidebar, #search-icon").length) {
             $("#search-icon").hasClass("d-none") ? $("#search-icon").removeClass("d-none") : '';
             if ($("#sidebar").hasClass("sidebar-open")) {
-       
+                removeSearchedHighlights();
                 $("#sidebar").removeClass("sidebar-open").addClass("sidebar-closed");
                 $(".container-fluid").removeClass("sidebar-open");
                 $("#search-icon").removeClass("icon-move-left");
                 $("#message-area").toggleClass("col-md-4 col-md-8");
                 const MessageInput=document.getElementById("messsage_search_query").value="";
                 const SerachResults=document.getElementById("search-results").innerHTML='';
-                const highlightedMessages = DOM.messages.querySelectorAll(".highlight");
                 const searchResultsDiv = document.querySelector(".search-results");
                  searchResultsDiv.innerHTML = "";
-                highlightedMessages.forEach((element) => {
-                    element.classList.remove("highlight");
-                });
             }
 
         }

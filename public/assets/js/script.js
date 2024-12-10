@@ -1050,7 +1050,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 const additionalFeatures = `
                     <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                         <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${editedMessage.user.name}</span> |
-                        <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(editedMessage.time * 1000))})</span> |
+                        <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${formatTimestampToDate(editedMessage.time)})</span> |
                           <span>
                             <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${editedMessage.id}">Seen</a> |
                         </span>
@@ -1381,7 +1381,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
                     </div>
                     <div class="reply-details">
-                        <p class="file-name">${message.reply.msg}</p>
+                        <p class="file-namee">${message.reply.msg}</p>
                     </div>
                 </div>
                <div class="file-message bg-white mt-2 shadow">
@@ -1418,11 +1418,12 @@ let addMessageToMessageArea = (message, flag = false) => {
                     <img src="${fileLink}" style="height:222px; width:100%;">
                 </div>
                     `
-            }
-            else if (message.reply.type == "Aidio") {
-                const audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
-                audioSrc = audioTag.match(/src="([^"]+)"/)[1];
-                messageContent = `
+
+                }
+                else if(message.reply.type == "Audio"){
+                    const audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
+                    audioSrc = audioTag.match(/src="([^"]+)"/)[1];
+                    messageContent=`
                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
@@ -1649,7 +1650,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span> |
+                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${formatTimestampToDate(message.time)})</span> |
                                 ${message.user.id == user.id ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
@@ -1804,7 +1805,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                         <div>
                             <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span>
+                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${formatTimestampToDate(message.time)})</span>
                                 <!-- Additional logic for seen and reply links -->
                             </div>
                         </div>
@@ -1838,7 +1839,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                             <div>
                                 <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                     <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-                                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${makeformatDate(new Date(message.time * 1000))})</span>
+                                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${formatTimestampToDate(message.time)})</span>
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
@@ -1955,6 +1956,7 @@ function scroll_function() {
             DOM.counter = 0;
             DOM.notificationDiv.innerHTML = "";
             DOM.notificationDiv.style.display = "none";
+        
         }
     });
     messageDiv.scrollTo({
@@ -2915,6 +2917,185 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                 if (DOM.groupReferenceMessageClick) {
                     scrollToMessage(message.id);
                 }
+                // else if (!DOM.groupReferenceMessageClick) {
+                //     const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
+                //     const messageTextElement = messageElement.querySelector(".shadow-sm");
+                //     const searchQuery = DOM.messageSearchQuery;
+
+                //     switch (message.type) {
+                //         case "Message":
+                //             if (message.reply) {
+                //                 messageTextElement.innerHTML = '';
+                //                 if (message.reply.type === "Audio") {
+
+                //                     var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
+                //                     <div class="avatar">
+                //                         <!-- Avatar image here -->
+                //                     </div>
+                //                     <div class="audio-content">
+                //                         <div class="audio-controls">
+                //                             <button class="playbutton">
+                //                                <svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                //         <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
+                //         </svg>
+                //                             </button>
+                //                             <div class="audio-progress">
+                //                                 <div class="progress-filled"></div>
+                //                             </div>
+                //                         </div>
+                //                         <div class="audio-time-container">
+                //                             <span class="audio-duration">0:00</span>
+                //                             <span class="audio-time">12:27 PM</span>
+                //                         </div>
+                //                     </div>
+                //                     </div>`;
+
+                //                     newMessageDisplay = `
+                //                     <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
+                //                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                //                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
+
+                //                         </div>
+                //                         <div class="reply-details">
+                //                             <p class="file-name">${message_body}</p>
+                //                         </div>
+                //                     </div>
+                //                 <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
+                //                 `;
+
+                //                     const messageText = message.msg.toLowerCase();
+                //                     const index = messageText.indexOf(searchQuery);
+
+                //                     if (index !== -1) {
+                //                         const highlightedText = message.msg.substring(0, index) +
+                //                             `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                //                             message.msg.substring(index + searchQuery.length);
+
+                //                         // Update the reply message area with highlighted text
+                //                         newMessageDisplay = `
+                //                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
+                //                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                //                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                //                         </div>
+                //                         <div class="reply-details">
+                //                             <p class="file-name">${message_body}</p>
+                //                         </div>
+                //                     </div>
+                //                     <div class="reply-message-area">${highlightedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
+                //                 `;
+                //                     }
+                //                     messageTextElement.innerHTML = newMessageDisplay;
+
+                //                 }
+                //                 else if (message.reply.type === "File") {
+                //                     replyDisplay = `
+                //                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
+                //                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                //                         ${message.user.name}
+                //                     </div>
+                //                     <div class="reply-details">
+                //                         <div class="file-message">
+                //                             <div class="file-icon">
+                //                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                //                                     <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"></path>
+                //                                     <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"></path>
+                //                                 </svg>
+                //                             </div>
+                //                             <div class="file-details">
+                //                                 <p class="file-name">${message.reply.media_name}</p>
+                //                             </div>
+                //                             <a href="${message.reply.msg}" class="download-icon" download="${message.reply.media_name}">
+                //                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                //                                     <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"></path>
+                //                                 </svg>
+                //                             </a>
+                //                         </div>
+                //                     </div>
+                //                 </div>`;
+                //                     messageTextElement.innerHTML = replyDisplay +
+                //                         `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+
+                //                     const messageText = message.msg.toLowerCase();
+                //                     const index = messageText.indexOf(searchQuery);
+                //                     if (index !== -1) {
+                //                         const highlightedText = message.msg.substring(0, index) +
+                //                             `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                //                             message.msg.substring(index + searchQuery.length);
+                //                         messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                //                     }
+                //                 }
+                //                 else if (message.reply.type === "Image") {
+                //                     var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                //                     replyDisplay = `
+                //                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
+                //                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                //                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
+                //                         </div>
+                //                         <div class="reply-details">
+                //                             <p class="file-name">${message_body}</p>
+                //                         </div>
+                //                     </div>
+                //                 `;
+
+                //                     messageTextElement.innerHTML = replyDisplay;
+                //                     const messageText = message.msg.toLowerCase();
+                //                     const index = messageText.indexOf(searchQuery);
+                //                     if (index !== -1) {
+                //                         const highlightedText = message.msg.substring(0, index) +
+                //                             `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+                //                             message.msg.substring(index + searchQuery.length);
+                //                         messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+                //                     }
+                //                 }
+
+                //             }
+                //             else {
+                //                 const messageText = messageTextElement.innerHTML;
+                //                 const index = messageText.indexOf(searchQuery);
+                //                 if (index !== -1) {
+                //                     const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+                //                     messageTextElement.innerHTML = highlightedText;
+                //                 }
+                //             }
+                //             break;
+                //         case "File":
+                //             const fileNameElement = messageElement.querySelector(".file-name");
+                //             if (fileNameElement) {
+                //                 const fileName = fileNameElement.textContent;
+
+                //                 const trimmedSearchQuery = searchQuery;
+                //                 const index = fileName.toLowerCase().indexOf(trimmedSearchQuery.toLowerCase());
+                //                 if (index !== -1) {
+                //                     const highlightedFileName = fileName.substring(0, index) +
+                //                         `<span class="highlight">${fileName.substring(index, index + trimmedSearchQuery.length)}</span>` +
+                //                         fileName.substring(index + trimmedSearchQuery.length);
+                //                     fileNameElement.innerHTML = highlightedFileName;
+                //                 }
+                //             }
+                //             break;
+                //         default:
+                //             const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
+                //             if (nullTypemessageTextElement) {
+                //                 const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
+
+                //                 const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
+                //                 if (nullTypeIndex !== -1) {
+                //                     const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
+                //                         `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
+                //                         nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
+
+                //                     nullTypemessageTextElement.innerHTML = highlightedText;
+                //                 }
+                //             } else {
+                //                 // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
+                //             }
+                //             break;
+                //         // console.log("Unknown message type:", message.type);
+                //     }
+                //     setTimeout(() => {
+                //         messageElement.scrollIntoView();
+                //     }, 200);
+                // }
                 else if (!DOM.groupReferenceMessageClick) {
                     const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                     const messageTextElement = messageElement.querySelector(".shadow-sm");
@@ -3092,6 +3273,14 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                     }
                     setTimeout(() => {
                         messageElement.scrollIntoView();
+                        const ml3Div = messageElement.closest('.ml-3');
+                if (ml3Div) {
+                    ml3Div.scrollIntoView();
+                    ml3Div.classList.add('selected-message');
+                    setTimeout(() => {
+                        ml3Div.classList.remove('selected-message');
+                    }, 2000);
+                }
                     }, 200);
                 }
             }
@@ -3212,7 +3401,8 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         .then(response => response.json())
         .then(data => {
             let memberNames = data.users_with_access.map(member => member.id === user.id ? "" : member.name);
-            DOM.messageAreaDetails.innerHTML = `${memberNames},You`;
+           let namesString=`${memberNames},You`
+            DOM.messageAreaDetails.innerHTML = namesString.replace(/,,/g, ',');
             DOM.messageAreaName.innerHTML = data.name;
         })
         .catch(error => {
@@ -4087,7 +4277,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             const resultTextDiv = document.createElement("div");
                             resultTextDiv.className = "result-text";
                             DOM.searchMessageClick = false;
-
+                            
                             if (message.msg.startsWith("https://")) {
                                 resultTextDiv.textContent = message.media_name;
                             } else if (/<a[^>]+>/g.test(message.msg)) {
@@ -4134,7 +4324,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
     else {
         const searchResultsDiv = document.querySelector(".search-results");
         searchResultsDiv.innerHTML = "";
-        removeHighlight();
+        // removeHighlight();
         searchMessageOffset = 0;
         previousSearchQuery = "";
     }
@@ -4207,8 +4397,73 @@ messageSidebar.addEventListener('scroll', function () {
         }
     }
 });
-
 function handleMessageResponse(messageElement, message, messageId, searchQuery) {
+    if (messageElement && searchQuery) {
+        if(getOldMessageType(message) == 'document') {
+            const contentDiv = messageElement.querySelector(".additional_style");
+            const fileName = contentDiv.querySelector(".file-name");
+
+            if (fileName) {
+                let content = fileName.innerHTML;
+                if (!content.includes('<span class="highlight">')) {
+                    const escapedSearchQuery = searchQuery.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');
+                    const regex = new RegExp(`(${escapedSearchQuery})`, 'gi');
+                    content = content.replace(regex, '<span class="highlight">$1</span>');
+                    fileName.innerHTML = content;
+                }
+                messageElement.scrollIntoView({ behavior: "smooth" });
+                const ml3Div = messageElement.closest('.ml-3');
+                if (ml3Div) {
+                    ml3Div.scrollIntoView();
+                    ml3Div.classList.add('selected-message');
+                    setTimeout(() => {
+                        ml3Div.classList.remove('selected-message');
+                    }, 2000);
+                }
+            }
+            return;
+        }
+        const contentDiv = messageElement.querySelector(".additional_style");
+        const replyDiv = contentDiv.querySelector(".reply-message-area");
+        let targetDiv = replyDiv || contentDiv;
+        if (targetDiv) {
+            let content = targetDiv.innerHTML;
+            if (!content.includes('<span class="highlight">')) {
+                const escapedSearchQuery = searchQuery.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');
+                const regex = new RegExp(`(${escapedSearchQuery})`, 'gi');
+                content = content.replace(regex, '<span class="highlight">$1</span>');
+                targetDiv.innerHTML = content;
+            }
+            messageElement.scrollIntoView({ behavior: "smooth" });
+            messageElement.scrollIntoView({ behavior: "smooth" });
+                const ml3Div = messageElement.closest('.ml-3');
+                if (ml3Div) {
+                    ml3Div.scrollIntoView();
+                    ml3Div.classList.add('selected-message');
+                    setTimeout(() => {
+                        ml3Div.classList.remove('selected-message');
+                    }, 2000);
+                }
+        }
+    }
+    else {
+        fetchPaginatedMessages(messageId, null, null);
+    }
+}
+
+
+function removeSearchedHighlights() {
+    const highlightedSpans = document.querySelectorAll('span.highlight');
+    highlightedSpans.forEach((span) => {
+        const textContent = span.textContent || span.innerText;
+        const parentNode = span.parentNode;
+        parentNode.replaceChild(document.createTextNode(textContent), span);
+    });
+}
+
+
+
+function handleMessageResponse_old(messageElement, message, messageId, searchQuery) {
     let replyDisplay = '';
     if (messageElement) {
         // DOM.searchMessageClick = true;
@@ -4915,5 +5170,27 @@ function mobilegroupSearchClose() {
         $("#message-area").toggleClass("col-md-4 col-md-8");
     }
 }
-
-
+function formatTimestampToDate(timestamp) {
+    const date = new Date(timestamp * 1000);
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    const formattedDate = date.toLocaleDateString('en-US', options);
+    const parts = formattedDate.split(' ');
+    
+    const month = parts[0];
+    const day = parts[1].replace(/,$/, '').trim();
+    const year = parts[2];
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12; 
+    hours = hours ? hours : 12; 
+    const time = `${hours}:${minutes} ${ampm}`;
+    const customFormat = `${time} ${day}/${month}/${year}`;
+    return customFormat;
+}
+document.getElementById('messages').addEventListener('scroll', function() {
+    const divElement = this;
+    if (divElement.scrollHeight - divElement.scrollTop === divElement.clientHeight) {
+        console.log('Scrolled to the bottom');
+    }
+});

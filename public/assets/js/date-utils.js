@@ -4,7 +4,14 @@ const mDate = (dateString) => {
 	let date = dateString ? new Date(dateString) : new Date();
 
 	let dualize = (x) => x < 10 ? "0" + x : x;
-	let getTime = () => dualize(date.getHours()) + ":" + dualize(date.getMinutes());
+	let getTime = () => {
+		const hours = date.getHours();
+		const minutes = dualize(date.getMinutes());
+		const ampm = hours >= 12 ? 'PM' : 'AM';
+		const formattedHours = dualize(hours % 12 || 12);
+		return `${formattedHours}:${minutes} ${ampm}`; 
+	};
+	
 	let getDate = () => dualize(date.getDate()) + "/" + dualize(date.getMonth()) + "/" + dualize(date.getFullYear());
 
 	return {
