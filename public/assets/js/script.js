@@ -635,8 +635,7 @@ socket.on('updateGroupMessages', (messageId) => {
 });
 
 socket.on('sendChatToClient', (message) => {
-    console.log("new message", message);
-    if (nextPageMessages && nextPageMessages.data.length == 0 && document.getElementById("no-message-found-div") && message) {
+    if (nextPageMessages && nextPageMessages.data && nextPageMessages.data.length == 0 && document.getElementById("no-message-found-div") && message) {
 
         let noMessageDiv = document.getElementById("no-message-found-div");
         if (noMessageDiv) {
