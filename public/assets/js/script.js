@@ -1419,11 +1419,11 @@ let addMessageToMessageArea = (message, flag = false) => {
                 </div>
                     `
 
-                }
-                else if(message.reply.type == "Audio"){
-                    const audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
-                    audioSrc = audioTag.match(/src="([^"]+)"/)[1];
-                    messageContent=`
+            }
+            else if (message.reply.type == "Audio") {
+                const audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
+                audioSrc = audioTag.match(/src="([^"]+)"/)[1];
+                messageContent = `
                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
@@ -1746,9 +1746,6 @@ let addMessageToMessageArea = (message, flag = false) => {
                                             ` : ''}
                                         ` : ''}
 
-//                                       inside here
-
-// inside here
                             ${user.role !== '1' && user.role !== '3' && message.sender !== user.unique_id ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
@@ -1956,7 +1953,7 @@ function scroll_function() {
             DOM.counter = 0;
             DOM.notificationDiv.innerHTML = "";
             DOM.notificationDiv.style.display = "none";
-        
+
         }
     });
     messageDiv.scrollTo({
@@ -3274,13 +3271,13 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
                     setTimeout(() => {
                         messageElement.scrollIntoView();
                         const ml3Div = messageElement.closest('.ml-3');
-                if (ml3Div) {
-                    ml3Div.scrollIntoView();
-                    ml3Div.classList.add('selected-message');
-                    setTimeout(() => {
-                        ml3Div.classList.remove('selected-message');
-                    }, 2000);
-                }
+                        if (ml3Div) {
+                            ml3Div.scrollIntoView();
+                            ml3Div.classList.add('selected-message');
+                            setTimeout(() => {
+                                ml3Div.classList.remove('selected-message');
+                            }, 2000);
+                        }
                     }, 200);
                 }
             }
@@ -3401,7 +3398,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         .then(response => response.json())
         .then(data => {
             let memberNames = data.users_with_access.map(member => member.id === user.id ? "" : member.name);
-           let namesString=`${memberNames},You`
+            let namesString = `${memberNames},You`
             DOM.messageAreaDetails.innerHTML = namesString.replace(/,,/g, ',');
             DOM.messageAreaName.innerHTML = data.name;
         })
@@ -4277,7 +4274,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                             const resultTextDiv = document.createElement("div");
                             resultTextDiv.className = "result-text";
                             DOM.searchMessageClick = false;
-                            
+
                             if (message.msg.startsWith("https://")) {
                                 resultTextDiv.textContent = message.media_name;
                             } else if (/<a[^>]+>/g.test(message.msg)) {
@@ -4399,7 +4396,7 @@ messageSidebar.addEventListener('scroll', function () {
 });
 function handleMessageResponse(messageElement, message, messageId, searchQuery) {
     if (messageElement && searchQuery) {
-        if(getOldMessageType(message) == 'document') {
+        if (getOldMessageType(message) == 'document') {
             const contentDiv = messageElement.querySelector(".additional_style");
             const fileName = contentDiv.querySelector(".file-name");
 
@@ -4436,14 +4433,14 @@ function handleMessageResponse(messageElement, message, messageId, searchQuery) 
             }
             messageElement.scrollIntoView({ behavior: "smooth" });
             messageElement.scrollIntoView({ behavior: "smooth" });
-                const ml3Div = messageElement.closest('.ml-3');
-                if (ml3Div) {
-                    ml3Div.scrollIntoView();
-                    ml3Div.classList.add('selected-message');
-                    setTimeout(() => {
-                        ml3Div.classList.remove('selected-message');
-                    }, 2000);
-                }
+            const ml3Div = messageElement.closest('.ml-3');
+            if (ml3Div) {
+                ml3Div.scrollIntoView();
+                ml3Div.classList.add('selected-message');
+                setTimeout(() => {
+                    ml3Div.classList.remove('selected-message');
+                }, 2000);
+            }
         }
     }
     else {
@@ -5175,20 +5172,20 @@ function formatTimestampToDate(timestamp) {
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
     const formattedDate = date.toLocaleDateString('en-US', options);
     const parts = formattedDate.split(' ');
-    
+
     const month = parts[0];
     const day = parts[1].replace(/,$/, '').trim();
     const year = parts[2];
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12; 
-    hours = hours ? hours : 12; 
+    hours = hours % 12;
+    hours = hours ? hours : 12;
     const time = `${hours}:${minutes} ${ampm}`;
     const customFormat = `${time} ${day}/${month}/${year}`;
     return customFormat;
 }
-document.getElementById('messages').addEventListener('scroll', function() {
+document.getElementById('messages').addEventListener('scroll', function () {
     const divElement = this;
     if (divElement.scrollHeight - divElement.scrollTop === divElement.clientHeight) {
         console.log('Scrolled to the bottom');
