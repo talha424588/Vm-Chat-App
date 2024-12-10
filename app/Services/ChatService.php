@@ -130,6 +130,7 @@ class ChatService implements ChatRepository
         $messageId = $request->messageId;
         $groupId = $request->groupId;
         Log::info('fetchMessagesUpToSearched:', ['pageNo' => $pageNo, 'messageId' => $messageId, 'groupId' => $groupId]);
+        $startTime = microtime(true);
 
         $messages = GroupMessage::where('group_id', $groupId)
             ->where('id', '>=', $messageId)
@@ -138,6 +139,12 @@ class ChatService implements ChatRepository
             // ->take(10000)
             // ->skip($pageNo * 20)
             ->get();
+
+        $queryTime = microtime(true) - $startTime;
+
+        Log::info('Messages found in fetchMessagesUpToSearched', json_decode($messages));
+        Log::info('Query response time for fetchMessagesUpToSearched:', ['time' => $queryTime]);
+
         if (count($messages)) {
             return response()->json([
                 'status' => true,
