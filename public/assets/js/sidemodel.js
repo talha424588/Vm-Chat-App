@@ -25,6 +25,13 @@ $(document).ready(function () {
         const searchResultsDiv = document.querySelector(".search-results");
         searchResultsDiv.innerHTML = "";
         removeSearchedHighlights();
+        searchMessageClick= false;
+                DOM.groupSearch= false;
+                DOM.groupReferenceMessageClick= false;
+                DOM.loader_showing= false;
+                DOM.groupSearchMessageFound= false;
+                DOM.lastMessageId=null;
+                searchMessageSet.clear();
     });
 
     // Close sidebar on clicking outside of it
@@ -33,6 +40,13 @@ $(document).ready(function () {
             $("#search-icon").hasClass("d-none") ? $("#search-icon").removeClass("d-none") : '';
             if ($("#sidebar").hasClass("sidebar-open")) {
                 removeSearchedHighlights();
+                DOM.searchMessageClick= false;
+                DOM.groupSearch= false;
+                DOM.groupReferenceMessageClick= false;
+                DOM.loader_showing= false;
+                DOM.groupSearchMessageFound= false;
+                searchMessageSet.clear();
+                DOM.lastMessageId=null;
                 $("#sidebar").removeClass("sidebar-open").addClass("sidebar-closed");
                 $(".container-fluid").removeClass("sidebar-open");
                 $("#search-icon").removeClass("icon-move-left");
