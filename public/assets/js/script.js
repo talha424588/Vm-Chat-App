@@ -2841,17 +2841,12 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
         const u_id = user.unique_id;
         // const ids = nextPageMessages.data.map(item => item.id);
 
-
-        console.log("messages", user.unique_id);
-        console.log("messages", nextPageMessages.data);
         const ids = nextPageMessages.data
             .filter(item =>
                 item.sender !== user.unique_id &&
                 !item.seen_by.split(', ').includes(user.unique_id)
             )
             .map(item => item.id);
-        // const ids = nextPageMessages.data.filter(item => item.sender != user.unique_id && !item.seen_by.split(",").includes(user.unique_id)).map(item => item.id);
-        console.log("ids", ids);
 
         const Notseenby = nextPageMessages.data
             .filter(item => {
@@ -2861,7 +2856,6 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             .map(item => item.id);
         DOM.unreadCounter = Notseenby.length;
         const notSeenById = Notseenby.at(-1);
-        console.log("fetchPaginatedMessages update message");
         if (ids.length > 0) {
             (async () => {
                 try {
@@ -2879,12 +2873,8 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             })();
         }
         else {
-            console.log("ids length less then 1");
+            // console.log("ids length less then 1");
         }
-
-
-        console.log("after update");
-
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
             if (DOM.currentPage == 1) {
@@ -3417,7 +3407,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
 
     if (DOM.groupSearchMessageFound == false) {
         if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
-            console.log("first");
             await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
             get_voice_list();
             removeEditMessage();
@@ -3433,7 +3422,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
 
 
         else if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
-            console.log("counter mote then 50");
             await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
             get_voice_list();
             removeEditMessage();
@@ -4150,9 +4138,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 }
 
                 if (messages == undefined) {
-                    console.log("is loading", loadMore);
                     if (!loadMore) {
-                        console.log("in condition");
                         // DOM.chatList2.innerHTML = `<div class="no-messages-found">No messages found.</div>`;
                         document.getElementById('messagesList').innerHTML = '<div class="no-messages-found">No messages found.</div>';
                         return;
