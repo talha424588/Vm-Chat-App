@@ -31,10 +31,10 @@ io.on('connection', (socket) => {
     });
 
     // Server-side code
-    socket.on('deleteMessage', (messageId,isMove) => {
-        console.log("delete message event", messageId);
-        io.emit('deleteMessage', messageId,isMove);
-        io.emit('updateGroupMessages', messageId);
+    socket.on('deleteMessage', (message,isMove) => {
+        console.log("delete message event", message);
+        io.emit('deleteMessage', message,isMove);
+        io.emit('updateGroupMessages', message);
     });
 
     socket.on('moveMessage', (moveMessages, newGroupId, groupId,uniqueId) => {
