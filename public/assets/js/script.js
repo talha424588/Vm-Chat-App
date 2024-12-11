@@ -1173,7 +1173,7 @@ socket.on('restoreMessage', (incomingMessage, uniqueId) => {
                 mainDiv.append(dropdownHTML);
             }
         }
-        else {
+        if (user.unique_id == uniqueId) {
             const dropdownHTML = `
             <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
