@@ -307,6 +307,23 @@ background-color: rgba(255, 255, 255, 0.5);
 
 /* Media query for mobile devices */
 @media (max-width: 768px) {
+	.lazy_spinner {
+		border: 6px solid rgba(0, 0, 0, 0.1) !important;
+		border-top: 6px solid #1DAB61 !important;
+		border-radius: 50% !important;
+		width: 35px !important;
+		height: 35px !important;
+		position: absolute !important;
+		top: -50px !important;
+		left: 50% !important;
+		transform: translateX(-50%);
+		animation: spin 1s linear infinite;
+		transition: top 0.4s ease-in-out !important;
+		z-index: 1;
+	}
+	.show-spinner {
+		top: 320px !important;
+	}
 	
 	#sidebar {
 	  width: 100%;
@@ -932,6 +949,7 @@ body{
 
 /* Responsive design for small screens */
 @media (max-width: 768px) {
+
     .back-arrow {
         display: block;
     }
@@ -945,6 +963,9 @@ body{
 	#search-icon{
 		display: block;
 	}
+	#search-icon-mobile{
+		display: none;
+	}
 	.chat-row
 	{
 		height: 100%;
@@ -955,9 +976,8 @@ body{
 	.search-results{
 		height: 80%;
 	}
-
+	
 }
-
 #message-area .overlay {
 	background: #f0f2f5;
 }
@@ -1005,7 +1025,7 @@ body{
 	flex: 1!important;
 	overflow: auto;
 	overflow-x: hidden;
-	background-image: url('../img/messages-background.png');
+	background-image: url('../img/messages-background.webp');
 	background-size: cover;
 	background-repeat: no-repeat;
 	margin-bottom: 74px;
@@ -1253,20 +1273,20 @@ body{
 	transition: filter 0.3s ease;
 	pointer-events: none;
 }
-.lazy_spinner {
-    border: 6px solid rgba(0, 0, 0, 0.1);
-    border-top: 6px solid #1DAB61;
+
+.lazy_spinner{
+	border: 10px solid rgba(0, 0, 0, 0.1);
+    border-top: 10px solid #1DAB61;
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
+    width: 60px;
+    height: 60px;
     position: absolute;
     top: -50px;
     left: 50%;
     transform: translateX(-50%);
     animation: spin 1s linear infinite;
     transition: top 0.4s ease-in-out;
-	z-index: 1;
-
+    z-index: 1;
 }
 
 @keyframes spin {
@@ -1275,7 +1295,7 @@ body{
 }
 
 .show-spinner {
-    top: 85px;
+    top: 350px;
 }
 
 .hide-spinner {
@@ -1451,4 +1471,7 @@ width: 60px;
 }
 .group-imgg svg{
     width: 100%;
+}
+.fa-angle-down{
+	cursor: pointer;
 }
