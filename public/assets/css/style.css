@@ -20,7 +20,9 @@ margin-bottom: 0px;
 position: relative;
 overflow: hidden; /* Ensure content does not overflow */
 }
-
+.audio-width{
+	width: 25% !important;
+	}
 #quoted-message::before {
 content: "";
 position: absolute;
@@ -305,6 +307,7 @@ background-color: rgba(255, 255, 255, 0.5);
 
 /* Media query for mobile devices */
 @media (max-width: 768px) {
+	
 	#sidebar {
 	  width: 100%;
 	}
@@ -329,7 +332,9 @@ background-color: rgba(255, 255, 255, 0.5);
 	.chat_list_view{
 		padding: 0px;
 	}
-
+	.audio-width{
+	width: 100% !important;
+	}
 
   }
 
@@ -1150,6 +1155,7 @@ body{
 	padding-top: 11px;
 }
 
+
 .file-message {
     display: flex;
     align-items: center;
@@ -1346,6 +1352,9 @@ body{
     }
 	#side_navbar{
 		width: 58%;
+	}
+	.audio-width{
+		width: 100%;
 	}
 }
 

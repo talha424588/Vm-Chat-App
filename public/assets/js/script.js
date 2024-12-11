@@ -1104,7 +1104,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     }
                 }
             }
-
+                get_voice_list();
         } else {
             console.error('Message element not found for ID:', editedMessage.id);
         }
@@ -2456,7 +2456,7 @@ function showReply(message_id, senderName, type) {
                 </a>
             </div>`;
     } else if (type === 'Audio') {
-        var message_body = `<div class="audio-message w-25 mb-2" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
+        var message_body = `<div class="audio-message audio-width  mb-2" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.msg}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
@@ -3964,6 +3964,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     } else {
         DOM.groupSearch = false;
         buttons.style.display = 'block';
+        removeSearchedHighlights();
         // chatList = [...previousChatList];
         // chatList.sort((a, b) => {
         //     if (a.time && b.time) {
@@ -4190,7 +4191,7 @@ messageSidebar.addEventListener('scroll', function () {
 });
 async function handleMessageResponse(messageElement, message, messageId, searchQuery) {
     if (messageElement && searchQuery) {
-        if (getOldMessageType(message) == 'document') {
+        if (getOldMessageType(message) == 'document' || message.type == 'File') {
             const contentDiv = messageElement.querySelector(".additional_style");
             const fileName = contentDiv.querySelector(".file-name");
 
@@ -4215,6 +4216,7 @@ async function handleMessageResponse(messageElement, message, messageId, searchQ
             }
             return;
         }
+        
         const contentDiv = messageElement.querySelector(".additional_style");
         const replyDiv = contentDiv.querySelector(".reply-message-area");
         let targetDiv = replyDiv || contentDiv;
