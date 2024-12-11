@@ -52,7 +52,7 @@ const DOM = {
     groupReferenceMessageClick: false,
     loader_showing: false,
     groupSearchMessageFound: false,
-    NormalLoading:true,
+    NormalLoading: true,
     // groupSearchCounter: 0,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
@@ -380,9 +380,9 @@ let viewMessageList = () => {
                     <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="generateMessageArea(this,${index},true,${elem.id})">
 
                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
-</svg>
-</span>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
+                    </svg>
+                    </span>
                       <div class="w-50">
                         <div class="name list-user-name">${elem.group.name}</div>
                         <div class="small last-message">${elem ? senderName + ": " : ""}${messageText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '').replace(/<a[^>]*>(.*?)<\/a>/g, '$1')}</div>
@@ -453,10 +453,6 @@ function makeformatDate(dateString) {
 }
 
 socket.on('deleteMessage', (message, isMove) => {
-    console.log("message array",nextPageMessages);
-    console.log("group array",chatList);
-    console.log("delete message",message);
-
     let deleteMessage = message;
     if (isMove == true) {
 
@@ -478,7 +474,7 @@ socket.on('deleteMessage', (message, isMove) => {
             else {
                 var replyLink = messageElement.find('#reply-link');
                 if (replyLink.length) {
-
+                    messageElement.find('.dropdown').remove();
                     replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                            id="restore-button-${deleteMessage.id}" onclick="restoreMessage(${deleteMessage.id})" data-message-id="${deleteMessage.id}">Restore</a>
@@ -490,7 +486,7 @@ socket.on('deleteMessage', (message, isMove) => {
         }
         else {
             var replyLink = messageElement.find('#reply-link');
-
+            messageElement.find('.dropdown').remove();
             if (replyLink.length) {
                 replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
@@ -614,7 +610,6 @@ function updateChatList(message) {
 
 socket.on('updateGroupMessages', (message) => {
 
-    console.log("message",message);
     let deleteMessage = message;
     const groupId = DOM.groupId;
     if (DOM.groupId != null || DOM.groupId != undefined) {
@@ -629,7 +624,6 @@ socket.on('updateGroupMessages', (message) => {
         }
     }
     else {
-        console.log("chat list",chatList);
         const group = chatList.find(group => {
             return group.group.group_messages.find(message => message.id === deleteMessage.id);
         });
@@ -754,7 +748,6 @@ socket.on('sendChatToClient', (message) => {
 
 socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) => {
     if (user.unique_id != uniqueId) {
-        console.log("not login user");
         if (DOM.groupId == null || DOM.groupId !== newGroupId) {
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
             if (newGroup) {
@@ -777,8 +770,7 @@ socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) 
 
                 rerenderChatList(preGroupId);
             }
-            else
-            {
+            else {
                 rerenderChatList(preGroupId);
             }
         }
@@ -823,7 +815,6 @@ socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) 
         }
     }
     else if (user.unique_id == uniqueId) {
-        console.log("actual login  login user");
         const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
         const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
         generateMessageArea(newGroupChatListItem, newIndex, false, null);
@@ -1119,7 +1110,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
                     }
                 }
             }
-                get_voice_list();
+            get_voice_list();
         } else {
             console.error('Message element not found for ID:', editedMessage.id);
         }
@@ -1130,7 +1121,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
     }
 });
 
-socket.on('restoreMessage', (incomingMessage) => {
+socket.on('restoreMessage', (incomingMessage, uniqueId) => {
 
     if (user.role != 0 && user.role != 2) {
         let groupToUpdate = chatList.find(chat => chat.group.group_id === incomingMessage.message.group_id);
@@ -1145,19 +1136,44 @@ socket.on('restoreMessage', (incomingMessage) => {
         rerenderChatList(incomingMessage.message.group_id);
         addMessageToMessageArea(incomingMessage.message, false);
     } else {
-        const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
         const mainDiv = $(`#message-${incomingMessage.message.id}`);
-        mainDiv.removeClass("deleted_niddle");
-        mainDiv.find(".additional_style").removeClass("msg_deleted");
-        if (restoreButton.length > 0) {
-            restoreButton.replaceWith(`
-                <span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666; "
-                      onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.sender}','${incomingMessage.message.type}')">
-                    Reply
-                </span>
-            `);
+        if (user.unique_id != uniqueId) {
+            const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
+            mainDiv.removeClass("deleted_niddle");
+            mainDiv.find(".additional_style").removeClass("msg_deleted");
+            if (restoreButton.length > 0) {
+                restoreButton.replaceWith(`
+                    <span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666; "
+                          onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.user.name}','${incomingMessage.message.type}')">
+                        Reply
+                    </span>
+                `);
 
 
+                const dropdownHTML = `
+                <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+                    <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-angle-down text-muted px-2"></i>
+                    </a>
+                    <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                        ${user.role !== '0' && user.role !== '2' ? `
+                            <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+                        ` : ''}
+                        ${(user.role === '0' || user.role === '2') && incomingMessage.message.type === "Message" ? `
+                            <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+                        ` : ''}
+
+                        ${(user.role === '0' || user.role === '2') && (incomingMessage.message.is_compose !== 1 && incomingMessage.message.is_compose !== true) ? `
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+                mainDiv.append(dropdownHTML);
+            }
+        }
+        else {
             const dropdownHTML = `
             <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -1177,33 +1193,7 @@ socket.on('restoreMessage', (incomingMessage) => {
                 </div>
             </div>
         `;
-
-
-            // const dropdownHTML = `
-            //         <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
-            //             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            //                 <i class="fas fa-angle-down text-muted px-2"></i>
-            //             </a>
-            //             <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-            //                 ${(user.role !== '0' && user.role !== '2') || (incomingMessage.message.type === "Message") ? `
-            //                     <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
-            //                 ` : ''}
-            //                 ${(user.role === '0' || user.role === '2') && incomingMessage.message.type === "Message" && incomingMessage.message.is_compose ? `
-            //                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${incomingMessage.message.id}', '${incomingMessage.message.user.name}')">Correction</a>
-            //                 ` : ''}
-            //                 ${(user.role === '0' || user.role === '2') && incomingMessage.message.is_compose && incomingMessage.message.type === "Message" ? `
-            //                     <a class="dropdown-item" href="#" onclick="moveMessage('${incomingMessage.message.id}')">Move</a>
-            //                 ` : ''}
-            //                 ${(user.role === '0' || user.role === '2') && !incomingMessage.message.is_compose ? `
-            //                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
-            //                 ` : ''}
-            //             </div>
-            //         </div>
-            //     `;
-
-            // Append the dropdown to the message
             mainDiv.append(dropdownHTML);
-
         }
     }
 });
@@ -1443,11 +1433,11 @@ let addMessageToMessageArea = (message, flag = false) => {
                     <img src="${fileLink}" style="height:222px; width:100%;">
                 </div>
                     `
-                }
-                else if(message.reply.type == "Audio"){
-                    const audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
-                    audioSrc = audioTag.match(/src="([^"]+)"/)[1];
-                    messageContent=`
+            }
+            else if (message.reply.type == "Audio") {
+                const audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
+                audioSrc = audioTag.match(/src="([^"]+)"/)[1];
+                messageContent = `
                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
@@ -1736,7 +1726,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
                             ${user.role != '1' && user.role != '3' && message.sender != user.unique_id ? `
-                                <div class="dropdown ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? '' : 'd-none'}" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
+                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
@@ -1753,7 +1743,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction </a>
                                     ` : ''}
                                     ${(message.type === "Message" || message.type === null) &&
-                                              (message.is_compose === 1 || message.is_compose === true) ? `
+                        (message.is_compose === 1 || message.is_compose === true) && (!message.reply) ? `
                                                 <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                                             ` : ''}
                                     ` : ''}
@@ -2763,7 +2753,7 @@ DOM.messages.addEventListener('scroll', async () => {
         isLoadingMessages = true;
         showSpinner();
         await fetchPaginatedMessages(null, null, null);
-            hideSpinner();
+        hideSpinner();
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
@@ -2891,193 +2881,193 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             if (message.id == message_id) {
                 const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
                 const searchQuery = DOM.messageSearchQuery;
-                setTimeout(()=>handleMessageResponse(messageElement,message,message,searchQuery),1000);
+                setTimeout(() => handleMessageResponse(messageElement, message, message, searchQuery), 1000);
             }
-                // if (DOM.groupReferenceMessageClick) {
-                //     console.log("refrence clicked");
-                //     scrollToMessage(message.id);
-                // }
-                // else if (!DOM.groupReferenceMessageClick) {
-                // }
-                // else if (!DOM.groupReferenceMessageClick) {
-                //     const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
-                //     const messageTextElement = messageElement.querySelector(".shadow-sm");
-                //     const searchQuery = DOM.messageSearchQuery;
+            // if (DOM.groupReferenceMessageClick) {
+            //     console.log("refrence clicked");
+            //     scrollToMessage(message.id);
+            // }
+            // else if (!DOM.groupReferenceMessageClick) {
+            // }
+            // else if (!DOM.groupReferenceMessageClick) {
+            //     const messageElement = DOM.messages.querySelector(`[data-message-id="${message.id}"]`);
+            //     const messageTextElement = messageElement.querySelector(".shadow-sm");
+            //     const searchQuery = DOM.messageSearchQuery;
 
-                //     switch (message.type) {
-                //         case "Message":
-                //             if (message.reply) {
-                //                 messageTextElement.innerHTML = '';
-                //                 if (message.reply.type === "Audio") {
+            //     switch (message.type) {
+            //         case "Message":
+            //             if (message.reply) {
+            //                 messageTextElement.innerHTML = '';
+            //                 if (message.reply.type === "Audio") {
 
-                //                     var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
-                //                     <div class="avatar">
-                //                         <!-- Avatar image here -->
-                //                     </div>
-                //                     <div class="audio-content">
-                //                         <div class="audio-controls">
-                //                             <button class="playbutton">
-                //                                <svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                //         <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
-                //         </svg>
-                //                             </button>
-                //                             <div class="audio-progress">
-                //                                 <div class="progress-filled"></div>
-                //                             </div>
-                //                         </div>
-                //                         <div class="audio-time-container">
-                //                             <span class="audio-duration">0:00</span>
-                //                             <span class="audio-time">12:27 PM</span>
-                //                         </div>
-                //                     </div>
-                //                     </div>`;
+            //                     var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? '#dcf8c6' : 'white'};" data-audio-src="${message.reply.msg}">
+            //                     <div class="avatar">
+            //                         <!-- Avatar image here -->
+            //                     </div>
+            //                     <div class="audio-content">
+            //                         <div class="audio-controls">
+            //                             <button class="playbutton">
+            //                                <svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //         <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
+            //         </svg>
+            //                             </button>
+            //                             <div class="audio-progress">
+            //                                 <div class="progress-filled"></div>
+            //                             </div>
+            //                         </div>
+            //                         <div class="audio-time-container">
+            //                             <span class="audio-duration">0:00</span>
+            //                             <span class="audio-time">12:27 PM</span>
+            //                         </div>
+            //                     </div>
+            //                     </div>`;
 
-                //                     newMessageDisplay = `
-                //                     <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
-                //                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                //                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
+            //                     newMessageDisplay = `
+            //                     <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id}','${message.id}')">
+            //                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+            //                         ${message.user?.id == user?.id ? message.user.name : message.user.name}
 
-                //                         </div>
-                //                         <div class="reply-details">
-                //                             <p class="file-name">${message_body}</p>
-                //                         </div>
-                //                     </div>
-                //                 <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
-                //                 `;
+            //                         </div>
+            //                         <div class="reply-details">
+            //                             <p class="file-name">${message_body}</p>
+            //                         </div>
+            //                     </div>
+            //                 <div class="reply-message-area">${(message.msg || message.message).replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div> <!-- Updated this line -->
+            //                 `;
 
-                //                     const messageText = message.msg.toLowerCase();
-                //                     const index = messageText.indexOf(searchQuery);
+            //                     const messageText = message.msg.toLowerCase();
+            //                     const index = messageText.indexOf(searchQuery);
 
-                //                     if (index !== -1) {
-                //                         const highlightedText = message.msg.substring(0, index) +
-                //                             `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                //                             message.msg.substring(index + searchQuery.length);
+            //                     if (index !== -1) {
+            //                         const highlightedText = message.msg.substring(0, index) +
+            //                             `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+            //                             message.msg.substring(index + searchQuery.length);
 
-                //                         // Update the reply message area with highlighted text
-                //                         newMessageDisplay = `
-                //                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
-                //                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                //                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
-                //                         </div>
-                //                         <div class="reply-details">
-                //                             <p class="file-name">${message_body}</p>
-                //                         </div>
-                //                     </div>
-                //                     <div class="reply-message-area">${highlightedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
-                //                 `;
-                //                     }
-                //                     messageTextElement.innerHTML = newMessageDisplay;
+            //                         // Update the reply message area with highlighted text
+            //                         newMessageDisplay = `
+            //                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
+            //                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+            //                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
+            //                         </div>
+            //                         <div class="reply-details">
+            //                             <p class="file-name">${message_body}</p>
+            //                         </div>
+            //                     </div>
+            //                     <div class="reply-message-area">${highlightedText.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/<i[^>]+>/g, '')}</div>
+            //                 `;
+            //                     }
+            //                     messageTextElement.innerHTML = newMessageDisplay;
 
-                //                 }
-                //                 else if (message.reply.type === "File") {
-                //                     replyDisplay = `
-                //                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
-                //                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                //                         ${message.user.name}
-                //                     </div>
-                //                     <div class="reply-details">
-                //                         <div class="file-message">
-                //                             <div class="file-icon">
-                //                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                //                                     <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"></path>
-                //                                     <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"></path>
-                //                                 </svg>
-                //                             </div>
-                //                             <div class="file-details">
-                //                                 <p class="file-name">${message.reply.media_name}</p>
-                //                             </div>
-                //                             <a href="${message.reply.msg}" class="download-icon" download="${message.reply.media_name}">
-                //                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                //                                     <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"></path>
-                //                                 </svg>
-                //                             </a>
-                //                         </div>
-                //                     </div>
-                //                 </div>`;
-                //                     messageTextElement.innerHTML = replyDisplay +
-                //                         `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
+            //                 }
+            //                 else if (message.reply.type === "File") {
+            //                     replyDisplay = `
+            //                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')">
+            //                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+            //                         ${message.user.name}
+            //                     </div>
+            //                     <div class="reply-details">
+            //                         <div class="file-message">
+            //                             <div class="file-icon">
+            //                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //                                     <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"></path>
+            //                                     <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"></path>
+            //                                 </svg>
+            //                             </div>
+            //                             <div class="file-details">
+            //                                 <p class="file-name">${message.reply.media_name}</p>
+            //                             </div>
+            //                             <a href="${message.reply.msg}" class="download-icon" download="${message.reply.media_name}">
+            //                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //                                     <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"></path>
+            //                                 </svg>
+            //                             </a>
+            //                         </div>
+            //                     </div>
+            //                 </div>`;
+            //                     messageTextElement.innerHTML = replyDisplay +
+            //                         `<div style="padding-top: 10px;">${message.msg.replace(/[\r\n]+/g, '<br>')}</div>`;
 
-                //                     const messageText = message.msg.toLowerCase();
-                //                     const index = messageText.indexOf(searchQuery);
-                //                     if (index !== -1) {
-                //                         const highlightedText = message.msg.substring(0, index) +
-                //                             `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                //                             message.msg.substring(index + searchQuery.length);
-                //                         messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
-                //                     }
-                //                 }
-                //                 else if (message.reply.type === "Image") {
-                //                     var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
-                //                     replyDisplay = `
-                //                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
-                //                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                //                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
-                //                         </div>
-                //                         <div class="reply-details">
-                //                             <p class="file-name">${message_body}</p>
-                //                         </div>
-                //                     </div>
-                //                 `;
+            //                     const messageText = message.msg.toLowerCase();
+            //                     const index = messageText.indexOf(searchQuery);
+            //                     if (index !== -1) {
+            //                         const highlightedText = message.msg.substring(0, index) +
+            //                             `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+            //                             message.msg.substring(index + searchQuery.length);
+            //                         messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+            //                     }
+            //                 }
+            //                 else if (message.reply.type === "Image") {
+            //                     var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            //                     replyDisplay = `
+            //                     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id}','${message.id}')"> <!-- Add onclick here -->
+            //                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+            //                             ${message.user?.id == user?.id ? message.user.name : message.user.name}
+            //                         </div>
+            //                         <div class="reply-details">
+            //                             <p class="file-name">${message_body}</p>
+            //                         </div>
+            //                     </div>
+            //                 `;
 
-                //                     messageTextElement.innerHTML = replyDisplay;
-                //                     const messageText = message.msg.toLowerCase();
-                //                     const index = messageText.indexOf(searchQuery);
-                //                     if (index !== -1) {
-                //                         const highlightedText = message.msg.substring(0, index) +
-                //                             `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
-                //                             message.msg.substring(index + searchQuery.length);
-                //                         messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
-                //                     }
-                //                 }
+            //                     messageTextElement.innerHTML = replyDisplay;
+            //                     const messageText = message.msg.toLowerCase();
+            //                     const index = messageText.indexOf(searchQuery);
+            //                     if (index !== -1) {
+            //                         const highlightedText = message.msg.substring(0, index) +
+            //                             `<span class="highlight">${message.msg.substring(index, index + searchQuery.length)}</span>` +
+            //                             message.msg.substring(index + searchQuery.length);
+            //                         messageTextElement.innerHTML = replyDisplay + highlightedText.replace(/[\r\n]+/g, '<br>');
+            //                     }
+            //                 }
 
-                //             }
-                //             else {
-                //                 const messageText = messageTextElement.innerHTML;
-                //                 const index = messageText.indexOf(searchQuery);
-                //                 if (index !== -1) {
-                //                     const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
-                //                     messageTextElement.innerHTML = highlightedText;
-                //                 }
-                //             }
-                //             break;
-                //         case "File":
-                //             const fileNameElement = messageElement.querySelector(".file-name");
-                //             if (fileNameElement) {
-                //                 const fileName = fileNameElement.textContent;
+            //             }
+            //             else {
+            //                 const messageText = messageTextElement.innerHTML;
+            //                 const index = messageText.indexOf(searchQuery);
+            //                 if (index !== -1) {
+            //                     const highlightedText = messageText.substring(0, index) + `<span class="highlight">${messageText.substring(index, index + searchQuery.length)}</span>` + messageText.substring(index + searchQuery.length);
+            //                     messageTextElement.innerHTML = highlightedText;
+            //                 }
+            //             }
+            //             break;
+            //         case "File":
+            //             const fileNameElement = messageElement.querySelector(".file-name");
+            //             if (fileNameElement) {
+            //                 const fileName = fileNameElement.textContent;
 
-                //                 const trimmedSearchQuery = searchQuery;
-                //                 const index = fileName.toLowerCase().indexOf(trimmedSearchQuery.toLowerCase());
-                //                 if (index !== -1) {
-                //                     const highlightedFileName = fileName.substring(0, index) +
-                //                         `<span class="highlight">${fileName.substring(index, index + trimmedSearchQuery.length)}</span>` +
-                //                         fileName.substring(index + trimmedSearchQuery.length);
-                //                     fileNameElement.innerHTML = highlightedFileName;
-                //                 }
-                //             }
-                //             break;
-                //         default:
-                //             const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
-                //             if (nullTypemessageTextElement) {
-                //                 const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
+            //                 const trimmedSearchQuery = searchQuery;
+            //                 const index = fileName.toLowerCase().indexOf(trimmedSearchQuery.toLowerCase());
+            //                 if (index !== -1) {
+            //                     const highlightedFileName = fileName.substring(0, index) +
+            //                         `<span class="highlight">${fileName.substring(index, index + trimmedSearchQuery.length)}</span>` +
+            //                         fileName.substring(index + trimmedSearchQuery.length);
+            //                     fileNameElement.innerHTML = highlightedFileName;
+            //                 }
+            //             }
+            //             break;
+            //         default:
+            //             const nullTypemessageTextElement = messageElement.querySelector(".shadow-sm");
+            //             if (nullTypemessageTextElement) {
+            //                 const nullTypeMessageText = nullTypemessageTextElement.innerHTML;
 
-                //                 const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
-                //                 if (nullTypeIndex !== -1) {
-                //                     const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
-                //                         `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
-                //                         nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
+            //                 const nullTypeIndex = nullTypeMessageText.toLowerCase().indexOf(searchQuery.toLowerCase());
+            //                 if (nullTypeIndex !== -1) {
+            //                     const highlightedText = nullTypeMessageText.substring(0, nullTypeIndex) +
+            //                         `<span class="highlight">${nullTypeMessageText.substring(nullTypeIndex, nullTypeIndex + searchQuery.length)}</span>` +
+            //                         nullTypeMessageText.substring(nullTypeIndex + searchQuery.length);
 
-                //                     nullTypemessageTextElement.innerHTML = highlightedText;
-                //                 }
-                //             } else {
-                //                 // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
-                //             }
-                //             break;
-                //         // console.log("Unknown message type:", message.type);
-                //     }
-                //     setTimeout(() => {
-                //         messageElement.scrollIntoView();
-                //     }, 200);
-                // }
+            //                     nullTypemessageTextElement.innerHTML = highlightedText;
+            //                 }
+            //             } else {
+            //                 // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
+            //             }
+            //             break;
+            //         // console.log("Unknown message type:", message.type);
+            //     }
+            //     setTimeout(() => {
+            //         messageElement.scrollIntoView();
+            //     }, 200);
+            // }
 
         });
         const newScrollHeight = DOM.messages.scrollHeight;
@@ -3141,9 +3131,8 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     change_icon_height(document.getElementById('reply-area'));
     chat = chatList[chatIndex];
     DOM.activeChatIndex = chatIndex;
-    if(searchMessage)
-    {
-        DOM.NormalLoading=false;
+    if (searchMessage) {
+        DOM.NormalLoading = false;
     }
 
     if (searchMessageSet.size > 0 && DOM.groupId == groupSearchMessage.group_id) {
@@ -3151,11 +3140,11 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
             // DOM.groupSearchMessageFound = true;
             const targetMessage = document.getElementById(`message-${groupSearchMessage.id}`);
             if (targetMessage) {
-                handleMessageResponse(targetMessage,groupSearchMessage,groupSearchMessage.id,groupSearchField.value)
+                handleMessageResponse(targetMessage, groupSearchMessage, groupSearchMessage.id, groupSearchField.value)
             }
             // DOM.groupSearchMessageFound = false;
-        }else{
-            handleMessageResponse(null,null,groupSearchMessage.id,null);
+        } else {
+            handleMessageResponse(null, null, groupSearchMessage.id, null);
         }
         return;
     }
@@ -3802,7 +3791,6 @@ $('#deleteModal .btn-delete').on('click', function () {
             //         group.group.group_messages.splice(messageIndex, 1);
             //     }
             // }
-            console.log("delete message response",message.data);
             $("#deleteModal").on('hide.bs.modal', function () { });
             $('#deleteModal').removeClass('show');
             $('body').removeClass('modal-open');
@@ -4190,13 +4178,13 @@ async function handleMessageResponse(messageElement, message, messageId, searchQ
                     fileName.innerHTML = content;
                     hideSpinner();
                 }
-                messageElement.scrollIntoView({block: 'center' });
+                messageElement.scrollIntoView({ block: 'center' });
                 const ml3Div = messageElement.closest('.ml-3');
                 if (ml3Div) {
                     ml3Div.classList.add('selected-message');
                     setTimeout(() => {
                         ml3Div.classList.remove('selected-message');
-                        DOM.NormalLoading=true;
+                        DOM.NormalLoading = true;
                     }, 2000);
                 }
             }
@@ -4215,24 +4203,24 @@ async function handleMessageResponse(messageElement, message, messageId, searchQ
                 targetDiv.innerHTML = content;
                 hideSpinner();
             }
-            messageElement.scrollIntoView({block: 'center' });
-                const ml3Div = messageElement.closest('.ml-3');
-                if (ml3Div) {
-                    ml3Div.classList.add('selected-message');
-                    setTimeout(() => {
-                        ml3Div.classList.remove('selected-message');
-                        DOM.NormalLoading=true;
-                    }, 2000);
-                }
+            messageElement.scrollIntoView({ block: 'center' });
+            const ml3Div = messageElement.closest('.ml-3');
+            if (ml3Div) {
+                ml3Div.classList.add('selected-message');
+                setTimeout(() => {
+                    ml3Div.classList.remove('selected-message');
+                    DOM.NormalLoading = true;
+                }, 2000);
+            }
         }
     }
-    else{
-        DOM.NormalLoading=false;
-    showloader();
-    await fetchPaginatedMessages(messageId, null, null);
-    setTimeout(()=>{
-        hideSpinner();
-    },1000);
+    else {
+        DOM.NormalLoading = false;
+        showloader();
+        await fetchPaginatedMessages(messageId, null, null);
+        setTimeout(() => {
+            hideSpinner();
+        }, 1000);
     }
 }
 
@@ -4698,11 +4686,31 @@ async function restoreMessage(id) {
 
             }
         }).then(message => {
-            socket.emit('restoreMessage', message);
+            socket.emit('restoreMessage', message, user.unique_id);
 
             var messageElement = $(`[data-message-id="${id}"]`);
 
             if (messageElement.length > 0) {
+
+                //         const dropdownHTML = `
+                //     <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+                //         <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                //             <i class="fas fa-angle-down text-muted px-2"></i>
+                //         </a>
+                //         <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                //             ${user.role !== '0' && user.role !== '2' ? `
+                //                 <a class="dropdown-item" href="#" onclick="editMessage('${id}')">Edit</a>
+                //             ` : ''}
+                //             ${(user.role === '0' || user.role === '2') && message.message.type === "Message" ? `
+                //                 <a class="dropdown-item" href="#" onclick="editMessage('${id}')">Edit</a>
+                //             ` : ''}
+                //             ${(user.role === '0' || user.role === '2') && !message.message.is_compose ? `
+                //                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${id}">Delete</a>
+                //             ` : ''}
+                //         </div>
+                //     </div>
+                // `;
+                //         messageElement.append(dropdownHTML);
                 const restoreButton = $(`#restore-button-${id}`);
                 if (restoreButton.length > 0) {
 
