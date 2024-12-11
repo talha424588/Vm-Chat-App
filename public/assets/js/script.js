@@ -4991,5 +4991,6 @@ document.getElementById('messages').addEventListener('scroll', function () {
     const divElement = this;
     if (divElement.scrollHeight - divElement.scrollTop === divElement.clientHeight) {
         // console.log('Scrolled to the bottom');
+        
     }
 });
