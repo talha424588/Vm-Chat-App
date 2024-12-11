@@ -112,7 +112,8 @@ class ChatController extends Controller
             if ($message->save()) {
                 return response()->json([
                     'status' => true,
-                    'message' => 'Message deleted successfully'
+                    'message' => 'Message deleted successfully',
+                    'data' => $message
                 ], 200);
             } else {
                 return response()->json([

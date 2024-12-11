@@ -452,23 +452,28 @@ function makeformatDate(dateString) {
     }
 }
 
-socket.on('deleteMessage', (messageId, isMove) => {
+socket.on('deleteMessage', (message, isMove) => {
+    console.log("message array",nextPageMessages);
+    console.log("group array",chatList);
+    console.log("delete message",message);
 
+    let deleteMessage = message;
     if (isMove == true) {
 
-        var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
+        var messageElement = $('[data-message-id="' + deleteMessage.id + '"]').closest('.ml-3');
         if (messageElement) {
             messageElement.remove();
         }
     }
     else {
 
-        var messageElement = $('[data-message-id="' + messageId + '"]').closest('.ml-3');
+        var messageElement = $('[data-message-id="' + deleteMessage.id + '"]').closest('.ml-3');
         if (user.role != 0 && user.role != 2) {
 
             if (messageElement) {
                 messageElement.remove();
-                viewChatList();
+                rerenderChatList(deleteMessage.group_id);
+                // viewChatList();
             }
             else {
                 var replyLink = messageElement.find('#reply-link');
@@ -476,7 +481,7 @@ socket.on('deleteMessage', (messageId, isMove) => {
 
                     replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
-                           id="restore-button-${messageId}" onclick="restoreMessage(${messageId})" data-message-id="${messageId}">Restore</a>
+                           id="restore-button-${deleteMessage.id}" onclick="restoreMessage(${deleteMessage.id})" data-message-id="${deleteMessage.id}">Restore</a>
                     `);
 
                 }
@@ -489,16 +494,16 @@ socket.on('deleteMessage', (messageId, isMove) => {
             if (replyLink.length) {
                 replyLink.replaceWith(`
                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
-                           id="restore-button-${messageId}" onclick="restoreMessage(${messageId})" data-message-id="${messageId}">Restore</a>
+                           id="restore-button-${deleteMessage.id}" onclick="restoreMessage(${deleteMessage.id})" data-message-id="${deleteMessage.id}">Restore</a>
                     `);
             }
-            // const message = findMessageById(messageId);
-            const message = getPaginatedArrayLastMessage(messageId);
+            // const message = findMessageById(message.id);
+            const message = getPaginatedArrayLastMessage(deleteMessage.id);
 
-            updateChatList(message)
+            updateChatList(deleteMessage)
         }
         messageElement.find(".additional_style").addClass("msg_deleted");
-        messageElement.find("#message-" + messageId).addClass("deleted_niddle");
+        messageElement.find("#message-" + deleteMessage.id).addClass("deleted_niddle");
 
     }
 });
@@ -607,12 +612,15 @@ function updateChatList(message) {
     }
 }
 
-socket.on('updateGroupMessages', (messageId) => {
+socket.on('updateGroupMessages', (message) => {
+
+    console.log("message",message);
+    let deleteMessage = message;
     const groupId = DOM.groupId;
     if (DOM.groupId != null || DOM.groupId != undefined) {
         const group = chatList.find(group => group.group.group_id === groupId);
         if (group) {
-            const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
+            const messageIndex = group.group.group_messages.findIndex(message => message.id === deleteMessage.id);
             if (messageIndex !== -1) {
                 group.group.group_messages.splice(messageIndex, 1);
                 group.unread -= 1
@@ -621,11 +629,12 @@ socket.on('updateGroupMessages', (messageId) => {
         }
     }
     else {
+        console.log("chat list",chatList);
         const group = chatList.find(group => {
-            return group.group.group_messages.find(message => message.id === messageId);
+            return group.group.group_messages.find(message => message.id === deleteMessage.id);
         });
         if (group) {
-            const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
+            const messageIndex = group.group.group_messages.findIndex(message => message.id === deleteMessage.id);
             if (messageIndex !== -1) {
                 group.group.group_messages.splice(messageIndex, 1);
                 group.unread -= 1
@@ -745,6 +754,7 @@ socket.on('sendChatToClient', (message) => {
 
 socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) => {
     if (user.unique_id != uniqueId) {
+        console.log("not login user");
         if (DOM.groupId == null || DOM.groupId !== newGroupId) {
             let newGroup = chatList.find(group => group.group.group_id == newGroupId);
             if (newGroup) {
@@ -765,6 +775,10 @@ socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) 
                     newGroup.unread += 1
                 }
 
+                rerenderChatList(preGroupId);
+            }
+            else
+            {
                 rerenderChatList(preGroupId);
             }
         }
@@ -809,6 +823,7 @@ socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) 
         }
     }
     else if (user.unique_id == uniqueId) {
+        console.log("actual login  login user");
         const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
         const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
         generateMessageArea(newGroupChatListItem, newIndex, false, null);
@@ -1720,42 +1735,14 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
 
-                            ${user.role !== '1' && user.role !== '3' && message.sender !== user.unique_id ? `
-                                <div class="dropdown" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;">
-                                    <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fas fa-angle-down text-muted px-2"></i>
-                                    </a>
-                                    <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                                        ${(user.role !== '0' && user.role !== '2') &&
-                    message.sender !== user.unique_id &&
-                    !/<a[^>]+>/g.test(message.msg) &&
-                    !/<audio[^>]+>/g.test(message.msg) ? `
-                                            <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-                                        ` : ''}
+                            ${user.role != '1' && user.role != '3' && message.sender != user.unique_id ? `
+                                <div class="dropdown ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? '' : 'd-none'}" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
+                                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-angle-down text-muted px-2"></i>
+                                </a>
+                                <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                                    ${!(user.role === '0' || user.role === '2') && message.sender != user.unique_id && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg) ? `
 
-                                        ${(user.role === '0' || user.role === '2') ? `
-                                            ${(message.type === "Message" || message.type === null) &&
-                        !/<a[^>]+>/g.test(message.msg) &&
-                        !/<audio[^>]+>/g.test(message.msg) ? `
-                                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-                                            ` : ''}
-
-                                            ${(message.type === "Message" || message.type === null) &&
-                        (message.is_compose === 1 || message.is_compose === true) ? `
-                                                <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}', '${senderName}')">Correction</a>
-                                            ` : ''}
-
-                                            ${(message.type === "Message" || message.type === null) &&
-                        (message.is_compose === 1 || message.is_compose === true) ? `
-                                                <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-                                            ` : ''}
-
-                                            ${(message.is_compose !== 1 && message.is_compose !== true) ? `
-                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                                            ` : ''}
-                                        ` : ''}
-
-                            ${user.role !== '1' && user.role !== '3' && message.sender !== user.unique_id ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
@@ -1765,16 +1752,13 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     ${(message.type === "Message" || message.type === null && !/<a[^>]+>/g.test(message.msg) && !/<audio[^>]+>/g.test(message.msg)) && (message.is_compose === 1 || message.is_compose == true) ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction </a>
                                     ` : ''}
-                                    ${message.is_compose === 1 && message.type === "Message" && !message.reply ? `
-                                    <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+                                    ${(message.type === "Message" || message.type === null) &&
+                                              (message.is_compose === 1 || message.is_compose === true) ? `
+                                                <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
+                                            ` : ''}
                                     ` : ''}
-                                    ` : ''}
-                                    <!---
-                                    ${user.role === '0' || user.role === '2' ? `
-                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-                                    ` : ''}---->
-                                    ${(message.is_compose !== 1 && message.is_compose !== true) && user.role === '0' || user.role === '2' ? `
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    ${(message.is_compose !== 1 && message.is_compose !== true) ? `
+                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     ` : ''}
                                     ${user.role === '3' && message.sender === user.unique_id ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
@@ -2557,7 +2541,7 @@ function removeQuotedMessage() {
     }
     document.getElementById("messages").style.marginBottom = "74px";
 
-    
+
 
 
 }
@@ -2648,7 +2632,7 @@ function moveSelectedMessagesToGroup(moveMessageIds, groupToMove, messagesToMove
             }
 
             messagesToMove.forEach(oldMessage => {
-                socket.emit('deleteMessage', oldMessage.id, true);
+                socket.emit('deleteMessage', oldMessage, true);
             });
 
             // const newGroupIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
@@ -3211,7 +3195,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         });
 
     if (DOM.groupSearchMessageFound == false) {
-    
+
         if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
 
             if (!searchMessageSet.size > 0) {
@@ -3808,7 +3792,7 @@ $('#deleteModal .btn-delete').on('click', function () {
                 throw new Error('Error deleting message');
             }
         })
-        .then(function () {
+        .then(function (message) {
             $('#btn-close').trigger('click');
             const groupId = DOM.groupId;
             // const group = chatList.find(group => group.group.group_id === groupId);
@@ -3818,7 +3802,7 @@ $('#deleteModal .btn-delete').on('click', function () {
             //         group.group.group_messages.splice(messageIndex, 1);
             //     }
             // }
-
+            console.log("delete message response",message.data);
             $("#deleteModal").on('hide.bs.modal', function () { });
             $('#deleteModal').removeClass('show');
             $('body').removeClass('modal-open');
@@ -3847,7 +3831,7 @@ $('#deleteModal .btn-delete').on('click', function () {
             //     }
 
 
-            socket.emit('deleteMessage', messageId, false);
+            socket.emit('deleteMessage', message.data, false);
         })
         .catch(function (error) {
             console.error(error);
@@ -4218,7 +4202,7 @@ async function handleMessageResponse(messageElement, message, messageId, searchQ
             }
             return;
         }
-        
+
         const contentDiv = messageElement.querySelector(".additional_style");
         const replyDiv = contentDiv.querySelector(".reply-message-area");
         let targetDiv = replyDiv || contentDiv;
@@ -4993,6 +4977,6 @@ document.getElementById('messages').addEventListener('scroll', function () {
     const divElement = this;
     if (divElement.scrollHeight - divElement.scrollTop === divElement.clientHeight) {
         // console.log('Scrolled to the bottom');
-        
+
     }
 });
