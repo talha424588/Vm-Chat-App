@@ -2837,13 +2837,13 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
 
         const u_id = user.unique_id;
         // const ids = nextPageMessages.data.map(item => item.id);
+
         const ids = nextPageMessages.data
             .filter(item =>
                 item.sender !== user.unique_id &&
                 !item.seen_by.split(', ').includes(user.unique_id)
             )
             .map(item => item.id);
-        // const ids = nextPageMessages.data.filter(item => item.sender != user.unique_id && !item.seen_by.split(",").includes(user.unique_id)).map(item => item.id);
 
         const Notseenby = nextPageMessages.data
             .filter(item => {
@@ -2870,7 +2870,7 @@ const fetchPaginatedMessages = async (message_id = null, current_Page = null, gr
             })();
         }
         else {
-            console.log("ids length less then 1");
+            // console.log("ids length less then 1");
         }
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
@@ -3213,9 +3213,11 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     if (DOM.groupSearchMessageFound == false) {
     
         if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
+
             if (!searchMessageSet.size > 0) {
                 await showloader();
             }
+
             await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
             get_voice_list();
             removeEditMessage();
