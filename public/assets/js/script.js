@@ -1121,7 +1121,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
     }
 });
 
-socket.on('restoreMessage', (incomingMessage) => {
+socket.on('restoreMessage', (incomingMessage, uniqueId) => {
 
     if (user.role != 0 && user.role != 2) {
         let groupToUpdate = chatList.find(chat => chat.group.group_id === incomingMessage.message.group_id);
@@ -1136,19 +1136,44 @@ socket.on('restoreMessage', (incomingMessage) => {
         rerenderChatList(incomingMessage.message.group_id);
         addMessageToMessageArea(incomingMessage.message, false);
     } else {
-        const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
         const mainDiv = $(`#message-${incomingMessage.message.id}`);
-        mainDiv.removeClass("deleted_niddle");
-        mainDiv.find(".additional_style").removeClass("msg_deleted");
-        if (restoreButton.length > 0) {
-            restoreButton.replaceWith(`
-                <span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666; "
-                      onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.user.name}','${incomingMessage.message.type}')">
-                    Reply
-                </span>
-            `);
+        if (user.unique_id != uniqueId) {
+            const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
+            mainDiv.removeClass("deleted_niddle");
+            mainDiv.find(".additional_style").removeClass("msg_deleted");
+            if (restoreButton.length > 0) {
+                restoreButton.replaceWith(`
+                    <span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666; "
+                          onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.user.name}','${incomingMessage.message.type}')">
+                        Reply
+                    </span>
+                `);
 
 
+                const dropdownHTML = `
+                <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+                    <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-angle-down text-muted px-2"></i>
+                    </a>
+                    <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                        ${user.role !== '0' && user.role !== '2' ? `
+                            <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+                        ` : ''}
+                        ${(user.role === '0' || user.role === '2') && incomingMessage.message.type === "Message" ? `
+                            <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+                        ` : ''}
+
+                        ${(user.role === '0' || user.role === '2') && (incomingMessage.message.is_compose !== 1 && incomingMessage.message.is_compose !== true) ? `
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+                mainDiv.append(dropdownHTML);
+            }
+        }
+        else {
             const dropdownHTML = `
             <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -1168,33 +1193,7 @@ socket.on('restoreMessage', (incomingMessage) => {
                 </div>
             </div>
         `;
-
-
-            // const dropdownHTML = `
-            //         <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
-            //             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            //                 <i class="fas fa-angle-down text-muted px-2"></i>
-            //             </a>
-            //             <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-            //                 ${(user.role !== '0' && user.role !== '2') || (incomingMessage.message.type === "Message") ? `
-            //                     <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
-            //                 ` : ''}
-            //                 ${(user.role === '0' || user.role === '2') && incomingMessage.message.type === "Message" && incomingMessage.message.is_compose ? `
-            //                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${incomingMessage.message.id}', '${incomingMessage.message.user.name}')">Correction</a>
-            //                 ` : ''}
-            //                 ${(user.role === '0' || user.role === '2') && incomingMessage.message.is_compose && incomingMessage.message.type === "Message" ? `
-            //                     <a class="dropdown-item" href="#" onclick="moveMessage('${incomingMessage.message.id}')">Move</a>
-            //                 ` : ''}
-            //                 ${(user.role === '0' || user.role === '2') && !incomingMessage.message.is_compose ? `
-            //                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
-            //                 ` : ''}
-            //             </div>
-            //         </div>
-            //     `;
-
-            // Append the dropdown to the message
             mainDiv.append(dropdownHTML);
-
         }
     }
 });
@@ -1744,7 +1743,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction </a>
                                     ` : ''}
                                     ${(message.type === "Message" || message.type === null) &&
-                                        (message.is_compose === 1 || message.is_compose === true) && (!message.reply) ? `
+                        (message.is_compose === 1 || message.is_compose === true) && (!message.reply) ? `
                                                 <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                                             ` : ''}
                                     ` : ''}
@@ -4687,7 +4686,7 @@ async function restoreMessage(id) {
 
             }
         }).then(message => {
-            socket.emit('restoreMessage', message);
+            socket.emit('restoreMessage', message, user.unique_id);
 
             var messageElement = $(`[data-message-id="${id}"]`);
 
