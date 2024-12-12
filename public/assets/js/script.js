@@ -1797,13 +1797,14 @@ let addMessageToMessageArea = (message, flag = false) => {
                                 </span> ---->
 
                             </div>
-                            ${message.sender === user.unique_id ? `
+                            ${message.sender === user.unique_id &&
+                                !((message.type === "File" && (message.is_compose === 1 || message.is_compose === true)) || /<a[^>]+>/g.test(message.msg)) ? `
                                 <div class="dropdown" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;">
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
                                 <div class="dropdown-menu custom-shadow"  aria-labelledby="dropdownMenuButton">
-                                    ${!(user.role === '0' || user.role === '2') ? `
+                                    ${!(user.role === '0' || user.role === '2') && message.type === "Message" ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     ` : ''}
                                     ${user.role === '0' || user.role === '2' ? `
@@ -1833,7 +1834,9 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
 
-                            ${user.role != '1' && user.role != '3' && message.sender != user.unique_id ? `
+                            ${user.role != '1' && user.role != '3' && message.sender != user.unique_id
+                                &&
+                                !((message.type === "File" && (message.is_compose === 1 || message.is_compose === true)) || /<a[^>]+>/g.test(message.msg)) ? `
                                 <div class="dropdown" style="position: absolute; top: ${message.reply ? '0px' : (message.type === 'Message' ? '-2px' : '-2px')}; right: 0px;}>
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
