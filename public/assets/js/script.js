@@ -495,7 +495,6 @@ socket.on('deleteMessage', (message, isMove) => {
             }
             // const message = findMessageById(message.id);
             const message = getPaginatedArrayLastMessage(deleteMessage.id);
-            console.log(deleteMessage);
             updateChatList(deleteMessage)
         }
         messageElement.find(".additional_style").addClass("msg_deleted");
