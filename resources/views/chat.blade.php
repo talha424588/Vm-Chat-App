@@ -182,6 +182,39 @@
             color: #888;
             font-size: 14px;
         }
+        /* Search Container Styling */
+.search-container {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f8f9fa; /* Light gray */
+    border-radius: 20px;
+    width: 100%;
+    padding: 12px;
+}
+
+/* Search Input Styling */
+.search-input-mobile {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 16px;
+    color: #58595D;
+}
+
+/* Search Icons Styling */
+.search-container i {
+    font-size: 16px;
+    color: #58595D;
+    cursor: pointer;
+    margin-right:10px
+}
+
+.search-container i:hover {
+    color: #000;
+}
+
     </style>
 </head>
 
@@ -338,14 +371,14 @@
                     </div>
 
 
-                    <a href="#"><span class=' profile-pic' id="pic">
+                   <span class='profile-pic' id="pic">
                             <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd" clip-rule="evenodd"
                                     d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z"
                                     fill="#58595D" />
                             </svg>
-                        </span></a>
+                        </span>
 
                     <div class="profile-details">
                         <div class="name" id="name">User Name</div>
@@ -359,19 +392,23 @@
                     <div class="search-icon" id="search-icon-mobile">
                         <i class="fas fa-search"></i>
                     </div>
+                
+<!-- Search Input -->
+    <div class="search-container">
+    <div class="back-arrow" onclick="showMobileNavbar()">
+       <i class="fas fa-arrow-left"></i>
+    </div>
+    <input 
+        type="text" 
+        class="search-input-mobile" 
+        id="search-input" 
+        placeholder="Search here..."
+        oninput="handleSearch(this.value)"
+    />
+    <i class="fas fa-chevron-up" id="search-toggle-up"></i>
+    <i class="fas fa-chevron-down" id="search-toggle-down"></i>
+    </div>
 
-                    {{-- <div class="d-none serach_div" id="serach_div">
-                        <div class="row flex-row search-header">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M0 17C0 18.7 1.3 20 3 20H17C18.7 20 20 18.7 20 17V9H0V17ZM17 2H15V1C15 0.4 14.6 0 14 0C13.4 0 13 0.4 13 1V2H7V1C7 0.4 6.6 0 6 0C5.4 0 5 0.4 5 1V2H3C1.3 2 0 3.3 0 5V7H20V5C20 3.3 18.7 2 17 2Z"
-                                    fill="#687780" />
-                            </svg>
-                            &nbsp;&nbsp;<input type="search" placeholder="Search messages" class="search-input"
-                                id="messsage_search_query">
-                        </div>
-                    </div> --}}
                 </div>
 
                 <div id="spinner" class="lazy_spinner"></div>
@@ -804,6 +841,24 @@
     </style>
 
     </style>
+    <script>
+    // Handle the search input dynamically
+    function handleSearch(query) {
+        console.log("Searching for:", query);
+        // Add your search logic here, e.g., filter items dynamically
+    }
+
+    // Add toggle functionality for chevron icons
+    document.getElementById("search-toggle-up").addEventListener("click", function () {
+        console.log("Chevron Up Clicked");
+        // Add behavior for up action
+    });
+
+    document.getElementById("search-toggle-down").addEventListener("click", function () {
+        console.log("Chevron Down Clicked");
+        // Add behavior for down action
+    });
+</script>
 
     <script>
         function display_chat(type) {
