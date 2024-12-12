@@ -713,12 +713,11 @@ socket.on('sendChatToClient', (message) => {
         addMessageToMessageArea(message, true);
         get_voice_list();
     } else {
-        breachMessageHandle(message,unique_id,groupId)
+        breachMessageHandle(message, unique_id, groupId)
     }
 });
 
-function breachMessageHandle(message,unique_id,groupId)
-{
+function breachMessageHandle(message, unique_id, groupId) {
     if (message.is_privacy_breach && user.role == 2 || user.role == 0) {
         if (DOM.groupSearch) {
             groupToUpdate = previousChatList.find(chat => chat.group.group_id === message.group_id);
@@ -750,7 +749,7 @@ function breachMessageHandle(message,unique_id,groupId)
         });
         viewChatList();
     }
-    else if(message.is_privacy_breach == false) {
+    else if (message.is_privacy_breach == false) {
 
         if (DOM.groupSearch) {
             groupToUpdate = previousChatList.find(chat => chat.group.group_id === message.group_id);
@@ -2866,6 +2865,12 @@ function hideSpinner() {
 }
 
 DOM.messages.addEventListener('scroll', async () => {
+
+    const dropdowns = document.querySelectorAll('.dropdown-menu.show');
+    dropdowns.forEach((dropdown) => {
+        dropdown.classList.remove('show');
+    });
+
     if (DOM.messages.scrollTop == 0 && !isLoadingMessages && hasMoreMessages && DOM.NormalLoading) {
         isLoadingMessages = true;
         showSpinner();
