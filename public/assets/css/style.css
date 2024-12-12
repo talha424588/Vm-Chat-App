@@ -1613,3 +1613,7 @@ body {
 .dropdown-menu {
     transition: all 0.2s ease;
 }
+
+.hidden-message {
+    display: none;
+}

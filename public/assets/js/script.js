@@ -467,7 +467,8 @@ socket.on('deleteMessage', (message, isMove) => {
         if (user.role != 0 && user.role != 2) {
 
             if (messageElement) {
-                messageElement.remove();
+                // messageElement.remove();
+                messageElement.addClass('hidden-message');
                 rerenderChatList(deleteMessage.group_id);
                 // viewChatList();
             }
@@ -1259,7 +1260,12 @@ socket.on('restoreMessage', (incomingMessage, uniqueId) => {
             }
         }
         rerenderChatList(incomingMessage.message.group_id);
-        addMessageToMessageArea(incomingMessage.message, false);
+        var messageElement = $('[data-message-id="' + incomingMessage.message.id + '"]').closest('.ml-3');
+
+        messageElement.removeClass('hidden-message');
+        messageElement.removeClass("deleted_niddle");
+        messageElement.find(".additional_style").removeClass("msg_deleted");
+        // addMessageToMessageArea(incomingMessage.message, false);
     } else {
         // Always append the dropdown for all users (including the restoring user)
         mainDiv.removeClass("deleted_niddle");
@@ -1997,7 +2003,7 @@ async function scrollToMessage(replyId, messageId = null) {
                 }
             });
             let response = await message.json();
-            console.log("response",response);
+            console.log("response", response);
             if (response.message.reply.is_deleted) {
                 return;
             }
