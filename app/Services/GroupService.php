@@ -176,7 +176,14 @@ class GroupService implements GroupRepository
 
     public function fetchGroupLastMessage($groupId)
     {
-        $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->where('is_deleted', 0)->orderBy("id", "Desc")->first();
+        if(Auth::user()->role == 0 || Auth::user()->role == 2 )
+        {
+            $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->orderBy("id", "Desc")->first();
+        }
+        else
+        {
+            $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->where('is_deleted', 0)->orderBy("id", "Desc")->first();
+        }
         return response()->json($lastestNotDeletedMessage);
     }
 }
