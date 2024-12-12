@@ -1120,9 +1120,98 @@ socket.on('updateEditedMessage', (editedMessage) => {
     }
 });
 
-socket.on('restoreMessage', (incomingMessage, uniqueId) => {
+// socket.on('restoreMessage', (incomingMessage, uniqueId) => {
 
-    if (user.role != 0 && user.role != 2) {
+//     if (user.role != 0 && user.role != 2) {
+//         let groupToUpdate = chatList.find(chat => chat.group.group_id === incomingMessage.message.group_id);
+//         if (groupToUpdate) {
+//             const seenBy = incomingMessage.message.seen_by.split(", ").map(s => s.trim());
+//             const hasUserSeenMessage = seenBy.includes(user.unique_id);
+//             if (incomingMessage.message.sender !== user.unique_id && !hasUserSeenMessage) {
+//                 groupToUpdate.unread += 1;
+//             }
+//         }
+//         rerenderChatList(incomingMessage.message.group_id);
+//         //  need to append message where it was deleted
+//         addMessageToMessageArea(incomingMessage.message, false);
+//     } else {
+//         const mainDiv = $(`#message-${incomingMessage.message.id}`);
+//         if (user.unique_id != uniqueId) {
+//             console.log("socket connected clients");
+//             const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
+//             mainDiv.removeClass("deleted_niddle");
+//             mainDiv.find(".additional_style").removeClass("msg_deleted");
+//             if (restoreButton.length > 0) {
+//                 restoreButton.replaceWith(`
+//                     <span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666; "
+//                           onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.user.name}','${incomingMessage.message.type}')">
+//                         Reply
+//                     </span>
+//                 `);
+
+
+//                 const dropdownHTML = `
+//                 <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+//                     <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+//                         <i class="fas fa-angle-down text-muted px-2"></i>
+//                     </a>
+//                     <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+//                         ${user.role !== '0' && user.role !== '2' ? `
+//                             <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+//                         ` : ''}
+//                         ${(user.role === '0' || user.role === '2') && incomingMessage.message.type === "Message" ? `
+//                             <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+//                         ` : ''}
+
+//                         ${(user.role === '0' || user.role === '2') && (incomingMessage.message.is_compose !== 1 && incomingMessage.message.is_compose !== true) ? `
+//                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
+//                         ` : ''}
+//                     </div>
+//                 </div>
+//             `;
+
+//                 mainDiv.append(dropdownHTML);
+//             }
+//         }
+//         if (user.unique_id == uniqueId) {
+//         const mainDiv = $(`#message-${incomingMessage.message.id}`);
+//         mainDiv.removeClass("deleted_niddle");
+//             mainDiv.find(".additional_style").removeClass("msg_deleted");
+
+//             console.log("current login user");
+//             const dropdownHTML = `
+//             <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+//                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+//                     <i class="fas fa-angle-down text-muted px-2"></i>
+//                 </a>
+//                 <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+//                     ${user.role !== '0' && user.role !== '2' ? `
+//                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+//                     ` : ''}
+//                     ${(user.role === '0' || user.role === '2') && incomingMessage.message.type === "Message" ? `
+//                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+//                     ` : ''}
+
+//                     ${(user.role === '0' || user.role === '2') && (incomingMessage.message.is_compose !== 1 && incomingMessage.message.is_compose !== true) ? `
+//                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
+//                     ` : ''}
+//                 </div>
+//             </div>
+//         `;
+//             mainDiv.append(dropdownHTML);
+//         }
+//     }
+// });
+
+
+socket.on('restoreMessage', (incomingMessage, uniqueId) => {
+    const mainDiv = $(`#message-${incomingMessage.message.id}`);
+
+    // Check if the restoring user is the current user
+    const isRestoringUser = user.unique_id === uniqueId;
+
+    // Handle unread messages for users who are not the one restoring the message
+    if (user.role !== '0' && user.role !== '2') {
         let groupToUpdate = chatList.find(chat => chat.group.group_id === incomingMessage.message.group_id);
         if (groupToUpdate) {
             const seenBy = incomingMessage.message.seen_by.split(", ").map(s => s.trim());
@@ -1131,49 +1220,24 @@ socket.on('restoreMessage', (incomingMessage, uniqueId) => {
                 groupToUpdate.unread += 1;
             }
         }
-        // updateChatList(incomingMessage.message);
         rerenderChatList(incomingMessage.message.group_id);
         addMessageToMessageArea(incomingMessage.message, false);
     } else {
-        const mainDiv = $(`#message-${incomingMessage.message.id}`);
-        if (user.unique_id != uniqueId) {
-            const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
-            mainDiv.removeClass("deleted_niddle");
-            mainDiv.find(".additional_style").removeClass("msg_deleted");
-            if (restoreButton.length > 0) {
-                restoreButton.replaceWith(`
-                    <span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666; "
-                          onclick="showReply('${incomingMessage.message.id}','${incomingMessage.message.user.name}','${incomingMessage.message.type}')">
-                        Reply
-                    </span>
-                `);
+        // Always append the dropdown for all users (including the restoring user)
+        mainDiv.removeClass("deleted_niddle");
+        mainDiv.find(".additional_style").removeClass("msg_deleted");
 
-
-                const dropdownHTML = `
-                <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
-                    <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-angle-down text-muted px-2"></i>
-                    </a>
-                    <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                        ${user.role !== '0' && user.role !== '2' ? `
-                            <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
-                        ` : ''}
-                        ${(user.role === '0' || user.role === '2') && incomingMessage.message.type === "Message" ? `
-                            <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
-                        ` : ''}
-
-                        ${(user.role === '0' || user.role === '2') && (incomingMessage.message.is_compose !== 1 && incomingMessage.message.is_compose !== true) ? `
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-
-                mainDiv.append(dropdownHTML);
-            }
+        const restoreButton = $(`#restore-button-${incomingMessage.message.id}`);
+        if (restoreButton.length > 0) {
+            restoreButton.replaceWith(`
+                <span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666; "
+                      onclick="showReply('${incomingMessage.message.id}', '${incomingMessage.message.user.name}', '${incomingMessage.message.type}')">
+                    Reply
+                </span>
+            `);
         }
-        if (user.unique_id == uniqueId) {
-            const dropdownHTML = `
+
+        const dropdownHTML = `
             <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-angle-down text-muted px-2"></i>
@@ -1185,17 +1249,18 @@ socket.on('restoreMessage', (incomingMessage, uniqueId) => {
                     ${(user.role === '0' || user.role === '2') && incomingMessage.message.type === "Message" ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     ` : ''}
-
                     ${(user.role === '0' || user.role === '2') && (incomingMessage.message.is_compose !== 1 && incomingMessage.message.is_compose !== true) ? `
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
                     ` : ''}
                 </div>
             </div>
         `;
-            mainDiv.append(dropdownHTML);
-        }
+        mainDiv.append(dropdownHTML);
     }
 });
+
+
+
 
 function updateViewChatList(editedMessage) {
 
@@ -1861,8 +1926,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     ImageViewer(DOM.messages);
 };
 
-function delMessage(id)
-{
+function delMessage(id) {
     const deleteModal = $('#deleteModal');
     deleteModal.find('.btn-delete').data('message-id', id);
     deleteModal.modal('show');
@@ -3308,7 +3372,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
 
                 // Send "Alert!!!" to the backend to save in DB
                 let msg = {
-                    user: user.fcm_token ? user : user.fcm_token = DOM.fcmToken,
+                    user: user,
                     message: alertMessage,
                     reply_id: DOM.replyId ?? "",
                     group_id: DOM.groupId,
@@ -3318,6 +3382,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                     csrf_token: csrfToken,
                     privacy_breach: true,
                 };
+                console.log("msg",msg);
                 socket.emit('sendChatToServer', msg);
             } else {
                 // Send original message to the backend to save in DB
@@ -4696,32 +4761,10 @@ async function restoreMessage(id) {
             var messageElement = $(`[data-message-id="${id}"]`);
 
             if (messageElement.length > 0) {
-
-                //         const dropdownHTML = `
-                //     <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
-                //         <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                //             <i class="fas fa-angle-down text-muted px-2"></i>
-                //         </a>
-                //         <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                //             ${user.role !== '0' && user.role !== '2' ? `
-                //                 <a class="dropdown-item" href="#" onclick="editMessage('${id}')">Edit</a>
-                //             ` : ''}
-                //             ${(user.role === '0' || user.role === '2') && message.message.type === "Message" ? `
-                //                 <a class="dropdown-item" href="#" onclick="editMessage('${id}')">Edit</a>
-                //             ` : ''}
-                //             ${(user.role === '0' || user.role === '2') && !message.message.is_compose ? `
-                //                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${id}">Delete</a>
-                //             ` : ''}
-                //         </div>
-                //     </div>
-                // `;
-                //         messageElement.append(dropdownHTML);
                 const restoreButton = $(`#restore-button-${id}`);
                 if (restoreButton.length > 0) {
-
                     restoreButton.replaceWith(`<span id="reply-link" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="showReply('${id}','${message.message.user.name}','${message.message.type}')">Reply</span>`);
                 }
-
                 messageElement.removeClass("deleted_niddle");
                 messageElement.find(".additional_style").removeClass("msg_deleted");
             }
@@ -4991,18 +5034,18 @@ document.getElementById('messages').addEventListener('scroll', function () {
         // console.log('Scrolled to the bottom');
     }
 });
-document.getElementById("search-icon-mobile")?.addEventListener('click',function(){
-    document.querySelector(".search-container").style.display="flex";
-    document.querySelector(".profile-details").style.display="none";
-    document.querySelector(".profile-pic").style.display="none";
-    document.querySelector(".back-arrow").style.display="none";
-    document.querySelector("#search-icon-mobile").style.display="none";
+document.getElementById("search-icon-mobile")?.addEventListener('click', function () {
+    document.querySelector(".search-container").style.display = "flex";
+    document.querySelector(".profile-details").style.display = "none";
+    document.querySelector(".profile-pic").style.display = "none";
+    document.querySelector(".back-arrow").style.display = "none";
+    document.querySelector("#search-icon-mobile").style.display = "none";
 
 });
-function showMobileNavbar(){
-    document.querySelector(".search-container").style.display="none";
-    document.querySelector(".profile-details").style.display="block";
-    document.querySelector(".profile-pic").style.display="block";
-    document.querySelector(".back-arrow").style.display="block";
-    document.querySelector("#search-icon-mobile").style.display="block";
+function showMobileNavbar() {
+    document.querySelector(".search-container").style.display = "none";
+    document.querySelector(".profile-details").style.display = "block";
+    document.querySelector(".profile-pic").style.display = "block";
+    document.querySelector(".back-arrow").style.display = "block";
+    document.querySelector("#search-icon-mobile").style.display = "block";
 }
