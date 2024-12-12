@@ -3959,7 +3959,6 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         // });
         messageList = [];
         DOM.messagesList.innerHTML = '';
-        // viewChatList();
         DOM.chatList.style.display = 'block';
         generateChatList();
     }
