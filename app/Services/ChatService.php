@@ -291,6 +291,18 @@ class ChatService implements ChatRepository
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
     }
 
+    public function messageDeleteStatusCheck($id)
+    {
+        $message = GroupMessage::with('reply')->where('id', $id)
+            ->first();
+        if ($message)
+            return response()->json(["status" => true, "msessage" => "success", "message" => new MessageResource($message)]);
+        else
+            return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+    }
+
+
+
     public function updateMessage($request)
     {
         $messageId = $request->input('id');
@@ -334,7 +346,7 @@ class ChatService implements ChatRepository
 
     public function restoreDeletedMessage($messageId)
     {
-        $message = GroupMessage::where('id', $messageId)->first();
+        $message = GroupMessage::with('reply')->where('id', $messageId)->first();
         if ($message) {
             $message->is_deleted = false;
             if ($message->save()) {

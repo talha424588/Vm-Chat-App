@@ -15,6 +15,21 @@ class MessageResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $reply = $this->reply ? [
+            'id' => $this->reply->id,
+            'sender' => $this->reply->sender,
+            'group_id' => $this->reply->group_id,
+            'msg' => $this->reply->msg,
+            'type' => $this->reply->type,
+            'media_name' => $this->reply->media_name,
+            'reply_id' => $this->reply->reply_id,
+            'seen_by' => $this->reply->seen_by,
+            'time' => $this->reply->time,
+            'is_compose' => $this->reply->is_compose,
+            'is_privacy_breach' => $this->reply->is_privacy_breach,
+            'is_deleted' => $this->reply->is_deleted,
+        ] : null;
+
         return [
              'id' => $this->id,
             'sender' => $this->sender,
@@ -44,6 +59,7 @@ class MessageResource extends JsonResource
                     'status' => $this->user->status,
                     'pic'=>$this->user->profile_img,
                 ],
+                'reply' => $reply,
         ];
     }
 }

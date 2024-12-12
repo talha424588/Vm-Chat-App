@@ -1974,7 +1974,7 @@ $(document).on('click', '#btn-close', function () {
 });
 
 let parentMessageIds = new Set();
-function scrollToMessage(replyId, messageId = null) {
+async function scrollToMessage(replyId, messageId = null) {
     const targetMessage = document.getElementById(`message-${replyId}`);
     if (targetMessage) {
         addChildIdsInSet(messageId, true);
@@ -1989,8 +1989,27 @@ function scrollToMessage(replyId, messageId = null) {
         }
     }
     else {
-        DOM.groupReferenceMessageClick = true;
-        fetchPaginatedMessages(replyId, null, null);
+        if (user.role == 1 || user.role == 3 && messageId) {
+            let message = await fetch("message/delete/check/" + messageId, {
+                method: 'GET',
+                headers: {
+                    'content-type': 'application/json'
+                }
+            });
+            let response = await message.json();
+            console.log("response",response);
+            if (response.message.reply.is_deleted) {
+                return;
+            }
+            else if (response.message.reply.is_deleted == false || response.message.reply.is_deleted == 0) {
+                DOM.groupReferenceMessageClick = true;
+                fetchPaginatedMessages(replyId, null, null);
+            }
+        }
+        else {
+            DOM.groupReferenceMessageClick = true;
+            fetchPaginatedMessages(replyId, null, null);
+        }
     }
 }
 
