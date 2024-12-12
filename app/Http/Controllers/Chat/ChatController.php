@@ -107,12 +107,13 @@ class ChatController extends Controller
     public function delete($id)
     {
         try {
-            $message = GroupMessage::findOrFail($id);
+            $message = GroupMessage::with("user")->findOrFail($id);
             $message->is_deleted = true;
             if ($message->save()) {
                 return response()->json([
                     'status' => true,
-                    'message' => 'Message deleted successfully'
+                    'message' => 'Message deleted successfully',
+                    'data' => $message
                 ], 200);
             } else {
                 return response()->json([

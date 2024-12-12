@@ -31,10 +31,10 @@ io.on('connection', (socket) => {
     });
 
     // Server-side code
-    socket.on('deleteMessage', (messageId,isMove) => {
-        console.log("delete message event", messageId);
-        io.emit('deleteMessage', messageId,isMove);
-        io.emit('updateGroupMessages', messageId);
+    socket.on('deleteMessage', (message,isMove) => {
+        console.log("delete message event", message);
+        io.emit('deleteMessage', message,isMove);
+        io.emit('updateGroupMessages', message);
     });
 
     socket.on('moveMessage', (moveMessages, newGroupId, groupId,uniqueId) => {
@@ -45,9 +45,9 @@ io.on('connection', (socket) => {
         io.emit('updateEditedMessage', editedMessage);
     });
 
-    socket.on('restoreMessage', (message) => {
-        console.log("Restore message event", message);
-        io.emit('restoreMessage', message);
+    socket.on('restoreMessage', (message,uniqueId) => {
+        console.log("Restore message event", message,uniqueId);
+        io.emit('restoreMessage', message,uniqueId);
     })
 
     socket.on('disconnect', () => {
