@@ -1064,9 +1064,9 @@ socket.on('updateEditedMessage', (editedMessage) => {
                 messageContentDiv.innerHTML = newMessageDisplay;
 
                 const additionalFeatures = `
-                    <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+                    <div style="color: #463C3C; font-size:12px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                         <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${editedMessage.user.name}</span> |
-                        <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${formatTimestampToDate(editedMessage.time)})</span> |
+                        <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${formatTimestampToDate(editedMessage.time)}</span> |
                           <span>
                             <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${editedMessage.id}">Seen</a> |
                         </span>
@@ -1662,30 +1662,30 @@ let addMessageToMessageArea = (message, flag = false) => {
                           ${messageContent}
                            </div>
                         <div>
-                            <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+                            <div style="color: #463C3C; font-size:12px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${formatTimestampToDate(message.time)})</span> |
+                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${formatTimestampToDate(message.time)}</span> |
                                 ${message.user.id == user.id ? `
                                     <span>
-                                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+                                        <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
                                             Seen
                                         </a>
                                     </span> |` :
                 (user.role == 0 || user.role == 2 ? `
                                     <span>
-                                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+                                        <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
                                             Seen
                                         </a>
                                     </span> |` : '')}
 
                                     <span>
-                                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
+                                        <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id}','${senderName}','${message.type}')" data-message-id="${message.id}">Reply</a>
                                     </span>
 
                                <!--- | <span>
-                                    <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                 </span> ---->
 
                             </div>
@@ -1783,9 +1783,9 @@ let addMessageToMessageArea = (message, flag = false) => {
 
                         </div>
                         <div>
-                            <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+                            <div style="color: #463C3C; font-size:12px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${formatTimestampToDate(message.time)})</span>
+                                <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${formatTimestampToDate(message.time)}</span>
                                 <!-- Additional logic for seen and reply links -->
                             </div>
                         </div>
@@ -1817,11 +1817,11 @@ let addMessageToMessageArea = (message, flag = false) => {
 
                             </div>
                             <div>
-                                <div style="color: #463C3C; font-size:14px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
+                                <div style="color: #463C3C; font-size:12px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                     <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
-                                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">(${formatTimestampToDate(message.time)})</span>
+                                    <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${formatTimestampToDate(message.time)}</span>
                                     <span>
-                                        <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+                                        <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
                                             Seen
                                         </a>
@@ -3198,7 +3198,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
 
             if (!searchMessageSet.size > 0) {
-                await showloader();
+                await showloader(); 
             }
 
             await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
@@ -3207,9 +3207,6 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
             removeQuotedMessage();
             return;
         }
-
-
-
         else if (DOM.unreadMessagesPerGroup[DOM.groupId] > 50) {
             await fetchPaginatedMessages(null, null, null, DOM.unreadMessagesPerGroup[DOM.groupId]);
             get_voice_list();
@@ -4975,26 +4972,39 @@ function mobilegroupSearchClose() {
 }
 function formatTimestampToDate(timestamp) {
     const date = new Date(timestamp * 1000);
-    const options = { day: 'numeric', month: 'long', year: 'numeric' };
-    const formattedDate = date.toLocaleDateString('en-US', options);
-    const parts = formattedDate.split(' ');
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed, so add 1
+    const year = date.getFullYear().toString().slice(-2); // Get the last two digits of the year
 
-    const month = parts[0];
-    const day = parts[1].replace(/,$/, '').trim();
-    const year = parts[2];
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const ampm = hours >= 12 ? 'pm' : 'am';
     hours = hours % 12;
     hours = hours ? hours : 12;
     const time = `${hours}:${minutes} ${ampm}`;
-    const customFormat = `${time} ${day}/${month}/${year}`;
+
+    const customFormat = `${day}-${month}-${year} ${time}`;
     return customFormat;
 }
+
 document.getElementById('messages').addEventListener('scroll', function () {
     const divElement = this;
     if (divElement.scrollHeight - divElement.scrollTop === divElement.clientHeight) {
         // console.log('Scrolled to the bottom');
 
-    }
 });
+document.getElementById("search-icon-mobile")?.addEventListener('click',function(){
+    document.querySelector(".search-container").style.display="flex";
+    document.querySelector(".profile-details").style.display="none";
+    document.querySelector(".profile-pic").style.display="none";
+    document.querySelector(".back-arrow").style.display="none";
+    document.querySelector("#search-icon-mobile").style.display="none";
+   
+});
+function showMobileNavbar(){
+    document.querySelector(".search-container").style.display="none";
+    document.querySelector(".profile-details").style.display="block";
+    document.querySelector(".profile-pic").style.display="block";
+    document.querySelector(".back-arrow").style.display="block";
+    document.querySelector("#search-icon-mobile").style.display="block";
+}
