@@ -495,7 +495,7 @@ socket.on('deleteMessage', (message, isMove) => {
             }
             // const message = findMessageById(message.id);
             const message = getPaginatedArrayLastMessage(deleteMessage.id);
-
+            console.log(deleteMessage);
             updateChatList(deleteMessage)
         }
         messageElement.find(".additional_style").addClass("msg_deleted");
@@ -1748,7 +1748,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                             ` : ''}
                                     ` : ''}
                                     ${(message.is_compose !== 1 && message.is_compose !== true) ? `
-                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                                <a class="dropdown-item" href="#" onclick="delMessage(${message.id})">Delete</a>
                                     ` : ''}
                                     ${user.role === '3' && message.sender === user.unique_id ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
@@ -1861,6 +1861,16 @@ let addMessageToMessageArea = (message, flag = false) => {
     }
     ImageViewer(DOM.messages);
 };
+
+function delMessage(id)
+{
+    const deleteModal = $('#deleteModal');
+    deleteModal.find('.btn-delete').data('message-id', id);
+    deleteModal.modal('show');
+}
+$(document).on('click', '#btn-close', function () {
+    $('#deleteModal').modal('hide');
+});
 
 let parentMessageIds = new Set();
 function scrollToMessage(replyId, messageId = null) {
