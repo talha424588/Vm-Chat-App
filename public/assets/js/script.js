@@ -495,7 +495,6 @@ socket.on('deleteMessage', (message, isMove) => {
             }
             // const message = findMessageById(message.id);
             const message = getPaginatedArrayLastMessage(deleteMessage.id);
-            console.log(deleteMessage);
             updateChatList(deleteMessage)
         }
         messageElement.find(".additional_style").addClass("msg_deleted");
@@ -3198,7 +3197,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         if (groupSearchMessage && groupSearchMessage.id && !notificationMessageId) {
 
             if (!searchMessageSet.size > 0) {
-                await showloader(); 
+                await showloader();
             }
 
             await fetchPaginatedMessages(groupSearchMessage.id, null, DOM.groupId);
@@ -3960,7 +3959,6 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         // });
         messageList = [];
         DOM.messagesList.innerHTML = '';
-        // viewChatList();
         DOM.chatList.style.display = 'block';
         generateChatList();
     }
@@ -4991,7 +4989,7 @@ document.getElementById('messages').addEventListener('scroll', function () {
     const divElement = this;
     if (divElement.scrollHeight - divElement.scrollTop === divElement.clientHeight) {
         // console.log('Scrolled to the bottom');
-
+    }
 });
 document.getElementById("search-icon-mobile")?.addEventListener('click',function(){
     document.querySelector(".search-container").style.display="flex";
@@ -4999,7 +4997,7 @@ document.getElementById("search-icon-mobile")?.addEventListener('click',function
     document.querySelector(".profile-pic").style.display="none";
     document.querySelector(".back-arrow").style.display="none";
     document.querySelector("#search-icon-mobile").style.display="none";
-   
+
 });
 function showMobileNavbar(){
     document.querySelector(".search-container").style.display="none";
