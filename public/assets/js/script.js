@@ -713,6 +713,13 @@ socket.on('sendChatToClient', (message) => {
         addMessageToMessageArea(message, true);
         get_voice_list();
     } else {
+        breachMessageHandle(message,unique_id,groupId)
+    }
+});
+
+function breachMessageHandle(message,unique_id,groupId)
+{
+    if (message.is_privacy_breach && user.role == 2 || user.role == 0) {
         if (DOM.groupSearch) {
             groupToUpdate = previousChatList.find(chat => chat.group.group_id === message.group_id);
         }
@@ -728,7 +735,7 @@ socket.on('sendChatToClient', (message) => {
         const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
         if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
             groupToUpdate.unread += 1;
-            DOM.unreadMessagesPerGroup[groupId] += 1;
+            DOM.unreadMessagesPerGroup[groupId] += 1
         }
         chatList.sort((a, b) => {
             if (a.time && b.time) {
@@ -743,7 +750,39 @@ socket.on('sendChatToClient', (message) => {
         });
         viewChatList();
     }
-});
+    else if(message.is_privacy_breach == false) {
+
+        if (DOM.groupSearch) {
+            groupToUpdate = previousChatList.find(chat => chat.group.group_id === message.group_id);
+        }
+        else {
+            groupToUpdate = chatList.find(chat => chat.group.group_id === message.group_id);
+        }
+        if (!groupToUpdate.group.group_messages) {
+            groupToUpdate.group.group_messages = [];
+        }
+        groupToUpdate.group.group_messages.push(message);
+        groupToUpdate.msg = message;
+        groupToUpdate.time = new Date(message.time * 1000);
+        const seenBy = message.seen_by ? message.seen_by.split(",").map(s => s.trim()) : [];
+        if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
+            groupToUpdate.unread += 1;
+            DOM.unreadMessagesPerGroup[groupId] += 1
+        }
+        chatList.sort((a, b) => {
+            if (a.time && b.time) {
+                return new Date(b.time) - new Date(a.time);
+            } else if (a.time) {
+                return -1;
+            } else if (b.time) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        viewChatList();
+    }
+}
 
 socket.on('moveMessage', async (moveMessages, newGroupId, preGroupId, uniqueId) => {
     if (user.unique_id != uniqueId) {
@@ -2210,12 +2249,17 @@ function correction_send_handel() {
 
 function checkPrivacyAndAlert(messageContent, messageId) {
     const numberPattern = /\b\d{7,}\b/;
-    const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
+    const emailPattern = /\b[A-Za-z0-9._%+-]+(?:@| at |\[at\]|\(at\)|_@_|\.at\.)[A-Za-z0-9._-]+\b/;;
+    const restrictedDashPattern = /\b\d{3,}(?:-\d{1,3}){2,}\b/;
 
     let reason = '';
     if (numberPattern.test(messageContent)) {
         reason = 'Contact Number';
-    } else if (emailPattern.test(messageContent)) {
+    }
+    if (restrictedDashPattern.test(messageContent)) {
+        reason = 'Contact Number';
+    }
+    else if (emailPattern.test(messageContent)) {
         reason = 'Email Address';
     }
 
@@ -3338,14 +3382,20 @@ let sendMessage = (type = 'Message', mediaName = null) => {
         let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         if (type == 'Message') {
             const numberPattern = /\b\d{7,}\b/;
-            const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
+            const emailPattern = /\b[A-Za-z0-9._%+-]+(?:@| at |\[at\]|\(at\)|_@_|\.at\.)[A-Za-z0-9._-]+\b/;;
+            const restrictedDashPattern = /\b\d{3,}(?:-\d{1,3}){2,}\b/;
+
 
             let value = DOM.messageInput.value;
             if (value === "") return;
             let reason = '';
             if (value.match(numberPattern)) {
                 reason = 'Contact Number';
-            } else if (value.match(emailPattern)) {
+            }
+            if (value.match(restrictedDashPattern)) {
+                reason = 'Contact Number';
+            }
+            else if (value.match(emailPattern)) {
                 reason = 'Email Address';
             }
             if (reason !== '') {
@@ -3382,7 +3432,7 @@ let sendMessage = (type = 'Message', mediaName = null) => {
                     csrf_token: csrfToken,
                     privacy_breach: true,
                 };
-                console.log("msg",msg);
+                console.log("msg", msg);
                 socket.emit('sendChatToServer', msg);
             } else {
                 // Send original message to the backend to save in DB
