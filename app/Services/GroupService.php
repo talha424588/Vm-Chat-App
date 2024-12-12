@@ -17,13 +17,23 @@ class GroupService implements GroupRepository
     public function fetchUserChatGroups(Request $request)
     {
         $groupWithMessagesArray = [];
-        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
-            ->with(['groupMessages' => function ($query) {
-                $query->latest('time')
-                    // ->where('is_deleted', false)
-                    ->whereNot('status', EnumMessageEnum::MOVE);
-            }, 'groupMessages.user'])
-            ->get();
+        if (Auth::user()->role == 2 || Auth::user()->role == 0) {
+            $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
+                ->with(['groupMessages' => function ($query) {
+                    $query->latest('time')
+                        // ->where('is_deleted', false)
+                        ->whereNot('status', EnumMessageEnum::MOVE);
+                }, 'groupMessages.user'])
+                ->get();
+        } else {
+            $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
+                ->with(['groupMessages' => function ($query) {
+                    $query->latest('time')
+                        ->where('is_privacy_breach', false)
+                        ->whereNot('status', EnumMessageEnum::MOVE);
+                }, 'groupMessages.user'])
+                ->get();
+        }
 
         $groupWithMessagesArray =  $this->alterGroupMessageArray($groups);
         $groupUnreadCount = $this->getUserUnreadMessageCount();
@@ -176,12 +186,9 @@ class GroupService implements GroupRepository
 
     public function fetchGroupLastMessage($groupId)
     {
-        if(Auth::user()->role == 0 || Auth::user()->role == 2 )
-        {
+        if (Auth::user()->role == 0 || Auth::user()->role == 2) {
             $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->orderBy("id", "Desc")->first();
-        }
-        else
-        {
+        } else {
             $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->where('is_deleted', 0)->orderBy("id", "Desc")->first();
         }
         return response()->json($lastestNotDeletedMessage);
