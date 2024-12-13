@@ -16,6 +16,11 @@ class Group extends Model
         return $this->hasOne(GroupMessage::class, 'group_id', 'group_id');
     }
 
+    public function groupAllMessages()
+    {
+        return $this->hasMany(GroupMessage::class, 'group_id', 'group_id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'access');
