@@ -1053,7 +1053,7 @@ socket.on('updateEditedMessage', (editedMessage) => {
 <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
                         </svg>
                                 </button>
-                                <div class="audio-progress">
+                                <div class="audio-progress pointer-null">
                                     <div class="progress-filled"></div>
                                 </div>
                             </div>
@@ -1329,6 +1329,7 @@ function processValue(value, isChatList = false) {
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
+    console.log("this is message : ",message);
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -1671,7 +1672,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
                         </svg>
                     </button>
-                    <div class="audio-progress">
+                    <div class="audio-progress pointer-null">
                         <div class="progress-filled"></div>
                     </div>
                 </div>
@@ -1686,12 +1687,11 @@ let addMessageToMessageArea = (message, flag = false) => {
                 if (message.reply.is_compose == 1) {
 
 
-
                     var message_body = processValue(message.reply.msg, false).substring(0, 200) + dots;
                 }
                 else {
 
-                    var message_body = message.reply.msg.replace(/<br\s*\/?>/gi, '\n').replace(/<i[^>]+>/g, '').replace(/<\/?[^>]+(>|$)/g, "").substring(0, 200) + dots;
+                    var message_body = message.reply.msg;
                 }
             }
             messageContent = `
