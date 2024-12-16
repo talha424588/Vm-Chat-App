@@ -107,7 +107,7 @@
         }
 
         .selected-message {
-            background-color: #E8E9EA;padding: 2px;
+            background-color: #E8E9EA;
             transition: background-color 0.3s ease;
         }
 
@@ -123,7 +123,7 @@
 
 
         .selected-message {
-            background-color: #E8E9EA;padding: 2px;
+            background-color: #E8E9EA;
             transition: background-color 0.3s ease;
         }
 

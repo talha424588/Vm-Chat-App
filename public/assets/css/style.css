@@ -498,6 +498,9 @@ h5 {
 .close-button:focus {
     outline: none;
 }
+.playbutton:focus{
+    outline: none;
+}
 
 .header-shadow {
     /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); Adjust the values as needed */
@@ -1616,4 +1619,7 @@ body {
 
 .hidden-message {
     display: none;
+}
+.pointer-null{
+    pointer-events: none;
 }
