@@ -1691,7 +1691,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 }
                 else {
 
-                    var message_body = message.reply.msg;
+                    var message_body = safeSubstring(message.reply.msg, 0, 200)+dots;
                 }
             }
             messageContent = `
@@ -5132,3 +5132,13 @@ function showMobileNavbar() {
     document.querySelector(".back-arrow").style.display = "block";
     document.querySelector("#search-icon-mobile").style.display = "block";
 }
+function safeSubstring(htmlContent, startIndex, endIndex) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    const substring = htmlContent.slice(startIndex, endIndex);
+    tempDiv.innerHTML = substring;
+    return tempDiv.innerHTML;
+}
+
+ 
+
