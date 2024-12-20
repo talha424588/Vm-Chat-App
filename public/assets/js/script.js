@@ -53,6 +53,8 @@ const DOM = {
     loader_showing: false,
     groupSearchMessageFound: false,
     NormalLoading: true,
+    showVoiceIcon:null,
+    audio_permissions:{},
     // groupSearchCounter: 0,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
@@ -132,8 +134,8 @@ let populateGroupList = async () => {
             chat.group.access = [group.access];
             // chat.members = [group.access];
             chat.name = group.name;
-            chat.unread = group.unread_count.length > 0 ? group.unread_count : 0;;
-
+            chat.unread = group.unread_count.length > 0 ? group.unread_count : 0;
+            DOM.audio_permissions[group.group_id]=group.audio_permission;
             if (group.group_messages && group.group_messages.length > 0) {
                 group.group_messages.reverse().forEach(msg => {
                     chat.msg = msg;
@@ -1329,7 +1331,7 @@ function processValue(value, isChatList = false) {
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
-    console.log("this is message : ",message);
+  
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -3284,7 +3286,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     if (searchMessage) {
         DOM.NormalLoading = false;
     }
-
+   
     if (searchMessageSet.size > 0 && DOM.groupId == groupSearchMessage.group_id) {
         if (Array.from(searchMessageSet).find(e => e.id == groupSearchMessage.id)) {
             // DOM.groupSearchMessageFound = true;
@@ -3302,6 +3304,9 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         DOM.messages.innerHTML = '';
     }
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
+    DOM.showVoiceIcon=DOM.audio_permissions[DOM.groupId];
+    console.log(DOM.audio_permissions[DOM.groupId]);
+    console.log(DOM.showVoiceIcon);
     DOM.currentPage = 1;
     displayedMessageIds.clear();
     resetChatArea();
@@ -3320,7 +3325,17 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     } else {
         elem.classList.add("active");
     }
-
+    const voiceIcon = document.getElementById('voice-icon');
+    const chat_icon_area = document.querySelector('.chat-action-icons');
+    if(!DOM.showVoiceIcon)
+        {
+            voiceIcon.style.display="none";
+            chat_icon_area.style.marginLeft="-77px";
+        }  
+        else{
+            voiceIcon.style.display="flex";
+            chat_icon_area.style.marginLeft="-80px";
+        }
     fetch(`/get-group-by-id/${DOM.groupId}`)
         .then(response => response.json())
         .then(data => {
