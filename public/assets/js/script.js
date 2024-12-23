@@ -53,6 +53,8 @@ const DOM = {
     loader_showing: false,
     groupSearchMessageFound: false,
     NormalLoading: true,
+    showVoiceIcon:null,
+    audio_permissions:{},
     // groupSearchCounter: 0,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
@@ -132,8 +134,8 @@ let populateGroupList = async () => {
             chat.group.access = [group.access];
             // chat.members = [group.access];
             chat.name = group.name;
-            chat.unread = group.unread_count.length > 0 ? group.unread_count : 0;;
-
+            chat.unread = group.unread_count.length > 0 ? group.unread_count : 0;
+            DOM.audio_permissions[group.group_id]=group.audio_permission;
             if (group.group_messages && group.group_messages.length > 0) {
                 group.group_messages.reverse().forEach(msg => {
                     chat.msg = msg;
@@ -451,7 +453,6 @@ function makeformatDate(dateString) {
         return `${day}/${month}/${year}`;
     }
 }
-
 socket.on('deleteMessage', (message, isMove) => {
     let deleteMessage = message;
     if (isMove == true) {
@@ -465,6 +466,16 @@ socket.on('deleteMessage', (message, isMove) => {
 
         var messageElement = $('[data-message-id="' + deleteMessage.id + '"]').closest('.ml-3');
         if (user.role != 0 && user.role != 2) {
+            console.log("non admin users");
+
+            let groupToUpdate = chatList.find(chat => chat.group.group_id === deleteMessage.group_id);
+            if (groupToUpdate) {
+                const seenBy = deleteMessage.seen_by.split(", ").map(s => s.trim());
+                const hasUserSeenMessage = seenBy.includes(user.unique_id);
+                if (deleteMessage.sender !== user.unique_id && !hasUserSeenMessage) {
+                    groupToUpdate.unread -= 1;
+                }
+            }
 
             if (messageElement) {
                 // messageElement.remove();
@@ -495,14 +506,67 @@ socket.on('deleteMessage', (message, isMove) => {
                     `);
             }
             // const message = findMessageById(message.id);
-            const message = getPaginatedArrayLastMessage(deleteMessage.id);
-            updateChatList(deleteMessage)
+            // const message = getPaginatedArrayLastMessage(deleteMessage.id);
+            console.log("deleted message");
+            // updateChatList(deleteMessage)
+            rerenderChatList(deleteMessage.group_id);
         }
         messageElement.find(".additional_style").addClass("msg_deleted");
         messageElement.find("#message-" + deleteMessage.id).addClass("deleted_niddle");
 
     }
 });
+// socket.on('deleteMessage', (message, isMove) => {
+//     let deleteMessage = message;
+//     if (isMove == true) {
+
+//         var messageElement = $('[data-message-id="' + deleteMessage.id + '"]').closest('.ml-3');
+//         if (messageElement) {
+//             messageElement.remove();
+//         }
+//     }
+//     else {
+
+//         var messageElement = $('[data-message-id="' + deleteMessage.id + '"]').closest('.ml-3');
+//         if (user.role != 0 && user.role != 2) {
+
+//             if (messageElement) {
+//                 // messageElement.remove();
+//                 messageElement.addClass('hidden-message');
+//                 rerenderChatList(deleteMessage.group_id);
+//                 // viewChatList();
+//             }
+//             else {
+//                 var replyLink = messageElement.find('#reply-link');
+//                 if (replyLink.length) {
+//                     messageElement.find('.dropdown').remove();
+//                     replyLink.replaceWith(`
+//                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+//                            id="restore-button-${deleteMessage.id}" onclick="restoreMessage(${deleteMessage.id})" data-message-id="${deleteMessage.id}">Restore</a>
+//                     `);
+
+//                 }
+//                 viewChatList();
+//             }
+//         }
+//         else {
+//             var replyLink = messageElement.find('#reply-link');
+//             messageElement.find('.dropdown').remove();
+//             if (replyLink.length) {
+//                 replyLink.replaceWith(`
+//                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+//                            id="restore-button-${deleteMessage.id}" onclick="restoreMessage(${deleteMessage.id})" data-message-id="${deleteMessage.id}">Restore</a>
+//                     `);
+//             }
+//             // const message = findMessageById(message.id);
+//             const message = getPaginatedArrayLastMessage(deleteMessage.id);
+//             updateChatList(deleteMessage)
+//         }
+//         messageElement.find(".additional_style").addClass("msg_deleted");
+//         messageElement.find("#message-" + deleteMessage.id).addClass("deleted_niddle");
+
+//     }
+// });
 // function getPaginatedArrayLastMessage(id) {
 //
 //     if (pagnicateChatList && pagnicateChatList.data) {
@@ -912,8 +976,17 @@ async function rerenderChatList(preGroupId) {
     let lastMessage = await response.json();
     const prevGroup = chatList.find(group => group.group.group_id == preGroupId);
     if (prevGroup) {
-        prevGroup.group.group_messages.push(lastMessage)
-    }
+        console.log("before group found", prevGroup);
+            const messageExists = prevGroup.group.group_messages.some(existingMessage => existingMessage.id === lastMessage.id);
+    
+            if (!messageExists) {
+                prevGroup.group.group_messages = [];
+                prevGroup.group.group_messages.push(lastMessage);
+            } else {
+                console.log("Message already exists in the group_messages array.");
+            }
+            // prevGroup.group.group_messages.push(lastMessage)
+        }
     chatList.sort((a, b) => {
         if (a.time && b.time) {
             return new Date(b.time) - new Date(a.time);
@@ -1263,8 +1336,9 @@ socket.on('restoreMessage', (incomingMessage, uniqueId) => {
         var messageElement = $('[data-message-id="' + incomingMessage.message.id + '"]').closest('.ml-3');
 
         messageElement.removeClass('hidden-message');
-        messageElement.removeClass("deleted_niddle");
+        $('[data-message-id="' + incomingMessage.message.id + '"]').removeClass("deleted_niddle");
         messageElement.find(".additional_style").removeClass("msg_deleted");
+        
         // addMessageToMessageArea(incomingMessage.message, false);
     } else {
         // Always append the dropdown for all users (including the restoring user)
@@ -1329,7 +1403,7 @@ function processValue(value, isChatList = false) {
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
-    console.log("this is message : ",message);
+  
     let msgDate = mDate(message.time).getDate();
     let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img}" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
@@ -3284,7 +3358,7 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     if (searchMessage) {
         DOM.NormalLoading = false;
     }
-
+   
     if (searchMessageSet.size > 0 && DOM.groupId == groupSearchMessage.group_id) {
         if (Array.from(searchMessageSet).find(e => e.id == groupSearchMessage.id)) {
             // DOM.groupSearchMessageFound = true;
@@ -3302,6 +3376,9 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
         DOM.messages.innerHTML = '';
     }
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
+    DOM.showVoiceIcon=DOM.audio_permissions[DOM.groupId];
+    console.log(DOM.audio_permissions[DOM.groupId]);
+    console.log(DOM.showVoiceIcon);
     DOM.currentPage = 1;
     displayedMessageIds.clear();
     resetChatArea();
@@ -3320,7 +3397,17 @@ let generateMessageArea = async (elem, chatIndex = null, searchMessage = false, 
     } else {
         elem.classList.add("active");
     }
-
+    const voiceIcon = document.getElementById('voice-icon');
+    const chat_icon_area = document.querySelector('.chat-action-icons');
+    if(!DOM.showVoiceIcon)
+        {
+            voiceIcon.style.display="none";
+            chat_icon_area.style.marginLeft="-77px";
+        }  
+        else{
+            voiceIcon.style.display="flex";
+            chat_icon_area.style.marginLeft="-80px";
+        }
     fetch(`/get-group-by-id/${DOM.groupId}`)
         .then(response => response.json())
         .then(data => {

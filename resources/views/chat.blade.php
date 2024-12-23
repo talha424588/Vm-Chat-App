@@ -600,6 +600,7 @@
 
                                 </svg></i>
                             <i id="voice-icon" class="chat-icon chat_action_voice">
+                                
                                 @if (Auth::user()->seen_privacy)
                                     <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
                                         viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">

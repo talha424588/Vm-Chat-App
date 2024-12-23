@@ -19,7 +19,8 @@ class GroupService implements GroupRepository
         $groupWithMessagesArray = [];
         if (Auth::user()->role == 2 || Auth::user()->role == 0) {
             $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
-                ->with(['groupMessages' => function ($query) {
+             ->where("status",1)  
+            ->with(['groupMessages' => function ($query) {
                     $query->latest('time')
                         // ->where('is_deleted', false)
                         ->whereNot('status', EnumMessageEnum::MOVE);
