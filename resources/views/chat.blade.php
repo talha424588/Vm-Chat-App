@@ -15,7 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-messaging.js"></script>
-    <script src="https://cdn.tiny.cloud/1/6hun1luhhppu7pkwfe4vetbftca09vpcny2aoik7l4fmmlcf/tinymce/6/tinymce.min.js"
+    <script src="https://cdn.tiny.cloud/1/xobw36ehtay62tuqr0vszjeg5hetxn82r315vx17eo9dzk4b/tinymce/6/tinymce.min.js"
         referrerpolicy="origin"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -392,16 +392,16 @@
                     <div class="search-icon" id="search-icon-mobile">
                         <i class="fas fa-search"></i>
                     </div>
-                
+
 <!-- Search Input -->
     <div class="search-container">
     <div class="back-arrow" onclick="showMobileNavbar()">
        <i class="fas fa-arrow-left"></i>
     </div>
-    <input 
-        type="text" 
-        class="search-input-mobile" 
-        id="search-input" 
+    <input
+        type="text"
+        class="search-input-mobile"
+        id="search-input"
         placeholder="Search here..."
         oninput="handleSearch(this.value)"
     />
@@ -600,7 +600,7 @@
 
                                 </svg></i>
                             <i id="voice-icon" class="chat-icon chat_action_voice">
-                                
+
                                 @if (Auth::user()->seen_privacy)
                                     <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
                                         viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
