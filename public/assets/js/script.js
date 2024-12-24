@@ -601,6 +601,17 @@ socket.on("deleteMessage", (message, isMove) => {
             '[data-message-id="' + deleteMessage.id + '"]'
         ).closest(".ml-3");
         if (user.role != 0 && user.role != 2) {
+            console.log("non admin users");
+
+            let groupToUpdate = chatList.find(chat => chat.group.group_id === deleteMessage.group_id);
+            if (groupToUpdate) {
+                const seenBy = deleteMessage.seen_by.split(", ").map(s => s.trim());
+                const hasUserSeenMessage = seenBy.includes(user.unique_id);
+                if (deleteMessage.sender !== user.unique_id && !hasUserSeenMessage) {
+                    groupToUpdate.unread -= 1;
+                }
+            }
+
             if (messageElement) {
                 // messageElement.remove();
                 messageElement.addClass("hidden-message");
@@ -627,8 +638,10 @@ socket.on("deleteMessage", (message, isMove) => {
                     `);
             }
             // const message = findMessageById(message.id);
-            const message = getPaginatedArrayLastMessage(deleteMessage.id);
-            updateChatList(deleteMessage);
+            // const message = getPaginatedArrayLastMessage(deleteMessage.id);
+            console.log("deleted message");
+            // updateChatList(deleteMessage)
+            rerenderChatList(deleteMessage.group_id);
         }
         messageElement.find(".additional_style").addClass("msg_deleted");
         messageElement
@@ -636,6 +649,57 @@ socket.on("deleteMessage", (message, isMove) => {
             .addClass("deleted_niddle");
     }
 });
+// socket.on('deleteMessage', (message, isMove) => {
+//     let deleteMessage = message;
+//     if (isMove == true) {
+
+//         var messageElement = $('[data-message-id="' + deleteMessage.id + '"]').closest('.ml-3');
+//         if (messageElement) {
+//             messageElement.remove();
+//         }
+//     }
+//     else {
+
+//         var messageElement = $('[data-message-id="' + deleteMessage.id + '"]').closest('.ml-3');
+//         if (user.role != 0 && user.role != 2) {
+
+//             if (messageElement) {
+//                 // messageElement.remove();
+//                 messageElement.addClass('hidden-message');
+//                 rerenderChatList(deleteMessage.group_id);
+//                 // viewChatList();
+//             }
+//             else {
+//                 var replyLink = messageElement.find('#reply-link');
+//                 if (replyLink.length) {
+//                     messageElement.find('.dropdown').remove();
+//                     replyLink.replaceWith(`
+//                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+//                            id="restore-button-${deleteMessage.id}" onclick="restoreMessage(${deleteMessage.id})" data-message-id="${deleteMessage.id}">Restore</a>
+//                     `);
+
+//                 }
+//                 viewChatList();
+//             }
+//         }
+//         else {
+//             var replyLink = messageElement.find('#reply-link');
+//             messageElement.find('.dropdown').remove();
+//             if (replyLink.length) {
+//                 replyLink.replaceWith(`
+//                         <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
+//                            id="restore-button-${deleteMessage.id}" onclick="restoreMessage(${deleteMessage.id})" data-message-id="${deleteMessage.id}">Restore</a>
+//                     `);
+//             }
+//             // const message = findMessageById(message.id);
+//             const message = getPaginatedArrayLastMessage(deleteMessage.id);
+//             updateChatList(deleteMessage)
+//         }
+//         messageElement.find(".additional_style").addClass("msg_deleted");
+//         messageElement.find("#message-" + deleteMessage.id).addClass("deleted_niddle");
+
+//     }
+// });
 // function getPaginatedArrayLastMessage(id) {
 //
 //     if (pagnicateChatList && pagnicateChatList.data) {
@@ -1156,8 +1220,17 @@ async function rerenderChatList(preGroupId) {
         (group) => group.group.group_id == preGroupId
     );
     if (prevGroup) {
-        prevGroup.group.group_messages.push(lastMessage);
-    }
+        console.log("before group found", prevGroup);
+            const messageExists = prevGroup.group.group_messages.some(existingMessage => existingMessage.id === lastMessage.id);
+
+            if (!messageExists) {
+                prevGroup.group.group_messages = [];
+                prevGroup.group.group_messages.push(lastMessage);
+            } else {
+                console.log("Message already exists in the group_messages array.");
+            }
+            // prevGroup.group.group_messages.push(lastMessage)
+        }
     chatList.sort((a, b) => {
         if (a.time && b.time) {
             return new Date(b.time) - new Date(a.time);
@@ -1590,9 +1663,10 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
             '[data-message-id="' + incomingMessage.message.id + '"]'
         ).closest(".ml-3");
 
-        messageElement.removeClass("hidden-message");
-        messageElement.removeClass("deleted_niddle");
+        messageElement.removeClass('hidden-message');
+        $('[data-message-id="' + incomingMessage.message.id + '"]').removeClass("deleted_niddle");
         messageElement.find(".additional_style").removeClass("msg_deleted");
+
         // addMessageToMessageArea(incomingMessage.message, false);
     } else {
         // Always append the dropdown for all users (including the restoring user)
