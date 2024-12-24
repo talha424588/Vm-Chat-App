@@ -18,8 +18,8 @@ class GroupService implements GroupRepository
     {
         $groupWithMessagesArray = [];
         if (Auth::user()->role == 2 || Auth::user()->role == 0) {
-            $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
-             ->where("status",1)  
+            $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
+             ->where("status",1)
             ->with(['groupMessages' => function ($query) {
                     $query->latest('time')
                         // ->where('is_deleted', false)
@@ -27,7 +27,7 @@ class GroupService implements GroupRepository
                 }, 'groupMessages.user'])
                 ->get();
         } else {
-            $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [$request->id])
+            $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
                 ->with(['groupMessages' => function ($query) {
                     $query->latest('time')
                         ->where('is_privacy_breach', false)
