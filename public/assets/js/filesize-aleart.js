@@ -1,6 +1,6 @@
 document.getElementById('file-input').addEventListener('change', function(event) {
   const files = event.target.files;
-  const maxSize = 0.1 * 1024 * 1024; // 500MB in bytes
+  const maxSize = 100 * 1024 * 1024; // 500MB in bytes
 
   for (let i = 0; i < files.length; i++) {
     if (files[i].size > maxSize) {
@@ -18,7 +18,7 @@ document.getElementById('file-input').addEventListener('change', function(event)
 
   document.getElementById('hidden-file-input').addEventListener('change', function(event) {
     const files = event.target.files;
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes // 10KB in bytes
+    const maxSize = 100 * 1024 * 1024; // 5MB in bytes // 10KB in bytes
 
     for (let i = 0; i < files.length; i++) {
       if (files[i].size > maxSize) {
