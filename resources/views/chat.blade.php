@@ -16,12 +16,13 @@
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-messaging.js"></script>
     <script src="https://cdn.tiny.cloud/1/xobw36ehtay62tuqr0vszjeg5hetxn82r315vx17eo9dzk4b/tinymce/6/tinymce.min.js"
-        referrerpolicy="origin"></script>
+    referrerpolicy="origin"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
         crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('assets/css/viewer.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
+
     <style>
         .audio-message {
             display: flex;
