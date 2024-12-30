@@ -3677,7 +3677,6 @@ const fetchPaginatedMessages = async (
 
         const ids = nextPageMessages.data
             .filter((item) => {
-                // Split the seen_by string into an array, handling both single and multiple IDs
                 const seenByIds = item.seen_by.split(/,\s*/); // This will split by comma and optional space
                 return item.sender !== user.unique_id && !seenByIds.includes(user.unique_id);
             })
