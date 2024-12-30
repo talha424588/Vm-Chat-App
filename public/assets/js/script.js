@@ -198,10 +198,10 @@ let viewChatList = (flag = false) => {
                 if (user.role == 0 || user.role == 2) {
                     latestMessage =
                         elem.group.group_messages &&
-                        elem.group.group_messages.length > 0
+                            elem.group.group_messages.length > 0
                             ? elem.group.group_messages[
-                                  elem.group.group_messages.length - 1
-                              ]
+                            elem.group.group_messages.length - 1
+                            ]
                             : null;
                 } else if (
                     elem.group.group_messages &&
@@ -286,51 +286,45 @@ let viewChatList = (flag = false) => {
                 </div>`;
 
                 DOM.chatList.innerHTML += `
-                    <input type="hidden" id="group-id" value="${
-                        elem.group.group_id
+                    <input type="hidden" id="group-id" value="${elem.group.group_id
                     }"></input>
-                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${
-                    elem.group.group_id
-                }" onclick="generateMessageArea(this, ${index},false)">
+                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id
+                    }" onclick="generateMessageArea(this, ${index},false)">
                   <span class='group-imgg'>
                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
 </svg>
 </span>
  <div class="w-50">
-                            <div class="name list-user-name">${
-                                elem.group.name.length > 23
-                                    ? elem.group.name.substring(0, 23) + "..."
-                                    : elem.group.name
-                            }</div>
+                            <div class="name list-user-name">${elem.group.name.length > 23
+                        ? elem.group.name.substring(0, 23) + "..."
+                        : elem.group.name
+                    }</div>
                             <div class="small last-message">
-                                ${
-                                    elem.isGroup
-                                        ? latestMessage
-                                            ? senderName + ": "
-                                            : ""
-                                        : ""
-                                }
-                                ${
-                                    latestMessage
-                                        ? latestMessage.is_compose === 1 ||
-                                          latestMessage.is_compose === true
-                                            ? processValue(
-                                                  messageText,
-                                                  true
-                                              ).concat("...")
-                                            : messageText
-                                        : "No Messages"
-                                }
+                                ${elem.isGroup
+                        ? latestMessage
+                            ? senderName + ": "
+                            : ""
+                        : ""
+                    }
+                                ${latestMessage
+                        ? latestMessage.is_compose === 1 ||
+                            latestMessage.is_compose === true
+                            ? processValue(
+                                messageText,
+                                true
+                            ).concat("...")
+                            : messageText
+                        : "No Messages"
+                    }
                             </div>
                         </div>
 
                     <div class="flex-grow-1 text-right">
                         <div class="small time">${timeText}</div>
-                    ${
-                        elem.unread > 0
-                            ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>`
-                            : ""
+                    ${elem.unread > 0
+                        ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>`
+                        : ""
                     }
                         </div>
                     </div>`;
@@ -445,12 +439,10 @@ let viewMessageList = () => {
                     ? elem.msg.replace(/<\/?p>/g, "")
                     : elem.msg;
                 DOM.messagesList.innerHTML += `
-                <input type="hidden" id="group-id" value="${
-                    elem.group.group_id
-                }"></input>
-                <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${
-                    elem.group.group_id
-                }" onclick="generateMessageArea(this,${index},true,${messageObject})">
+                <input type="hidden" id="group-id" value="${elem.group.group_id
+                    }"></input>
+                <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id
+                    }" onclick="generateMessageArea(this,${index},true,${messageObject})">
                  <span class='group-imgg'>
                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
@@ -458,23 +450,21 @@ let viewMessageList = () => {
                     </span>
                   <div class="w-50">
                     <div class="name list-user-name">${elem.group.name}</div>
-                    <div class="small last-message">${
-                        elem ? senderName + ": " : ""
+                    <div class="small last-message">${elem ? senderName + ": " : ""
                     }${messageText
-                    .replace(/\r\n/g, "<br>")
-                    .replace(/\n/g, "<br>")
-                    .replace(/<i[^>]+>/g, "")
-                    .replace(/<a[^>]*>(.*?)<\/a>/g, "$1")}</div>
+                        .replace(/\r\n/g, "<br>")
+                        .replace(/\n/g, "<br>")
+                        .replace(/<i[^>]+>/g, "")
+                        .replace(/<a[^>]*>(.*?)<\/a>/g, "$1")}</div>
                   </div>
 
                   <div class="flex-grow-1 text-right">
                     <div class="small time">${timeText}
                     </div>
-                   ${
-                       elem.unread > 0
-                           ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>`
-                           : ""
-                   }
+                   ${elem.unread > 0
+                        ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>`
+                        : ""
+                    }
                   </div>
                 </div>`;
             } else {
@@ -485,40 +475,34 @@ let viewMessageList = () => {
                     messageText = getOldMessageMediaName(elem);
                     // let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
                     DOM.messagesList.innerHTML += `
-                    <input type="hidden" id="group-id" value="${
-                        elem.group.group_id
-                    }"></input>
-                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${
-                        elem.group.group_id
-                    }" onclick="generateMessageArea(this,${index},true,${
-                        elem.id
-                    })">
+                    <input type="hidden" id="group-id" value="${elem.group.group_id
+                        }"></input>
+                    <div class="chat-list-item d-flex flex-row w-100 p-2 border-bottom tohide${unreadClass}" data-group-id="${elem.group.group_id
+                        }" onclick="generateMessageArea(this,${index},true,${elem.id
+                        })">
 
                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z" fill="#58595D"/>
                     </svg>
                     </span>
                       <div class="w-50">
-                        <div class="name list-user-name">${
-                            elem.group.name
+                        <div class="name list-user-name">${elem.group.name
                         }</div>
-                        <div class="small last-message">${
-                            elem ? senderName + ": " : ""
+                        <div class="small last-message">${elem ? senderName + ": " : ""
                         }${messageText
-                        .replace(/\r\n/g, "<br>")
-                        .replace(/\n/g, "<br>")
-                        .replace(/<i[^>]+>/g, "")
-                        .replace(/<a[^>]*>(.*?)<\/a>/g, "$1")}</div>
+                            .replace(/\r\n/g, "<br>")
+                            .replace(/\n/g, "<br>")
+                            .replace(/<i[^>]+>/g, "")
+                            .replace(/<a[^>]*>(.*?)<\/a>/g, "$1")}</div>
                       </div>
 
                       <div class="flex-grow-1 text-right">
                         <div class="small time">${timeText}
                         </div>
-                       ${
-                           elem.unread > 0
-                               ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>`
-                               : ""
-                       }
+                       ${elem.unread > 0
+                            ? `<div class="${elem.group.group_id} badge badge-success badge-pill small" id="unread-count">${elem.unread}</div>`
+                            : ""
+                        }
                       </div>
                     </div>`;
                 }
@@ -554,11 +538,10 @@ let addUnread = () => {
     span.innerHTML = `
             <div id="unread-wrapper" class="notification-wrapper">
                 <div class="unread-messages">
-                    <span id="unread-counter-div">${
-                        oldCount
-                            ? DOM.unreadCounter + parseInt(oldCount)
-                            : DOM.unreadCounter
-                    }</span> UNREAD MESSAGES
+                    <span id="unread-counter-div">${oldCount
+            ? DOM.unreadCounter + parseInt(oldCount)
+            : DOM.unreadCounter
+        }</span> UNREAD MESSAGES
                 </div>
             </div>
         `;
@@ -750,7 +733,7 @@ function getPaginatedArrayLastMessage(id) {
             if (Array.isArray(group.group.group_messages)) {
                 lastMessage =
                     group.group.group_messages[
-                        group.group.group_messages.length - 1
+                    group.group.group_messages.length - 1
                     ];
             } else {
                 lastMessage = group.group.group_messages;
@@ -775,8 +758,8 @@ function findMessageById(messageId) {
         );
         let deleteMessage = group
             ? group.group.group_messages.find(
-                  (message) => message.id === messageId
-              )
+                (message) => message.id === messageId
+            )
             : null;
 
         return deleteMessage;
@@ -793,7 +776,7 @@ function updateChatList(message) {
                 if (user.role != 0 && user.role != 2) {
                     let paginateArrayLastMessage =
                         pagnicateChatList.data.reverse()[
-                            pagnicateChatList.data.length - 1
+                        pagnicateChatList.data.length - 1
                         ];
                     currentUsergroup.group.group_messages.push(
                         paginateArrayLastMessage
@@ -806,7 +789,7 @@ function updateChatList(message) {
                     if (findMessage.id == message.id) {
                         let paginateArrayLastMessage =
                             pagnicateChatList.data.reverse()[
-                                pagnicateChatList.data.length - 1
+                            pagnicateChatList.data.length - 1
                             ];
                         currentUsergroup.group.group_messages.push(
                             paginateArrayLastMessage
@@ -814,7 +797,7 @@ function updateChatList(message) {
                     } else {
                         let paginateArrayLastMessage =
                             pagnicateChatList.data[
-                                pagnicateChatList.data.length - 1
+                            pagnicateChatList.data.length - 1
                             ];
                         currentUsergroup.group.group_messages.push(
                             paginateArrayLastMessage
@@ -1158,7 +1141,7 @@ socket.on(
                             : [];
                         newGroup.unread +=
                             message.sender !== user.unique_id &&
-                            !seenBy.includes(user.unique_id)
+                                !seenBy.includes(user.unique_id)
                                 ? 1
                                 : 0;
                     });
@@ -1174,12 +1157,12 @@ socket.on(
                     );
                     const seenBy = moveMessages.messages[0].seen_by
                         ? moveMessages.messages[0].seen_by
-                              .split(",")
-                              .map((s) => s.trim())
+                            .split(",")
+                            .map((s) => s.trim())
                         : [];
                     newGroup.unread +=
                         moveMessages.messages[0].sender !== user.unique_id &&
-                        !seenBy.includes(user.unique_id)
+                            !seenBy.includes(user.unique_id)
                             ? 1
                             : 0;
                 }
@@ -1221,16 +1204,16 @@ async function rerenderChatList(preGroupId) {
     );
     if (prevGroup) {
         console.log("before group found", prevGroup);
-            const messageExists = prevGroup.group.group_messages.some(existingMessage => existingMessage.id === lastMessage.id);
+        const messageExists = prevGroup.group.group_messages.some(existingMessage => existingMessage.id === lastMessage.id);
 
-            if (!messageExists) {
-                prevGroup.group.group_messages = [];
-                prevGroup.group.group_messages.push(lastMessage);
-            } else {
-                console.log("Message already exists in the group_messages array.");
-            }
-            // prevGroup.group.group_messages.push(lastMessage)
+        if (!messageExists) {
+            prevGroup.group.group_messages = [];
+            prevGroup.group.group_messages.push(lastMessage);
+        } else {
+            console.log("Message already exists in the group_messages array.");
         }
+        // prevGroup.group.group_messages.push(lastMessage)
+    }
     chatList.sort((a, b) => {
         if (a.time && b.time) {
             return new Date(b.time) - new Date(a.time);
@@ -1271,20 +1254,18 @@ socket.on("updateEditedMessage", (editedMessage) => {
                     )}</div>`;
                     const replyMessage = editedMessage.reply.msg;
                     newMessageDisplay = `
-                        <div class="reply-message-div" onclick="scrollToMessage('${
-                            editedMessage.reply.id
+                        <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id
                         }')">
                             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                 ${editedMessage.user.name}
                             </div>
                             <div class="reply-details">
                                 <p class="file-name">${replyMessage
-                                    .replace(/\r\n/g, "<br>")
-                                    .replace(/\n/g, "<br>")
-                                    .replace(/<i[^>]+>/g, "")
-                                    .substring(0, 200)}${
-                        replyMessage.length > 100 ? "...." : ""
-                    }</p>
+                            .replace(/\r\n/g, "<br>")
+                            .replace(/\n/g, "<br>")
+                            .replace(/<i[^>]+>/g, "")
+                            .substring(0, 200)}${replyMessage.length > 100 ? "...." : ""
+                        }</p>
                             </div>
                         </div>
                         ${newMessageDisplay}`;
@@ -1294,15 +1275,13 @@ socket.on("updateEditedMessage", (editedMessage) => {
                     var message_body = `<img  src="${editedMessage.reply.msg}" style="height:125px; width:100%;">`;
 
                     newMessageDisplay = `
-                    <div class="reply-message-div" onclick="scrollToMessage('${
-                        editedMessage.reply.id
-                    }')"> <!-- Add onclick here -->
+                    <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id
+                        }')"> <!-- Add onclick here -->
                         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                            ${
-                                editedMessage.user?.id == user?.id
-                                    ? editedMessage.user.name
-                                    : editedMessage.user.name
-                            }
+                            ${editedMessage.user?.id == user?.id
+                            ? editedMessage.user.name
+                            : editedMessage.user.name
+                        }
                         </div>
                         <div class="reply-details">
                             <p class="file-name">${message_body}</p>
@@ -1312,9 +1291,8 @@ socket.on("updateEditedMessage", (editedMessage) => {
                     messageContentDiv.innerHTML = newMessageDisplay;
                 } else if (editedMessage.reply.type === "File") {
                     const add_file_view = `
-                     <div class="reply-message-div" onclick="scrollToMessage('${
-                         editedMessage.reply.id
-                     }')">
+                     <div class="reply-message-div" onclick="scrollToMessage('${editedMessage.reply.id
+                        }')">
                        <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
                                 ${editedMessage.user.name}
                             </div>
@@ -1326,16 +1304,13 @@ socket.on("updateEditedMessage", (editedMessage) => {
                             </svg>
                         </div>
                         <div class="file-details">
-                            <p class="file-name">${
-                                editedMessage.reply.media_name
-                            }</p>
+                            <p class="file-name">${editedMessage.reply.media_name
+                        }</p>
                         </div>
-                        <a href="${
-                            editedMessage.reply.message ??
-                            editedMessage.reply.msg
-                        }" target="_blank" download="${
-                        editedMessage.reply.media_name
-                    }" class="download-icon">
+                        <a href="${editedMessage.reply.message ??
+                        editedMessage.reply.msg
+                        }" target="_blank" download="${editedMessage.reply.media_name
+                        }" class="download-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
                             </svg>
@@ -1360,7 +1335,7 @@ socket.on("updateEditedMessage", (editedMessage) => {
                     const displayMediaName = mediaName;
                     const mediaType =
                         displayMediaName.split(".").pop().toLowerCase() ===
-                        "pdf"
+                            "pdf"
                             ? "document"
                             : "image";
                     if (mediaType == "document") {
@@ -1397,9 +1372,8 @@ socket.on("updateEditedMessage", (editedMessage) => {
                         /\/\//g,
                         "/"
                     );
-                    var message_body = `<div class="audio-message" style="background-color:${
-                        editedMessage.user.id == user.id ? "#dcf8c6" : "white"
-                    };" data-audio-src="${audioSrc}">
+                    var message_body = `<div class="audio-message" style="background-color:${editedMessage.user.id == user.id ? "#dcf8c6" : "white"
+                        };" data-audio-src="${audioSrc}">
                         <div class="avatar">
                             <!-- Avatar image here -->
                         </div>
@@ -1422,15 +1396,13 @@ socket.on("updateEditedMessage", (editedMessage) => {
                         </div>`;
 
                     newMessageDisplay = `
-                        <div class="reply-message-div"  onclick="scrollToMessage('${
-                            editedMessage.reply.id
+                        <div class="reply-message-div"  onclick="scrollToMessage('${editedMessage.reply.id
                         }')">
                             <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                            ${
-                                editedMessage.user?.id == user?.id
-                                    ? editedMessage.user.name
-                                    : editedMessage.user.name
-                            }
+                            ${editedMessage.user?.id == user?.id
+                            ? editedMessage.user.name
+                            : editedMessage.user.name
+                        }
 
                             </div>
                             <div class="reply-details">
@@ -1438,14 +1410,14 @@ socket.on("updateEditedMessage", (editedMessage) => {
                             </div>
                         </div>
                     <div class="reply-message-area">${(
-                        editedMessage.msg || editedMessage.message
-                    )
-                        .replace(/\r\n/g, "<br>")
-                        .replace(/\n/g, "<br>")
-                        .replace(
-                            /<i[^>]+>/g,
-                            ""
-                        )}</div> <!-- Updated this line -->
+                            editedMessage.msg || editedMessage.message
+                        )
+                            .replace(/\r\n/g, "<br>")
+                            .replace(/\n/g, "<br>")
+                            .replace(
+                                /<i[^>]+>/g,
+                                ""
+                            )}</div> <!-- Updated this line -->
                     `;
                     messageContentDiv.innerHTML = newMessageDisplay;
                 }
@@ -1473,23 +1445,19 @@ socket.on("updateEditedMessage", (editedMessage) => {
 
                 const additionalFeatures = `
                     <div style="color: #463C3C; font-size:12px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
-                        <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${
-                            editedMessage.user.name
-                        }</span> |
+                        <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${editedMessage.user.name
+                    }</span> |
                         <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${formatTimestampToDate(
-                            editedMessage.time
-                        )}</span> |
+                        editedMessage.time
+                    )}</span> |
                           <span>
-                            <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${
-                                editedMessage.id
-                            }">Seen</a> |
+                            <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#seenModal" data-message-id="${editedMessage.id
+                    }">Seen</a> |
                         </span>
                         <span>
-                            <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${
-                                editedMessage.id
-                            }','${editedMessage.user.name}','${
-                    editedMessage.type
-                }')" data-message-id="${editedMessage.id}">Reply</a>
+                            <a href="#" style="color: #463C3C; font-size:14px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${editedMessage.id
+                    }','${editedMessage.user.name}','${editedMessage.type
+                    }')" data-message-id="${editedMessage.id}">Reply</a>
                         </span>
 
                     </div>
@@ -1501,22 +1469,20 @@ socket.on("updateEditedMessage", (editedMessage) => {
                             <i class="fas fa-angle-down text-muted px-2"></i>
                         </a>
                         <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                            ${
-                                user.role === "0" || user.role === "2"
-                                    ? `
+                            ${user.role === "0" || user.role === "2"
+                        ? `
                                 <a class="dropdown-item" href="#" onclick="editMessage('${editedMessage.id}')">Edit</a>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
                             `
-                                    : ""
-                            }
-                            ${
-                                user.role === "3" &&
-                                editedMessage.sender === user.unique_id
-                                    ? `
+                        : ""
+                    }
+                            ${user.role === "3" &&
+                        editedMessage.sender === user.unique_id
+                        ? `
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
                             `
-                                    : ""
-                            }
+                        : ""
+                    }
                         </div>
                     </div>
                 `;
@@ -1691,30 +1657,27 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
                     <i class="fas fa-angle-down text-muted px-2"></i>
                 </a>
                 <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                    ${
-                        user.role !== "0" && user.role !== "2"
-                            ? `
+                    ${user.role !== "0" && user.role !== "2"
+                ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     `
-                            : ""
-                    }
-                    ${
-                        (user.role === "0" || user.role === "2") &&
-                        incomingMessage.message.type === "Message"
-                            ? `
+                : ""
+            }
+                    ${(user.role === "0" || user.role === "2") &&
+                incomingMessage.message.type === "Message"
+                ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     `
-                            : ""
-                    }
-                    ${
-                        (user.role === "0" || user.role === "2") &&
-                        incomingMessage.message.is_compose !== 1 &&
-                        incomingMessage.message.is_compose !== true
-                            ? `
+                : ""
+            }
+                    ${(user.role === "0" || user.role === "2") &&
+                incomingMessage.message.is_compose !== 1 &&
+                incomingMessage.message.is_compose !== true
+                ? `
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
                     `
-                            : ""
-                    }
+                : ""
+            }
                 </div>
             </div>
         `;
@@ -1739,21 +1702,20 @@ function processValue(value, isChatList = false) {
     value = value.trim();
     return isChatList
         ? value
-              .replace(/\r\n/g, "<br>")
-              .replace(/\n/g, "<br>")
-              .replace(/<i[^>]+>/g, "")
-              .slice(0, 12)
+            .replace(/\r\n/g, "<br>")
+            .replace(/\n/g, "<br>")
+            .replace(/<i[^>]+>/g, "")
+            .slice(0, 12)
         : value
-              .replace(/\r\n/g, "<br>")
-              .replace(/\n/g, "<br>")
-              .replace(/<i[^>]+>/g, "");
+            .replace(/\r\n/g, "<br>")
+            .replace(/\n/g, "<br>")
+            .replace(/<i[^>]+>/g, "");
 }
 
 let addMessageToMessageArea = (message, flag = false) => {
     let msgDate = mDate(message.time).getDate();
-    let profileImage = `<img src="assets/profile_pics/${
-        message.user?.pic ?? message.user?.profile_img
-    }" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
+    let profileImage = `<img src="assets/profile_pics/${message.user?.pic ?? message.user?.profile_img
+        }" alt="Profile Photo" class="img-fluid rounded-circle" style="height:40px; width:40px; margin-top:5px">`;
     let senderName = message.user.name;
     let messageContent;
     let oldMessageType = null;
@@ -1784,9 +1746,8 @@ let addMessageToMessageArea = (message, flag = false) => {
                 </a>
             </div>`;
             } else if (message.reply.type === "Audio") {
-                var message_body = `<div class="audio-message" style="background-color:${
-                    message.user.id == user.id ? "#dcf8c6" : "white"
-                };" data-audio-src="${message.msg}">
+                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
+                    };" data-audio-src="${message.msg}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
@@ -1811,9 +1772,8 @@ let addMessageToMessageArea = (message, flag = false) => {
                 var message_body = message.reply.msg;
             }
             var add_file_view = `
-            <div class="file-message" onclick="scrollToMessage('${
-                message.reply.id
-            }','${message.id}')">
+            <div class="file-message" onclick="scrollToMessage('${message.reply.id
+                }','${message.id}')">
                 <div class="file-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
@@ -1824,11 +1784,9 @@ let addMessageToMessageArea = (message, flag = false) => {
                     <p class="file-name">${message.media_name}</p>
 
                 </div>
-                <a href="${
-                    message.message ?? message.msg
-                }" target="_blank" download="${
-                message.media_name
-            }" class="download-icon">
+                <a href="${message.message ?? message.msg
+                }" target="_blank" download="${message.media_name
+                }" class="download-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
                     </svg>
@@ -1848,11 +1806,9 @@ let addMessageToMessageArea = (message, flag = false) => {
                     <p class="file-name">${add_file_view}</p>
 
                 </div>
-                <a href="${
-                    message.message ?? message.msg
-                }" target="_blank" download="${
-                message.media_name
-            }" class="download-icon">
+                <a href="${message.message ?? message.msg
+                }" target="_blank" download="${message.media_name
+                }" class="download-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
                     </svg>
@@ -1874,11 +1830,9 @@ let addMessageToMessageArea = (message, flag = false) => {
                     <p class="file-name">${message.media_name}</p>
 
                 </div>
-                <a href="${
-                    message.message ?? message.msg
-                }" target="_blank" download="${
-                message.media_name
-            }" class="download-icon">
+                <a href="${message.message ?? message.msg
+                }" target="_blank" download="${message.media_name
+                }" class="download-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
                     </svg>
@@ -1942,15 +1896,13 @@ let addMessageToMessageArea = (message, flag = false) => {
             message.reply.type = getOldMessageType(message.reply);
             if (message.reply.type == "Message") {
                 messageContent = `
-                    <div class="reply-message-div" onclick="scrollToMessage('${
-                        message.reply.id
+                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
                     }','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                        ${
-                            message.user?.id == user?.id
-                                ? message.user.name
-                                : message.user.name
-                        }
+                        ${message.user?.id == user?.id
+                        ? message.user.name
+                        : message.user.name
+                    }
                     </div>
                     <div class="reply-details">
                         <p class="file-namee">${message.reply.msg}</p>
@@ -1977,15 +1929,13 @@ let addMessageToMessageArea = (message, flag = false) => {
                     `;
             } else if (message.reply.type == "Image") {
                 messageContent = `
-                    <div class="reply-message-div" onclick="scrollToMessage('${
-                        message.reply.id
+                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
                     }','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                        ${
-                            message.user?.id == user?.id
-                                ? message.user.name
-                                : message.user.name
-                        }
+                        ${message.user?.id == user?.id
+                        ? message.user.name
+                        : message.user.name
+                    }
                     </div>
                     <div class="reply-details">
                         <p class="file-name">${message.reply.msg}</p>
@@ -1999,24 +1949,21 @@ let addMessageToMessageArea = (message, flag = false) => {
                 const audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
                 audioSrc = audioTag.match(/src="([^"]+)"/)[1];
                 messageContent = `
-                    <div class="reply-message-div" onclick="scrollToMessage('${
-                        message.reply.id
+                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
                     }','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                        ${
-                            message.user?.id == user?.id
-                                ? message.user.name
-                                : message.user.name
-                        }
+                        ${message.user?.id == user?.id
+                        ? message.user.name
+                        : message.user.name
+                    }
                     </div>
                     <div class="reply-details">
                         <p class="file-name">${message.reply.msg}</p>
                     </div>
                 </div>
 
-        <div class="audio-message" style="background-color:${
-            message.user.id == user.id ? "#dcf8c6" : "white"
-        };" data-audio-src="${audioSrc}">
+        <div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
+                    };" data-audio-src="${audioSrc}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
@@ -2072,19 +2019,16 @@ let addMessageToMessageArea = (message, flag = false) => {
                 var message_body = message.reply.msg;
             }
 
-            var message_new = `<img src="${
-                message.message ?? message.msg
-            }" class="view-image" style="height:222px; width:100%;">`;
+            var message_new = `<img src="${message.message ?? message.msg
+                }" class="view-image" style="height:222px; width:100%;">`;
             messageContent = `
-                <div class="reply-message-div" onclick="scrollToMessage('${
-                    message.reply.id
+                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
                 }','${message.id}')"> <!-- Add onclick here -->
                     <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                        ${
-                            message.user?.id == user?.id
-                                ? message.user.name
-                                : message.user.name
-                        }
+                        ${message.user?.id == user?.id
+                    ? message.user.name
+                    : message.user.name
+                }
                     </div>
                     <div class="reply-details">
                         <p class="file-name">${message_body}</p>
@@ -2094,9 +2038,8 @@ let addMessageToMessageArea = (message, flag = false) => {
             `;
         } else {
             messageContent = `
-            <img src="${message.message ?? message.msg}" data-original="${
-                message.message ?? message.msg
-            }" class="view-image"" style="height:222px; width:100%;">
+            <img src="${message.message ?? message.msg}" data-original="${message.message ?? message.msg
+                }" class="view-image"" style="height:222px; width:100%;">
         `;
         }
     } else if (
@@ -2138,9 +2081,8 @@ let addMessageToMessageArea = (message, flag = false) => {
                 audioSrc = message.reply.msg.startsWith("https://")
                     ? message.reply.msg
                     : audioTag.match(/src="([^"]+)"/)[1];
-                var message_body = `<div class="audio-message" style="background-color:${
-                    message.user.id == user.id ? "#dcf8c6" : "white"
-                };" data-audio-src="${audioSrc}">
+                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
+                    };" data-audio-src="${audioSrc}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
@@ -2175,15 +2117,13 @@ let addMessageToMessageArea = (message, flag = false) => {
                 }
             }
             messageContent = `
-            <div class="reply-message-div"  onclick="scrollToMessage('${
-                message.reply.id
-            }','${message.id}')">
+            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id
+                }','${message.id}')">
                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                  ${
-                      message.user?.id == user?.id
-                          ? message.user.name
-                          : message.user.name
-                  }
+                  ${message.user?.id == user?.id
+                    ? message.user.name
+                    : message.user.name
+                }
 
                 </div>
                 <div class="reply-details">
@@ -2191,9 +2131,9 @@ let addMessageToMessageArea = (message, flag = false) => {
                 </div>
             </div>
         <div class="reply-message-area">${(message.msg || message.message)
-            .replace(/\r\n/g, "<br>")
-            .replace(/\n/g, "<br>")
-            .replace(/<i[^>]+>/g, "")}</div> <!-- Updated this line -->
+                    .replace(/\r\n/g, "<br>")
+                    .replace(/\n/g, "<br>")
+                    .replace(/<i[^>]+>/g, "")}</div> <!-- Updated this line -->
         `;
         } else {
             if (message.is_compose === 1) {
@@ -2219,9 +2159,8 @@ let addMessageToMessageArea = (message, flag = false) => {
 
         messageContent = `
 
-        <div class="audio-message" style="background-color:${
-            message.user.id == user.id ? "#dcf8c6" : "white"
-        };" data-audio-src="${audioSrc}">
+        <div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
+            };" data-audio-src="${audioSrc}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
@@ -2249,263 +2188,236 @@ let addMessageToMessageArea = (message, flag = false) => {
         let messageElement = document.createElement("div");
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
-            <div class="" ${
-                message.user.id == user.id ? "" : 'style="display:flex"'
+            <div class="" ${message.user.id == user.id ? "" : 'style="display:flex"'
             }>
             ${message.user.id == user.id ? "" : profileImage}
-            <div class="align-self-${
-                message.user.id == user.id ? "end self" : "start"
-            } d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${
-            message.user.id == user.id ? "right-nidle" : "left-nidle"
-        }" data-message-id="${message.id}" id="message-${message.id}">
+            <div class="align-self-${message.user.id == user.id ? "end self" : "start"
+            } d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? "right-nidle" : "left-nidle"
+            }" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
-                        <div class="shadow-sm additional_style" style="background:${
-                            message.user.id == user.id ? "#dcf8c6" : "white"
-                        };">
+                        <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? "#dcf8c6" : "white"
+            };">
                           ${messageContent}
                            </div>
                         <div>
                             <div style="color: #463C3C; font-size:12px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${formatTimestampToDate(
-                                    message.time
-                                )}</span> |
-                                ${
-                                    message.user.id == user.id
-                                        ? `
+                message.time
+            )}</span> |
+                                ${message.user.id == user.id
+                ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
                                             Seen
                                         </a>
                                     </span> |`
-                                        : user.role == 0 || user.role == 2
-                                        ? `
+                : user.role == 0 || user.role == 2
+                    ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
                                             data-toggle="modal" data-target="#seenModal" data-message-id="${message.id}">
                                             Seen
                                         </a>
                                     </span> |`
-                                        : ""
-                                }
+                    : ""
+            }
 
                                     <span>
-                                        <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${
-                                            message.id
-                                        }','${senderName}','${
-            message.type
-        }')" data-message-id="${message.id}">Reply</a>
+                                        <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" id="reply-link" onclick="showReply('${message.id
+            }','${senderName}','${message.type
+            }')" data-message-id="${message.id}">Reply</a>
                                     </span>
 
                                <!--- | <span>
-                                    <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${
-                                        message.id
-                                    }">Delete</a>
+                                    <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id
+            }">Delete</a>
                                 </span> ---->
 
                             </div>
-                            ${
-                                message.sender === user.unique_id &&
-                                !(
-                                    (message.type === "File" &&
-                                        (message.is_compose === 1 ||
-                                            message.is_compose === true)) ||
-                                    /<a[^>]+>/g.test(message.msg)
-                                )
-                                    ? `
-                                <div class="dropdown" style="position: absolute; top: ${
-                                    message.reply
-                                        ? "0px"
-                                        : message.type === "Message"
-                                        ? "-2px"
-                                        : "-2px"
-                                }; right: 0px;">
+                            ${message.sender === user.unique_id &&
+                !(
+                    (message.type === "File" &&
+                        (message.is_compose === 1 ||
+                            message.is_compose === true)) ||
+                    /<a[^>]+>/g.test(message.msg)
+                )
+                ? `
+                                <div class="dropdown" style="position: absolute; top: ${message.reply
+                    ? "0px"
+                    : message.type === "Message"
+                        ? "-2px"
+                        : "-2px"
+                }; right: 0px;">
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
                                 <div class="dropdown-menu custom-shadow"  aria-labelledby="dropdownMenuButton">
-                                    ${
-                                        !(
-                                            user.role === "0" ||
-                                            user.role === "2"
-                                        ) && message.type === "Message"
-                                            ? `
+                                    ${!(
+                    user.role === "0" ||
+                    user.role === "2"
+                ) && message.type === "Message"
+                    ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     `
-                                            : ""
-                                    }
-                                    ${
-                                        user.role === "0" || user.role === "2"
-                                            ? `
-                                        ${
-                                            message.type === "Message"
-                                                ? `
+                    : ""
+                }
+                                    ${user.role === "0" || user.role === "2"
+                    ? `
+                                        ${message.type === "Message"
+                        ? `
                                                 <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         `
-                                                : ""
-                                        }
-                                    ${
-                                        message.type === "Message" &&
-                                        message.status !== "Correction" &&
-                                        (message.is_compose === 1 ||
-                                            message.is_compose === true)
-                                            ? `
+                        : ""
+                    }
+                                    ${message.type === "Message" &&
+                        message.status !== "Correction" &&
+                        (message.is_compose === 1 ||
+                            message.is_compose === true)
+                        ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     `
-                                            : ""
-                                    }
-                                    ${
-                                        message.is_compose === 1 &&
-                                        message.type === "Message" &&
-                                        !message.reply
-                                            ? `
+                        : ""
+                    }
+                                    ${message.is_compose === 1 &&
+                        message.type === "Message" &&
+                        !message.reply
+                        ? `
                                     <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                                     `
-                                            : ""
-                                    }
+                        : ""
+                    }
                                     `
-                                            : ""
-                                    }
+                    : ""
+                }
                                     <!---
-                                    ${
-                                        user.role === "0" || user.role === "2"
-                                            ? `
+                                    ${user.role === "0" || user.role === "2"
+                    ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
                                     `
-                                            : ""
-                                    }---->
-                                    ${
-                                        message.is_compose !== 1 &&
-                                        message.is_compose !== true &&
-                                        (user.role === "0" || user.role === "2")
-                                            ? `
+                    : ""
+                }---->
+                                    ${message.is_compose !== 1 &&
+                    message.is_compose !== true &&
+                    (user.role === "0" || user.role === "2")
+                    ? `
                                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     `
-                                            : ""
-                                    }
-                                    ${
-                                        message.is_compose !== 1 &&
-                                        message.is_compose !== true &&
-                                        user.role === "3" &&
-                                        message.sender === user.unique_id
-                                            ? `
+                    : ""
+                }
+                                    ${message.is_compose !== 1 &&
+                    message.is_compose !== true &&
+                    user.role === "3" &&
+                    message.sender === user.unique_id
+                    ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     `
-                                            : ""
-                                    }
+                    : ""
+                }
                                 </div>
                                 </div>
                             `
-                                    : ``
-                            }
+                : ``
+            }
 
 
 
-                            ${
-                                user.role != "1" &&
-                                user.role != "3" &&
-                                message.sender != user.unique_id &&
-                                !(
-                                    (message.type === "File" &&
-                                        (message.is_compose === 1 ||
-                                            message.is_compose === true)) ||
-                                    /<a[^>]+>/g.test(message.msg)
-                                )
-                                    ? `
-                                <div class="dropdown" style="position: absolute; top: ${
-                                    message.reply
-                                        ? "0px"
-                                        : message.type === "Message"
-                                        ? "-2px"
-                                        : "-2px"
-                                }; right: 0px;}>
+                            ${user.role != "1" &&
+                user.role != "3" &&
+                message.sender != user.unique_id &&
+                !(
+                    (message.type === "File" &&
+                        (message.is_compose === 1 ||
+                            message.is_compose === true)) ||
+                    /<a[^>]+>/g.test(message.msg)
+                )
+                ? `
+                                <div class="dropdown" style="position: absolute; top: ${message.reply
+                    ? "0px"
+                    : message.type === "Message"
+                        ? "-2px"
+                        : "-2px"
+                }; right: 0px;}>
                                 <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-angle-down text-muted px-2"></i>
                                 </a>
                                 <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                                    ${
-                                        !(
-                                            user.role === "0" ||
-                                            user.role === "2"
-                                        ) &&
-                                        message.sender != user.unique_id &&
-                                        !/<a[^>]+>/g.test(message.msg) &&
-                                        !/<audio[^>]+>/g.test(message.msg)
-                                            ? `
+                                    ${!(
+                    user.role === "0" ||
+                    user.role === "2"
+                ) &&
+                    message.sender != user.unique_id &&
+                    !/<a[^>]+>/g.test(message.msg) &&
+                    !/<audio[^>]+>/g.test(message.msg)
+                    ? `
 
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     `
-                                            : ""
-                                    }
-                                    ${
-                                        user.role === "0" || user.role === "2"
-                                            ? `
-                                        ${
-                                            message.type === "Message" ||
-                                            (message.type === null &&
-                                                !/<a[^>]+>/g.test(
-                                                    message.msg
-                                                ) &&
-                                                !/<audio[^>]+>/g.test(
-                                                    message.msg
-                                                ))
-                                                ? `
+                    : ""
+                }
+                                    ${user.role === "0" || user.role === "2"
+                    ? `
+                                        ${message.type === "Message" ||
+                        (message.type === null &&
+                            !/<a[^>]+>/g.test(
+                                message.msg
+                            ) &&
+                            !/<audio[^>]+>/g.test(
+                                message.msg
+                            ))
+                        ? `
                                         <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         `
-                                                : ""
-                                        }
-                                    ${
-                                        (message.type === "Message" ||
-                                            (message.type === null &&
-                                                !/<a[^>]+>/g.test(
-                                                    message.msg
-                                                ) &&
-                                                !/<audio[^>]+>/g.test(
-                                                    message.msg
-                                                ))) &&
-                                        (message.is_compose === 1 ||
-                                            message.is_compose == true)
-                                            ? `
+                        : ""
+                    }
+                                    ${(message.type === "Message" ||
+                        (message.type === null &&
+                            !/<a[^>]+>/g.test(
+                                message.msg
+                            ) &&
+                            !/<audio[^>]+>/g.test(
+                                message.msg
+                            ))) &&
+                        (message.is_compose === 1 ||
+                            message.is_compose == true)
+                        ? `
                                     <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction </a>
                                     `
-                                            : ""
-                                    }
-                                    ${
-                                        (message.type === "Message" ||
-                                            message.type === null) &&
-                                        (message.is_compose === 1 ||
-                                            message.is_compose === true) &&
-                                        !message.reply
-                                            ? `
+                        : ""
+                    }
+                                    ${(message.type === "Message" ||
+                        message.type === null) &&
+                        (message.is_compose === 1 ||
+                            message.is_compose === true) &&
+                        !message.reply
+                        ? `
                                                 <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
                                             `
-                                            : ""
-                                    }
+                        : ""
+                    }
                                     `
-                                            : ""
-                                    }
-                                    ${
-                                        message.is_compose !== 1 &&
-                                        message.is_compose !== true
-                                            ? `
+                    : ""
+                }
+                                    ${message.is_compose !== 1 &&
+                    message.is_compose !== true
+                    ? `
                                                 <a class="dropdown-item" href="#" onclick="delMessage(${message.id})">Delete</a>
                                     `
-                                            : ""
-                                    }
-                                    ${
-                                        user.role === "3" &&
-                                        message.sender === user.unique_id
-                                            ? `
+                    : ""
+                }
+                                    ${user.role === "3" &&
+                    message.sender === user.unique_id
+                    ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     `
-                                            : ""
-                                    }
+                    : ""
+                }
                                 </div>
                                 </div>
                             `
-                                    : ""
-                            }
+                : ""
+            }
                        </div>
                     </div>
                 </div>
@@ -2523,19 +2435,15 @@ let addMessageToMessageArea = (message, flag = false) => {
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
 
-              <div class="" ${
-                  message.user.id == user.id ? "" : 'style="display:flex"'
-              }>
+              <div class="" ${message.user.id == user.id ? "" : 'style="display:flex"'
+            }>
             ${message.user.id == user.id ? "" : profileImage}
-                <div class="align-self-${
-                    message.user.id == user.id ? "end self" : "start"
-                } d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${
-            message.user.id == user.id ? "right-nidle" : "left-nidle"
-        }" data-message-id="${message.id}" id="message-${message.id}">
+                <div class="align-self-${message.user.id == user.id ? "end self" : "start"
+            } d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? "right-nidle" : "left-nidle"
+            }" data-message-id="${message.id}" id="message-${message.id}">
                     <div style="margin-top:-4px">
-                        <div class="shadow-sm additional_style" style="background:${
-                            message.user.id == user.id ? "#dcf8c6" : "white"
-                        };">
+                        <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? "#dcf8c6" : "white"
+            };">
 
                            ${messageContent}
 
@@ -2544,8 +2452,8 @@ let addMessageToMessageArea = (message, flag = false) => {
                             <div style="color: #463C3C; font-size:12px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${formatTimestampToDate(
-                                    message.time
-                                )}</span>
+                message.time
+            )}</span>
                                 <!-- Additional logic for seen and reply links -->
                             </div>
                         </div>
@@ -2564,19 +2472,15 @@ let addMessageToMessageArea = (message, flag = false) => {
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
 
-                <div class="" ${
-                    message.user.id == user.id ? "" : 'style="display:flex"'
-                }>
+                <div class="" ${message.user.id == user.id ? "" : 'style="display:flex"'
+            }>
             ${message.user.id == user.id ? "" : profileImage}
-                    <div class="deleted_niddle align-self-${
-                        message.user.id == user.id ? "end self" : "start"
-                    } d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${
-            message.user.id == user.id ? "right-nidle" : "left-nidle"
-        }" data-message-id="${message.id}" id="message-${message.id}">
+                    <div class="deleted_niddle align-self-${message.user.id == user.id ? "end self" : "start"
+            } d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? "right-nidle" : "left-nidle"
+            }" data-message-id="${message.id}" id="message-${message.id}">
                         <div style="margin-top:-4px">
-                            <div class="shadow-sm additional_style msg_deleted" style="background:${
-                                message.user.id == user.id ? "#dcf8c6" : "white"
-                            };">
+                            <div class="shadow-sm additional_style msg_deleted" style="background:${message.user.id == user.id ? "#dcf8c6" : "white"
+            };">
 
                                ${messageContent}
 
@@ -2585,21 +2489,18 @@ let addMessageToMessageArea = (message, flag = false) => {
                                 <div style="color: #463C3C; font-size:12px; font-weight:400; margin-top: 10px; width: 100%; background-color: transparent;">
                                     <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${senderName}</span> |
                                     <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${formatTimestampToDate(
-                                        message.time
-                                    )}</span>
+                message.time
+            )}</span>
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
-                                            data-toggle="modal" data-target="#seenModal" data-message-id="${
-                                                message.id
-                                            }">
+                                            data-toggle="modal" data-target="#seenModal" data-message-id="${message.id
+            }">
                                             Seen
                                         </a>
                                     </span> |
-                                    <span id="restore-button-${
-                                        message.id
-                                    }" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="restoreMessage('${
-            message.id
-        }')">Restore</span>                                    <!-- Additional logic for seen and reply links -->
+                                    <span id="restore-button-${message.id
+            }" style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;" onclick="restoreMessage('${message.id
+            }')">Restore</span>                                    <!-- Additional logic for seen and reply links -->
                                 </div>
                             </div>
                         </div>
@@ -3287,9 +3188,8 @@ function showReply(message_id, senderName, type) {
                 </a>
             </div>`;
     } else if (type === "Audio") {
-        var message_body = `<div class="audio-message audio-width  mb-2" style="background-color:${
-            message.user.id == user.id ? "#dcf8c6" : "white"
-        };" data-audio-src="${message.msg}">
+        var message_body = `<div class="audio-message audio-width  mb-2" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
+            };" data-audio-src="${message.msg}">
             <div class="avatar">
                 <!-- Avatar image here -->
             </div>
@@ -3427,9 +3327,8 @@ function moveMessage(messageId) {
         $("#input-area").hide();
         document.getElementById("messages").style.marginBottom = "0px";
 
-        document.getElementById("selected-count").textContent = `${
-            selectedMessageIds.length
-        } message${selectedMessageIds.length > 1 ? "s" : ""} selected`;
+        document.getElementById("selected-count").textContent = `${selectedMessageIds.length
+            } message${selectedMessageIds.length > 1 ? "s" : ""} selected`;
 
         document.getElementById("messages_ids").value =
             selectedMessageIds.join(",");
@@ -3766,19 +3665,38 @@ const fetchPaginatedMessages = async (
 
         const u_id = user.unique_id;
         // const ids = nextPageMessages.data.map(item => item.id);
+        console.log("messages", nextPageMessages.data);
+        // const ids = nextPageMessages.data
+        //     .filter(
+        //         (item) =>
+        //             item.sender !== user.unique_id &&
+        //             !item.seen_by.split(", ").includes(user.unique_id)
+        //     )
+        //     .map((item) => item.id);
+
 
         const ids = nextPageMessages.data
-            .filter(
-                (item) =>
-                    item.sender !== user.unique_id &&
-                    !item.seen_by.split(", ").includes(user.unique_id)
-            )
+            .filter((item) => {
+                // Split the seen_by string into an array, handling both single and multiple IDs
+                const seenByIds = item.seen_by.split(/,\s*/); // This will split by comma and optional space
+                return item.sender !== user.unique_id && !seenByIds.includes(user.unique_id);
+            })
             .map((item) => item.id);
+
+        // const Notseenby = nextPageMessages.data
+        //     .filter((item) => {
+        //         const seenBy = item.seen_by
+        //             ? item.seen_by.split(",").map((id) => id.trim())
+        //             : [];
+        //         return !seenBy.includes(u_id);
+        //     })
+        //     .map((item) => item.id);
+
 
         const Notseenby = nextPageMessages.data
             .filter((item) => {
                 const seenBy = item.seen_by
-                    ? item.seen_by.split(",").map((id) => id.trim())
+                    ? item.seen_by.split(/,\s*/).map((id) => id.trim())
                     : [];
                 return !seenBy.includes(u_id);
             })
@@ -4854,7 +4772,7 @@ $("#deleteModal .btn-delete").on("click", function () {
             //         group.group.group_messages.splice(messageIndex, 1);
             //     }
             // }
-            $("#deleteModal").on("hide.bs.modal", function () {});
+            $("#deleteModal").on("hide.bs.modal", function () { });
             $("#deleteModal").removeClass("show");
             $("body").removeClass("modal-open");
             $(".modal-backdrop").remove();
@@ -4969,10 +4887,10 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                             group.group_messages.reverse().forEach((msg) => {
                                 chat.unread +=
                                     msg.sender !== unique_id &&
-                                    !msg.seen_by
-                                        .split(",")
-                                        .map((s) => s.trim())
-                                        .includes(unique_id)
+                                        !msg.seen_by
+                                            .split(",")
+                                            .map((s) => s.trim())
+                                            .includes(unique_id)
                                         ? 1
                                         : 0;
                                 chat.time = new Date(msg.time * 1000);
@@ -5380,9 +5298,8 @@ function handleMessageResponse_old(
                         message.reply.type = getOldMessageType(message.reply);
                     messageTextElement.innerHTML = "";
                     if (message.reply.type === "Audio") {
-                        var message_body = `<div class="audio-message" style="background-color:${
-                            message.user.id == user.id ? "#dcf8c6" : "white"
-                        };" data-audio-src="${message.reply.msg}">
+                        var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
+                            };" data-audio-src="${message.reply.msg}">
                             <div class="avatar">
                                 <!-- Avatar image here -->
                             </div>
@@ -5405,15 +5322,13 @@ function handleMessageResponse_old(
                             </div>`;
 
                         newMessageDisplay = `
-                            <div class="reply-message-div"  onclick="scrollToMessage('${
-                                message.reply.id
+                            <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id
                             }','${message.id}')">
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                ${
-                                    message.user?.id == user?.id
-                                        ? message.user.name
-                                        : message.user.name
-                                }
+                                ${message.user?.id == user?.id
+                                ? message.user.name
+                                : message.user.name
+                            }
 
                                 </div>
                                 <div class="reply-details">
@@ -5421,14 +5336,14 @@ function handleMessageResponse_old(
                                 </div>
                             </div>
                         <div class="reply-message-area">${(
-                            message.msg || message.message
-                        )
-                            .replace(/\r\n/g, "<br>")
-                            .replace(/\n/g, "<br>")
-                            .replace(
-                                /<i[^>]+>/g,
-                                ""
-                            )}</div> <!-- Updated this line -->
+                                message.msg || message.message
+                            )
+                                .replace(/\r\n/g, "<br>")
+                                .replace(/\n/g, "<br>")
+                                .replace(
+                                    /<i[^>]+>/g,
+                                    ""
+                                )}</div> <!-- Updated this line -->
                         `;
 
                         const searchQuery = DOM.messageSearchQuery;
@@ -5448,24 +5363,22 @@ function handleMessageResponse_old(
                                 );
 
                             newMessageDisplay = `
-                            <div class="reply-message-div" onclick="scrollToMessage('${
-                                message.reply.id
-                            }','${message.id}')">
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
+                                }','${message.id}')">
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                    ${
-                                        message.user?.id == user?.id
-                                            ? message.user.name
-                                            : message.user.name
-                                    }
+                                    ${message.user?.id == user?.id
+                                    ? message.user.name
+                                    : message.user.name
+                                }
                                 </div>
                                 <div class="reply-details">
                                     <p class="file-name">${message_body}</p>
                                 </div>
                             </div>
                             <div class="reply-message-area">${highlightedText
-                                .replace(/\r\n/g, "<br>")
-                                .replace(/\n/g, "<br>")
-                                .replace(/<i[^>]+>/g, "")}</div>
+                                    .replace(/\r\n/g, "<br>")
+                                    .replace(/\n/g, "<br>")
+                                    .replace(/<i[^>]+>/g, "")}</div>
                         `;
                         }
 
@@ -5524,15 +5437,13 @@ function handleMessageResponse_old(
                     } else if (message.reply.type === "Image") {
                         var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
                         replyDisplay = `
-                            <div class="reply-message-div" onclick="scrollToMessage('${
-                                message.reply.id
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
                             }','${message.id}')"> <!-- Add onclick here -->
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                    ${
-                                        message.user?.id == user?.id
-                                            ? message.user.name
-                                            : message.user.name
-                                    }
+                                    ${message.user?.id == user?.id
+                                ? message.user.name
+                                : message.user.name
+                            }
                                 </div>
                                 <div class="reply-details">
                                     <p class="file-name">${message_body}</p>
@@ -5561,20 +5472,17 @@ function handleMessageResponse_old(
                         }
                     } else if (message.reply.type === "Message") {
                         replyDisplay = `
-                            <div class="reply-message-div" onclick="scrollToMessage('${
-                                message.reply.id
+                            <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
                             }','${message.id}')">
                                 <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                                    ${
-                                        message.user?.id == user?.id
-                                            ? message.user.name
-                                            : message.user.name
-                                    }
+                                    ${message.user?.id == user?.id
+                                ? message.user.name
+                                : message.user.name
+                            }
                                 </div>
                                 <div class="reply-details">
-                                    <p class="file-name">${
-                                        message.reply.msg
-                                    }</p>
+                                    <p class="file-name">${message.reply.msg
+                            }</p>
                                 </div>
                             </div>
                         `;
