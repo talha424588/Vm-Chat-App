@@ -332,6 +332,7 @@ class ChatService implements ChatRepository
         $message = GroupMessage::where('id', $messageId)->first();
         if ($message) {
             $message->msg = $messageContent;
+            // $message->compose_id = $request->compose_id;
             $message->status = EnumMessageEnum::CORRECTION;
             if ($message->save()) {
                 return response()->json(["status" => true, "message" => "Correction saved successfully", "message" => new MessageResource($message)]);

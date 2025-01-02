@@ -339,7 +339,6 @@ function getOldMessageMediaName1(message) {
     return mediaName;
 }
 function getOldMessageMediaName(message) {
-    console.log("old message  media name ", message);
     const linkTag = message.msg.match(/<a[^>]+>/g)[0];
     if (linkTag.match(/href="([^"]+)"/)) {
         fileLink = linkTag.match(/href="([^"]+)"/)[1];
@@ -2821,7 +2820,7 @@ function correction_send_handel() {
     const old_message = pagnicateChatList.data.find(
         (message) => message.id === parseInt(correction_message_id)
     );
-
+console.log("old_message",old_message);
     if (messageIndex !== -1) {
         pagnicateChatList.data[messageIndex].msg = messageContent;
     }
@@ -2840,6 +2839,8 @@ function correction_send_handel() {
                 .content,
             compose_id: old_message.compose_id,
         };
+
+        console.log("newMessage",newMessage);
 
         socket.emit("sendChatToServer", newMessage);
     }
@@ -3665,7 +3666,6 @@ const fetchPaginatedMessages = async (
 
         const u_id = user.unique_id;
         // const ids = nextPageMessages.data.map(item => item.id);
-        console.log("messages", nextPageMessages.data);
         // const ids = nextPageMessages.data
         //     .filter(
         //         (item) =>
@@ -4055,8 +4055,6 @@ let generateMessageArea = async (
     }
     DOM.groupId = elem.dataset.groupId ?? groupSearchMessage.id;
     DOM.showVoiceIcon = DOM.audio_permissions[DOM.groupId];
-    console.log(DOM.audio_permissions[DOM.groupId]);
-    console.log(DOM.showVoiceIcon);
     DOM.currentPage = 1;
     displayedMessageIds.clear();
     resetChatArea();
