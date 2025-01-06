@@ -4289,6 +4289,8 @@ let sendMessage = (type = "Message", mediaName = null) => {
                 };
                 console.log("msg", msg);
                 socket.emit("sendChatToServer", msg);
+                removeQuotedMessage();
+
             } else {
                 // Send original message to the backend to save in DB
                 let msg = {
@@ -4303,6 +4305,7 @@ let sendMessage = (type = "Message", mediaName = null) => {
                 };
 
                 socket.emit("sendChatToServer", msg);
+                removeQuotedMessage();
             }
             DOM.messageInput.value = "";
             DOM.replyId = null;
@@ -4323,6 +4326,7 @@ let sendMessage = (type = "Message", mediaName = null) => {
                 csrf_token: csrfToken,
             };
             socket.emit("sendChatToServer", msg);
+            removeQuotedMessage();
             DOM.messageInput.value = "";
             DOM.replyId = null;
         }
