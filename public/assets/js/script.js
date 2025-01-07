@@ -3535,50 +3535,6 @@ function moveSelectedMessagesToGroup(
             messagesToMove.forEach((oldMessage) => {
                 socket.emit("deleteMessage", oldMessage, true);
             });
-
-            // const newGroupIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
-
-            // if (newGroupIndex !== -1) {
-            //     data.messages.forEach(newMessage => {
-            //         const messageIndex = chatList[newGroupIndex].group.group_messages.findIndex(message => message.time > newMessage.time);
-            //         if (messageIndex === -1) {
-            //             chatList[newGroupIndex].group.group_messages.push(newMessage);
-            //         } else {
-            //             chatList[newGroupIndex].group.group_messages.splice(messageIndex, 0, newMessage);
-            //         }
-            //         chatList[newGroupIndex].msg = newMessage;
-            //         chatList[newGroupIndex].time = new Date(newMessage.time * 1000);
-
-            //         // Update the last message text
-            //         const senderName = newMessage.user.name;
-            //         let messageText = '';
-            //         if (newMessage.type === 'File') {
-            //             messageText = newMessage.media_name;
-            //         } else if (newMessage.type === 'Image') {
-            //             messageText = '[Image]';
-            //         } else if (newMessage.type === 'Audio') {
-            //             messageText = '[Audio]';
-            //         } else {
-            //             messageText = newMessage.msg;
-            //         }
-            //         chatList[newGroupIndex].lastMessage = `${senderName}: ${messageText}`;
-            //     });
-            // }
-
-            // chatList.sort((a, b) => {
-            //     if (a.time && b.time) {
-            //         return new Date(b.time) - new Date(a.time);
-            //     } else if (a.time) {
-            //         return -1;
-            //     } else if (b.time) {
-            //         return 1;
-            //     } else {
-            //         return 0;
-            //     }
-            // });
-
-            // const newIndex = chatList.findIndex(group => group.group.group_id === newGroupId);
-
             socket.emit(
                 "moveMessage",
                 moveMessageResponse,
