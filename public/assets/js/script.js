@@ -3542,10 +3542,6 @@ function moveSelectedMessagesToGroup(
                 DOM.groupId,
                 user.unique_id
             );
-
-            // const newGroupChatListItem = document.querySelector(`[data-group-id="${newGroupId}"]`);
-            // generateMessageArea(newGroupChatListItem, newIndex, false, null);
-            // viewChatList();
             cancelMoveMessage();
             document.querySelector(".close").click();
         })
