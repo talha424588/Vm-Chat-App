@@ -1192,7 +1192,6 @@ socket.on(
                 });
             }
         }
-        // generateChatList();
     }
 );
 
