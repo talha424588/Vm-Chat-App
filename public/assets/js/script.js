@@ -1216,7 +1216,6 @@ async function rerenderChatList(preGroupId) {
         } else {
             console.log("Message already exists in the group_messages array.");
         }
-        // prevGroup.group.group_messages.push(lastMessage)
     }
     chatList.sort((a, b) => {
         if (a.time && b.time) {
