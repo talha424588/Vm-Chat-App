@@ -1810,7 +1810,6 @@ let addMessageToMessageArea = (message, flag = false) => {
         !message.reply
     ) {
         let fileLink;
-        // if (/<a[^>]+>/g.test(message.msg)) {
         const linkTag = message.msg.match(/<a[^>]+>/g)[0];
         fileLink = linkTag.match(/href="([^"]+)"/)[1];
         const mediaName = fileLink.split("uploads/")[1];
@@ -1846,8 +1845,6 @@ let addMessageToMessageArea = (message, flag = false) => {
         }
     } else if (message.type === "document") {
         let fileLink;
-        // if (/<a[^>]+>/g.test(message.msg)) {
-
         const linkTag = message.msg.match(/<a[^>]+>/g)[0];
         fileLink = linkTag.match(/href="([^"]+)"/)[1];
         const mediaName = fileLink.split("uploads/")[1];
@@ -2003,7 +2000,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             if (message.reply.type === "Message") {
                 var message_new = `<img src="${message.message ?? message.msg
-                }" class="view-image" style="height:222px; width:100%;">`;
+                    }" class="view-image" style="height:222px; width:100%;">`;
                 messageContent = `
                 ${message_body}
                 <div class="reply-message-area">${message_new}</div>
@@ -3342,8 +3339,12 @@ const sendMessageReply = () => {
 
 let selectedMessageIds = [];
 let selectedMessages = [];
+let allSelectedMessages = [];
+let selectedMessagesSet = new Set();
+
 
 function moveMessage(messageId) {
+    console.log("paginated ChatList", pagnicateChatList.data);
     var replyDiv = document.getElementById("reply-div");
     if (replyDiv && window.getComputedStyle(replyDiv).display === "block") {
         return;
@@ -3370,16 +3371,61 @@ function moveMessage(messageId) {
         $("#input-area").hide();
         document.getElementById("messages").style.marginBottom = "0px";
 
-        document.getElementById("selected-count").textContent = `${selectedMessageIds.length
-            } message${selectedMessageIds.length > 1 ? "s" : ""} selected`;
 
         document.getElementById("messages_ids").value =
             selectedMessageIds.join(",");
         selectedMessages = selectedMessageIds.map((id) =>
             pagnicateChatList.data.find((msg) => msg.id === id)
         );
+
+        pagnicateChatList.data.forEach(msg => {
+            selectedMessages.forEach(eachSelectedMessages => {
+                if (msg.reply !== null && eachSelectedMessages.id == msg.reply.id) {
+                    selectedMessagesSet.add(msg);
+                    highlightSelectedMessage(msg.id)
+                    selectChildMessages(msg);
+                }
+            });
+        });
+        allSelectedMessages = [...selectedMessages, [...selectedMessagesSet]];
+        document.getElementById("selected-count").textContent = `${allSelectedMessages.length - 1 + selectedMessagesSet.size
+            } message${allSelectedMessages.length - 1 + selectedMessagesSet.size > 1 ? "s" : ""} selected`;
+
     } else {
         console.error(`Message with ID: ${messageId} not found.`);
+    }
+}
+
+function selectChildMessages(message) {
+    pagnicateChatList.data.forEach(msg => {
+        if (msg.reply !== null && message.id == msg.reply.id) {
+            selectedMessagesSet.add(msg);
+            highlightSelectedMessage(msg.id)
+        }
+    });
+}
+
+function highlightSelectedMessage(id) {
+    const messageElement = document.querySelector(
+        `[data-message-id='${id}']`
+    );
+
+    if (messageElement) {
+        const parentDiv = messageElement.closest(".ml-3");
+        if (parentDiv) {
+            if (!parentDiv.classList.contains("selected-message")) {
+                parentDiv.classList.add("selected-message");
+            }
+        }
+        // if (parentDiv) {
+        //     parentDiv.classList.toggle("selected-message");
+        // }
+        else {
+            // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
+        }
+    }
+    else {
+        console.error(`Message with ID: ${msg.id} not found.`);
     }
 }
 
@@ -3388,7 +3434,7 @@ function moveSelectedMessagesToGroup(
     groupToMove,
     messagesToMove
 ) {
-    const selectedMessages = moveMessageIds.map((id) => {
+    const allSelectedMessages = moveMessageIds.map((id) => {
         return {
             id: id,
             groupId: DOM.groupId,
@@ -3405,7 +3451,7 @@ function moveSelectedMessagesToGroup(
             "X-CSRF-TOKEN": csrfToken,
         },
         body: JSON.stringify({
-            messages: selectedMessages,
+            messages: allSelectedMessages,
             newGroupId: newGroupId,
             messageList: messagesToMove,
         }),
@@ -3484,6 +3530,7 @@ function cancelMoveMessage() {
     document.getElementById("selected-count").textContent =
         "Selected Messages: 0";
     selectedMessageIds = [];
+    selectedMessagesSet.clear();
 }
 
 document
@@ -3514,7 +3561,7 @@ $(document).ready(function () {
         moveSelectedMessagesToGroup(
             messageIdArray,
             groupToMove,
-            selectedMessages
+            allSelectedMessages
         );
         document.getElementById("messages_ids").value = "";
         document.getElementById("group_to_move_message").value = "";
