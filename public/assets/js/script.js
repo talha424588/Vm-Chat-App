@@ -4982,7 +4982,7 @@ async function unreadGrouChat() {
 }
 
 function replaceBrWithNewline(value) {
-    return value.replace(/<br\s*\/?>/gi, "\n"); // Replaces all <br> tags with \n
+    return value.replace(/<br\s*\/?>/gi, "\n");
 }
 
 let searchMessageOffset = 0;
