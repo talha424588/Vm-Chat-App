@@ -193,6 +193,7 @@ class ChatController extends Controller
             $moveMessageClone->compose_id = isset($moveMessageClone['compose_id']) ?? null;
             $message['compose_id'] ? $moveMessageClone->compose_id = $message['compose_id'] : '';
             if ($moveMessageClone->save()) {
+
                 $moveMessageClone->user = User::where("unique_id", $message['user']['unique_id'])->first();
                 DB::table('group_messages')
                     ->where('id', $message['id'])
