@@ -4854,13 +4854,6 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         currentPageGroups++;
         currentPageMessages++;
     }
-
-    // else {
-    //     currentPageGroups = 1;
-    //     currentPageMessages = 1;
-    //     DOM.chatList.innerHTML = `<div class="heading"><h2>Groups</h2></div>`;
-    //     DOM.chatList2.innerHTML = `<h2>Messages</h2>`;
-    // }
     else {
         currentPageGroups = 1;
         currentPageMessages = 1;
