@@ -4811,38 +4811,11 @@ $("#deleteModal .btn-delete").on("click", function () {
         .then(function (message) {
             $("#btn-close").trigger("click");
             const groupId = DOM.groupId;
-            // const group = chatList.find(group => group.group.group_id === groupId);
-            // if (group) {
-            //     const messageIndex = group.group.group_messages.findIndex(message => message.id === messageId);
-            //     if (messageIndex !== -1) {
-            //         group.group.group_messages.splice(messageIndex, 1);
-            //     }
-            // }
+
             $("#deleteModal").on("hide.bs.modal", function () { });
             $("#deleteModal").removeClass("show");
             $("body").removeClass("modal-open");
             $(".modal-backdrop").remove();
-            // let paginateArrayLastMessage = pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
-
-            // messageElement.remove();
-            // messageElement.parent().parent().removeClass("msg_deleted");
-            // messageElement.parent().parent().addClass("msg_deleted");
-            // let deletedMessage = findMessageById(messageId);
-            // const deletedMessage = findMessageById(messageId);
-            //     if (pagnicateChatList.data.length > 0) {
-            //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
-            //         if (currentUsergroup) {
-            //             currentUsergroup.group.group_messages.push(paginateArrayLastMessage);
-            //             viewChatList();
-            //         }
-            //     }
-            //     else {
-            //         let currentUsergroup = chatList.find(group => group.group.group_id === deletedMessage.group_id);
-            //         if (currentUsergroup) {
-            //             currentUsergroup.group.group_messages.push(message);
-            //             viewChatList();
-            //         }
-            //     }
 
             socket.emit("deleteMessage", message.data, false);
         })
