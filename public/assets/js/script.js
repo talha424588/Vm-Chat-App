@@ -4395,6 +4395,10 @@ let init = () => {
 
 init();
 
+setInterval(async() =>
+{
+    await generateChatList();
+},120000);
 var OneSignal = window.OneSignal || [];
 
 OneSignal.push(function () {
