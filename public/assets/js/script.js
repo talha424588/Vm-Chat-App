@@ -4934,18 +4934,6 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         DOM.groupSearch = false;
         buttons.style.display = "block";
         removeSearchedHighlights();
-        // chatList = [...previousChatList];
-        // chatList.sort((a, b) => {
-        //     if (a.time && b.time) {
-        //         return new Date(b.time) - new Date(a.time);
-        //     } else if (a.time) {
-        //         return -1;
-        //     } else if (b.time) {
-        //         return 1;
-        //     } else {
-        //         return 0;
-        //     }
-        // });
         messageList = [];
         DOM.messagesList.innerHTML = "";
         DOM.chatList.style.display = "block";
