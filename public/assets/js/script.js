@@ -4926,10 +4926,6 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     });
                     viewMessageList();
                 }
-
-                // if (loadMore && !groups && messages == undefined) {
-                //     DOM.chatList2.innerHTML += `<div class="no-messages-found">No more data found.</div>`;
-                // }
             }
         } catch (error) {
             // console.log(error);
