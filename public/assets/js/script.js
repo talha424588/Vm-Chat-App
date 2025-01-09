@@ -4916,7 +4916,6 @@ let searchGroups = async (searchQuery, loadMore = false) => {
 
                 if (messages == undefined) {
                     if (!loadMore) {
-                        // DOM.chatList2.innerHTML = `<div class="no-messages-found">No messages found.</div>`;
                         document.getElementById("messagesList").innerHTML =
                             '<div class="no-messages-found">No messages found.</div>';
                         return;
