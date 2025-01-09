@@ -171,13 +171,22 @@ class ChatController extends Controller
 
     public function moveMessages(Request $request)
     {
-        $messages = $request->input('messages');
         $newGroupId = $request->input('newGroupId');
         $messages = $request->input('messageList');
+        $moveMessageConvMsg = [];
         $moveMessages = [];
-
+        $mainMessages = [];
         foreach ($messages as $message) {
+            if (is_array($message) && isset($message[0])) {
+                foreach ($message as $nestedMessage) {
+                    $moveMessageConvMsg[] = $nestedMessage;
+                }
+            } else {
+                $mainMessages[] = $message;
+            }
+        }
 
+        foreach ($mainMessages as $message) {
             $moveMessageClone = new GroupMessage;
             $moveMessageClone->msg = $message["msg"];
             $moveMessageClone->sender = $message['user']['unique_id'];
@@ -202,7 +211,18 @@ class ChatController extends Controller
                 $moveMessages[] = $moveMessageClone;
             }
         }
+        $this->deleteMoveMessageConvo($moveMessageConvMsg);
+
         return response()->json(['status' => true, "message" => "success", "messages" => $moveMessages], 200);
+    }
+
+    private function deleteMoveMessageConvo($moveMessageConvMsg)
+    {
+        $ids = array_map(function ($message) {
+            return (string)$message["id"];
+        }, $moveMessageConvMsg);
+
+        DB::table('group_messages')->whereIn("id",$ids)->delete();
     }
 
     public function viewDocument(Request $request)
