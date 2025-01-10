@@ -189,7 +189,6 @@ let viewChatList = (flag = false) => {
             }
         })
         .forEach((elem, index) => {
-            // let statusClass = elem.msg && elem.msg.status < 2 ? "far" : "fas";
             let unreadClass = elem.unread ? "unread" : "";
             if (elem.isGroup) {
                 let latestMessage = null;
