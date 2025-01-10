@@ -2329,24 +2329,28 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     `
                     : ""
                 }
-                                    <!---
-                                    ${user.role === "0" || user.role === "2"
-                    ? `
-                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-                                    `
-                    : ""
-                }---->
-                                    ${message.is_compose !== 1 &&
-                    message.is_compose !== true &&
-                    (user.role === "0" || user.role === "2")
+
+                ${message.is_compose == 1 &&
+                    message.is_compose == true &&
+                    (user.role === "0")
                     ? `
                                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     `
                     : ""
                 }
-                                    ${message.is_compose !== 1 &&
+
+
+                    ${message.is_compose == 1 &&
+                    message.is_compose == true &&
+                    (user.role === "2")
+                    ? `
+                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Request (Delete)</a>
+                                    `
+                    : ""
+                }
+                    ${message.is_compose !== 1 &&
                     message.is_compose !== true &&
-                    user.role === "3" &&
+                    (user.role === "3" || user.role === "2") &&
                     message.sender === user.unique_id
                     ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
@@ -2361,7 +2365,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
 
 
-                            ${user.role != "1" &&
+                ${user.role != "1" &&
                 user.role != "3" &&
                 message.sender != user.unique_id &&
                 !(
@@ -2437,20 +2441,26 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     `
                     : ""
                 }
-                                    ${message.is_compose !== 1 &&
-                    message.is_compose !== true
+                    ${user.role == 0
                     ? `
                                                 <a class="dropdown-item" href="#" onclick="delMessage(${message.id})">Delete</a>
                                     `
                     : ""
                 }
-                                    ${user.role === "3" &&
+
+                    ${message.is_compose == 1 &&
+                    message.is_compose == true && user.role == 2
+                    ? `
+                                                <a class="dropdown-item" href="#" onclick="delMessage(${message.id})">Request (Delete)</a>
+                    `
+                    : user.role === "2" ||
                     message.sender === user.unique_id
                     ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     `
                     : ""
                 }
+
                                 </div>
                                 </div>
                             `
