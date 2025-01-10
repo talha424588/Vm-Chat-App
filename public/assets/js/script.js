@@ -2301,28 +2301,32 @@ let addMessageToMessageArea = (message, flag = false) => {
                     : ""
                 }
                                     ${user.role === "0" || user.role === "2"
-                    ? `
-                                        ${message.type === "Message"
-                        ? `
-                                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-                                        `
+                    ?
+                    `
+                        ${message.type === "Message"
+                        ?
+                        `
+                            <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                        `
                         : ""
                     }
                                     ${message.type === "Message" &&
                         message.status !== "Correction" &&
                         (message.is_compose === 1 ||
                             message.is_compose === true)
-                        ? `
-                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-                                    `
+                        ?
+                        `
+                        <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+                        `
                         : ""
                     }
                                     ${message.is_compose === 1 &&
                         message.type === "Message" &&
                         !message.reply
-                        ? `
+                        ?
+                        `
                                     <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-                                    `
+                        `
                         : ""
                     }
                                     `
@@ -2332,9 +2336,10 @@ let addMessageToMessageArea = (message, flag = false) => {
                 ${message.is_compose == 1 &&
                     message.is_compose == true &&
                     (user.role === "0")
-                    ? `
-                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                                    `
+                    ?
+                    `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                    `
                     : ""
                 }
 
@@ -2342,22 +2347,24 @@ let addMessageToMessageArea = (message, flag = false) => {
                     ${message.is_compose == 1 &&
                     message.is_compose == true &&
                     (user.role === "2")
-                    ? `
-                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Request (Delete)</a>
-                                    `
+                    ?
+                    `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Request (Delete)</a>
+                    `
                     : ""
                 }
                     ${message.is_compose !== 1 &&
                     message.is_compose !== true &&
                     (user.role === "3" || user.role === "2") &&
                     message.sender === user.unique_id
-                    ? `
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                                    `
+                    ?
+                    `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                        `
                     : ""
                 }
-                                </div>
-                                </div>
+                        </div>
+                    </div>
                             `
                 : ``
             }
@@ -2453,11 +2460,11 @@ let addMessageToMessageArea = (message, flag = false) => {
                                                 <a class="dropdown-item" href="#" onclick="delMessage(${message.id})">Request (Delete)</a>
                     `
                     : user.role === "2" ||
-                    message.sender === user.unique_id
-                    ? `
+                        message.sender === user.unique_id
+                        ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     `
-                    : ""
+                        : ""
                 }
 
                                 </div>
@@ -4404,10 +4411,9 @@ let init = () => {
 
 init();
 
-setInterval(async() =>
-{
+setInterval(async () => {
     await generateChatList();
-},120000);
+}, 120000);
 var OneSignal = window.OneSignal || [];
 
 OneSignal.push(function () {
