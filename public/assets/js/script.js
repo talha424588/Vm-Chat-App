@@ -1554,7 +1554,6 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
         $('[data-message-id="' + incomingMessage.message.id + '"]').removeClass("deleted_niddle");
         messageElement.find(".additional_style").removeClass("msg_deleted");
 
-        // addMessageToMessageArea(incomingMessage.message, false);
     } else {
         // Always append the dropdown for all users (including the restoring user)
         mainDiv.removeClass("deleted_niddle");
