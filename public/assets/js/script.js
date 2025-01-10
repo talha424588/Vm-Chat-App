@@ -2338,7 +2338,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                     (user.role === "0")
                     ?
                     `
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}" data-is-perm-delete = "${0}">Delete</a>
                     `
                     : ""
                 }
@@ -2349,7 +2349,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                     (user.role === "2")
                     ?
                     `
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Request (Delete)</a>
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}" data-is-perm-delete = "${1}">Request (Delete)</a>
                     `
                     : ""
                 }
@@ -2449,15 +2449,15 @@ let addMessageToMessageArea = (message, flag = false) => {
                 }
                     ${user.role == 0
                     ? `
-                                                <a class="dropdown-item" href="#" onclick="delMessage(${message.id})">Delete</a>
-                                    `
+                        <a class="dropdown-item" href="#" onclick="delMessage(this,${message.id})" data-is-perm-delete = "${0}">Delete</a>
+                        `
                     : ""
                 }
 
                     ${message.is_compose == 1 &&
                     message.is_compose == true && user.role == 2
                     ? `
-                                                <a class="dropdown-item" href="#" onclick="delMessage(${message.id})">Request (Delete)</a>
+                        <a class="dropdown-item" href="#" onclick="delMessage(this,${message.id})" data-is-perm-delete = "${1}">Request (Delete)</a>
                     `
                     : user.role === "2" ||
                         message.sender === user.unique_id
@@ -2588,9 +2588,13 @@ let addMessageToMessageArea = (message, flag = false) => {
     ImageViewer(DOM.messages);
 };
 
-function delMessage(id) {
+function delMessage(element, id) {
     const deleteModal = $("#deleteModal");
     deleteModal.find(".btn-delete").data("message-id", id);
+    deleteModal.find(".btn-delete").data("is-perm-delete", element);
+
+    let flagStatus = $(element).data("is-perm-delete");
+    $("#deleteModal").find(".btn-delete").data("is-perm-delete", flagStatus);
     deleteModal.modal("show");
 }
 $(document).on("click", "#btn-close", function () {
@@ -4799,7 +4803,9 @@ textarea.addEventListener("keydown", function (event) {
 $("#deleteModal").on("show.bs.modal", function (event) {
     var button = $(event.relatedTarget);
     var messageId = button.data("message-id");
+    let messageFlag = button.data("is-perm-delete");
     $(this).find(".btn-delete").data("message-id", messageId);
+    $(this).find(".btn-delete").data("is-perm-delete", messageFlag);
 });
 
 $("#deleteModal .btn-delete").on("click", function () {
@@ -4808,13 +4814,28 @@ $("#deleteModal .btn-delete").on("click", function () {
         ".ml-3"
     );
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    const body = {
+        message_id: messageId,
+    }
+    let messageFlag = "";
+    if ($(this).data("is-perm-delete")) {
+        messageFlag = $(this).data("is-perm-delete");
+    }
+    else {
+        messageFlag = $(this).data("is-perm-delete");
+    }
+    console.log("Deleting message ID:", messageId, "with flag status:", messageFlag);
+    if (messageFlag !== null || messageFlag !== undefined) {
+        body.is_perm_delete = messageFlag;
+    }
 
-    fetch("message/delete/" + messageId, {
+    fetch("message/delete/", {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
             "X-CSRF-Token": csrfToken,
         },
+        body: JSON.stringify(body)
     })
         .then(function (response) {
             if (response.ok) {

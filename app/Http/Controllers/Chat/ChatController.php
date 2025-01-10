@@ -241,8 +241,10 @@ class ChatController extends Controller
     {
         return $this->chatRepository->openChatGroup($request, $group_id);
     }
-    public function messageisDeleteStatusCheck($id)
+    public function messageisDeleteStatusCheck(Request $request)
     {
-        return $this->chatRepository->messageDeleteStatusCheck($id);
+        return $request;
+        exit();
+        return $this->chatRepository->messageDeleteStatusCheck($request);
     }
 }

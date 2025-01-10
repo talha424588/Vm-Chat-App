@@ -16,5 +16,5 @@ interface ChatRepository
     public function messageCorrection($request);
     public function restoreDeletedMessage($id);
     public function openChatGroup($request,$groupId);
-    public function messageDeleteStatusCheck($id);
+    public function messageDeleteStatusCheck($request);
 }
