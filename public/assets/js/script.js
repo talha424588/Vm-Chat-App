@@ -149,8 +149,6 @@ let populateGroupList = async () => {
                     chat.msg = msg;
                     chat.time = new Date(msg.time * 1000);
 
-                    // const seenBy = msg.seen_by ? msg.seen_by.split(",").map(s => s.trim()) : [];
-                    // chat.unread += (msg.sender !== unique_id && !seenBy.includes(unique_id)) ? 1 : 0;
                     chat.unread += group.unread_count;
                 });
             }
