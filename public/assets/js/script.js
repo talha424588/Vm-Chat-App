@@ -249,8 +249,7 @@ let viewChatList = (flag = false) => {
                     elem.group.group_messages.length > 0 &&
                     latestMessage != null
                 ) {
-                    let messageText = latestMessage.text || ""; // Default to an empty string if text is undefined
-
+                    let messageText = latestMessage.text || "";
                     if (latestMessage.status === "Correction") {
                         messageText = removeTags(messageText);
                     } else {
@@ -358,12 +357,10 @@ function getOldMessageType1(message) {
     return mediaType;
 }
 function getOldMessageType(message) {
-    // Check if the message contains an audio tag
     if (/<audio[^>]+>/g.test(message.msg)) {
         return "Audio";
     }
 
-    // Check if the message contains a link tag
     const linkTags = message.msg.match(/<a[^>]+>/g);
     if (linkTags && linkTags.length > 0) {
         const linkTag = linkTags[0];
@@ -377,14 +374,12 @@ function getOldMessageType(message) {
         return mediaType;
     }
 
-    // Check for simple HTML tags (like <p>, <h2>, etc.)
     if (/<(p|h[1-6])[^>]*>.*?<\/(p|h[1-6])>/g.test(message.msg)) {
-        return "Text"; // or any other type you want to return for simple HTML tags
+        return "Text";
     }
     if (/[\s\n]+/.test(message.msg) && !/<[^>]+>/.test(message.msg)) {
-        return "Message"; // or any other type you want to return for messages with spaces and newlines
+        return "Message";
     }
-    // If none of the above conditions are met, return a default type
     return "Unknown";
 }
 function removeTags(messageText) {
