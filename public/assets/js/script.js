@@ -4814,8 +4814,9 @@ $("#deleteModal .btn-delete").on("click", function () {
         ".ml-3"
     );
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    let message = pagnicateChatList.data.find((message)=>message.id = messageId);
     const body = {
-        message_id: messageId,
+        message: message,
     }
     let messageFlag = "";
     if ($(this).data("is-perm-delete")) {
@@ -4824,10 +4825,11 @@ $("#deleteModal .btn-delete").on("click", function () {
     else {
         messageFlag = $(this).data("is-perm-delete");
     }
-    console.log("Deleting message ID:", messageId, "with flag status:", messageFlag);
     if (messageFlag !== null || messageFlag !== undefined) {
         body.is_perm_delete = messageFlag;
     }
+
+    console.log("delete message",message);
 
     fetch("message/delete/", {
         method: "DELETE",

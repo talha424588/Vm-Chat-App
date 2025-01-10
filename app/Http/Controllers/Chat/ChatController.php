@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Chat;
 
 use App\Enum\MessageEnum as EnumMessageEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\MailController;
 use App\Jobs\SendNotificationJob;
 use App\Models\GroupMessage;
 use App\Models\User;
@@ -11,12 +12,17 @@ use App\Repositories\ChatRepository;
 use App\Services\FirebaseService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 class ChatController extends Controller
 {
-    public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService) {}
+    protected MailController $mailController; // Declare the property
+
+    public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService, MailController $mailController) {
+        $this->mailController = $mailController;
+    }
 
     public function index(Request $request)
     {
@@ -109,33 +115,44 @@ class ChatController extends Controller
         }
     }
 
-    public function delete($id)
+    public function delete(Request $request)
     {
-        try {
-            $message = GroupMessage::with("user")->findOrFail($id);
-            $message->is_deleted = true;
-            if ($message->save()) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Message deleted successfully',
-                    'data' => $message
-                ], 200);
-            } else {
+        if (isset($request->is_perm_delete) && $request->is_perm_delete == 1 && Auth::user()->role==2) {
+
+            $this->mailController->RequestMessageDelete(Auth::user(),$request);
+            return response()->json([
+                'status' => true,
+                'message' => 'delete message request send successfully',
+            ], 200);
+        }
+        else
+        {
+            try {
+                $message = GroupMessage::with("user")->findOrFail($request->message->id);
+                $message->is_deleted = true;
+                if ($message->save()) {
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Message deleted successfully',
+                        'data' => $message
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Message deletion failed'
+                    ], 400);
+                }
+            } catch (ModelNotFoundException $e) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Message deletion failed'
-                ], 400);
+                    'message' => 'Message not found'
+                ], 404);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'An error occurred while deleting the message'
+                ], 500);
             }
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Message not found'
-            ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'An error occurred while deleting the message'
-            ], 500);
         }
     }
 
@@ -241,10 +258,8 @@ class ChatController extends Controller
     {
         return $this->chatRepository->openChatGroup($request, $group_id);
     }
-    public function messageisDeleteStatusCheck(Request $request)
+    public function messageisDeleteStatusCheck($id)
     {
-        return $request;
-        exit();
-        return $this->chatRepository->messageDeleteStatusCheck($request);
+        return $this->chatRepository->messageDeleteStatusCheck($id);
     }
 }

@@ -25,11 +25,11 @@ Auth::routes();
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
-Route::get('/forgot-password', function () {
-    return view('forgotPassword');
-})->middleware('guest')->name('password.request');
+// Route::get('/forgot-password', function () {
+//     return view('forgotPassword');
+// })->middleware('guest')->name('password.request');
 
-Route::get('/reset-password/', [AuthController::class, 'resetPassword'])->middleware('guest')->name('password.reset');
+// Route::get('/reset-password/', [AuthController::class, 'resetPassword'])->middleware('guest')->name('password.reset');
 
 Route::get('/', [ChatController::class, 'index'])->name('chat')->middleware('auth');
 
@@ -61,7 +61,7 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::get('/messages', [ChatController::class, 'index']);
     Route::get('auth/token/verify', [AuthController::class, 'verifyToken']);
 
-    Route::delete('/message/delete/{id}', [ChatController::class, 'delete']);
+    Route::delete('/message/delete/', [ChatController::class, 'delete']);
     Route::post('/message/seen-by/update', [ChatController::class, 'updateMessageReadStatus']);
     Route::get('/message/seen-by/{id}', [ChatController::class, 'getMessageReadStatus']);
     Route::get('message/search/{query}/{groupId}/{offset}/{limit}', [ChatController::class, 'searchMessage']);

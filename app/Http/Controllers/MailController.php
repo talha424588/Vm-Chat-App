@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\AlertEmail;
+use App\Mail\MessageDeleteRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -16,5 +17,10 @@ class MailController extends Controller
 
         Mail::to($devEmail)->bcc($bccEmail)->send(new AlertEmail($subject, $request->reason, $request->name, $request->email, $request->message));
         return response()->json(['message' => 'Email sent successfully']);
+    }
+
+    public function RequestMessageDelete($user, $request)
+    {
+        Mail::to("tal424588@gmail.com")->send(new MessageDeleteRequest($user,$request));
     }
 }

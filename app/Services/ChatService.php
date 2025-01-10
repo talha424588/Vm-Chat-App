@@ -291,9 +291,8 @@ class ChatService implements ChatRepository
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
     }
 
-    public function messageDeleteStatusCheck($request)
+    public function messageDeleteStatusCheck($id)
     {
-        return $request;
         $message = GroupMessage::with('reply')->where('id', $id)
             ->first();
         if ($message)
