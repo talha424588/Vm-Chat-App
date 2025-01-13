@@ -6,7 +6,7 @@ html,body {
 .bg-white {
 	background-color: #ffffff !important;
   }
-  
+
   .shadow-bottom {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
@@ -15,7 +15,7 @@ html,body {
 	font-size: 28px;
 	font-weight: bold;
 	line-height: auto;
-	
+
 
 }
 .btn-contactus{
@@ -48,7 +48,7 @@ html,body {
 			margin-left:45px;
 		}
   .btn-contactus {
-	
+
     margin-right: 45px;
   }
 }
@@ -76,7 +76,7 @@ html,body {
 	font-size: 14px;
 	font-weight: 400;
 	font-family: 'Open Sans', sans-serif;
-	
+
 }
 .eye-div{
 	position: relative;
@@ -110,18 +110,18 @@ html,body {
 
 
 .login-form-control:-webkit-autofill:focus {
-    background-color: transparent !important; 
+    background-color: transparent !important;
 }
 .login-form-control:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 30px white inset !important;
     box-shadow: 0 0 0 30px white inset !important;
-    transition: background-color 9999s ease-in-out 0s; 
+    transition: background-color 9999s ease-in-out 0s;
 }
 
 
 .loginbutton {
 	background-color: #1DAB61;
-	color: black;
+	color: white;
 	font-size: 16px;
 	font-weight: 400;
 	border-radius: 12px;
@@ -167,7 +167,7 @@ body.my-login-page {
 /* .my-login-page .card {
     border-color: transparent;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    margin: 99px auto; 
+    margin: 99px auto;
 } */
 
 .my-login-page .card.fat {
@@ -175,7 +175,7 @@ body.my-login-page {
 }
 
 .my-login-page .card .card-title {
-	
+
 	font-size: 28px;
 	font-weight: 600;
 	font-family: 'Open Sans', sans-serif;

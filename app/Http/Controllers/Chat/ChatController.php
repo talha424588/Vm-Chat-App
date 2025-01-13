@@ -21,6 +21,7 @@ class ChatController extends Controller
     protected MailController $mailController; // Declare the property
 
     public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService, MailController $mailController)
+
     {
         $this->mailController = $mailController;
     }
@@ -116,34 +117,75 @@ class ChatController extends Controller
         }
     }
 
-    public function delete($id)
+    public function delete(Request $request)
     {
-        try {
-            $message = GroupMessage::with("user")->findOrFail($id);
-            $message->is_deleted = true;
-            if ($message->save()) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Message deleted successfully',
-                    'data' => $message
-                ], 200);
-            } else {
+        if (isset($request->is_perm_delete) && $request->is_perm_delete == 1 && Auth::user()->role == 2) {
+            $this->mailController->RequestMessageDelete(Auth::user(), $request);
+            $message = $this->fetchMessage($request->message['id']);
+            return response()->json([
+                'status' => true,
+                'message' => 'delete message request send successfully',
+                'data' => $message,
+            ], 200);
+        } else {
+            try {
+                $message = $this->fetchMessage($request->message['id']);
+                if (isset($request->is_perm_delete) && $request->is_perm_delete == 0 && Auth::user()->role == 0) {
+                    if ($message->delete()) {
+                        // if (Auth::user()->role == 0 || Auth::user()->role == 2) {
+                        //     $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $message->group_id)->orderBy("id", "Desc")->first();
+                        // } else {
+                        //     $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $message->group_id)->where('is_deleted', 0)->orderBy("id", "Desc")->first();
+                        // }
+                        $data = [
+                            "message" => $message,
+                            "deleteFlag" => true
+                        ];
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Message deleted successfully',
+                            'data' => $data
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Message deletion failed'
+                        ], 400);
+                    }
+                } else {
+                    $message->is_deleted = true;
+                    if ($message->save()) {
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Message deleted successfully',
+                            'data' => $message
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Message deletion failed'
+                        ], 400);
+                    }
+                }
+            } catch (ModelNotFoundException $e) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Message deletion failed'
-                ], 400);
+                    'message' => 'Message not found'
+                ], 404);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'An error occurred while deleting the message'
+                ], 500);
             }
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Message not found'
-            ], 404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'An error occurred while deleting the message'
-            ], 500);
         }
+    }
+
+    private function fetchMessage($id)
+    {
+
+        $message = GroupMessage::with("user")->findOrFail($id);
+        return $message;
     }
 
     public function getMessageReadStatus($messageId)
@@ -229,7 +271,7 @@ class ChatController extends Controller
             return (string)$message["id"];
         }, $moveMessageConvMsg);
 
-        DB::table('group_messages')->whereIn("id", $ids)->delete();
+        DB::table('group_messages')->whereIn("id",  $ids)->delete();
     }
 
     public function viewDocument(Request $request)

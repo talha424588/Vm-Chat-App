@@ -61,7 +61,6 @@ const DOM = {
     NormalLoading: true,
     showVoiceIcon: null,
     audio_permissions: {},
-    // groupSearchCounter: 0,
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
     const search_div = getById("serach_div");
@@ -562,7 +561,15 @@ function makeformatDate(dateString) {
 }
 
 socket.on("deleteMessage", (message, isMove) => {
-    let deleteMessage = message;
+    console.log("message details", message);
+    let deleteMessage = null
+    if ('deleteFlag' in message) {
+        deleteMessage = message.message;
+    }
+    else {
+        deleteMessage = message;
+    }
+    console.log("delete mesage", deleteMessage);
     if (isMove == true) {
         var messageElement = $(
             '[data-message-id="' + deleteMessage.id + '"]'
@@ -571,9 +578,17 @@ socket.on("deleteMessage", (message, isMove) => {
             messageElement.remove();
         }
     } else {
+        console.log("else part");
         var messageElement = $(
             '[data-message-id="' + deleteMessage.id + '"]'
         ).closest(".ml-3");
+        console.log("delete mesage element", deleteMessage);
+
+        if ('deleteFlag' in message) {
+            console.log("inside if if part");
+
+            messageElement.addClass("hidden-message");
+        }
         if (user.role != 0 && user.role != 2) {
             console.log("non admin users");
 
@@ -602,7 +617,8 @@ socket.on("deleteMessage", (message, isMove) => {
                 }
                 viewChatList();
             }
-        } else {
+        }
+        else {
             var replyLink = messageElement.find("#reply-link");
             messageElement.find(".dropdown").remove();
             if (replyLink.length) {
@@ -613,7 +629,6 @@ socket.on("deleteMessage", (message, isMove) => {
             }
             // const message = findMessageById(message.id);
             // const message = getPaginatedArrayLastMessage(deleteMessage.id);
-            console.log("deleted message");
             // updateChatList(deleteMessage)
             rerenderChatList(deleteMessage.group_id);
         }
@@ -829,9 +844,14 @@ socket.on("updateGroupMessages", (message) => {
         }
     } else {
         const group = chatList.find((group) => {
-            return group.group.group_messages.find(
-                (message) => message.id === deleteMessage.id
-            );
+            if (group) {
+                if (group.group && group.group.group_messages) {
+                    return group.group.group_messages.find(
+                        (message) => message.id === deleteMessage.id
+                    );
+                }
+            }
+
         });
         if (group) {
             const messageIndex = group.group.group_messages.findIndex(
@@ -2320,11 +2340,12 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     `
                     : ""
                 }
-                                    <!---
-                                    ${user.role === "0" || user.role === "2"
-                    ? `
-                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-                                    `
+
+                ${user.role == 0
+                    ?
+                    `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}" data-is-perm-delete = "${0}">Delete</a>
+                    `
                     : ""
                 }---->
                                     ${message.is_compose !== 1 &&
@@ -4790,22 +4811,23 @@ $("#deleteModal .btn-delete").on("click", function () {
         ".ml-3"
     );
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    // let message = pagnicateChatList.data.find((message)=>message.id = messageId);
-    // const body = {
-    //     message: message,
-    // }
-    // let messageFlag = "";
-    // if ($(this).data("is-perm-delete")) {
-    //     messageFlag = $(this).data("is-perm-delete");
-    // }
-    // else {
-    //     messageFlag = $(this).data("is-perm-delete");
-    // }
-    // if (messageFlag !== null || messageFlag !== undefined) {
-    //     body.is_perm_delete = messageFlag;
-    // }
+    let message = pagnicateChatList.data.find((message) => message.id == messageId);
+    console.log("paginate chat list", pagnicateChatList);
+    const body = {
+        message: message,
+    }
+    let messageFlag = "";
+    if ($(this).data("is-perm-delete")) {
+        messageFlag = $(this).data("is-perm-delete");
+    }
+    else {
+        messageFlag = $(this).data("is-perm-delete");
+    }
+    if ((messageFlag == 1 || messageFlag == 0) && message.is_compose == 1) {
+        console.log("considon passs");
+        body.is_perm_delete = messageFlag;
+    }
 
-    // console.log("delete message",message);
 
     fetch("message/delete/" + messageId, {
         method: "DELETE",
@@ -4829,7 +4851,7 @@ $("#deleteModal .btn-delete").on("click", function () {
             $("#deleteModal").removeClass("show");
             $("body").removeClass("modal-open");
             $(".modal-backdrop").remove();
-
+            console.log("delte flag", message.data.deleteFlag);
             socket.emit("deleteMessage", message.data, false);
         })
         .catch(function (error) {
