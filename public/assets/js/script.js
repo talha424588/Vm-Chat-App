@@ -5886,28 +5886,6 @@ let update_user_profile = async (elem, file) => {
     }
 };
 
-// DOM.inputName.addEventListener("blur", async (e) => {
-//     const name = e.target.value;
-//     try {
-//         const response = await fetch("update_user_profile", {
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 "X-CSRF-Token": csrfToken,
-//             },
-//             body: JSON.stringify({
-//                 userId: user.id,
-//                 name: name
-//             }),
-//         });
-//         const res = await response.json();
-//         if (res.status == 200) {
-//             user.name = name;
-//         }
-//     } catch (error) {
-//         console.error('Error updating User Profile:', error);
-//     }
-// });
 
 let draggableIcon = () => {
     const icon = document.querySelector(".onesignal-bell-container");
