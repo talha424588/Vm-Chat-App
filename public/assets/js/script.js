@@ -5816,8 +5816,6 @@ const resizeObserver = new ResizeObserver((entries) => {
     }
 });
 
-// resizeObserver.observe(InputBar);
-
 const resetChatArea = () => {
     const MessageInput = document.getElementById("messsage_search_query");
     const SerachResults = document.getElementById("search-results");
