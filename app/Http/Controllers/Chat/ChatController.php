@@ -103,7 +103,7 @@ class ChatController extends Controller
         if (isset($request->compose_id)) {
             $message->compose_id = $request->input('compose_id');
         } else {
-            $message->compose_id = null; // or any default value you prefer
+            $message->compose_id = null;
         }
         if ($message->save()) {
             $message->user = User::where("unique_id", $uniqueId)->first();
