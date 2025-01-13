@@ -5678,7 +5678,6 @@ function get_voice_list() {
                         currentlyPlayingAudio !== audioPlayer
                     ) {
                         currentlyPlayingAudio.pause();
-                        // currentlyPlayingAudio.currentTime=0;
                         updatePlayButton(currentPlaybutton, false);
                     }
                     audioPlayer.play();
