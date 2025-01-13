@@ -5314,7 +5314,6 @@ function handleMessageResponse_old(
 ) {
     let replyDisplay = "";
     if (messageElement) {
-        // DOM.searchMessageClick = true;
         const messageTextElement = messageElement.querySelector(".shadow-sm");
         let highlightElement = document.getElementsByClassName("highlight")[0];
         if (highlightElement) {
@@ -5643,102 +5642,7 @@ function formatDuration(seconds) {
         "0"
     )}`;
 }
-// function get_voice_list() {
-//     const audioMessages = document.querySelectorAll('.chat_list_messages .audio-message');
 
-//     audioMessages.forEach((message) => {
-//         const playButton = message.querySelector('.play-button');
-//         const progressBarContainer = message.querySelector('.audio-progress');
-//         const progressFilled = message.querySelector('.progress-filled');
-//         const audioDuration = message.querySelector('.audio-duration');
-//         const audioSrc = message.getAttribute('data-audio-src');
-//         const audioTotalDuration=message.querySelector('.audio-time');
-//         const audioPlayer = new Audio(audioSrc);
-//         audioPlayer.addEventListener('loadedmetadata', () => {
-//             if (isFinite(audioPlayer.duration)) {
-//                 const totalDuration = audioPlayer.duration;
-//                 audioTotalDuration.innerHTML = formatDuration(totalDuration);
-//             } else {
-//                 audioTotalDuration.innerHTML = '00:00';
-//             }
-//         });
-
-//         // Load the audio to trigger the metadata loading
-//         audioPlayer.load();
-//         if (playButton) {
-
-//             playButton.addEventListener('click', function () {
-//                 if (audioPlayer.paused) {
-//                     if (currentlyPlayingAudio && currentlyPlayingAudio !== audioPlayer) {
-//                         currentlyPlayingAudio.pause();
-//                         currentlyPlayingAudio.currentTime = 0;
-//                         playButton.innerHTML = `<svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                         <path d="M3 21C4.65 21 6 19.65 6 18V3C6 1.35 4.65 0 3 0C1.35 0 0 1.35 0 3V18C0 19.65 1.35 21 3 21ZM12 3V18C12 19.65 13.35 21 15 21C16.65 21 18 19.65 18 18V3C18 1.35 16.65 0 15 0C13.35 0 12 1.35 12 3Z" fill="#687780"/>
-//                         </svg>`;
-//                     }
-
-//                     audioPlayer.play();
-//                     playButton.innerHTML = `<svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-// <path d="M3 21C4.65 21 6 19.65 6 18V3C6 1.35 4.65 0 3 0C1.35 0 0 1.35 0 3V18C0 19.65 1.35 21 3 21ZM12 3V18C12 19.65 13.35 21 15 21C16.65 21 18 19.65 18 18V3C18 1.35 16.65 0 15 0C13.35 0 12 1.35 12 3Z" fill="#687780"/>
-// </svg>`;
-//                     currentlyPlayingAudio = audioPlayer;
-//                 } else {
-//                     audioPlayer.pause();
-//                     playButton.innerHTML = `    <svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-// <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
-//                         </svg>`;
-//                     currentlyPlayingAudio = null;
-//                 }
-//             });
-//         }
-
-//         // Update the progress bar as the audio plays
-//         audioPlayer.addEventListener('timeupdate', function () {
-
-//             if (audioPlayer.duration) {
-//                 if (isFinite(audioPlayer.duration)) {
-//                     const totalDuration = audioPlayer.duration;
-//                     audioTotalDuration.innerHTML = formatDuration(totalDuration);
-//                 } else {
-//                     audioTotalDuration.innerHTML = '00:00';
-//                 }
-//                 const progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-//                 progressFilled.style.width = `${progressPercent}%`;
-//                 audioDuration.textContent = formatTime(audioPlayer.currentTime);
-//             }
-//         });
-
-//         audioPlayer.addEventListener('ended', function () {
-//             playButton.innerHTML = `<svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-// <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
-// </svg>`;
-//             progressFilled.style.width = '0%';
-//             audioDuration.textContent = '0:00';
-//             currentlyPlayingAudio = null;
-//         });
-
-//         function formatTime(seconds) {
-//             const minutes = Math.floor(seconds / 60);
-//             const secs = Math.floor(seconds % 60);
-//             return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-//         }
-
-//         progressBarContainer.addEventListener('click', (event) => {
-//             const progressBarWidth = progressBarContainer.offsetWidth;
-//             const clickX = event.offsetX;
-
-//             if (audioPlayer.duration && audioPlayer.duration > 0) {
-//                 const newTime = (clickX / progressBarWidth) * audioPlayer.duration;
-//                 audioPlayer.currentTime = Math.min(Math.max(newTime, 0), audioPlayer.duration);
-//             } else {
-//                 console.warn('Audio duration is not available or invalid:', audioPlayer.duration);
-//             }
-//         });
-
-//         audioPlayer.addEventListener('play', () => console.log('Playing audio:', audioSrc));
-//         audioPlayer.addEventListener('pause', () => console.log('Paused audio:', audioSrc));
-//     });
-// }
 function get_voice_list() {
     const audioMessages = document.querySelectorAll(
         ".chat_list_messages .audio-message"
