@@ -61,7 +61,7 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::get('/messages', [ChatController::class, 'index']);
     Route::get('auth/token/verify', [AuthController::class, 'verifyToken']);
 
-    Route::delete('/message/delete/', [ChatController::class, 'delete']);
+    Route::delete('/message/delete/{id}', [ChatController::class, 'delete']);
     Route::post('/message/seen-by/update', [ChatController::class, 'updateMessageReadStatus']);
     Route::get('/message/seen-by/{id}', [ChatController::class, 'getMessageReadStatus']);
     Route::get('message/search/{query}/{groupId}/{offset}/{limit}', [ChatController::class, 'searchMessage']);
