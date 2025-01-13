@@ -2234,7 +2234,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                 <span style="color: #463C3C; cursor: pointer; text-decoration: underline; color: #666;">${formatTimestampToDate(
                 message.time
             )}</span> |
-                                ${message.user.id == user.id
+            ${message.user.id == user.id
                 ? `
                                     <span>
                                         <a href="#" style="color: #463C3C; font-size:12px; font-weight:400; cursor: pointer; text-decoration: underline; color: #666;"
@@ -2293,77 +2293,66 @@ let addMessageToMessageArea = (message, flag = false) => {
                     : ""
                 }
                                     ${user.role === "0" || user.role === "2"
-                    ?
-                    `
-                        ${message.type === "Message"
-                        ?
-                        `
-                            <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-                        `
+                    ? `
+                                        ${message.type === "Message"
+                        ? `
+                                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
+                                        `
                         : ""
                     }
                                     ${message.type === "Message" &&
                         message.status !== "Correction" &&
                         (message.is_compose === 1 ||
                             message.is_compose === true)
-                        ?
-                        `
-                        <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
-                        `
+                        ? `
+                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+                                    `
                         : ""
                     }
                                     ${message.is_compose === 1 &&
                         message.type === "Message" &&
                         !message.reply
-                        ?
-                        `
+                        ? `
                                     <a class="dropdown-item" href="#" onclick="moveMessage(${message.id})">Move</a>
-                        `
+                                    `
                         : ""
                     }
                                     `
                     : ""
                 }
-
-                ${message.is_compose == 1 &&
-                    message.is_compose == true &&
-                    (user.role === "0")
-                    ?
-                    `
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}" data-is-perm-delete = "${0}">Delete</a>
-                    `
+                                    <!---
+                                    ${user.role === "0" || user.role === "2"
+                    ? `
+                                    <a class="dropdown-item" href="#" onclick="CorrectionMessage('${message.id}','${senderName}')">Correction</a>
+                                    `
                     : ""
-                }
-
-
-                    ${message.is_compose == 1 &&
-                    message.is_compose == true &&
-                    (user.role === "2")
-                    ?
-                    `
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}" data-is-perm-delete = "${1}">Request (Delete)</a>
-                    `
-                    : ""
-                }
-                    ${message.is_compose !== 1 &&
+                }---->
+                                    ${message.is_compose !== 1 &&
                     message.is_compose !== true &&
-                    (user.role === "3" || user.role === "2") &&
-                    message.sender === user.unique_id
-                    ?
-                    `
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                        `
+                    (user.role === "0" || user.role === "2")
+                    ? `
+                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    `
                     : ""
                 }
-                        </div>
-                    </div>
+                                    ${message.is_compose !== 1 &&
+                    message.is_compose !== true &&
+                    user.role === "3" &&
+                    message.sender === user.unique_id
+                    ? `
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    `
+                    : ""
+                }
+                                </div>
+                                </div>
                             `
                 : ``
             }
 
 
 
-                ${user.role != "1" &&
+                            ${user.role != "1" &&
                 user.role != "3" &&
                 message.sender != user.unique_id &&
                 !(
@@ -2439,26 +2428,20 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     `
                     : ""
                 }
-                    ${user.role == 0
+                                    ${message.is_compose !== 1 &&
+                    message.is_compose !== true
                     ? `
-                        <a class="dropdown-item" href="#" onclick="delMessage(this,${message.id})" data-is-perm-delete = "${0}">Delete</a>
-                        `
+                                                <a class="dropdown-item" href="#" onclick="delMessage(${message.id})">Delete</a>
+                                    `
                     : ""
                 }
-
-                    ${message.is_compose == 1 &&
-                    message.is_compose == true && user.role == 2
+                                    ${user.role === "3" &&
+                    message.sender === user.unique_id
                     ? `
-                        <a class="dropdown-item" href="#" onclick="delMessage(this,${message.id})" data-is-perm-delete = "${1}">Request (Delete)</a>
-                    `
-                    : user.role === "2" ||
-                        message.sender === user.unique_id
-                        ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
                                     `
-                        : ""
+                    : ""
                 }
-
                                 </div>
                                 </div>
                             `
@@ -2580,12 +2563,13 @@ let addMessageToMessageArea = (message, flag = false) => {
     ImageViewer(DOM.messages);
 };
 
-function delMessage(element, id) {
+function delMessage(id) {
+    // function delMessage(element, id) {
     const deleteModal = $("#deleteModal");
     deleteModal.find(".btn-delete").data("message-id", id);
-    deleteModal.find(".btn-delete").data("is-perm-delete", element);
+    // deleteModal.find(".btn-delete").data("is-perm-delete", element);
 
-    let flagStatus = $(element).data("is-perm-delete");
+    // let flagStatus = $(element).data("is-perm-delete");
     $("#deleteModal").find(".btn-delete").data("is-perm-delete", flagStatus);
     deleteModal.modal("show");
 }
@@ -4806,30 +4790,29 @@ $("#deleteModal .btn-delete").on("click", function () {
         ".ml-3"
     );
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    let message = pagnicateChatList.data.find((message)=>message.id = messageId);
-    const body = {
-        message: message,
-    }
-    let messageFlag = "";
-    if ($(this).data("is-perm-delete")) {
-        messageFlag = $(this).data("is-perm-delete");
-    }
-    else {
-        messageFlag = $(this).data("is-perm-delete");
-    }
-    if (messageFlag !== null || messageFlag !== undefined) {
-        body.is_perm_delete = messageFlag;
-    }
+    // let message = pagnicateChatList.data.find((message)=>message.id = messageId);
+    // const body = {
+    //     message: message,
+    // }
+    // let messageFlag = "";
+    // if ($(this).data("is-perm-delete")) {
+    //     messageFlag = $(this).data("is-perm-delete");
+    // }
+    // else {
+    //     messageFlag = $(this).data("is-perm-delete");
+    // }
+    // if (messageFlag !== null || messageFlag !== undefined) {
+    //     body.is_perm_delete = messageFlag;
+    // }
 
-    console.log("delete message",message);
+    // console.log("delete message",message);
 
-    fetch("message/delete/", {
+    fetch("message/delete/" + messageId, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
             "X-CSRF-Token": csrfToken,
         },
-        body: JSON.stringify(body)
     })
         .then(function (response) {
             if (response.ok) {

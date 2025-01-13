@@ -20,7 +20,8 @@ class ChatController extends Controller
 {
     protected MailController $mailController; // Declare the property
 
-    public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService, MailController $mailController) {
+    public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService, MailController $mailController)
+    {
         $this->mailController = $mailController;
     }
 
@@ -115,44 +116,33 @@ class ChatController extends Controller
         }
     }
 
-    public function delete(Request $request)
+    public function delete($id)
     {
-        if (isset($request->is_perm_delete) && $request->is_perm_delete == 1 && Auth::user()->role==2) {
-
-            $this->mailController->RequestMessageDelete(Auth::user(),$request);
-            return response()->json([
-                'status' => true,
-                'message' => 'delete message request send successfully',
-            ], 200);
-        }
-        else
-        {
-            try {
-                $message = GroupMessage::with("user")->findOrFail($request->message->id);
-                $message->is_deleted = true;
-                if ($message->save()) {
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Message deleted successfully',
-                        'data' => $message
-                    ], 200);
-                } else {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Message deletion failed'
-                    ], 400);
-                }
-            } catch (ModelNotFoundException $e) {
+        try {
+            $message = GroupMessage::with("user")->findOrFail($id);
+            $message->is_deleted = true;
+            if ($message->save()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Message deleted successfully',
+                    'data' => $message
+                ], 200);
+            } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Message not found'
-                ], 404);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'An error occurred while deleting the message'
-                ], 500);
+                    'message' => 'Message deletion failed'
+                ], 400);
             }
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Message not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while deleting the message'
+            ], 500);
         }
     }
 
@@ -239,7 +229,7 @@ class ChatController extends Controller
             return (string)$message["id"];
         }, $moveMessageConvMsg);
 
-        DB::table('group_messages')->whereIn("id",$ids)->delete();
+        DB::table('group_messages')->whereIn("id", $ids)->delete();
     }
 
     public function viewDocument(Request $request)
