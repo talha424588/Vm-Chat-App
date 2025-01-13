@@ -5131,7 +5131,6 @@ searchMessageInputFeild.addEventListener("input", function (e) {
     } else {
         const searchResultsDiv = document.querySelector(".search-results");
         searchResultsDiv.innerHTML = "";
-        // removeHighlight();
         searchMessageOffset = 0;
         previousSearchQuery = "";
     }
