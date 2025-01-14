@@ -132,13 +132,23 @@ class ChatService implements ChatRepository
         Log::info('fetchMessagesUpToSearched:', ['pageNo' => $pageNo, 'messageId' => $messageId, 'groupId' => $groupId]);
         $startTime = microtime(true);
 
-        $messages = GroupMessage::where('group_id', $groupId)
+        if(Auth::user()->role == 0 || Auth::user()->role == 2)
+        {
+            $messages = GroupMessage::where('group_id', $groupId)
             ->where('id', '>=', $messageId)
-            ->where('is_deleted', false)
             ->orderBy('id', 'desc')
             // ->take(10000)
             // ->skip($pageNo * 20)
             ->get();
+        }
+        else
+        {
+            $messages = GroupMessage::where('group_id', $groupId)
+            ->where('id', '>=', $messageId)
+            ->where('is_deleted', false)
+            ->orderBy('id', 'desc')
+            ->get();
+        }
 
         $queryTime = microtime(true) - $startTime;
 

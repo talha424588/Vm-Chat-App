@@ -3702,6 +3702,8 @@ const fetchPaginatedMessages = async (
             DOM.currentPage = Math.ceil(unreadCounter / 50);
             requestBody.unreadCount = unreadCounter;
         }
+        console.log(message_id);
+        console.log(url);
 
         const response = await fetch(url, {
             method: 'POST',
@@ -3713,7 +3715,12 @@ const fetchPaginatedMessages = async (
             body: JSON.stringify(requestBody)
         });
 
+        console.log("body");
+        console.log("requestBody",requestBody);
+
+
         const nextPageMessages = await response.json();
+        console.log("nextPageMessages",nextPageMessages);
 
         if (DOM.groupSearch) {
             nextPageMessages.data.forEach(item => searchMessageSet.add(item));
@@ -3825,6 +3832,7 @@ const fetchPaginatedMessages = async (
             }
             if (message.id == notSeenById && !DOM.unreadDividerAdded)
                 addUnread();
+            console.log("message",message.id,message_id);
             if (message.id == message_id) {
                 const messageElement = DOM.messages.querySelector(
                     `[data-message-id="${message.id}"]`
