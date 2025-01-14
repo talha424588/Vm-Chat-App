@@ -1580,7 +1580,22 @@ let addMessageToMessageArea = (message, flag = false) => {
     if (message.type === "File") {
         if (message.reply) {
             if (message.reply.type === "Image") {
-                var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:125px;">`;
+                var message_body = `
+                    <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
+                    }','${message.id}')"> <!-- Add onclick here -->
+                    <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                        ${message.user?.id == user?.id
+                        ? message.user.name
+                        : message.user.name
+                    }
+                    </div>
+                    <div class="reply-details">
+                        <img class="file-name" src = '${message.reply.msg}'></img>
+                    </div>
+                </div>
+
+                    `;
+
             } else if (message.reply.type === "File") {
                 var message_body = ` <div class="file-message" >
                 <div class="file-icon">
@@ -1667,6 +1682,32 @@ let addMessageToMessageArea = (message, flag = false) => {
                     </a>
                 </div>
                     `;
+            }
+
+            if (message.reply.type == "Image") {
+                messageContent = `
+                   ${message_body}
+                   <div class="file-message-reply">
+                    <div class="file-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <p class="file-name">${message.media_name}</p>
+
+                    </div>
+                    <a href="${message.message ?? message.msg
+                    }" target="_blank" download="${message.media_name
+                    }" class="download-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                        </svg>
+                    </a>
+                </div>
+                    `;
+
             }
             else {
                 var add_file_view = `
@@ -1953,7 +1994,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                     }
                     </div>
                     <div class="reply-details">
-                        <p class="file-name">${message_body}</p>
+                        <img class="file-name" src = '${message_body}'></img>
                     </div>
                 </div>
                 <div class="reply-message-area">${message_new}</div>
@@ -3638,11 +3679,11 @@ const fetchPaginatedMessages = async (
         });
 
         console.log("body");
-        console.log("requestBody",requestBody);
+        console.log("requestBody", requestBody);
 
 
         const nextPageMessages = await response.json();
-        console.log("nextPageMessages",nextPageMessages);
+        console.log("nextPageMessages", nextPageMessages);
 
         if (DOM.groupSearch) {
             nextPageMessages.data.forEach(item => searchMessageSet.add(item));
@@ -3754,7 +3795,7 @@ const fetchPaginatedMessages = async (
             }
             if (message.id == notSeenById && !DOM.unreadDividerAdded)
                 addUnread();
-            console.log("message",message.id,message_id);
+            console.log("message", message.id, message_id);
             if (message.id == message_id) {
                 const messageElement = DOM.messages.querySelector(
                     `[data-message-id="${message.id}"]`
