@@ -2347,18 +2347,20 @@ let addMessageToMessageArea = (message, flag = false) => {
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}" data-is-perm-delete = "${0}">Delete</a>
                     `
                     : ""
-                }---->
-                                    ${message.is_compose !== 1 &&
-                    message.is_compose !== true &&
-                    (user.role === "0" || user.role === "2")
-                    ? `
-                                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
-                                    `
+                }
+                    ${message.is_compose == 1 &&
+                    message.is_compose == true &&
+                    (user.role === "2")
+                    ?
+                    `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}" data-is-perm-delete = "${1}">Request (Delete)</a>
+                    `
                     : ""
+                }
                 }
                                     ${message.is_compose !== 1 &&
                     message.is_compose !== true &&
-                    user.role === "3" &&
+                    (user.role === "3" || user.role === "2") &&
                     message.sender === user.unique_id
                     ? `
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
@@ -2449,13 +2451,27 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     `
                     : ""
                 }
-                                    ${message.is_compose !== 1 &&
-                    message.is_compose !== true
+                     ${user.role == 0
                     ? `
-                                                <a class="dropdown-item" href="#" onclick="delMessage(${message.id})">Delete</a>
+                        <a class="dropdown-item" href="#" onclick="delMessage(this,${message.id})" data-is-perm-delete = "${0}">Delete</a>
                                     `
                     : ""
                 }
+
+                ${message.is_compose == 1 &&
+                    message.is_compose == true && user.role == 2
+                    ? `
+                        <a class="dropdown-item" href="#" onclick="delMessage(this,${message.id})" data-is-perm-delete = "${1}">Request (Delete)</a>
+                    `
+                    : user.role === "2" ||
+                        message.sender === user.unique_id
+                        ? `
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    `
+                        : ""
+                }
+
+
                                     ${user.role === "3" &&
                     message.sender === user.unique_id
                     ? `
@@ -2584,13 +2600,12 @@ let addMessageToMessageArea = (message, flag = false) => {
     ImageViewer(DOM.messages);
 };
 
-function delMessage(id) {
-    // function delMessage(element, id) {
+function delMessage(element, id) {
     const deleteModal = $("#deleteModal");
     deleteModal.find(".btn-delete").data("message-id", id);
-    // deleteModal.find(".btn-delete").data("is-perm-delete", element);
+    deleteModal.find(".btn-delete").data("is-perm-delete", element);
 
-    // let flagStatus = $(element).data("is-perm-delete");
+    let flagStatus = $(element).data("is-perm-delete");
     $("#deleteModal").find(".btn-delete").data("is-perm-delete", flagStatus);
     deleteModal.modal("show");
 }
@@ -4186,7 +4201,16 @@ let generateMessageArea = async (
             removeQuotedMessage();
             scroll_to_unread_div();
             return;
-        } else {
+        }
+        else if (DOM.notification_message_id) {
+            await fetchPaginatedMessages(
+                DOM.notification_message_id,
+                null,
+                null,
+                null
+            );
+        }
+        else {
             await fetchPaginatedMessages(null, null, null);
             get_voice_list();
             removeEditMessage();
@@ -4373,13 +4397,21 @@ let init = () => {
                 DOM.notification_message_id != null &&
                 DOM.notification_message_id !== ""
             ) {
+
                 const elem = document.querySelector(
                     `[data-group-id="${DOM.notification_group_id}"]`
                 );
+                console.log("ele", elem);
+                console.log("notification_group_id", DOM.notification_group_id);
                 const newIndex = chatList.findIndex(
                     (group) =>
                         group.group.group_id === DOM.notification_group_id
                 );
+                console.log("notification_group_id", DOM.notification_group_id);
+
+                console.log("newIndex", newIndex);
+
+
 
                 if (newIndex !== -1) {
                     generateMessageArea(
@@ -4829,12 +4861,13 @@ $("#deleteModal .btn-delete").on("click", function () {
     }
 
 
-    fetch("message/delete/" + messageId, {
+    fetch("message/delete/", {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
             "X-CSRF-Token": csrfToken,
         },
+        body: JSON.stringify(body)
     })
         .then(function (response) {
             if (response.ok) {

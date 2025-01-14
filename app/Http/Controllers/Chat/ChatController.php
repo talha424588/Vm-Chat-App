@@ -122,11 +122,14 @@ class ChatController extends Controller
         if (isset($request->is_perm_delete) && $request->is_perm_delete == 1 && Auth::user()->role == 2) {
             $this->mailController->RequestMessageDelete(Auth::user(), $request);
             $message = $this->fetchMessage($request->message['id']);
-            return response()->json([
-                'status' => true,
-                'message' => 'delete message request send successfully',
-                'data' => $message,
-            ], 200);
+            $message->is_deleted = true;
+            if ($message->save()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'delete message request send successfully',
+                    'data' => $message,
+                ], 200);
+            }
         } else {
             try {
                 $message = $this->fetchMessage($request->message['id']);
