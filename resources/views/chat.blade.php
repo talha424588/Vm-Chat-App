@@ -603,7 +603,7 @@
                                 </svg></i>
                             <i id="voice-icon" class="chat-icon chat_action_voice">
 
-                                @if (Auth::user()->seen_privacy)
+                                {{-- @if (Auth::user()->seen_privacy) --}}
                                     <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
                                         viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
@@ -611,7 +611,7 @@
                                             d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z"
                                             fill="white" />
                                     </svg>
-                                @endif
+                                {{-- @endif --}}
                             </i>
                         </div>
                         <div class="chat-action-icons" id="Editreply-area" style="display:none; margin-left: 5px;">
