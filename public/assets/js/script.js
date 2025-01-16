@@ -1585,27 +1585,10 @@ let addMessageToMessageArea = (message, flag = false) => {
                     </div>
                 </div>
 
-                    `;
+                `;
+            }
 
-            } else if (message.reply.type === "File") {
-                var message_body = ` <div class="file-message" >
-                <div class="file-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-                        <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-                    </svg>
-                </div>
-                <div class="file-details">
-                    <p class="file-name">File</p>
-
-                </div>
-                <a href="#"  class="download-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-                    </svg>
-                </a>
-            </div>`;
-            } else if (message.reply.type === "Audio") {
+             else if (message.reply.type === "Audio") {
                 var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
                     };" data-audio-src="${message.msg}">
                     <div class="avatar">
@@ -1646,6 +1629,31 @@ let addMessageToMessageArea = (message, flag = false) => {
                 </div>
             `;
             }
+            else if (message.reply.type === "File") {
+
+                var message_body = `
+                <div class="file-message" onclick="scrollToMessage('${message.reply.id
+                    }','${message.reply.id}')">
+                    <div class="file-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <p class="file-name">${message.reply.media_name}</p>
+
+                    </div>
+                    <a href="${message.reply.message ?? message.reply.msg
+                    }" target="_blank" download="${message.reply.media_name
+                    }" class="download-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                        </svg>
+                    </a>
+                </div>
+                `;
+            }
             else {
                 var message_body = message.reply.msg;
             }
@@ -1675,6 +1683,8 @@ let addMessageToMessageArea = (message, flag = false) => {
                     `;
             }
 
+
+
             if (message.reply.type == "Image") {
                 messageContent = `
                    ${message_body}
@@ -1700,7 +1710,36 @@ let addMessageToMessageArea = (message, flag = false) => {
                     `;
 
             }
+            if (message.reply.type == "File") {
+
+                console.log("file part");
+
+                messageContent = `
+                   ${message_body}
+                   <div class="file-message-reply">
+                    <div class="file-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+                            <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+                        </svg>
+                    </div>
+                    <div class="file-details">
+                        <p class="file-name">${message.media_name}</p>
+
+                    </div>
+                    <a href="${message.message ?? message.msg
+                    }" target="_blank" download="${message.media_name
+                    }" class="download-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+                        </svg>
+                    </a>
+                </div>
+                    `;
+
+            }
             else {
+                console.log("else part");
                 var add_file_view = `
                 <div class="file-message" onclick="scrollToMessage('${message.reply.id
                     }','${message.id}')">
@@ -1940,7 +1979,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             }
             // else if (message.reply.type === "File") {
 
-                // var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:125px;">`;
+            // var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:125px;">`;
             // }
             // else if (message.reply.type === "Audio") {
 
@@ -2025,8 +2064,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 <div class="reply-message-area">${message_new}</div>
             `;
             }
-            if(message.reply.type == "File")
-            {
+            if (message.reply.type == "File") {
                 var message_body = `
                 <div class="file-message" onclick="scrollToMessage('${message.reply.id
                     }','${message.reply.id}')">
@@ -2050,7 +2088,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 </div>
                 `;
                 let message_new = `<img src="${message.message ?? message.msg
-                }" class="view-image" style="height:222px; width:100%;">`;
+                    }" class="view-image" style="height:222px; width:100%;">`;
 
                 messageContent = `
                     ${message_body}
