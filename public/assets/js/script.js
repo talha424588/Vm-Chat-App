@@ -1584,7 +1584,6 @@ let addMessageToMessageArea = (message, flag = false) => {
                         <img class="file-name" src = '${message.reply.msg}'></img>
                     </div>
                 </div>
-
                 `;
             }
 
@@ -1684,6 +1683,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             }
 
             if (message.reply.type == "Image") {
+                console.log("reply on image");
                 messageContent = `
                    ${message_body}
                    <div class="file-message-reply">
@@ -1706,7 +1706,6 @@ let addMessageToMessageArea = (message, flag = false) => {
                     </a>
                 </div>
                     `;
-
             }
 
             if (message.reply.type == "Audio") {
@@ -1735,11 +1734,11 @@ let addMessageToMessageArea = (message, flag = false) => {
                     `;
 
             }
-            else {
-                console.log("else part");
-                var add_file_view = `
-                <div class="file-message" onclick="scrollToMessage('${message.reply.id
-                    }','${message.id}')">
+            if (message.reply.type == "File") {
+
+                messageContent = `
+                   ${message_body}
+                   <div class="file-message-reply">
                     <div class="file-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
@@ -1758,29 +1757,55 @@ let addMessageToMessageArea = (message, flag = false) => {
                         </svg>
                     </a>
                 </div>
-                `;
-                messageContent = `
-                    <div class="file-message">
-                        <div class="file-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
-                                <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
-                            </svg>
-                        </div>
-                        <div class="file-details">
-                            <p class="file-name">${add_file_view}</p>
+                    `;
 
-                        </div>
-                        <a href="${message.message ?? message.msg
-                    }" target="_blank" download="${message.media_name
-                    }" class="download-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
-                            </svg>
-                        </a>
-                    </div>
-                `;
             }
+            // else {
+            //     console.log("on reoky ");
+            //     var add_file_view = `
+            //     <div class="file-message" onclick="scrollToMessage('${message.reply.id
+            //         }','${message.id}')">
+            //         <div class="file-icon">
+            //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //                 <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+            //                 <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+            //             </svg>
+            //         </div>
+            //         <div class="file-details">
+            //             <p class="file-name">${message.media_name}</p>
+
+            //         </div>
+            //         <a href="${message.message ?? message.msg
+            //         }" target="_blank" download="${message.media_name
+            //         }" class="download-icon">
+            //             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //                 <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+            //             </svg>
+            //         </a>
+            //     </div>
+            //     `;
+            //     messageContent = `
+            //         <div class="file-message">
+            //             <div class="file-icon">
+            //                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //                     <path fill="#54656F" d="M6 2H14L20 8V20C20 21.1 19.1 22 18 22H6C4.9 22 4 21.1 4 20V4C4 2.9 4.9 2 6 2Z"/>
+            //                     <path fill="#54656F" d="M14 9V3.5L19.5 9H14Z"/>
+            //                 </svg>
+            //             </div>
+            //             <div class="file-details">
+            //                 <p class="file-name">${add_file_view}</p>
+
+            //             </div>
+            //             <a href="${message.message ?? message.msg
+            //         }" target="_blank" download="${message.media_name
+            //         }" class="download-icon">
+            //                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            //                     <path d="M5 20H19V18H5V20ZM12 16L17 11H14V4H10V11H7L12 16Z" fill="#54656F"/>
+            //                 </svg>
+            //             </a>
+            //         </div>
+            //     `;
+            // }
         } else {
             messageContent = `
 
@@ -2092,28 +2117,26 @@ let addMessageToMessageArea = (message, flag = false) => {
                 <div class="reply-message-area">${message_new}</div>
             `;
             }
-            else {
+            // else {
 
-                var message_new = `<img src="${message.message ?? message.msg
-                    }" class="view-image" style="height:222px; width:100%;">`;
-                messageContent = `
-                <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
-                    }','${message.id}')"> <!-- Add onclick here -->
-                    <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                        ${message.user?.id == user?.id
-                        ? message.user.name
-                        : message.user.name
-                    }
-                    </div>
-                    <div class="reply-details">
-                        <img class="file-name" src = '${message_body}'></img>
-                    </div>
-                </div>
-                <div class="reply-message-area">${message_new}</div>
-            `;
-            }
-
-
+            //     var message_new = `<img src="${message.message ?? message.msg
+            //         }" class="view-image" style="height:222px; width:100%;">`;
+            //     messageContent = `
+            //     <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
+            //         }','${message.id}')"> <!-- Add onclick here -->
+            //         <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+            //             ${message.user?.id == user?.id
+            //             ? message.user.name
+            //             : message.user.name
+            //         }
+            //         </div>
+            //         <div class="reply-details">
+            //             <img class="file-name" src = '${message_body}'></img>
+            //         </div>
+            //     </div>
+            //     <div class="reply-message-area">${message_new}</div>
+            // `;
+            // }
         } else {
             messageContent = `
             <img src="${message.message ?? message.msg}" data-original="${message.message ?? message.msg
