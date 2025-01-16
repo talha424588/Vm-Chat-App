@@ -561,7 +561,6 @@ function makeformatDate(dateString) {
 }
 
 socket.on("deleteMessage", (message, isMove) => {
-    console.log("message details", message);
     let deleteMessage = null
     if ('deleteFlag' in message) {
         deleteMessage = message.message;
@@ -569,7 +568,6 @@ socket.on("deleteMessage", (message, isMove) => {
     else {
         deleteMessage = message;
     }
-    console.log("delete mesage", deleteMessage);
     if (isMove == true) {
         var messageElement = $(
             '[data-message-id="' + deleteMessage.id + '"]'
@@ -578,20 +576,14 @@ socket.on("deleteMessage", (message, isMove) => {
             messageElement.remove();
         }
     } else {
-        console.log("else part");
         var messageElement = $(
             '[data-message-id="' + deleteMessage.id + '"]'
         ).closest(".ml-3");
-        console.log("delete mesage element", deleteMessage);
 
         if ('deleteFlag' in message) {
-            console.log("inside if if part");
-
             messageElement.addClass("hidden-message");
         }
         if (user.role != 0 && user.role != 2) {
-            console.log("non admin users");
-
             let groupToUpdate = chatList.find(chat => chat.group.group_id === deleteMessage.group_id);
             if (groupToUpdate) {
                 const seenBy = deleteMessage.seen_by.split(", ").map(s => s.trim());
@@ -1141,14 +1133,13 @@ async function rerenderChatList(preGroupId) {
         (group) => group.group.group_id == preGroupId
     );
     if (prevGroup) {
-        console.log("before group found", prevGroup);
         const messageExists = prevGroup.group.group_messages.some(existingMessage => existingMessage.id === lastMessage.id);
 
         if (!messageExists) {
             prevGroup.group.group_messages = [];
             prevGroup.group.group_messages.push(lastMessage);
         } else {
-            console.log("Message already exists in the group_messages array.");
+            // console.log("Message already exists in the group_messages array.");
         }
     }
     chatList.sort((a, b) => {
@@ -1983,7 +1974,6 @@ let addMessageToMessageArea = (message, flag = false) => {
             `;
             }
             if (message.reply.type == "Audio") {
-                console.log("reply type audion");
                 let audioTag = message.reply.msg.startsWith("https://")
                     ? message.reply.msg
                     : message.reply.msg.match(/<audio[^>]+>/g)[0];
@@ -2224,12 +2214,10 @@ let addMessageToMessageArea = (message, flag = false) => {
             let audioTag = message.msg.startsWith("https://")
                 ? message.msg
                 : message.msg.match(/<audio[^>]+>/g)[0];
-            console.log(audioTag);
 
             audioSrc = message.msg.startsWith("https://")
                 ? message.msg
                 : audioTag.match(/src="([^"]+)"/)[1];
-            console.log(audioSrc);
 
             var message_new = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
                 };" data-audio-src="${audioSrc}">
@@ -2256,7 +2244,6 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             var message_body = `<img src="${message.reply.msg
                 }" class="view-image" style="height:222px; width:100%;">`;
-            console.log(message_body);
 
             messageContent = `
                     <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id
@@ -2277,7 +2264,6 @@ let addMessageToMessageArea = (message, flag = false) => {
         }
 
         else {
-            console.log("else part ");
             messageContent = `
                 <div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
                 };" data-audio-src="${audioSrc}">
@@ -2708,7 +2694,6 @@ async function scrollToMessage(replyId, messageId = null) {
                 },
             });
             let response = await message.json();
-            console.log("response", response);
             if (response.message.reply.is_deleted) {
                 return;
             } else if (
@@ -2963,7 +2948,6 @@ function correction_send_handel() {
     const old_message = pagnicateChatList.data.find(
         (message) => message.id === parseInt(correction_message_id)
     );
-    console.log("old_message", old_message);
     if (messageIndex !== -1) {
         pagnicateChatList.data[messageIndex].msg = messageContent;
     }
@@ -2982,8 +2966,6 @@ function correction_send_handel() {
                 .content,
             compose_id: old_message.compose_id,
         };
-
-        console.log("newMessage", newMessage);
 
         socket.emit("sendChatToServer", newMessage);
     }
@@ -4393,7 +4375,6 @@ let sendMessage = (type = "Message", mediaName = null) => {
                     csrf_token: csrfToken,
                     privacy_breach: true,
                 };
-                console.log("msg", msg);
                 socket.emit("sendChatToServer", msg);
                 removeQuotedMessage();
 
@@ -4474,18 +4455,10 @@ let init = () => {
                 const elem = document.querySelector(
                     `[data-group-id="${DOM.notification_group_id}"]`
                 );
-                console.log("ele", elem);
-                console.log("notification_group_id", DOM.notification_group_id);
                 const newIndex = chatList.findIndex(
                     (group) =>
                         group.group.group_id === DOM.notification_group_id
                 );
-                console.log("notification_group_id", DOM.notification_group_id);
-
-                console.log("newIndex", newIndex);
-
-
-
                 if (newIndex !== -1) {
                     generateMessageArea(
                         elem,
@@ -4917,7 +4890,6 @@ $("#deleteModal .btn-delete").on("click", function () {
     );
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     let message = pagnicateChatList.data.find((message) => message.id == messageId);
-    console.log("paginate chat list", pagnicateChatList);
     const body = {
         message: message,
     }
@@ -4929,7 +4901,6 @@ $("#deleteModal .btn-delete").on("click", function () {
         messageFlag = $(this).data("is-perm-delete");
     }
     if ((messageFlag == 1 || messageFlag == 0) && message.is_compose == 1) {
-        console.log("considon passs");
         body.is_perm_delete = messageFlag;
     }
 
@@ -4957,7 +4928,6 @@ $("#deleteModal .btn-delete").on("click", function () {
             $("#deleteModal").removeClass("show");
             $("body").removeClass("modal-open");
             $(".modal-backdrop").remove();
-            console.log("delte flag", message.data.deleteFlag);
             socket.emit("deleteMessage", message.data, false);
         })
         .catch(function (error) {
