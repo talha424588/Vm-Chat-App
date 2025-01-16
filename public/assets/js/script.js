@@ -2389,19 +2389,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 </div>`;
 
             messageContent = `
-                <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id
-                }','${message.id}')">
-                    <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
-                    ${message.user?.id == user?.id
-                    ? message.user.name
-                    : message.user.name
-                }
-
-                    </div>
-                    <div class="reply-details">
-                        <p class="file-name">${message_body}</p>
-                    </div>
-                </div>
+            ${message_body}
             <div class="reply-message-area">${message_new}</div>
         `;
         }
