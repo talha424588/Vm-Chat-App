@@ -1589,7 +1589,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             else if (message.reply.type === "Audio") {
                 var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
-                    };" data-audio-src="${message.msg}">
+                    };" data-audio-src="${message.reply.msg}">
                     <div class="avatar">
                         <!-- Avatar image here -->
                     </div>
@@ -1710,8 +1710,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             if (message.reply.type == "Audio") {
 
-                messageContent = `
-                   ${message_body}
+                message_new = `
                    <div class="file-message-reply">
                     <div class="file-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1732,6 +1731,23 @@ let addMessageToMessageArea = (message, flag = false) => {
                     </a>
                 </div>
                     `;
+                messageContent = `
+                    <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id
+                    }','${message.id}')">
+                        <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                        ${message.user?.id == user?.id
+                        ? message.user.name
+                        : message.user.name
+                    }
+
+                        </div>
+                        <div class="reply-details">
+                            <p class="file-name">${message_body}</p>
+                        </div>
+                    </div>
+                <div class="reply-message-area">${message_new}</div>
+
+                 `;
 
             }
             if (message.reply.type == "File") {
