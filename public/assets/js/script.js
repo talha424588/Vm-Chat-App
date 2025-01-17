@@ -2371,7 +2371,6 @@ let addMessageToMessageArea = (message, flag = false) => {
             `;
         }
 
-
         else if (message && message.reply && message.reply.type == "File") {
             let audioTag = message.msg.startsWith("https://")
                 ? message.msg
@@ -2431,6 +2430,81 @@ let addMessageToMessageArea = (message, flag = false) => {
             ${message_body}
             <div class="reply-message-area">${message_new}</div>
         `;
+        }
+
+        else if (message && message.reply && message.reply.type == "Audio") {
+            let audioTag = message.msg.startsWith("https://")
+                ? message.msg
+                : message.msg.match(/<audio[^>]+>/g)[0];
+
+            audioSrc = message.msg.startsWith("https://")
+                ? message.msg
+                : audioTag.match(/src="([^"]+)"/)[1];
+
+                var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
+                };" data-audio-src="${message.reply.msg}">
+                <div class="avatar">
+                    <!-- Avatar image here -->
+                </div>
+                <div class="audio-content">
+                    <div class="audio-controls">
+                        <button class="play-button">
+                        <svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
+                            </svg>
+                        </button>
+                        <div class="audio-progress">
+                            <div class="progress-filled"></div>
+                        </div>
+                    </div>
+                    <div class="audio-time-container">
+                        <span class="audio-duration">0:00</span>
+                        <span class="audio-time">12:27 PM</span>
+                    </div>
+                </div>
+                </div>`;
+
+            var message_new = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
+                };" data-audio-src="${audioSrc}">
+                    <div class="avatar">
+                        <!-- Avatar image here -->
+                    </div>
+                    <div class="audio-content">
+                        <div class="audio-controls">
+                            <button class="play-button">
+                            <svg width="18" height="21" viewBox="0 0 18 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.687 10.3438C17.6889 10.616 17.6203 10.8841 17.4879 11.122C17.3555 11.3599 17.1638 11.5595 16.9314 11.7013L2.53109 20.6007C2.28831 20.7509 2.00983 20.8336 1.72442 20.8402C1.43902 20.8468 1.15703 20.777 0.907579 20.6382C0.660509 20.5015 0.454302 20.3015 0.310162 20.0587C0.166023 19.8159 0.0891535 19.5391 0.0874594 19.2568L0.00722626 1.59107C0.00635568 1.30872 0.0807075 1.03124 0.222636 0.787147C0.364564 0.543058 0.568946 0.341177 0.814765 0.202266C1.06294 0.0611697 1.34429 -0.0111163 1.62974 -0.0071269C1.9152 -0.0031375 2.19441 0.0769828 2.43855 0.224959L16.9191 8.99323C17.1528 9.13296 17.3463 9.33077 17.4808 9.56744C17.6154 9.80411 17.6864 10.0716 17.687 10.3438Z" fill="#687780"/>
+                                </svg>
+                            </button>
+                            <div class="audio-progress pointer-null">
+                                <div class="progress-filled"></div>
+                            </div>
+                        </div>
+                        <div class="audio-time-container">
+                            <span class="audio-duration">0:00</span>
+                            <span class="audio-time">12:27 PM</span>
+                        </div>
+                    </div>
+                </div>`;
+
+
+                messageContent = `
+                <div class="reply-message-div"  onclick="scrollToMessage('${message.reply.id
+                }','${message.id}')">
+                    <div class="file-icon" style="font-size:14px; color:#1DAB61; font-weight:600;">
+                    ${message.user?.id == user?.id
+                    ? message.user.name
+                    : message.user.name
+                }
+
+                    </div>
+                    <div class="reply-details">
+                        <p class="file-name">${message_body}</p>
+                    </div>
+                </div>
+            <div class="reply-message-area">${message_new}</div>
+
+             `;
         }
 
         else {
