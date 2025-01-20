@@ -61,6 +61,8 @@ const DOM = {
     NormalLoading: true,
     showVoiceIcon: null,
     audio_permissions: {},
+    isDeleteRequest: false,
+
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
     const search_div = getById("serach_div");
@@ -3999,7 +4001,7 @@ const fetchPaginatedMessages = async (
         if (DOM.searchMessageClick && DOM.lastMessageId) {
             requestBody.lastMessageId = DOM.lastMessageId;
             requestBody.searchMessageClick = true;
-        } else if (message_id || DOM.lastMessageId) {
+        } else if (message_id || DOM.lastMessageId && DOM.isDeleteRequest == false) {
             requestBody.messageId = message_id || DOM.lastMessageId;
         } else if (unreadCounter) {
             DOM.currentPage = Math.ceil(unreadCounter / 50);
@@ -4685,6 +4687,50 @@ window.addEventListener("resize", (e) => {
 });
 
 let init = () => {
+    function removeQueryParams() {
+        console.log("remove param");
+        const url = new URL(window.location.href);
+        console.log("url", url);
+
+        // Check if both parameters exist
+        if (url.searchParams.has('group_id') && url.searchParams.has('message_id')) {
+            const messageId = url.searchParams.get('message_id');
+
+            console.log('Message ID:', messageId);
+
+            // Function to check for messageElement
+            function checkMessageElement() {
+                var messageElement = $('[data-message-id="' + messageId + '"]').closest(".ml-3");
+                if (messageElement.length) {
+
+                    DOM.isDeleteRequest = true;
+                    DOM.notification_message_id = null;
+                    DOM.notification_group_id = null;
+                    // Remove query parameters
+                    url.searchParams.delete('group_id');
+                    url.searchParams.delete('message_id');
+                    window.history.replaceState({}, document.title, url.toString());
+                    console.log("Parameters removed");
+                } else {
+                    console.log("Message element not found, retrying...");
+                    setTimeout(checkMessageElement, 1000); // Retry after 1 second
+                }
+            }
+
+            // Start checking for the message element
+            checkMessageElement();
+        } else {
+            DOM.isDeleteRequest = false;
+
+            console.log("Both parameters are not present. Function will not run.");
+        }
+    }
+
+    // Run the function after 3 seconds
+    setTimeout(() => {
+        removeQueryParams();
+    }, 3000);
+
     DOM.username.innerHTML = user.name;
 
     generateChatList();
@@ -4708,6 +4754,7 @@ let init = () => {
                         group.group.group_id === DOM.notification_group_id
                 );
                 if (newIndex !== -1) {
+                    console.log("group found");
                     generateMessageArea(
                         elem,
                         newIndex,

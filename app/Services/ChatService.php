@@ -281,6 +281,7 @@ class ChatService implements ChatRepository
             ->with('reply')
             ->offset($offset)
             ->limit($limit)
+            ->orderBy("id","asc")
             ->get();
 
         if (count($messages) > 0) {

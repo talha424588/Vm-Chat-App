@@ -68,7 +68,8 @@
 
 
                 <div style="text-align: center; margin-top: 35px;">
-                    <a href="https://stag.visamtion.org/?group_id={{ $groupId }}&message_id={{ $id }}"
+                    {{-- <a href="https://stag.visamtion.org/?group_id={{ $groupId }}&message_id={{ $id }}" --}}
+                    <a href="http://127.0.0.1:8000/?group_id={{ $groupId }}&message_id={{ $id }}"
                         style="background: #1DAB61; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 500; letter-spacing: 0.3px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(126, 58, 242, 0.2);">View
                         Message</a>
                 </div>
