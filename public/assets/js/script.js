@@ -4687,12 +4687,13 @@ window.addEventListener("resize", (e) => {
 });
 
 let init = () => {
+    console.log("before param remove function");
     function removeQueryParams() {
         console.log("remove param");
         const url = new URL(window.location.href);
         console.log("url", url);
 
-        // Check if both parameters exist
+
         if (url.searchParams.has('group_id') && url.searchParams.has('message_id')) {
             const messageId = url.searchParams.get('message_id');
 
@@ -4700,8 +4701,10 @@ let init = () => {
 
             // Function to check for messageElement
             function checkMessageElement() {
-                var messageElement = $('[data-message-id="' + messageId + '"]').closest(".ml-3");
+                var messageElement = $('[data-message-id="' + messageId + '"]');
                 if (messageElement.length) {
+
+                    scrollToMessage(messageId,null);
 
                     DOM.isDeleteRequest = true;
                     DOM.notification_message_id = null;
