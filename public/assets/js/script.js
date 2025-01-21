@@ -62,6 +62,7 @@ const DOM = {
     showVoiceIcon: null,
     audio_permissions: {},
     isDeleteRequest: false,
+    isDeleteParam: document.getElementById("is_delete").value
 
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
@@ -4684,6 +4685,11 @@ window.addEventListener("resize", (e) => {
 });
 
 let init = () => {
+    if (DOM.isDeleteParam == 1) {
+        // alert('Message deleted successfully.');
+        window.close();
+
+    }
     // function removeQueryParams() {
     //     console.log("remove param");
     //     const url = new URL(window.location.href);

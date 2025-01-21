@@ -28,9 +28,22 @@ class ChatController extends Controller
 
     public function index(Request $request)
     {
+
+        if ($request->has('is_delete')) {
+            $group_id = $request->group_id ?? null;
+            $message_id = $request->message_id ?? null;
+            $is_delete = $request->input('is_delete');
+            if ($is_delete === '1') {
+                $this->chatRepository->deleteMessage($message_id);
+            }
+            $group_id =  null;
+            $message_id =  null;
+            return view('chat', compact("group_id", "message_id", "is_delete"));
+        }
         $group_id = $request->group_id ?? null;
         $message_id = $request->message_id ?? null;
-        return view('chat', compact("group_id", "message_id"));
+        $is_delete = null;
+        return view('chat', compact("group_id", "message_id", "is_delete"));
     }
     //
     public function searchGroupMessages(Request $request)
@@ -124,11 +137,11 @@ class ChatController extends Controller
             $message = $this->fetchMessage($request->message['id']);
             // $message->is_deleted = true;
             // if ($message->save()) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'delete message request send successfully',
-                    'data' => $message,
-                ], 200);
+            return response()->json([
+                'status' => true,
+                'message' => 'delete message request send successfully',
+                'data' => $message,
+            ], 200);
             // }
         } else {
             try {

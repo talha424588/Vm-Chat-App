@@ -132,22 +132,19 @@ class ChatService implements ChatRepository
         Log::info('fetchMessagesUpToSearched:', ['pageNo' => $pageNo, 'messageId' => $messageId, 'groupId' => $groupId]);
         $startTime = microtime(true);
 
-        if(Auth::user()->role == 0 || Auth::user()->role == 2)
-        {
+        if (Auth::user()->role == 0 || Auth::user()->role == 2) {
             $messages = GroupMessage::where('group_id', $groupId)
-            ->where('id', '>=', $messageId)
-            ->orderBy('id', 'desc')
-            // ->take(10000)
-            // ->skip($pageNo * 20)
-            ->get();
-        }
-        else
-        {
+                ->where('id', '>=', $messageId)
+                ->orderBy('id', 'desc')
+                // ->take(10000)
+                // ->skip($pageNo * 20)
+                ->get();
+        } else {
             $messages = GroupMessage::where('group_id', $groupId)
-            ->where('id', '>=', $messageId)
-            ->where('is_deleted', false)
-            ->orderBy('id', 'desc')
-            ->get();
+                ->where('id', '>=', $messageId)
+                ->where('is_deleted', false)
+                ->orderBy('id', 'desc')
+                ->get();
         }
 
         $queryTime = microtime(true) - $startTime;
@@ -281,7 +278,7 @@ class ChatService implements ChatRepository
             ->with('reply')
             ->offset($offset)
             ->limit($limit)
-            ->orderBy("id","asc")
+            ->orderBy("id", "asc")
             ->get();
 
         if (count($messages) > 0) {
@@ -368,6 +365,18 @@ class ChatService implements ChatRepository
             }
         } else {
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
+        }
+    }
+
+
+    public function deleteMessage($messageId)
+    {
+        $message = GroupMessage::find($messageId);
+        if ($message) {
+            $message->delete();
+            return response()->json(['true' => 'Message deleted successfully']);
+        } else {
+            return response()->json(['false' => 'Not found']);
         }
     }
 

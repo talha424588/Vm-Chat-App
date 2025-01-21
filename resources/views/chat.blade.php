@@ -831,6 +831,7 @@
     <input type="hidden" value="{{ Auth::user()->seen_privacy }}" id="login_user_seen_privacy">
     <input type="hidden" value="{{ $group_id }}" id="notification_group_id">
     <input type="hidden" value="{{ $message_id }}" id="notification_message_id">
+    <input type="hidden" value="{{ $is_delete }}" id="is_delete">
 
     <style>
         .hidden {
