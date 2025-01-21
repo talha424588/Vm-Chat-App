@@ -1499,36 +1499,95 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
             `);
         }
 
+        // const dropdownHTML = `
+        //     <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+        //         <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        //             <i class="fas fa-angle-down text-muted px-2"></i>
+        //         </a>
+        //         <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+        //             ${user.role !== "0" && user.role !== "2"
+        //         ? `
+        //                 <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+        //             `
+        //         : ""
+        //     }
+        //             ${(user.role === "0" || user.role === "2") &&
+        //         incomingMessage.message.type === "Message"
+        //         ? `
+        //                 <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+        //             `
+        //         : ""
+        //     }
+
+        //     }
+        //         </div>
+        //     </div>
+        // `;
+
+
         const dropdownHTML = `
-            <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
-                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-angle-down text-muted px-2"></i>
-                </a>
-                <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                    ${user.role !== "0" && user.role !== "2"
-                ? `
+        <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+            <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-angle-down text-muted px-2"></i>
+            </a>
+            <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                ${user.role !== "0" && user.role !== "2"
+                    ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     `
-                : ""
-            }
-                    ${(user.role === "0" || user.role === "2") &&
-                incomingMessage.message.type === "Message"
-                ? `
+                    : ""
+                }
+                ${(user.role === "0" || user.role === "2") &&
+                    incomingMessage.message.type === "Message"
+                    ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     `
-                : ""
-            }
-                    ${(user.role === "0" || user.role === "2") &&
-                incomingMessage.message.is_compose !== 1 &&
-                incomingMessage.message.is_compose !== true
-                ? `
+                    : ""
+                }
+                ${incomingMessage.message.type === "Message" &&
+                    incomingMessage.message.status !== "Correction" &&
+                    (incomingMessage.message.is_compose === 1 || incomingMessage.message.is_compose === true)
+                    ? `
+                        <a class="dropdown-item" href="#" onclick="CorrectionMessage('${incomingMessage.message.id}','${incomingMessage.message.user.name}')">Correction</a>
+                    `
+                    : ""
+                }
+                ${incomingMessage.message.is_compose === 1 &&
+                    incomingMessage.message.type === "Message" &&
+                    !incomingMessage.message.reply
+                    ? `
+                        <a class="dropdown-item" href="#" onclick="moveMessage(${incomingMessage.message.id})">Move</a>
+                    `
+                    : ""
+                }
+                ${user.role == 0
+                    ? `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}" data-is-perm-delete="${0}">Delete</a>
+                    `
+                    : ""
+                }
+                ${incomingMessage.message.is_compose == 1 &&
+                    incomingMessage.message.is_compose == true &&
+                    user.role === "2"
+                    ? `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}" data-is-perm-delete="${1}">Request (Delete)</a>
+                    `
+                    : ""
+                }
+                ${incomingMessage.message.is_compose !== 1 &&
+                    incomingMessage.message.is_compose !== true &&
+                    (user.role === "3" || user.role === "2") &&
+                    incomingMessage.message.sender === user.unique_id
+                    ? `
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
                     `
-                : ""
-            }
-                </div>
+                    : ""
+                }
             </div>
-        `;
+        </div>
+    `;
+
+
         mainDiv.append(dropdownHTML);
     }
 });
