@@ -3713,17 +3713,6 @@ function removeQuotedMessage() {
         document.querySelector("#input").focus();
     }
 
-    const chat_action = document.getElementById("chat_action");
-    const Editreplyarea = document.getElementById("message-reply-area");
-    // if (
-    //     getComputedStyle(chat_action).display == "none" ||
-    //     (getComputedStyle(chat_action).display == "flex" &&
-    //         getComputedStyle(Editreplyarea).display == "block")
-    // ) {
-    //     Editreplyarea.style.display = "none";
-    //     chat_action.style.display = "flex";
-    //     document.querySelector("#input").focus();
-    // }
     document.getElementById("messages").style.marginBottom = "74px";
 }
 const sendMessageReply = () => {
