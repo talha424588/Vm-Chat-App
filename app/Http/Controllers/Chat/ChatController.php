@@ -241,12 +241,13 @@ class ChatController extends Controller
         $moveMessageConvMsg = [];
         $moveMessages = [];
         $mainMessages = [];
+
         foreach ($messages as $message) {
             if (is_array($message) && isset($message[0])) {
                 foreach ($message as $nestedMessage) {
                     $moveMessageConvMsg[] = $nestedMessage;
                 }
-            } else {
+            } elseif (!empty($message)) {
                 $mainMessages[] = $message;
             }
         }
