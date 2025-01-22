@@ -3729,8 +3729,7 @@ function moveMessage(messageId) {
         console.error(`Message with ID: ${messageId} not found.`);
     }
 }
-function pickParentChildMessages(selectedMessage)
-{
+function pickParentChildMessages(selectedMessage) {
     pagnicateChatList.data.forEach(msg => {
         if (msg.reply !== null && selectedMessage.id == msg.reply.id) {
             selectedMessagesSet.add(msg);
