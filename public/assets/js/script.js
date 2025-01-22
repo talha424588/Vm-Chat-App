@@ -3186,11 +3186,6 @@ function correction_call(message_id, messagebody, senderName) {
         ".reply-message-area"
     );
 
-    // if (existingReplyDiv) {
-    //     existingReplyDiv.innerHTML = messagebody;
-    // } else {
-    //     messageContentDiv.innerHTML = messagebody;
-    // }
     const chat_actionss = document.getElementById("chat_action");
     chat_actionss.style.display = "none";
     const Editreplyarea = document.getElementById("correctionreply-area");
