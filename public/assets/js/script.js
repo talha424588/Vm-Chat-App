@@ -1532,57 +1532,57 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
             </a>
             <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
                 ${user.role !== "0" && user.role !== "2"
-                    ? `
+                ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     `
-                    : ""
-                }
+                : ""
+            }
                 ${(user.role === "0" || user.role === "2") &&
-                    incomingMessage.message.type === "Message"
-                    ? `
+                incomingMessage.message.type === "Message"
+                ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     `
-                    : ""
-                }
+                : ""
+            }
                 ${incomingMessage.message.type === "Message" &&
-                    incomingMessage.message.status !== "Correction" &&
-                    (incomingMessage.message.is_compose === 1 || incomingMessage.message.is_compose === true)
-                    ? `
+                incomingMessage.message.status !== "Correction" &&
+                (incomingMessage.message.is_compose === 1 || incomingMessage.message.is_compose === true)
+                ? `
                         <a class="dropdown-item" href="#" onclick="CorrectionMessage('${incomingMessage.message.id}','${incomingMessage.message.user.name}')">Correction</a>
                     `
-                    : ""
-                }
+                : ""
+            }
                 ${incomingMessage.message.is_compose === 1 &&
-                    incomingMessage.message.type === "Message" &&
-                    !incomingMessage.message.reply
-                    ? `
+                incomingMessage.message.type === "Message" &&
+                !incomingMessage.message.reply
+                ? `
                         <a class="dropdown-item" href="#" onclick="moveMessage(${incomingMessage.message.id})">Move</a>
                     `
-                    : ""
-                }
+                : ""
+            }
                 ${user.role == 0
-                    ? `
+                ? `
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}" data-is-perm-delete="${0}">Delete</a>
                     `
-                    : ""
-                }
+                : ""
+            }
                 ${incomingMessage.message.is_compose == 1 &&
-                    incomingMessage.message.is_compose == true &&
-                    user.role === "2"
-                    ? `
+                incomingMessage.message.is_compose == true &&
+                user.role === "2"
+                ? `
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}" data-is-perm-delete="${1}">Request (Delete)</a>
                     `
-                    : ""
-                }
+                : ""
+            }
                 ${incomingMessage.message.is_compose !== 1 &&
-                    incomingMessage.message.is_compose !== true &&
-                    (user.role === "3" || user.role === "2") &&
-                    incomingMessage.message.sender === user.unique_id
-                    ? `
+                incomingMessage.message.is_compose !== true &&
+                (user.role === "3" || user.role === "2") &&
+                incomingMessage.message.sender === user.unique_id
+                ? `
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
                     `
-                    : ""
-                }
+                : ""
+            }
             </div>
         </div>
     `;
@@ -3772,14 +3772,8 @@ function moveMessage(messageId) {
             pagnicateChatList.data.find((msg) => msg.id === id)
         );
 
-        pagnicateChatList.data.forEach(msg => {
-            selectedMessages.forEach(eachSelectedMessages => {
-                if (msg.reply !== null && eachSelectedMessages.id == msg.reply.id) {
-                    selectedMessagesSet.add(msg);
-                    highlightSelectedMessage(msg.id)
-                    selectChildMessages(msg);
-                }
-            });
+        selectedMessages.forEach(eachSelectedMessage => {
+            pickParentChildMessages(eachSelectedMessage)
         });
         allSelectedMessages = [...selectedMessages, [...selectedMessagesSet]];
         document.getElementById("selected-count").textContent = `${allSelectedMessages.length - 1 + selectedMessagesSet.size
@@ -3788,6 +3782,16 @@ function moveMessage(messageId) {
     } else {
         console.error(`Message with ID: ${messageId} not found.`);
     }
+}
+function pickParentChildMessages(selectedMessage)
+{
+    pagnicateChatList.data.forEach(msg => {
+        if (msg.reply !== null && selectedMessage.id == msg.reply.id) {
+            selectedMessagesSet.add(msg);
+            highlightSelectedMessage(msg.id)
+            selectChildMessages(msg);
+        }
+    });
 }
 
 function selectChildMessages(message) {
