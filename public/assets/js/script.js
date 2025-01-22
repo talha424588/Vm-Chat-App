@@ -3689,23 +3689,6 @@ function removeQuotedMessage() {
         .querySelector(".auto-resize-textarea")
         .style.setProperty("overflow", "hidden");
     document.querySelector("#input").value = "";
-    // document.querySelector("#input").focus();
-    // const chat_action = document.getElementById('chat_action');
-    //     if (getComputedStyle(chat_action).display == "none") {
-    //         const Editreplyarea = document.getElementById('message-reply-area');
-    //         Editreplyarea.style.display = 'none';
-    //         chat_action.style.display = "";
-    //         const fileicon = document.querySelector('.chat_action_file');
-    //     }
-
-    // const chat_action = document.getElementById('chat_action');
-    // if(getComputedStyle(chat_action).display == "none")
-    // {
-    //     const Editreplyarea = document.getElementById('message-reply-area');
-    //     Editreplyarea.style.display = 'none';
-    //     chat_action.style.display="";
-    //     const fileicon = document.querySelector('.chat_action_file');
-    // }
 
     const correctionarea = document.getElementById("correction-div");
     if (getComputedStyle(correctionarea).display == "block") {
