@@ -44,14 +44,12 @@ class MessageDeleteRequest extends Mailable
     public function build()
     {
 
-        // Accessing message details
         $messageId = $this->message['message']['id'];
         $messageGroupId = $this->message['message']['group_id'];
         // $messageContent = Str::limit($this->message['message']['msg'], 50, '...');
         $messageContent = $this->message['message']['msg'];
-        $messageTime = $this->message['message']['time']; // Assuming this is a timestamp
+        $messageTime = $this->message['message']['time'];
 
-        // Accessing user details
         $userName = $this->user['name'];
         $userEmail = $this->user['email'];
         $userRole = $this->user['role'];
