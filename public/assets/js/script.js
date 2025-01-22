@@ -3743,6 +3743,7 @@ function selectChildMessages(message) {
     pagnicateChatList.data.forEach(msg => {
         if (msg.reply !== null && message.id == msg.reply.id) {
             selectedMessagesSet.add(msg);
+            selectChildMessages(msg)
             highlightSelectedMessage(msg.id)
         }
     });
