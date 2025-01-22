@@ -3519,13 +3519,6 @@ function handleSendMessage() {
         const Editreplyarea = document.getElementById("Editreply-area");
 
         Editreplyarea.style.display = "none";
-        // const fileicon = document.querySelector('.chat_action_file');
-        // fileicon.style.visibility = 'visible';
-        // const chat_action_capture = document.querySelector('.chat_action_capture');
-        // chat_action_capture.style.visibility = 'visible';
-        // const chat_action_voice = document.querySelector('.chat_action_voice');
-        // chat_action_voice.style.visibility = 'visible';
-        // chat_action_voice.style.display = 'block';
         const correctionarea = document.getElementById("correction-div");
         correctionarea.style.display = "none";
     } else {
