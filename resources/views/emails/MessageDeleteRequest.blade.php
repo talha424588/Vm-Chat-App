@@ -7,6 +7,12 @@
     <title>Message Deletion Request</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+<style>
+    .ii a[href] {
+        text-decoration: none;
+        color: #ffffff;
+    }
+</style>
 
 <body
     style="margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ">
