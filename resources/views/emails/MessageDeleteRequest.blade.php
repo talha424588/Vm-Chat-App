@@ -7,6 +7,12 @@
     <title>Message Deletion Request</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+<style>
+    .ii a[href] {
+        text-decoration: none;
+        color: #ffffff;
+    }
+</style>
 
 <body
     style="margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; ">
@@ -69,8 +75,8 @@
 
                 <div style="text-align: center; margin-top: 35px;">
                     {{-- <a href="https://stag.visamtion.org/?group_id={{ $groupId }}&message_id={{ $id }}" --}}
-                    <a href="http://127.0.0.1:8000/?group_id={{ $groupId }}&message_id={{ $id }}"
-                        style="background: #1DAB61; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 500; letter-spacing: 0.3px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(126, 58, 242, 0.2);">View
+                    <a href="http://127.0.0.1:8000/?group_id={{ $groupId }}&message_id={{ $id }}&is_delete={{ true }}"
+                        style="background: #1DAB61; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 500; letter-spacing: 0.3px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(126, 58, 242, 0.2);">Delete
                         Message</a>
                 </div>
 

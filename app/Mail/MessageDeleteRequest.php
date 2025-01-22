@@ -2,16 +2,10 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class MessageDeleteRequest extends Mailable
 {
@@ -44,13 +38,12 @@ class MessageDeleteRequest extends Mailable
     public function build()
     {
 
-        // Accessing message details
         $messageId = $this->message['message']['id'];
         $messageGroupId = $this->message['message']['group_id'];
-        $messageContent = Str::limit($this->message['message']['msg'], 50, '...');
-        $messageTime = $this->message['message']['time']; // Assuming this is a timestamp
+        // $messageContent = Str::limit($this->message['message']['msg'], 50, '...');
+        $messageContent = $this->message['message']['msg'];
+        $messageTime = $this->message['message']['time'];
 
-        // Accessing user details
         $userName = $this->user['name'];
         $userEmail = $this->user['email'];
         $userRole = $this->user['role'];

@@ -62,6 +62,7 @@ const DOM = {
     showVoiceIcon: null,
     audio_permissions: {},
     isDeleteRequest: false,
+    isDeleteParam: document.getElementById("is_delete").value
 
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
@@ -242,9 +243,6 @@ let viewChatList = (flag = false) => {
                 } else {
                     messageText = "No messages";
                 }
-                // if (elem.group.group_messages && elem.group.group_messages.length > 0 && latestMessage != null) {
-                //     latestMessage.status == "Correction" ? messageText = removeTags(messageText) : messageText = getCleanedTextSnippet(messageText) + (messageText.length > 30 ? "..." : "")
-                // }
                 if (
                     elem.group.group_messages &&
                     elem.group.group_messages.length > 0 &&
@@ -1141,8 +1139,10 @@ async function rerenderChatList(preGroupId) {
         const messageExists = prevGroup.group.group_messages.some(existingMessage => existingMessage.id === lastMessage.id);
 
         if (!messageExists) {
+            console.log("lastMessage",lastMessage);
             prevGroup.group.group_messages = [];
-            prevGroup.group.group_messages.push(lastMessage);
+            lastMessage.length > 0 ?? prevGroup.group.group_messages.push(lastMessage)
+            // prevGroup.group.group_messages.push(lastMessage);
         } else {
             // console.log("Message already exists in the group_messages array.");
         }
@@ -1501,36 +1501,95 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
             `);
         }
 
+        // const dropdownHTML = `
+        //     <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+        //         <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        //             <i class="fas fa-angle-down text-muted px-2"></i>
+        //         </a>
+        //         <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+        //             ${user.role !== "0" && user.role !== "2"
+        //         ? `
+        //                 <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+        //             `
+        //         : ""
+        //     }
+        //             ${(user.role === "0" || user.role === "2") &&
+        //         incomingMessage.message.type === "Message"
+        //         ? `
+        //                 <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
+        //             `
+        //         : ""
+        //     }
+
+        //     }
+        //         </div>
+        //     </div>
+        // `;
+
+
         const dropdownHTML = `
-            <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
-                <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-angle-down text-muted px-2"></i>
-                </a>
-                <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                    ${user.role !== "0" && user.role !== "2"
+        <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
+            <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-angle-down text-muted px-2"></i>
+            </a>
+            <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
+                ${user.role !== "0" && user.role !== "2"
                 ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     `
                 : ""
             }
-                    ${(user.role === "0" || user.role === "2") &&
+                ${(user.role === "0" || user.role === "2") &&
                 incomingMessage.message.type === "Message"
                 ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     `
                 : ""
             }
-                    ${(user.role === "0" || user.role === "2") &&
-                incomingMessage.message.is_compose !== 1 &&
-                incomingMessage.message.is_compose !== true
+                ${incomingMessage.message.type === "Message" &&
+                incomingMessage.message.status !== "Correction" &&
+                (incomingMessage.message.is_compose === 1 || incomingMessage.message.is_compose === true)
+                ? `
+                        <a class="dropdown-item" href="#" onclick="CorrectionMessage('${incomingMessage.message.id}','${incomingMessage.message.user.name}')">Correction</a>
+                    `
+                : ""
+            }
+                ${incomingMessage.message.is_compose === 1 &&
+                incomingMessage.message.type === "Message" &&
+                !incomingMessage.message.reply
+                ? `
+                        <a class="dropdown-item" href="#" onclick="moveMessage(${incomingMessage.message.id})">Move</a>
+                    `
+                : ""
+            }
+                ${user.role == 0
+                ? `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}" data-is-perm-delete="${0}">Delete</a>
+                    `
+                : ""
+            }
+                ${incomingMessage.message.is_compose == 1 &&
+                incomingMessage.message.is_compose == true &&
+                user.role === "2"
+                ? `
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}" data-is-perm-delete="${1}">Request (Delete)</a>
+                    `
+                : ""
+            }
+                ${incomingMessage.message.is_compose !== 1 &&
+                incomingMessage.message.is_compose !== true &&
+                (user.role === "3" || user.role === "2") &&
+                incomingMessage.message.sender === user.unique_id
                 ? `
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
                     `
                 : ""
             }
-                </div>
             </div>
-        `;
+        </div>
+    `;
+
+
         mainDiv.append(dropdownHTML);
     }
 });
@@ -2226,7 +2285,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>`;
             }
             else {
-                const dots = message.reply.msg.length > 100 ? "..." : "";
+                const dots = message.reply !== null ?? message.reply.msg.length > 100 ? "..." : "";
                 if (message.reply.is_compose == 1) {
                     var message_body =
                         processValue(message.reply.msg, false).substring(
@@ -2234,8 +2293,12 @@ let addMessageToMessageArea = (message, flag = false) => {
                             200
                         ) + dots;
                 } else {
-                    var message_body =
-                        safeSubstring(message.reply.msg, 0, 200) + dots;
+                    console.log("mesage",message);;
+                    if(message.reply !== null)
+                    {
+                        var message_body =
+                            safeSubstring(message.reply.msg, 0, 200) + dots;
+                    }
                 }
             }
             messageContent = `
@@ -3129,11 +3192,6 @@ function correction_call(message_id, messagebody, senderName) {
         ".reply-message-area"
     );
 
-    // if (existingReplyDiv) {
-    //     existingReplyDiv.innerHTML = messagebody;
-    // } else {
-    //     messageContentDiv.innerHTML = messagebody;
-    // }
     const chat_actionss = document.getElementById("chat_action");
     chat_actionss.style.display = "none";
     const Editreplyarea = document.getElementById("correctionreply-area");
@@ -3462,13 +3520,6 @@ function handleSendMessage() {
         const Editreplyarea = document.getElementById("Editreply-area");
 
         Editreplyarea.style.display = "none";
-        // const fileicon = document.querySelector('.chat_action_file');
-        // fileicon.style.visibility = 'visible';
-        // const chat_action_capture = document.querySelector('.chat_action_capture');
-        // chat_action_capture.style.visibility = 'visible';
-        // const chat_action_voice = document.querySelector('.chat_action_voice');
-        // chat_action_voice.style.visibility = 'visible';
-        // chat_action_voice.style.display = 'block';
         const correctionarea = document.getElementById("correction-div");
         correctionarea.style.display = "none";
     } else {
@@ -3491,13 +3542,7 @@ function removeEditMessage() {
     correctionarea.style.display = "none";
     var iconContainer = document.querySelector(".icon-container");
     iconContainer.style.bottom = "90px";
-    // const fileicon = document.querySelector('.chat_action_file');
-    // fileicon.style.visibility = 'visible';
-    // const chat_action_capture = document.querySelector('.chat_action_capture');
-    // chat_action_capture.style.visibility = 'visible';
-    // const chat_action_voice = document.querySelector('.chat_action_voice');
-    // chat_action_voice.style.visibility = 'visible';
-    // chat_action_voice.style.display = 'block';
+
     const chat_action = document.getElementById("chat_action");
     if (getComputedStyle(chat_action).display == "none")
         chat_action.style.display = "flex";
@@ -3606,14 +3651,6 @@ function showReply(message_id, senderName, type) {
     const fileicon = document.getElementById("file-icon");
     const captureid = document.getElementById("captureid");
 
-    // if (
-    //     getComputedStyle(chat_action).display == "block" ||
-    //     (getComputedStyle(chat_action).display == "flex" &&
-    //         getComputedStyle(Editreplyarea).display == "none")
-    // ) {
-    //     document.getElementById("chat_action").style.display = "none";
-    //     Editreplyarea.style.display = "block";
-    // }
     change_icon_height(replyDiv);
     document.querySelector("#input").value = "";
     document.querySelector("#input").focus();
@@ -3632,23 +3669,6 @@ function removeQuotedMessage() {
         .querySelector(".auto-resize-textarea")
         .style.setProperty("overflow", "hidden");
     document.querySelector("#input").value = "";
-    // document.querySelector("#input").focus();
-    // const chat_action = document.getElementById('chat_action');
-    //     if (getComputedStyle(chat_action).display == "none") {
-    //         const Editreplyarea = document.getElementById('message-reply-area');
-    //         Editreplyarea.style.display = 'none';
-    //         chat_action.style.display = "";
-    //         const fileicon = document.querySelector('.chat_action_file');
-    //     }
-
-    // const chat_action = document.getElementById('chat_action');
-    // if(getComputedStyle(chat_action).display == "none")
-    // {
-    //     const Editreplyarea = document.getElementById('message-reply-area');
-    //     Editreplyarea.style.display = 'none';
-    //     chat_action.style.display="";
-    //     const fileicon = document.querySelector('.chat_action_file');
-    // }
 
     const correctionarea = document.getElementById("correction-div");
     if (getComputedStyle(correctionarea).display == "block") {
@@ -3656,17 +3676,6 @@ function removeQuotedMessage() {
         document.querySelector("#input").focus();
     }
 
-    const chat_action = document.getElementById("chat_action");
-    const Editreplyarea = document.getElementById("message-reply-area");
-    // if (
-    //     getComputedStyle(chat_action).display == "none" ||
-    //     (getComputedStyle(chat_action).display == "flex" &&
-    //         getComputedStyle(Editreplyarea).display == "block")
-    // ) {
-    //     Editreplyarea.style.display = "none";
-    //     chat_action.style.display = "flex";
-    //     document.querySelector("#input").focus();
-    // }
     document.getElementById("messages").style.marginBottom = "74px";
 }
 const sendMessageReply = () => {
@@ -3681,7 +3690,6 @@ let selectedMessagesSet = new Set();
 
 
 function moveMessage(messageId) {
-    console.log("paginated ChatList", pagnicateChatList.data);
     var replyDiv = document.getElementById("reply-div");
     if (replyDiv && window.getComputedStyle(replyDiv).display === "block") {
         return;
@@ -3715,14 +3723,8 @@ function moveMessage(messageId) {
             pagnicateChatList.data.find((msg) => msg.id === id)
         );
 
-        pagnicateChatList.data.forEach(msg => {
-            selectedMessages.forEach(eachSelectedMessages => {
-                if (msg.reply !== null && eachSelectedMessages.id == msg.reply.id) {
-                    selectedMessagesSet.add(msg);
-                    highlightSelectedMessage(msg.id)
-                    selectChildMessages(msg);
-                }
-            });
+        selectedMessages.forEach(eachSelectedMessage => {
+            pickParentChildMessages(eachSelectedMessage)
         });
         allSelectedMessages = [...selectedMessages, [...selectedMessagesSet]];
         document.getElementById("selected-count").textContent = `${allSelectedMessages.length - 1 + selectedMessagesSet.size
@@ -3732,11 +3734,24 @@ function moveMessage(messageId) {
         console.error(`Message with ID: ${messageId} not found.`);
     }
 }
+function pickParentChildMessages(selectedMessage) {
+    console.log("pagnicateChatList",pagnicateChatList.data);
+
+    pagnicateChatList.data.forEach(msg => {
+        console.log("msg",msg);
+        if (msg.reply !== null && selectedMessage.id == msg.reply.id) {
+            selectedMessagesSet.add(msg);
+            highlightSelectedMessage(msg.id)
+            selectChildMessages(msg);
+        }
+    });
+}
 
 function selectChildMessages(message) {
     pagnicateChatList.data.forEach(msg => {
         if (msg.reply !== null && message.id == msg.reply.id) {
             selectedMessagesSet.add(msg);
+            selectChildMessages(msg)
             highlightSelectedMessage(msg.id)
         }
     });
@@ -4687,52 +4702,56 @@ window.addEventListener("resize", (e) => {
 });
 
 let init = () => {
-    console.log("before param remove function");
-    function removeQueryParams() {
-        console.log("remove param");
-        const url = new URL(window.location.href);
-        console.log("url", url);
+    if (DOM.isDeleteParam == 1) {
+        // alert('Message deleted successfully.');
+        window.close();
 
-
-        if (url.searchParams.has('group_id') && url.searchParams.has('message_id')) {
-            const messageId = url.searchParams.get('message_id');
-
-            console.log('Message ID:', messageId);
-
-            // Function to check for messageElement
-            function checkMessageElement() {
-                var messageElement = $('[data-message-id="' + messageId + '"]');
-                if (messageElement.length) {
-
-                    scrollToMessage(messageId,null);
-
-                    DOM.isDeleteRequest = true;
-                    DOM.notification_message_id = null;
-                    DOM.notification_group_id = null;
-                    // Remove query parameters
-                    url.searchParams.delete('group_id');
-                    url.searchParams.delete('message_id');
-                    window.history.replaceState({}, document.title, url.toString());
-                    console.log("Parameters removed");
-                } else {
-                    console.log("Message element not found, retrying...");
-                    setTimeout(checkMessageElement, 1000); // Retry after 1 second
-                }
-            }
-
-            // Start checking for the message element
-            checkMessageElement();
-        } else {
-            DOM.isDeleteRequest = false;
-
-            console.log("Both parameters are not present. Function will not run.");
-        }
     }
+    // function removeQueryParams() {
+    //     console.log("remove param");
+    //     const url = new URL(window.location.href);
+    //     console.log("url", url);
 
-    // Run the function after 3 seconds
-    setTimeout(() => {
-        removeQueryParams();
-    }, 3000);
+
+    //     if (url.searchParams.has('group_id') && url.searchParams.has('message_id')) {
+    //         const messageId = url.searchParams.get('message_id');
+
+    //         console.log('Message ID:', messageId);
+
+    //         // Function to check for messageElement
+    //         function checkMessageElement() {
+    //             var messageElement = $('[data-message-id="' + messageId + '"]');
+    //             if (messageElement.length) {
+
+    //                 scrollToMessage(messageId,null);
+
+    //                 DOM.isDeleteRequest = true;
+    //                 DOM.notification_message_id = null;
+    //                 DOM.notification_group_id = null;
+    //                 // Remove query parameters
+    //                 url.searchParams.delete('group_id');
+    //                 url.searchParams.delete('message_id');
+    //                 window.history.replaceState({}, document.title, url.toString());
+    //                 console.log("Parameters removed");
+    //             } else {
+    //                 console.log("Message element not found, retrying...");
+    //                 setTimeout(checkMessageElement, 1000); // Retry after 1 second
+    //             }
+    //         }
+
+    //         // Start checking for the message element
+    //         checkMessageElement();
+    //     } else {
+    //         DOM.isDeleteRequest = false;
+
+    //         console.log("Both parameters are not present. Function will not run.");
+    //     }
+    // }
+
+    // // Run the function after 3 seconds
+    // setTimeout(() => {
+    //     removeQueryParams();
+    // }, 3000);
 
     DOM.username.innerHTML = user.name;
 
@@ -4788,9 +4807,9 @@ let init = () => {
 
 init();
 
-setInterval(async () => {
-    await generateChatList();
-}, 120000);
+// setInterval(async () => {
+//     await generateChatList();
+// }, 120000);
 var OneSignal = window.OneSignal || [];
 
 OneSignal.push(function () {
