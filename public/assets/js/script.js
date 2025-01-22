@@ -2285,7 +2285,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             </div>`;
             }
             else {
-                const dots = message.reply.msg.length > 100 ? "..." : "";
+                const dots = message.reply !== null ?? message.reply.msg.length > 100 ? "..." : "";
                 if (message.reply.is_compose == 1) {
                     var message_body =
                         processValue(message.reply.msg, false).substring(
@@ -2293,8 +2293,12 @@ let addMessageToMessageArea = (message, flag = false) => {
                             200
                         ) + dots;
                 } else {
-                    var message_body =
-                        safeSubstring(message.reply.msg, 0, 200) + dots;
+                    console.log("mesage",message);;
+                    if(message.reply !== null)
+                    {
+                        var message_body =
+                            safeSubstring(message.reply.msg, 0, 200) + dots;
+                    }
                 }
             }
             messageContent = `
@@ -3731,7 +3735,10 @@ function moveMessage(messageId) {
     }
 }
 function pickParentChildMessages(selectedMessage) {
+    console.log("pagnicateChatList",pagnicateChatList.data);
+
     pagnicateChatList.data.forEach(msg => {
+        console.log("msg",msg);
         if (msg.reply !== null && selectedMessage.id == msg.reply.id) {
             selectedMessagesSet.add(msg);
             highlightSelectedMessage(msg.id)
