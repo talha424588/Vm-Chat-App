@@ -3548,13 +3548,7 @@ function removeEditMessage() {
     correctionarea.style.display = "none";
     var iconContainer = document.querySelector(".icon-container");
     iconContainer.style.bottom = "90px";
-    // const fileicon = document.querySelector('.chat_action_file');
-    // fileicon.style.visibility = 'visible';
-    // const chat_action_capture = document.querySelector('.chat_action_capture');
-    // chat_action_capture.style.visibility = 'visible';
-    // const chat_action_voice = document.querySelector('.chat_action_voice');
-    // chat_action_voice.style.visibility = 'visible';
-    // chat_action_voice.style.display = 'block';
+
     const chat_action = document.getElementById("chat_action");
     if (getComputedStyle(chat_action).display == "none")
         chat_action.style.display = "flex";
