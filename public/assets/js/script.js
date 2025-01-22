@@ -1139,8 +1139,10 @@ async function rerenderChatList(preGroupId) {
         const messageExists = prevGroup.group.group_messages.some(existingMessage => existingMessage.id === lastMessage.id);
 
         if (!messageExists) {
+            console.log("lastMessage",lastMessage);
             prevGroup.group.group_messages = [];
-            prevGroup.group.group_messages.push(lastMessage);
+            lastMessage.length > 0 ?? prevGroup.group.group_messages.push(lastMessage)
+            // prevGroup.group.group_messages.push(lastMessage);
         } else {
             // console.log("Message already exists in the group_messages array.");
         }
@@ -3684,7 +3686,6 @@ let selectedMessagesSet = new Set();
 
 
 function moveMessage(messageId) {
-    console.log("paginated ChatList", pagnicateChatList.data);
     var replyDiv = document.getElementById("reply-div");
     if (replyDiv && window.getComputedStyle(replyDiv).display === "block") {
         return;
@@ -4799,9 +4800,9 @@ let init = () => {
 
 init();
 
-setInterval(async () => {
-    await generateChatList();
-}, 120000);
+// setInterval(async () => {
+//     await generateChatList();
+// }, 120000);
 var OneSignal = window.OneSignal || [];
 
 OneSignal.push(function () {
