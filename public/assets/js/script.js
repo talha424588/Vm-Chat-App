@@ -3663,14 +3663,6 @@ function showReply(message_id, senderName, type) {
     const fileicon = document.getElementById("file-icon");
     const captureid = document.getElementById("captureid");
 
-    // if (
-    //     getComputedStyle(chat_action).display == "block" ||
-    //     (getComputedStyle(chat_action).display == "flex" &&
-    //         getComputedStyle(Editreplyarea).display == "none")
-    // ) {
-    //     document.getElementById("chat_action").style.display = "none";
-    //     Editreplyarea.style.display = "block";
-    // }
     change_icon_height(replyDiv);
     document.querySelector("#input").value = "";
     document.querySelector("#input").focus();
