@@ -71,8 +71,6 @@ Route::post('/messages', [ChatController::class, 'store']);
 // Route::get('/chat',[ChatController::class,'store'])->name('store.chat');
 
 // Auth::routes();
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
 
 Route::get("/accessToken", [FirebaseService::class, 'sendMessageNotification']);
 
