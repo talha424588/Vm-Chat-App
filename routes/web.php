@@ -91,10 +91,3 @@ Route::get("/accessToken", [FirebaseService::class, 'sendMessageNotification']);
 
 
 Route::get('/send-notification', [FirebaseService::class, 'sendNotification']);
-
-
-
-
-// Route::get("message/all/messages/{id}",[ChatController::class, 'deleteAllMessage']);
-
-
