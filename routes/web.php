@@ -32,8 +32,7 @@ Route::post('/broadcast', [ChatController::class, 'broadcastChat'])->name('broad
 
 Route::group(['middleware' => ['auth:web']], function () {
 
-    // user
-
+    // User routes
     Route::post("/user/update/{token}" , [UserController::class, 'updateUserFcmToken']);
 
     //Groups Routes
@@ -47,14 +46,9 @@ Route::group(['middleware' => ['auth:web']], function () {
 
     //Chats Routes
     Route::get('search-groups-chat-messages', [ChatController::class, 'searchGroupMessages']);
-
-    // Route::get('?{group_id}', [ChatController::class, 'openChatGroup']);
-
     Route::post('get-groups-messages-by-group-id', [ChatController::class, 'getUserAllGroupsMessages']);
-
     Route::get('/messages', [ChatController::class, 'index']);
     Route::get('auth/token/verify', [AuthController::class, 'verifyToken']);
-
     Route::delete('/message/delete/', [ChatController::class, 'delete']);
     Route::post('/message/seen-by/update', [ChatController::class, 'updateMessageReadStatus']);
     Route::get('/message/seen-by/{id}', [ChatController::class, 'getMessageReadStatus']);
