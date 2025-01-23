@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enum\MessageEnum as EnumMessageEnum;
+use App\Http\Controllers\MailController;
 use App\Http\Requests\LoginRequestBody;
 use App\Http\Resources\GroupResource;
 use App\Http\Resources\MessageResource;
@@ -16,6 +17,7 @@ use App\Repositories\GroupRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\UserRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -27,6 +29,12 @@ use function PHPUnit\Framework\returnSelf;
 
 class ChatService implements ChatRepository
 {
+    protected MailController $mailController; // Declare the property
+
+    public function __construct(MailController $mailController)
+    {
+        $this->mailController = $mailController;
+    }
     public function searchChatMessages($request)
     {
         $messages = GroupMessage::with('group')->where('msg', 'LIKE', "%{$request->get("query")}%")->get();
@@ -369,15 +377,117 @@ class ChatService implements ChatRepository
     }
 
 
-    public function deleteMessage($messageId)
+    // public function deleteMessage($messageId)
+    // {
+    //     $message = GroupMessage::find($messageId);
+    //     if ($message) {
+    //         $message->delete();
+    //         return response()->json(['true' => 'Message deleted successfully']);
+    //     } else {
+    //         return response()->json(['false' => 'Not found']);
+    //     }
+    // }
+
+
+    public function deleteMessage($request)
     {
-        $message = GroupMessage::find($messageId);
-        if ($message) {
-            $message->delete();
-            return response()->json(['true' => 'Message deleted successfully']);
+        if (isset($request->is_perm_delete) && $request->is_perm_delete == 1 && Auth::user()->role == 2) {
+            $this->mailController->RequestMessageDelete(Auth::user(), $request);
+            $message = $this->fetchMessage($request->message['id']);
+            return response()->json([
+                'status' => true,
+                'message' => 'delete message request send successfully',
+                'data' => $message,
+            ], 200);
+            // }
         } else {
-            return response()->json(['false' => 'Not found']);
+            try {
+                $messageId = $request->message ? $request->message['id'] : $request->message_id;
+                $message = $this->fetchMessage($messageId);
+                if (isset($request->is_perm_delete) && $request->is_perm_delete == 0 && Auth::user()->role == 0) {
+                    if ($message) {
+                        $message = GroupMessage::find($messageId);
+                        if ($message) {
+                            $toDeleteMessages = $this->fetchAllMessagesToDelete($message->id);
+                            GroupMessage::destroy(array_column($toDeleteMessages, 'id'));
+                            $message->delete();
+                            $data = [
+                                "message" => $message,
+                                "deleteFlag" => true
+                            ];
+                            return response()->json([
+                                'status' => true,
+                                'message' => 'Message deleted successfully',
+                                'data' => $data
+                            ], 200);
+                        } else {
+                            return response()->json(['false' => 'Not found']);
+                        }
+                        $data = [
+                            "message" => $message,
+                            "deleteFlag" => true
+                        ];
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Message deleted successfully',
+                            'data' => $data
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Message deletion failed'
+                        ], 400);
+                    }
+                } else {
+                    $message->is_deleted = true;
+                    if ($message->save()) {
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Message deleted successfully',
+                            'data' => $message
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Message deletion failed'
+                        ], 400);
+                    }
+                }
+            } catch (ModelNotFoundException $e) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Message not found'
+                ], 404);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'An error occurred while deleting the message'
+                ], 500);
+            }
         }
+    }
+
+    private function fetchMessage($id)
+    {
+
+        $message = GroupMessage::with("user")->findOrFail($id);
+        return $message;
+    }
+
+    public function fetchAllMessagesToDelete($id)
+    {
+        $toDeleteMessageArray = [];
+        $messageToCheck = [$id];
+
+        while (!empty($messageToCheck)) {
+            $currentId = array_pop($messageToCheck);
+            $childMessages = GroupMessage::where("reply_id", $currentId)->get();
+            $toDeleteMessageArray = array_merge($toDeleteMessageArray, $childMessages->toArray());
+            foreach ($childMessages as $message) {
+                $messageToCheck[] = $message->id;
+            }
+        }
+        return $toDeleteMessageArray;
     }
 
     public function openChatGroup($request, $groupId)

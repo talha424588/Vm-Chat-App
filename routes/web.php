@@ -25,12 +25,6 @@ Auth::routes();
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
-// Route::get('/forgot-password', function () {
-//     return view('forgotPassword');
-// })->middleware('guest')->name('password.request');
-
-// Route::get('/reset-password/', [AuthController::class, 'resetPassword'])->middleware('guest')->name('password.reset');
-
 Route::get('/', [ChatController::class, 'index'])->name('chat')->middleware('auth');
 
 Route::post('/broadcast', [ChatController::class, 'broadcastChat'])->name('broadcast.chat');
@@ -38,8 +32,7 @@ Route::post('/broadcast', [ChatController::class, 'broadcastChat'])->name('broad
 
 Route::group(['middleware' => ['auth:web']], function () {
 
-    // user
-
+    // User routes
     Route::post("/user/update/{token}" , [UserController::class, 'updateUserFcmToken']);
 
     //Groups Routes
@@ -53,14 +46,9 @@ Route::group(['middleware' => ['auth:web']], function () {
 
     //Chats Routes
     Route::get('search-groups-chat-messages', [ChatController::class, 'searchGroupMessages']);
-
-    // Route::get('?{group_id}', [ChatController::class, 'openChatGroup']);
-
     Route::post('get-groups-messages-by-group-id', [ChatController::class, 'getUserAllGroupsMessages']);
-
     Route::get('/messages', [ChatController::class, 'index']);
     Route::get('auth/token/verify', [AuthController::class, 'verifyToken']);
-
     Route::delete('/message/delete/', [ChatController::class, 'delete']);
     Route::post('/message/seen-by/update', [ChatController::class, 'updateMessageReadStatus']);
     Route::get('/message/seen-by/{id}', [ChatController::class, 'getMessageReadStatus']);
@@ -83,13 +71,9 @@ Route::post('/messages', [ChatController::class, 'store']);
 // Route::get('/chat',[ChatController::class,'store'])->name('store.chat');
 
 // Auth::routes();
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
 
 Route::get("/accessToken", [FirebaseService::class, 'sendMessageNotification']);
 
 
 
 Route::get('/send-notification', [FirebaseService::class, 'sendNotification']);
-
-
