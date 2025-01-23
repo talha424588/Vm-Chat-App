@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Chat;
 use App\Enum\MessageEnum as EnumMessageEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\MailController;
-use App\Jobs\SendNotificationJob;
 use App\Models\GroupMessage;
 use App\Models\User;
 use App\Repositories\ChatRepository;
@@ -18,23 +17,19 @@ use Illuminate\Support\Facades\DB;
 
 class ChatController extends Controller
 {
-    protected MailController $mailController; // Declare the property
 
-    public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService, MailController $mailController)
-
+    public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService)
     {
-        $this->mailController = $mailController;
     }
 
     public function index(Request $request)
     {
-
         if ($request->has('is_delete')) {
             $group_id = $request->group_id ?? null;
             $message_id = $request->message_id ?? null;
             $is_delete = $request->input('is_delete');
             if ($is_delete === '1') {
-                $this->chatRepository->deleteMessage($message_id);
+                $this->chatRepository->deleteMessage($request);
             }
             $group_id =  null;
             $message_id =  null;
@@ -135,76 +130,7 @@ class ChatController extends Controller
 
     public function delete(Request $request)
     {
-        if (isset($request->is_perm_delete) && $request->is_perm_delete == 1 && Auth::user()->role == 2) {
-            $this->mailController->RequestMessageDelete(Auth::user(), $request);
-            $message = $this->fetchMessage($request->message['id']);
-            // $message->is_deleted = true;
-            // if ($message->save()) {
-            return response()->json([
-                'status' => true,
-                'message' => 'delete message request send successfully',
-                'data' => $message,
-            ], 200);
-            // }
-        } else {
-            try {
-                $message = $this->fetchMessage($request->message['id']);
-                if (isset($request->is_perm_delete) && $request->is_perm_delete == 0 && Auth::user()->role == 0) {
-                    if ($message->delete()) {
-                        // if (Auth::user()->role == 0 || Auth::user()->role == 2) {
-                        //     $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $message->group_id)->orderBy("id", "Desc")->first();
-                        // } else {
-                        //     $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $message->group_id)->where('is_deleted', 0)->orderBy("id", "Desc")->first();
-                        // }
-                        $data = [
-                            "message" => $message,
-                            "deleteFlag" => true
-                        ];
-                        return response()->json([
-                            'status' => true,
-                            'message' => 'Message deleted successfully',
-                            'data' => $data
-                        ], 200);
-                    } else {
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Message deletion failed'
-                        ], 400);
-                    }
-                } else {
-                    $message->is_deleted = true;
-                    if ($message->save()) {
-                        return response()->json([
-                            'status' => true,
-                            'message' => 'Message deleted successfully',
-                            'data' => $message
-                        ], 200);
-                    } else {
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Message deletion failed'
-                        ], 400);
-                    }
-                }
-            } catch (ModelNotFoundException $e) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Message not found'
-                ], 404);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'An error occurred while deleting the message'
-                ], 500);
-            }
-        }
-    }
-
-    private function fetchMessage($id)
-    {
-
-        $message = GroupMessage::with("user")->findOrFail($id);
-        return $message;
+        return $this->chatRepository->deleteMessage($request);
     }
 
     public function getMessageReadStatus($messageId)

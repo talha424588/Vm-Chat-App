@@ -559,6 +559,15 @@ function makeformatDate(dateString) {
         return `${day}/${month}/${year}`;
     }
 }
+removeMessageArray = [];
+function removeChildMessages(id) {
+    pagnicateChatList.data.forEach(msg => {
+        if (msg.reply !== null && id == msg.reply.id) {
+            removeMessageArray.push(msg);
+            removeChildMessages(msg.id)
+        }
+    });
+}
 
 socket.on("deleteMessage", (message, isMove) => {
     let deleteMessage = null
@@ -581,6 +590,16 @@ socket.on("deleteMessage", (message, isMove) => {
         ).closest(".ml-3");
 
         if ('deleteFlag' in message) {
+
+            removeChildMessages(deleteMessage.id)
+            removeMessageArray.forEach((msg => {
+                var messageElement = $(
+                    '[data-message-id="' + msg.id + '"]'
+                ).closest(".ml-3");
+                messageElement.addClass("hidden-message");
+
+            }
+            ))
             messageElement.addClass("hidden-message");
         }
         if (user.role != 0 && user.role != 2) {
@@ -1139,7 +1158,7 @@ async function rerenderChatList(preGroupId) {
         const messageExists = prevGroup.group.group_messages.some(existingMessage => existingMessage.id === lastMessage.id);
 
         if (!messageExists) {
-            console.log("lastMessage",lastMessage);
+            console.log("lastMessage", lastMessage);
             prevGroup.group.group_messages = [];
             lastMessage.length > 0 ?? prevGroup.group.group_messages.push(lastMessage)
             // prevGroup.group.group_messages.push(lastMessage);
@@ -2293,9 +2312,8 @@ let addMessageToMessageArea = (message, flag = false) => {
                             200
                         ) + dots;
                 } else {
-                    console.log("mesage",message);;
-                    if(message.reply !== null)
-                    {
+                    console.log("mesage", message);;
+                    if (message.reply !== null) {
                         var message_body =
                             safeSubstring(message.reply.msg, 0, 200) + dots;
                     }
@@ -3735,10 +3753,10 @@ function moveMessage(messageId) {
     }
 }
 function pickParentChildMessages(selectedMessage) {
-    console.log("pagnicateChatList",pagnicateChatList.data);
+    console.log("pagnicateChatList", pagnicateChatList.data);
 
     pagnicateChatList.data.forEach(msg => {
-        console.log("msg",msg);
+        console.log("msg", msg);
         if (msg.reply !== null && selectedMessage.id == msg.reply.id) {
             selectedMessagesSet.add(msg);
             highlightSelectedMessage(msg.id)
