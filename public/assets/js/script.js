@@ -4721,6 +4721,7 @@ window.addEventListener("resize", (e) => {
 
 let init = () => {
     if (DOM.isDeleteParam == 1) {
+        console.log("delete params",DOM.isDeleteParam)
         window.close();
     }
     // function removeQueryParams() {
