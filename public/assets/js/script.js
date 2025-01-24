@@ -561,12 +561,15 @@ function makeformatDate(dateString) {
 }
 removeMessageArray = [];
 function removeChildMessages(id) {
-    pagnicateChatList.data.forEach(msg => {
-        if (msg.reply !== null && id == msg.reply.id) {
-            removeMessageArray.push(msg);
-            removeChildMessages(msg.id)
-        }
-    });
+    if(pagnicateChatList && pagnicateChatList.data)
+    {
+        pagnicateChatList.data.forEach(msg => {
+            if (msg.reply !== null && id == msg.reply.id) {
+                removeMessageArray.push(msg);
+                removeChildMessages(msg.id)
+            }
+        });
+    }
 }
 
 socket.on("deleteMessage", (message, isMove) => {
