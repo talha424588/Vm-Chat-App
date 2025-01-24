@@ -1161,10 +1161,20 @@ async function rerenderChatList(preGroupId) {
         const messageExists = prevGroup.group.group_messages.some(existingMessage => existingMessage.id === lastMessage.id);
 
         if (!messageExists) {
-            console.log("lastMessage", lastMessage);
+
             prevGroup.group.group_messages = [];
-            lastMessage.length > 0 ?? prevGroup.group.group_messages.push(lastMessage)
-            // prevGroup.group.group_messages.push(lastMessage);
+            if(lastMessage != null)
+            {
+                prevGroup.group.group_messages.push(lastMessage);
+            }
+            let seenBy = lastMessage.seen_by.split(", ").map((id)=>id.trim());
+
+
+            let unseenBy = seenBy.includes(user.unique_id);
+            if(!unseenBy)
+            {
+                prevGroup.unread +=1;
+            }
         } else {
             // console.log("Message already exists in the group_messages array.");
         }
