@@ -399,30 +399,49 @@ class ChatService implements ChatRepository
                 'message' => 'delete message request send successfully',
                 'data' => $message,
             ], 200);
-            // }
         } else {
             try {
                 $messageId = $request->message ? $request->message['id'] : $request->message_id;
                 $message = $this->fetchMessage($messageId);
-                if (isset($request->is_perm_delete) && $request->is_perm_delete == 0 && Auth::user()->role == 0) {
-                    if ($message) {
-                        $message = GroupMessage::find($messageId);
-                        if ($message) {
-                            $toDeleteMessages = $this->fetchAllMessagesToDelete($message->id);
-                            GroupMessage::destroy(array_column($toDeleteMessages, 'id'));
-                            $message->delete();
-                            $data = [
-                                "message" => $message,
-                                "deleteFlag" => true
-                            ];
-                            return response()->json([
-                                'status' => true,
-                                'message' => 'Message deleted successfully',
-                                'data' => $data
-                            ], 200);
-                        } else {
-                            return response()->json(['false' => 'Not found']);
-                        }
+                if ($message) {
+                    if (isset($request->is_perm_delete) && $request->is_perm_delete == 0 && Auth::user()->role == 0) {
+                        $toDeleteMessages = $this->fetchAllMessagesToDelete($message->id);
+                        GroupMessage::destroy(array_column($toDeleteMessages, 'id'));
+                        $message->delete();
+                        $data = [
+                            "message" => $message,
+                            "deleteFlag" => true
+                        ];
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Message deleted successfully',
+                            'data' => $data
+                        ], 200);
+
+                        $data = [
+                            "message" => $message,
+                            "deleteFlag" => true
+                        ];
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Message deleted successfully',
+                            'data' => $data
+                        ], 200);
+                    }
+                    if ($request->input('is_delete') === "1") {
+                        $toDeleteMessages = $this->fetchAllMessagesToDelete($message->id);
+                        GroupMessage::destroy(array_column($toDeleteMessages, 'id'));
+                        $message->delete();
+                        $data = [
+                            "message" => $message,
+                            "deleteFlag" => true
+                        ];
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Message deleted successfully',
+                            'data' => $data
+                        ], 200);
+
                         $data = [
                             "message" => $message,
                             "deleteFlag" => true
@@ -433,25 +452,25 @@ class ChatService implements ChatRepository
                             'data' => $data
                         ], 200);
                     } else {
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Message deletion failed'
-                        ], 400);
+                        $message->is_deleted = true;
+                        if ($message->save()) {
+                            return response()->json([
+                                'status' => true,
+                                'message' => 'Message deleted successfully',
+                                'data' => $message
+                            ], 200);
+                        } else {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Message deletion failed'
+                            ], 400);
+                        }
                     }
                 } else {
-                    $message->is_deleted = true;
-                    if ($message->save()) {
-                        return response()->json([
-                            'status' => true,
-                            'message' => 'Message deleted successfully',
-                            'data' => $message
-                        ], 200);
-                    } else {
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Message deletion failed'
-                        ], 400);
-                    }
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Message not found'
+                    ], 404);
                 }
             } catch (ModelNotFoundException $e) {
                 return response()->json([

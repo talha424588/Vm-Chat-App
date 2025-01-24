@@ -561,12 +561,14 @@ function makeformatDate(dateString) {
 }
 removeMessageArray = [];
 function removeChildMessages(id) {
-    pagnicateChatList.data.forEach(msg => {
-        if (msg.reply !== null && id == msg.reply.id) {
-            removeMessageArray.push(msg);
-            removeChildMessages(msg.id)
-        }
-    });
+    if (pagnicateChatList && pagnicateChatList.data) {
+        pagnicateChatList.data.forEach(msg => {
+            if (msg.reply !== null && id == msg.reply.id) {
+                removeMessageArray.push(msg);
+                removeChildMessages(msg.id)
+            }
+        });
+    }
 }
 
 socket.on("deleteMessage", (message, isMove) => {
@@ -1158,10 +1160,18 @@ async function rerenderChatList(preGroupId) {
         const messageExists = prevGroup.group.group_messages.some(existingMessage => existingMessage.id === lastMessage.id);
 
         if (!messageExists) {
-            console.log("lastMessage", lastMessage);
+
             prevGroup.group.group_messages = [];
-            lastMessage.length > 0 ?? prevGroup.group.group_messages.push(lastMessage)
-            // prevGroup.group.group_messages.push(lastMessage);
+            if (lastMessage != null) {
+                prevGroup.group.group_messages.push(lastMessage);
+            }
+            let seenBy = lastMessage.seen_by.split(", ").map((id) => id.trim());
+
+
+            let unseenBy = seenBy.includes(user.unique_id);
+            if (!unseenBy) {
+                prevGroup.unread += 1;
+            }
         } else {
             // console.log("Message already exists in the group_messages array.");
         }
@@ -1593,7 +1603,14 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
                 ? `
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}" data-is-perm-delete="${1}">Request (Delete)</a>
                     `
-                : ""
+                : incomingMessage.message.is_compose !== 1 &&
+                    incomingMessage.message.is_compose !== true &&
+                    (user.role === "3" || user.role === "2") ||
+                    incomingMessage.message.sender === user.unique_id
+                    ? `
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
+                                `
+                    : ""
             }
                 ${incomingMessage.message.is_compose !== 1 &&
                 incomingMessage.message.is_compose !== true &&
@@ -4721,9 +4738,8 @@ window.addEventListener("resize", (e) => {
 
 let init = () => {
     if (DOM.isDeleteParam == 1) {
-        // alert('Message deleted successfully.');
+        console.log("delete params", DOM.isDeleteParam)
         window.close();
-
     }
     // function removeQueryParams() {
     //     console.log("remove param");

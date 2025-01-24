@@ -28,7 +28,7 @@ class ChatController extends Controller
             $group_id = $request->group_id ?? null;
             $message_id = $request->message_id ?? null;
             $is_delete = $request->input('is_delete');
-            if ($is_delete === '1') {
+            if ($is_delete === "1") {
                 $this->chatRepository->deleteMessage($request);
             }
             $group_id =  null;
