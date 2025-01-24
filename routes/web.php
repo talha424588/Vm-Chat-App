@@ -65,15 +65,6 @@ Route::group(['middleware' => ['auth:web']], function () {
 });
 
 Route::post('/messages/move', [ChatController::class, 'moveMessages']);
-
-
 Route::post('/messages', [ChatController::class, 'store']);
-// Route::get('/chat',[ChatController::class,'store'])->name('store.chat');
-
-// Auth::routes();
-
 Route::get("/accessToken", [FirebaseService::class, 'sendMessageNotification']);
-
-
-
 Route::get('/send-notification', [FirebaseService::class, 'sendNotification']);
