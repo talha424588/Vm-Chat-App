@@ -802,7 +802,7 @@ socket.on("updateGroupMessages", (message) => {
 });
 
 socket.on("sendChatToClient", (message) => {
-    console.log("sendChatToClient",message);
+    console.log("sendChatToClient", message);
     if (
         nextPageMessages &&
         nextPageMessages.data &&
@@ -817,6 +817,11 @@ socket.on("sendChatToClient", (message) => {
     }
 
     if (pagnicateChatList && pagnicateChatList.data) {
+        let isMsgExist = pagnicateChatList.data.find((msg)=>msg.id == message.id);
+        if(isMsgExist != null)
+        {
+            return;
+        }
         pagnicateChatList.data.push(message);
     }
 
@@ -4841,18 +4846,21 @@ let init = () => {
 };
 
 init();
-let lastMessageId = null;
+let lastVmMessageId = 0;
+console.log("last message id", lastVmMessageId);
 setInterval(async () => {
     await generateChatList();
     if (DOM.groupId != null) {
         let openGroup = chatList.find((group) => group.group.group_id == DOM.groupId);
         if (openGroup) {
-                if(openGroup.msg && lastMessageId !== openGroup.msg.id)
-                {
-                    lastMessageId = openGroup.msg.id;
-                    socket.emit("sendChatToServer", openGroup.msg,true);
-                    return;
-                }
+            if(lastVmMessageId == 0)
+            {
+                lastVmMessageId = openGroup.msg.id;
+            }
+            if (openGroup.msg && lastVmMessageId !== openGroup.msg.id) {
+                lastVmMessageId = openGroup.msg.id;
+                socket.emit("sendChatToServer", openGroup.msg, true);
+            }
         }
     }
 }, 12000);
