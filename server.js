@@ -14,7 +14,7 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
     console.log('connection');
 
-    socket.on('sendChatToServer', async (msg, isSaved) => {
+    socket.on('sendChatToServer', async (msg, isSaved=null) => {
         console.log("message details", msg);
         if (isSaved == true) {
             socket.emit('sendChatToClient', msg);
