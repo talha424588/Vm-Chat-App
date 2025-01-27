@@ -966,6 +966,9 @@ function breachMessageHandle(message, unique_id, groupId) {
                 (chat) => chat.group.group_id === message.group_id
             );
         }
+
+        //group not found
+
         if (groupToUpdate && groupToUpdate.group) {
             if (!groupToUpdate.group.group_messages) {
                 groupToUpdate.group.group_messages = [];
