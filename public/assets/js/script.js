@@ -802,6 +802,7 @@ socket.on("updateGroupMessages", (message) => {
 });
 
 socket.on("sendChatToClient", (message) => {
+    console.log("sendChatToClient",message);
     if (
         nextPageMessages &&
         nextPageMessages.data &&
@@ -4840,10 +4841,21 @@ let init = () => {
 };
 
 init();
-
-// setInterval(async () => {
-//     await generateChatList();
-// }, 120000);
+let lastMessageId = null;
+setInterval(async () => {
+    await generateChatList();
+    if (DOM.groupId != null) {
+        let openGroup = chatList.find((group) => group.group.group_id == DOM.groupId);
+        if (openGroup) {
+                if(openGroup.msg && lastMessageId !== openGroup.msg.id)
+                {
+                    lastMessageId = openGroup.msg.id;
+                    socket.emit("sendChatToServer", openGroup.msg,true);
+                    return;
+                }
+        }
+    }
+}, 12000);
 var OneSignal = window.OneSignal || [];
 
 OneSignal.push(function () {
