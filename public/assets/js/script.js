@@ -4939,7 +4939,6 @@ function oneSignalSubscription(userId) {
             document.getElementById("login_user_fcm_token").value = userId;
         })
         .catch((error) => {
-            // console.log(error);
         });
 }
 
