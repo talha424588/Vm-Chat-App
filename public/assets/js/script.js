@@ -929,20 +929,21 @@ function breachMessageHandle(message, unique_id, groupId) {
                 groupToUpdate.group.group_messages = [];
             }
         }
-        //error here note:consider you are sending message and refresh api call the group array is now emptry and when you were sending message you
-        //the message was supposed to be in a group and group array as well as chat list were supposed to be updated now when api hit to update group it and
-        //there were no group cause of api call and group array was emtry we gor error or no group found
-        console.log("groupToUpdate",groupToUpdate);
-        groupToUpdate.group.group_messages.push(message);
-        groupToUpdate.msg = message;
-        groupToUpdate.time = new Date(message.time * 1000);
-        const seenBy = message.seen_by
-            ? message.seen_by.split(",").map((s) => s.trim())
-            : [];
-        if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
-            groupToUpdate.unread += 1;
-            DOM.unreadMessagesPerGroup[groupId] += 1;
+
+        if(groupToUpdate && groupToUpdate.group)
+        {
+            groupToUpdate.group.group_messages.push(message);
+            groupToUpdate.msg = message;
+            groupToUpdate.time = new Date(message.time * 1000);
+            const seenBy = message.seen_by
+                ? message.seen_by.split(",").map((s) => s.trim())
+                : [];
+            if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
+                groupToUpdate.unread += 1;
+                DOM.unreadMessagesPerGroup[groupId] += 1;
+            }
         }
+
         chatList.sort((a, b) => {
             if (a.time && b.time) {
                 return new Date(b.time) - new Date(a.time);
@@ -973,16 +974,20 @@ function breachMessageHandle(message, unique_id, groupId) {
                 groupToUpdate.group.group_messages = [];
             }
         }
-        groupToUpdate.group.group_messages.push(message);
-        groupToUpdate.msg = message;
-        groupToUpdate.time = new Date(message.time * 1000);
-        const seenBy = message.seen_by
-            ? message.seen_by.split(",").map((s) => s.trim())
-            : [];
-        if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
-            groupToUpdate.unread += 1;
-            DOM.unreadMessagesPerGroup[groupId] += 1;
+        if(groupToUpdate && groupToUpdate.group)
+        {
+            groupToUpdate.group.group_messages.push(message);
+            groupToUpdate.msg = message;
+            groupToUpdate.time = new Date(message.time * 1000);
+            const seenBy = message.seen_by
+                ? message.seen_by.split(",").map((s) => s.trim())
+                : [];
+            if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
+                groupToUpdate.unread += 1;
+                DOM.unreadMessagesPerGroup[groupId] += 1;
+            }
         }
+
         chatList.sort((a, b) => {
             if (a.time && b.time) {
                 return new Date(b.time) - new Date(a.time);
@@ -3538,8 +3543,8 @@ function handleSendMessage() {
             body: JSON.stringify({ id: messageId, message: messageContent }),
         })
             .then((response) => response.json())
-            .then((data) => console.log(data))
-            .catch((error) => console.error(error));
+            .then((data) => {})
+            .catch((error) => {});
 
         document.getElementById("editMessageDiv").style.display = "none";
         const textarea = document.getElementById("input");
