@@ -4858,7 +4858,10 @@ setInterval(async () => {
         if (openGroup) {
             if(lastVmMessageId == 0)
             {
-                lastVmMessageId = openGroup.msg.id;
+                if(openGroup.msg)
+                {
+                    lastVmMessageId = openGroup.msg.id;
+                }
             }
             if (openGroup.msg && lastVmMessageId !== openGroup.msg.id) {
                 lastVmMessageId = openGroup.msg.id;
