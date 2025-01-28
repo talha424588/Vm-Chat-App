@@ -802,7 +802,6 @@ socket.on("updateGroupMessages", (message) => {
 });
 
 socket.on("sendChatToClient", (message) => {
-    console.log("sendChatToClient", message);
     if (
         nextPageMessages &&
         nextPageMessages.data &&
@@ -1792,7 +1791,6 @@ let addMessageToMessageArea = (message, flag = false) => {
             }
 
             if (message.reply.type == "Image") {
-                console.log("reply on image");
                 messageContent = `
                    ${message_body}
                    <div class="file-message-reply">
@@ -2338,7 +2336,6 @@ let addMessageToMessageArea = (message, flag = false) => {
                             200
                         ) + dots;
                 } else {
-                    console.log("mesage", message);;
                     if (message.reply !== null) {
                         var message_body =
                             safeSubstring(message.reply.msg, 0, 200) + dots;
@@ -3779,10 +3776,8 @@ function moveMessage(messageId) {
     }
 }
 function pickParentChildMessages(selectedMessage) {
-    console.log("pagnicateChatList", pagnicateChatList.data);
 
     pagnicateChatList.data.forEach(msg => {
-        console.log("msg", msg);
         if (msg.reply !== null && selectedMessage.id == msg.reply.id) {
             selectedMessagesSet.add(msg);
             highlightSelectedMessage(msg.id)
@@ -4747,7 +4742,6 @@ window.addEventListener("resize", (e) => {
 
 let init = () => {
     if (DOM.isDeleteParam == 1) {
-        console.log("delete params", DOM.isDeleteParam)
         window.close();
     }
     // function removeQueryParams() {
@@ -4819,7 +4813,6 @@ let init = () => {
                         group.group.group_id === DOM.notification_group_id
                 );
                 if (newIndex !== -1) {
-                    console.log("group found");
                     generateMessageArea(
                         elem,
                         newIndex,
@@ -4850,7 +4843,6 @@ let init = () => {
 
 init();
 let lastVmMessageId = 0;
-console.log("last message id", lastVmMessageId);
 setInterval(async () => {
     await generateChatList();
     if (DOM.groupId != null) {
