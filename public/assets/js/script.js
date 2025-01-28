@@ -816,9 +816,8 @@ socket.on("sendChatToClient", (message) => {
     }
 
     if (pagnicateChatList && pagnicateChatList.data) {
-        let isMsgExist = pagnicateChatList.data.find((msg)=>msg.id == message.id);
-        if(isMsgExist != null)
-        {
+        let isMsgExist = pagnicateChatList.data.find((msg) => msg.id == message.id);
+        if (isMsgExist != null) {
             return;
         }
         pagnicateChatList.data.push(message);
@@ -933,6 +932,7 @@ function breachMessageHandle(message, unique_id, groupId) {
         //error here note:consider you are sending message and refresh api call the group array is now emptry and when you were sending message you
         //the message was supposed to be in a group and group array as well as chat list were supposed to be updated now when api hit to update group it and
         //there were no group cause of api call and group array was emtry we gor error or no group found
+        console.log("groupToUpdate",groupToUpdate);
         groupToUpdate.group.group_messages.push(message);
         groupToUpdate.msg = message;
         groupToUpdate.time = new Date(message.time * 1000);
@@ -1170,15 +1170,13 @@ async function rerenderChatList(preGroupId) {
         if (!messageExists) {
 
             prevGroup.group.group_messages = [];
-            if (lastMessage != null) {
+            if (lastMessage != null && Object.keys(lastMessage) > 0) {
                 prevGroup.group.group_messages.push(lastMessage);
-            }
-            let seenBy = lastMessage.seen_by.split(", ").map((id) => id.trim());
-
-
-            let unseenBy = seenBy.includes(user.unique_id);
-            if (!unseenBy) {
-                prevGroup.unread += 1;
+                let seenBy = lastMessage.seen_by.split(", ").map((id) => id.trim());
+                let unseenBy = seenBy.includes(user.unique_id);
+                if (!unseenBy) {
+                    prevGroup.unread += 1;
+                }
             }
         } else {
             // console.log("Message already exists in the group_messages array.");
@@ -1612,21 +1610,15 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}" data-is-perm-delete="${1}">Request (Delete)</a>
                     `
                 : incomingMessage.message.is_compose !== 1 &&
-                    incomingMessage.message.is_compose !== true &&
-                    (user.role === "3" || user.role === "2") ||
-                    incomingMessage.message.sender === user.unique_id
-                    ? `
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
-                                `
-                    : ""
-            }
-                ${incomingMessage.message.is_compose !== 1 &&
                 incomingMessage.message.is_compose !== true &&
-                (user.role === "3" || user.role === "2") &&
-                incomingMessage.message.sender === user.unique_id
+                (
+                    (user.role == "2") ||
+                    (user.role == "3") ||
+                    (incomingMessage.message.sender === user.unique_id && user.role == "3")
+                )
                 ? `
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
-                    `
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete 2</a>
+                `
                 : ""
             }
             </div>
@@ -2879,16 +2871,15 @@ let addMessageToMessageArea = (message, flag = false) => {
                     : user.role === "2" ||
                         message.sender === user.unique_id
                         ? `
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" onclick="delMessage(this,${message.id})">Delete</a>
                                     `
                         : ""
                 }
 
-
                                     ${user.role === "3" &&
                     message.sender === user.unique_id
                     ? `
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" onclick="delMessage(this,${message.id})">Delete</a>
                                     `
                     : ""
                 }
@@ -4848,10 +4839,8 @@ setInterval(async () => {
     if (DOM.groupId != null) {
         let openGroup = chatList.find((group) => group.group.group_id == DOM.groupId);
         if (openGroup) {
-            if(lastVmMessageId == 0)
-            {
-                if(openGroup.msg)
-                {
+            if (lastVmMessageId == 0) {
+                if (openGroup.msg) {
                     lastVmMessageId = openGroup.msg.id;
                 }
             }
@@ -4862,6 +4851,7 @@ setInterval(async () => {
         }
     }
 }, 12000);
+// }, 2 * 60 * 1000);
 var OneSignal = window.OneSignal || [];
 
 OneSignal.push(function () {
