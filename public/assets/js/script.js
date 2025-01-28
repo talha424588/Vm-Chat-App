@@ -5308,7 +5308,6 @@ $("#seenModal").on("show.bs.modal", async function (event) {
         const names = messageStatus.data.join(", ");
         document.getElementById("is_read").innerHTML = names;
     } catch {
-        // console.log("Something went wrong");
     }
 });
 
