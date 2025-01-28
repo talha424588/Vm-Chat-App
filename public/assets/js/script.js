@@ -5232,7 +5232,6 @@ textarea.addEventListener("keydown", function (event) {
             textarea.style.height = "44px";
             textarea.style.overflowY = "hidden";
         } else {
-            // console.log('The div has a different display property.');
         }
     }
 });
