@@ -1565,33 +1565,6 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
                 </span>
             `);
         }
-
-        // const dropdownHTML = `
-        //     <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
-        //         <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        //             <i class="fas fa-angle-down text-muted px-2"></i>
-        //         </a>
-        //         <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-        //             ${user.role !== "0" && user.role !== "2"
-        //         ? `
-        //                 <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
-        //             `
-        //         : ""
-        //     }
-        //             ${(user.role === "0" || user.role === "2") &&
-        //         incomingMessage.message.type === "Message"
-        //         ? `
-        //                 <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
-        //             `
-        //         : ""
-        //     }
-
-        //     }
-        //         </div>
-        //     </div>
-        // `;
-
-
         const dropdownHTML = `
         <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
