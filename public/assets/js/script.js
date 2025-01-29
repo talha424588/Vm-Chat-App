@@ -613,10 +613,8 @@ socket.on("deleteMessage", (message, isMove) => {
             }
 
             if (messageElement) {
-                // messageElement.remove();
                 messageElement.addClass("hidden-message");
                 rerenderChatList(deleteMessage.group_id);
-                // viewChatList();
             } else {
                 var replyLink = messageElement.find("#reply-link");
                 if (replyLink.length) {
