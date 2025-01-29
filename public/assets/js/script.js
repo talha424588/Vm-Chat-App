@@ -690,7 +690,6 @@ function getPaginatedArrayLastMessage(id) {
             (a, b) => b.id - a.id
         );
         const lastMessage = sortedMessages[0];
-        // return pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
         return lastMessage;
     } else {
         let group = chatList.find((group) =>
