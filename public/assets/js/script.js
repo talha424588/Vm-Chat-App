@@ -613,10 +613,8 @@ socket.on("deleteMessage", (message, isMove) => {
             }
 
             if (messageElement) {
-                // messageElement.remove();
                 messageElement.addClass("hidden-message");
                 rerenderChatList(deleteMessage.group_id);
-                // viewChatList();
             } else {
                 var replyLink = messageElement.find("#reply-link");
                 if (replyLink.length) {
@@ -692,7 +690,6 @@ function getPaginatedArrayLastMessage(id) {
             (a, b) => b.id - a.id
         );
         const lastMessage = sortedMessages[0];
-        // return pagnicateChatList.data.reverse()[pagnicateChatList.data.length - 1]
         return lastMessage;
     } else {
         let group = chatList.find((group) =>
@@ -1568,33 +1565,6 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
                 </span>
             `);
         }
-
-        // const dropdownHTML = `
-        //     <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
-        //         <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        //             <i class="fas fa-angle-down text-muted px-2"></i>
-        //         </a>
-        //         <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-        //             ${user.role !== "0" && user.role !== "2"
-        //         ? `
-        //                 <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
-        //             `
-        //         : ""
-        //     }
-        //             ${(user.role === "0" || user.role === "2") &&
-        //         incomingMessage.message.type === "Message"
-        //         ? `
-        //                 <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
-        //             `
-        //         : ""
-        //     }
-
-        //     }
-        //         </div>
-        //     </div>
-        // `;
-
-
         const dropdownHTML = `
         <div class="dropdown" style="position: absolute; top: -2px; right: 0px;">
             <a href="#" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -2144,17 +2114,6 @@ let addMessageToMessageArea = (message, flag = false) => {
         }
     } else if (message.type === "Image") {
         if (message.reply) {
-            // if (message.reply.type === "Image") {
-            //     var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:100%">`;
-            // }
-            // else if (message.reply.type === "File") {
-
-            // var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:125px;">`;
-            // }
-            // else if (message.reply.type === "Audio") {
-
-            //     var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:125px;">`;
-            // }
             if (message.reply.type === "Message") {
                 message_body = `
                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
