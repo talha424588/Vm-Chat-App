@@ -2114,17 +2114,6 @@ let addMessageToMessageArea = (message, flag = false) => {
         }
     } else if (message.type === "Image") {
         if (message.reply) {
-            // if (message.reply.type === "Image") {
-            //     var message_body = `<img class="view-image" src="${message.reply.msg}" style="height:125px; width:100%">`;
-            // }
-            // else if (message.reply.type === "File") {
-
-            // var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:125px;">`;
-            // }
-            // else if (message.reply.type === "Audio") {
-
-            //     var message_body = `<img  src="${message.reply.msg}" style="height:125px; width:125px;">`;
-            // }
             if (message.reply.type === "Message") {
                 message_body = `
                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
