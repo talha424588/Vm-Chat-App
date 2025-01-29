@@ -57,6 +57,11 @@ io.on('connection', (socket) => {
         io.emit('restoreMessage', message, uniqueId);
     })
 
+    socket.on("updateChatAreaMessages", (msgId,grpId)=>{
+        console.log("chat area update log:",msgId,grpId);
+        io.emit("updateClientChatArea",msgId,grpId);
+    })
+
     socket.on('disconnect', () => {
         console.log('Disconnect');
     });

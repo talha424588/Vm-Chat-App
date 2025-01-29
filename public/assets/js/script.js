@@ -62,7 +62,9 @@ const DOM = {
     showVoiceIcon: null,
     audio_permissions: {},
     isDeleteRequest: false,
-    isDeleteParam: document.getElementById("is_delete").value
+    isDeleteParam: document.getElementById("is_delete").value,
+    delMsgGrpId: document.getElementById("del_msg_group_id").value,
+    delMsgID: document.getElementById("del_message_id").value,
 
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
@@ -651,6 +653,41 @@ socket.on("deleteMessage", (message, isMove) => {
             .addClass("deleted_niddle");
     }
 });
+let hasRun = false;
+
+socket.on("updateClientChatArea", async (msgId, grpId) => {
+    await hideMessages(grpId, msgId);
+    rerenderChatList(grpId);
+    window.close();
+})
+async function hideMessages(grpId, msgId) {
+    const deleteMessageGroup = chatList.find((group) => group.group.group_id == grpId);
+
+    if (deleteMessageGroup && DOM.groupId == deleteMessageGroup.group.group_id) {
+        removeChildMessages(msgId);
+        removeMessageArray.forEach((msg) => {
+            const messageElement = $(
+                '[data-message-id="' + msg.id + '"]'
+            ).closest(".ml-3");
+            messageElement.addClass("hidden-message");
+        });
+        const messageElement = $(
+            '[data-message-id="' + msgId + '"]'
+        ).closest(".ml-3");
+        messageElement.addClass("hidden-message");
+    }
+}
+
+if (chatList.length > 0) {
+    hideMessages(grpId, msgId);
+} else {
+    if (!hasRun && DOM.isDeleteParam) {
+        setTimeout(() => {
+            hideMessages(grpId, msgId);
+        }, 5000);
+        hasRun = true;
+    }
+}
 
 function getPaginatedArrayLastMessage(id) {
     if (
@@ -930,8 +967,7 @@ function breachMessageHandle(message, unique_id, groupId) {
             }
         }
 
-        if(groupToUpdate && groupToUpdate.group)
-        {
+        if (groupToUpdate && groupToUpdate.group) {
             groupToUpdate.group.group_messages.push(message);
             groupToUpdate.msg = message;
             groupToUpdate.time = new Date(message.time * 1000);
@@ -974,8 +1010,7 @@ function breachMessageHandle(message, unique_id, groupId) {
                 groupToUpdate.group.group_messages = [];
             }
         }
-        if(groupToUpdate && groupToUpdate.group)
-        {
+        if (groupToUpdate && groupToUpdate.group) {
             groupToUpdate.group.group_messages.push(message);
             groupToUpdate.msg = message;
             groupToUpdate.time = new Date(message.time * 1000);
@@ -1615,16 +1650,16 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}" data-is-perm-delete="${1}">Request (Delete)</a>
                     `
                 : incomingMessage.message.is_compose !== 1 &&
-                incomingMessage.message.is_compose !== true &&
-                (
-                    (user.role == "2") ||
-                    (user.role == "3") ||
-                    (incomingMessage.message.sender === user.unique_id && user.role == "3")
-                )
-                ? `
+                    incomingMessage.message.is_compose !== true &&
+                    (
+                        (user.role == "2") ||
+                        (user.role == "3") ||
+                        (incomingMessage.message.sender === user.unique_id && user.role == "3")
+                    )
+                    ? `
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete 2</a>
                 `
-                : ""
+                    : ""
             }
             </div>
         </div>
@@ -3543,8 +3578,8 @@ function handleSendMessage() {
             body: JSON.stringify({ id: messageId, message: messageContent }),
         })
             .then((response) => response.json())
-            .then((data) => {})
-            .catch((error) => {});
+            .then((data) => { })
+            .catch((error) => { });
 
         document.getElementById("editMessageDiv").style.display = "none";
         const textarea = document.getElementById("input");
@@ -4738,7 +4773,14 @@ window.addEventListener("resize", (e) => {
 
 let init = () => {
     if (DOM.isDeleteParam == 1) {
-        window.close();
+        //
+        console.log("msg id", DOM.delMsgID);
+        console.log("group id", DOM.delMsgGrpId);
+
+        socket.emit("updateChatAreaMessages", DOM.delMsgID, DOM.delMsgGrpId);
+
+        // return;
+        // window.close();
     }
     // function removeQueryParams() {
     //     console.log("remove param");
@@ -4855,7 +4897,7 @@ setInterval(async () => {
             }
         }
     }
-}, 12000);
+    }, 12000);
 // }, 2 * 60 * 1000);
 var OneSignal = window.OneSignal || [];
 
