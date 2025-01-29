@@ -141,7 +141,6 @@ let populateGroupList = async () => {
             chat.isGroup = true;
             chat.group = group;
             chat.group.access = [group.access];
-            // chat.members = [group.access];
             chat.name = group.name;
             chat.unread =
                 group.unread_count.length > 0 ? group.unread_count : 0;
@@ -413,11 +412,11 @@ let viewMessageList = () => {
         .forEach((elem, index) => {
             let unreadClass = elem.unread ? "unread" : "";
             const messageObject = JSON.stringify(elem)
-                .replace(/\\/g, "\\\\") // Escape backslashes
-                .replace(/'/g, "\\'") // Escape single quotes
-                .replace(/"/g, "&quot;") // Escape double quotes
-                .replace(/\n/g, "\\n") // Escape newlines
-                .replace(/\r/g, "\\r") // Escape carriage returns
+                .replace(/\\/g, "\\\\")
+                .replace(/'/g, "\\'")
+                .replace(/"/g, "&quot;")
+                .replace(/\n/g, "\\n")
+                .replace(/\r/g, "\\r")
                 .replace(/\t/g, "\\t");
             const senderName = elem.user.name;
             let time = new Date(elem.time * 1000);
@@ -463,7 +462,6 @@ let viewMessageList = () => {
                     !/<audio[^>]+>/g.test(elem.msg)
                 ) {
                     messageText = getOldMessageMediaName(elem);
-                    // let messageText = elem.msg.includes("<p>") ? elem.msg.replace(/<\/?p>/g, "") : elem.msg;
                     DOM.messagesList.innerHTML += `
                     <input type="hidden" id="group-id" value="${elem.group.group_id
                         }"></input>
