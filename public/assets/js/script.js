@@ -36,8 +36,6 @@ const DOM = {
     moveMessageUser: null,
     messagesList: getById("messagesList"),
     fcmToken: null,
-    // displayed_edit_div:false,
-    // displayed_correction_div:false,
     displayed_message_div: false,
     mobile_search_icon: getById("search-icon-mobile"),
     counter: 0,
