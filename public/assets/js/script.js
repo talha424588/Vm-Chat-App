@@ -62,7 +62,9 @@ const DOM = {
     showVoiceIcon: null,
     audio_permissions: {},
     isDeleteRequest: false,
-    isDeleteParam: document.getElementById("is_delete").value
+    isDeleteParam: document.getElementById("is_delete").value,
+    delMsgGrpId: document.getElementById("del_msg_group_id").value,
+    delMsgID: document.getElementById("del_message_id").value,
 
 };
 DOM.mobile_search_icon.addEventListener("click", () => {
@@ -651,6 +653,41 @@ socket.on("deleteMessage", (message, isMove) => {
             .addClass("deleted_niddle");
     }
 });
+let hasRun = false;
+
+socket.on("updateClientChatArea", async (msgId, grpId) => {
+    await hideMessages(grpId, msgId);
+    rerenderChatList(grpId);
+    window.close();
+})
+async function hideMessages(grpId, msgId) {
+    const deleteMessageGroup = chatList.find((group) => group.group.group_id == grpId);
+
+    if (deleteMessageGroup && DOM.groupId == deleteMessageGroup.group.group_id) {
+        removeChildMessages(msgId);
+        removeMessageArray.forEach((msg) => {
+            const messageElement = $(
+                '[data-message-id="' + msg.id + '"]'
+            ).closest(".ml-3");
+            messageElement.addClass("hidden-message");
+        });
+        const messageElement = $(
+            '[data-message-id="' + msgId + '"]'
+        ).closest(".ml-3");
+        messageElement.addClass("hidden-message");
+    }
+}
+
+if (chatList.length > 0) {
+    hideMessages(grpId, msgId);
+} else {
+    if (!hasRun && DOM.isDeleteParam) {
+        setTimeout(() => {
+            hideMessages(grpId, msgId);
+        }, 5000);
+        hasRun = true;
+    }
+}
 
 function getPaginatedArrayLastMessage(id) {
     if (
@@ -816,9 +853,8 @@ socket.on("sendChatToClient", (message) => {
     }
 
     if (pagnicateChatList && pagnicateChatList.data) {
-        let isMsgExist = pagnicateChatList.data.find((msg)=>msg.id == message.id);
-        if(isMsgExist != null)
-        {
+        let isMsgExist = pagnicateChatList.data.find((msg) => msg.id == message.id);
+        if (isMsgExist != null) {
             return;
         }
         pagnicateChatList.data.push(message);
@@ -930,19 +966,20 @@ function breachMessageHandle(message, unique_id, groupId) {
                 groupToUpdate.group.group_messages = [];
             }
         }
-        //error here note:consider you are sending message and refresh api call the group array is now emptry and when you were sending message you
-        //the message was supposed to be in a group and group array as well as chat list were supposed to be updated now when api hit to update group it and
-        //there were no group cause of api call and group array was emtry we gor error or no group found
-        groupToUpdate.group.group_messages.push(message);
-        groupToUpdate.msg = message;
-        groupToUpdate.time = new Date(message.time * 1000);
-        const seenBy = message.seen_by
-            ? message.seen_by.split(",").map((s) => s.trim())
-            : [];
-        if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
-            groupToUpdate.unread += 1;
-            DOM.unreadMessagesPerGroup[groupId] += 1;
+
+        if (groupToUpdate && groupToUpdate.group) {
+            groupToUpdate.group.group_messages.push(message);
+            groupToUpdate.msg = message;
+            groupToUpdate.time = new Date(message.time * 1000);
+            const seenBy = message.seen_by
+                ? message.seen_by.split(",").map((s) => s.trim())
+                : [];
+            if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
+                groupToUpdate.unread += 1;
+                DOM.unreadMessagesPerGroup[groupId] += 1;
+            }
         }
+
         chatList.sort((a, b) => {
             if (a.time && b.time) {
                 return new Date(b.time) - new Date(a.time);
@@ -973,16 +1010,19 @@ function breachMessageHandle(message, unique_id, groupId) {
                 groupToUpdate.group.group_messages = [];
             }
         }
-        groupToUpdate.group.group_messages.push(message);
-        groupToUpdate.msg = message;
-        groupToUpdate.time = new Date(message.time * 1000);
-        const seenBy = message.seen_by
-            ? message.seen_by.split(",").map((s) => s.trim())
-            : [];
-        if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
-            groupToUpdate.unread += 1;
-            DOM.unreadMessagesPerGroup[groupId] += 1;
+        if (groupToUpdate && groupToUpdate.group) {
+            groupToUpdate.group.group_messages.push(message);
+            groupToUpdate.msg = message;
+            groupToUpdate.time = new Date(message.time * 1000);
+            const seenBy = message.seen_by
+                ? message.seen_by.split(",").map((s) => s.trim())
+                : [];
+            if (message.sender !== unique_id && !seenBy.includes(unique_id)) {
+                groupToUpdate.unread += 1;
+                DOM.unreadMessagesPerGroup[groupId] += 1;
+            }
         }
+
         chatList.sort((a, b) => {
             if (a.time && b.time) {
                 return new Date(b.time) - new Date(a.time);
@@ -1170,15 +1210,13 @@ async function rerenderChatList(preGroupId) {
         if (!messageExists) {
 
             prevGroup.group.group_messages = [];
-            if (lastMessage != null) {
+            if (lastMessage != null && Object.keys(lastMessage) > 0) {
                 prevGroup.group.group_messages.push(lastMessage);
-            }
-            let seenBy = lastMessage.seen_by.split(", ").map((id) => id.trim());
-
-
-            let unseenBy = seenBy.includes(user.unique_id);
-            if (!unseenBy) {
-                prevGroup.unread += 1;
+                let seenBy = lastMessage.seen_by.split(", ").map((id) => id.trim());
+                let unseenBy = seenBy.includes(user.unique_id);
+                if (!unseenBy) {
+                    prevGroup.unread += 1;
+                }
             }
         } else {
             // console.log("Message already exists in the group_messages array.");
@@ -1613,21 +1651,15 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
                     `
                 : incomingMessage.message.is_compose !== 1 &&
                     incomingMessage.message.is_compose !== true &&
-                    (user.role === "3" || user.role === "2") ||
-                    incomingMessage.message.sender === user.unique_id
+                    (
+                        (user.role == "2") ||
+                        (user.role == "3") ||
+                        (incomingMessage.message.sender === user.unique_id && user.role == "3")
+                    )
                     ? `
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
-                                `
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete 2</a>
+                `
                     : ""
-            }
-                ${incomingMessage.message.is_compose !== 1 &&
-                incomingMessage.message.is_compose !== true &&
-                (user.role === "3" || user.role === "2") &&
-                incomingMessage.message.sender === user.unique_id
-                ? `
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
-                    `
-                : ""
             }
             </div>
         </div>
@@ -2879,16 +2911,15 @@ let addMessageToMessageArea = (message, flag = false) => {
                     : user.role === "2" ||
                         message.sender === user.unique_id
                         ? `
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" onclick="delMessage(this,${message.id})">Delete</a>
                                     `
                         : ""
                 }
 
-
                                     ${user.role === "3" &&
                     message.sender === user.unique_id
                     ? `
-                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${message.id}">Delete</a>
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" onclick="delMessage(this,${message.id})">Delete</a>
                                     `
                     : ""
                 }
@@ -3547,8 +3578,8 @@ function handleSendMessage() {
             body: JSON.stringify({ id: messageId, message: messageContent }),
         })
             .then((response) => response.json())
-            .then((data) => console.log(data))
-            .catch((error) => console.error(error));
+            .then((data) => { })
+            .catch((error) => { });
 
         document.getElementById("editMessageDiv").style.display = "none";
         const textarea = document.getElementById("input");
@@ -4742,7 +4773,14 @@ window.addEventListener("resize", (e) => {
 
 let init = () => {
     if (DOM.isDeleteParam == 1) {
-        window.close();
+        //
+        console.log("msg id", DOM.delMsgID);
+        console.log("group id", DOM.delMsgGrpId);
+
+        socket.emit("updateChatAreaMessages", DOM.delMsgID, DOM.delMsgGrpId);
+
+        // return;
+        // window.close();
     }
     // function removeQueryParams() {
     //     console.log("remove param");
@@ -4848,10 +4886,8 @@ setInterval(async () => {
     if (DOM.groupId != null) {
         let openGroup = chatList.find((group) => group.group.group_id == DOM.groupId);
         if (openGroup) {
-            if(lastVmMessageId == 0)
-            {
-                if(openGroup.msg)
-                {
+            if (lastVmMessageId == 0) {
+                if (openGroup.msg) {
                     lastVmMessageId = openGroup.msg.id;
                 }
             }
@@ -4861,7 +4897,8 @@ setInterval(async () => {
             }
         }
     }
-}, 12000);
+    }, 12000);
+// }, 2 * 60 * 1000);
 var OneSignal = window.OneSignal || [];
 
 OneSignal.push(function () {
@@ -4944,7 +4981,6 @@ function oneSignalSubscription(userId) {
             document.getElementById("login_user_fcm_token").value = userId;
         })
         .catch((error) => {
-            // console.log(error);
         });
 }
 
@@ -5238,7 +5274,6 @@ textarea.addEventListener("keydown", function (event) {
             textarea.style.height = "44px";
             textarea.style.overflowY = "hidden";
         } else {
-            // console.log('The div has a different display property.');
         }
     }
 });
@@ -5315,7 +5350,6 @@ $("#seenModal").on("show.bs.modal", async function (event) {
         const names = messageStatus.data.join(", ");
         document.getElementById("is_read").innerHTML = names;
     } catch {
-        // console.log("Something went wrong");
     }
 });
 

@@ -25,15 +25,15 @@ class ChatController extends Controller
     public function index(Request $request)
     {
         if ($request->has('is_delete')) {
-            $group_id = $request->group_id ?? null;
-            $message_id = $request->message_id ?? null;
+            $del_msg_group_id = $request->group_id ?? null;
+            $de_message_id = $request->message_id ?? null;
             $is_delete = $request->input('is_delete');
             if ($is_delete === "1") {
                 $this->chatRepository->deleteMessage($request);
             }
-            $group_id =  null;
-            $message_id =  null;
-            return view('chat', compact("group_id", "message_id", "is_delete"));
+            // $del_msg_group_id =  null;
+            // $de_message_id =  null;
+            return view('chat', compact("del_msg_group_id", "de_message_id", "is_delete"));
         }
         $group_id = $request->group_id ?? null;
         $message_id = $request->message_id ?? null;
