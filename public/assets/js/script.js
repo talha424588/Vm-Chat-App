@@ -640,9 +640,6 @@ socket.on("deleteMessage", (message, isMove) => {
                            id="restore-button-${deleteMessage.id}" onclick="restoreMessage(${deleteMessage.id})" data-message-id="${deleteMessage.id}">Restore</a>
                     `);
             }
-            // const message = findMessageById(message.id);
-            // const message = getPaginatedArrayLastMessage(deleteMessage.id);
-            // updateChatList(deleteMessage)
             rerenderChatList(deleteMessage.group_id);
         }
         messageElement.find(".additional_style").addClass("msg_deleted");
