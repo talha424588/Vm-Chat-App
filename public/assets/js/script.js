@@ -1620,7 +1620,7 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
                         (incomingMessage.message.sender === user.unique_id && user.role == "3")
                     )
                     ? `
-                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete 2</a>
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${incomingMessage.message.id}">Delete</a>
                 `
                     : ""
             }
