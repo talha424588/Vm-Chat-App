@@ -3306,8 +3306,7 @@ function correction_send_handel() {
 
 function checkPrivacyAndAlert(messageContent, messageId) {
     const numberPattern = /\b\d{7,}\b/;
-    const emailPattern =
-        /\b[A-Za-z0-9._%+-]+(?:@| at |\[at\]|\(at\)|_@_|\.at\.)[A-Za-z0-9._-]+\b/;
+    const emailPattern =  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
     const restrictedDashPattern = /\b\d{3,}(?:-\d{1,3}){2,}\b/;
 
     let reason = "";
@@ -4611,8 +4610,8 @@ let sendMessage = (type = "Message", mediaName = null) => {
         ).content;
         if (type == "Message") {
             const numberPattern = /\b\d{7,}\b/;
-            const emailPattern =
-                /\b[A-Za-z0-9._%+-]+(?:@| at |\[at\]|\(at\)|_@_|\.at\.)[A-Za-z0-9._-]+\b/;
+            const emailPattern  = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
+
             const restrictedDashPattern = /\b\d{3,}(?:-\d{1,3}){2,}\b/;
 
             let value = DOM.messageInput.value;
