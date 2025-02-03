@@ -4053,16 +4053,6 @@ const fetchPaginatedMessages = async (
         }
 
         const u_id = user.unique_id;
-        // const ids = nextPageMessages.data.map(item => item.id);
-        // const ids = nextPageMessages.data
-        //     .filter(
-        //         (item) =>
-        //             item.sender !== user.unique_id &&
-        //             !item.seen_by.split(", ").includes(user.unique_id)
-        //     )
-        //     .map((item) => item.id);
-
-
         const ids = nextPageMessages.data
             .filter((item) => {
                 const seenByIds = item.seen_by.split(/,\s*/); // This will split by comma and optional space
