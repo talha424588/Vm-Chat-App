@@ -4038,7 +4038,7 @@ const fetchPaginatedMessages = async (
             pagnicateChatList = nextPageMessages;
             hasMoreMessages = true;
         }
-        // here
+
         if (message_id) {
             DOM.lastMessageId = nextPageMessages.data.at(-1).id;
         }
@@ -4055,7 +4055,7 @@ const fetchPaginatedMessages = async (
         const u_id = user.unique_id;
         const ids = nextPageMessages.data
             .filter((item) => {
-                const seenByIds = item.seen_by.split(/,\s*/); // This will split by comma and optional space
+                const seenByIds = item.seen_by.split(/,\s*/);
                 return item.sender !== user.unique_id && !seenByIds.includes(user.unique_id);
             })
             .map((item) => item.id);
@@ -4602,7 +4602,6 @@ let sendMessage = (type = "Message", mediaName = null) => {
                         // console.error(error);
                     });
 
-                // Send "Alert!!!" to the backend to save in DB
                 let msg = {
                     user: user,
                     message: alertMessage,
@@ -4618,7 +4617,7 @@ let sendMessage = (type = "Message", mediaName = null) => {
                 removeQuotedMessage();
 
             } else {
-                // Send original message to the backend to save in DB
+
                 let msg = {
                     user: user,
                     message: value,
