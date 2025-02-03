@@ -4059,17 +4059,6 @@ const fetchPaginatedMessages = async (
                 return item.sender !== user.unique_id && !seenByIds.includes(user.unique_id);
             })
             .map((item) => item.id);
-
-        // const Notseenby = nextPageMessages.data
-        //     .filter((item) => {
-        //         const seenBy = item.seen_by
-        //             ? item.seen_by.split(",").map((id) => id.trim())
-        //             : [];
-        //         return !seenBy.includes(u_id);
-        //     })
-        //     .map((item) => item.id);
-
-
         const Notseenby = nextPageMessages.data
             .filter((item) => {
                 const seenBy = item.seen_by
