@@ -3802,9 +3802,6 @@ function highlightSelectedMessage(id) {
                 parentDiv.classList.add("selected-message");
             }
         }
-        // if (parentDiv) {
-        //     parentDiv.classList.toggle("selected-message");
-        // }
         else {
             // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
         }
