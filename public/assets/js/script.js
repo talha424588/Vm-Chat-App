@@ -4676,14 +4676,12 @@ window.addEventListener("resize", (e) => {
 
 let init = () => {
     if (DOM.isDeleteParam == 1) {
-        //
+
         console.log("msg id", DOM.delMsgID);
         console.log("group id", DOM.delMsgGrpId);
 
         socket.emit("updateChatAreaMessages", DOM.delMsgID, DOM.delMsgGrpId);
 
-        // return;
-        // window.close();
     }
     // function removeQueryParams() {
     //     console.log("remove param");
