@@ -3673,36 +3673,48 @@ function showReply(message_id, senderName, type) {
     const voiceIcon = document.getElementById("voice-icon");
     const fileicon = document.getElementById("file-icon");
     const captureid = document.getElementById("captureid");
+    if (getComputedStyle(chat_action).display == "block" || getComputedStyle(chat_action).display == "flex"
+    && getComputedStyle(Editreplyarea).display == "none"
+) {
 
+    document.getElementById('chat_action').style.display = "none";
+    Editreplyarea.style.display = 'block';
+}
     change_icon_height(replyDiv);
     document.querySelector("#input").value = "";
     document.querySelector("#input").focus();
 }
 
 function removeQuotedMessage() {
-    var replyDiv = document.getElementById("reply-div");
-    var iconContainer = document.querySelector(".icon-container");
-    replyDiv.style.display = "none";
-    iconContainer.style.bottom = "90px";
+    var replyDiv = document.getElementById('reply-div');
+    var iconContainer = document.querySelector('.icon-container');
+    replyDiv.style.display = 'none';
+    iconContainer.style.bottom = '90px';
     DOM.replyId = null;
-    document
-        .querySelector(".auto-resize-textarea")
-        .style.setProperty("height", "44px");
-    document
-        .querySelector(".auto-resize-textarea")
-        .style.setProperty("overflow", "hidden");
+    document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
+    document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
     document.querySelector("#input").value = "";
-
-    const correctionarea = document.getElementById("correction-div");
+    const correctionarea = document.getElementById('correction-div');
     if (getComputedStyle(correctionarea).display == "block") {
-        correctionarea.style.display = "none";
+        correctionarea.style.display = 'none';
         document.querySelector("#input").focus();
     }
 
+
+    const chat_action = document.getElementById('chat_action');
+    const Editreplyarea = document.getElementById('message-reply-area');
+    if (getComputedStyle(chat_action).display == "none" || getComputedStyle(chat_action).display == "flex"
+        && getComputedStyle(Editreplyarea).display == "block") {
+
+        Editreplyarea.style.display = 'none';
+        chat_action.style.display = "flex";
+        document.querySelector("#input").focus();
+    }
     document.getElementById("messages").style.marginBottom = "74px";
 }
 const sendMessageReply = () => {
     sendMessage();
+    removeEditMessage();
     removeQuotedMessage();
 };
 
