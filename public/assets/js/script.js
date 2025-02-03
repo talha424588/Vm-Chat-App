@@ -4001,41 +4001,6 @@ const fetchPaginatedMessages = async (
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
-        // let url = "";
-        // if (DOM.searchMessageClick && DOM.lastMessageId) {
-        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
-        //         DOM.groupId
-        //     )}&page=${DOM.currentPage}${
-        //         DOM.searchMessageClick && DOM.lastMessageId
-        //             ? `&lastMessageId=${encodeURIComponent(DOM.lastMessageId)}`
-        //             : ""
-        //     }`;
-        // } else if (message_id || DOM.lastMessageId) {
-        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
-        //         DOM.groupId
-        //     )}&page=${DOM.currentPage}&messageId=${encodeURIComponent(
-        //         message_id
-        //     )}`;
-        // } else if (unreadCounter) {
-        //     DOM.currentPage = Math.ceil(unreadCounter / 50);
-        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
-        //         DOM.groupId
-        //     )}&page=${DOM.currentPage}&unreadCount=${unreadCounter}`;
-        // } else {
-        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
-        //         DOM.groupId
-        //     )}&page=${DOM.currentPage}`;
-        // }
-        // const response = await fetch(url, {
-        //     method: "GET",
-        //     headers: {
-        //         "content-type": "application/json",
-        //     },
-        // });
-        // nextPageMessages = await response.json();
-        // if (DOM.groupSearch) {
-        //     nextPageMessages.data.forEach((item) => searchMessageSet.add(item));
-        // }
         let url = 'get-groups-messages-by-group-id';
 
         const requestBody = {
