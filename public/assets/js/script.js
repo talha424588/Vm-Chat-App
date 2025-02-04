@@ -164,7 +164,6 @@ let populateGroupList = async () => {
             }
         });
     } catch (error) {
-        // console.log("Error fetching chat groups:", error);
     }
 };
 
@@ -1209,7 +1208,6 @@ async function rerenderChatList(preGroupId) {
                 }
             }
         } else {
-            // console.log("Message already exists in the group_messages array.");
         }
     }
     chatList.sort((a, b) => {
@@ -1879,7 +1877,6 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             }
             // else {
-            //     console.log("on reoky ");
             //     var add_file_view = `
             //     <div class="file-message" onclick="scrollToMessage('${message.reply.id
             //         }','${message.id}')">
@@ -3338,7 +3335,6 @@ function checkPrivacyAndAlert(messageContent, messageId) {
             }),
         })
             .then((response) => {
-                // console.log(response);
             })
             .catch((error) => {
                 console.error(error);
@@ -3983,7 +3979,6 @@ DOM.messages.addEventListener("scroll", async () => {
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
-        //console.log('User is not at the top yet');
     }
 });
 
@@ -4085,7 +4080,6 @@ const fetchPaginatedMessages = async (
                 }
             })();
         } else {
-            // console.log("ids length less then 1");
         }
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
@@ -4136,7 +4130,6 @@ const fetchPaginatedMessages = async (
                 );
             }
             // if (DOM.groupReferenceMessageClick) {
-            //     console.log("refrence clicked");
             //     scrollToMessage(message.id);
             // }
             // else if (!DOM.groupReferenceMessageClick) {
@@ -4311,10 +4304,8 @@ const fetchPaginatedMessages = async (
             //                     nullTypemessageTextElement.innerHTML = highlightedText;
             //                 }
             //             } else {
-            //                 // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
             //             }
             //             break;
-            //         // console.log("Unknown message type:", message.type);
             //     }
             //     setTimeout(() => {
             //         messageElement.scrollIntoView();
@@ -4596,10 +4587,8 @@ let sendMessage = (type = "Message", mediaName = null) => {
                     }),
                 })
                     .then((response) => {
-                        // console.log(response);
                     })
                     .catch((error) => {
-                        // console.error(error);
                     });
 
                 let msg = {
@@ -5993,10 +5982,8 @@ function handleMessageResponse_old(
                         nullTypemessageTextElement.innerHTML = highlightedText;
                     }
                 } else {
-                    // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                 }
                 break;
-            // console.log("Unknown message type:", message.type);
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
         setTimeout(function () {
@@ -6166,7 +6153,6 @@ async function restoreMessage(id) {
                 }
             });
     } catch (error) {
-        // console.log("Error Restoring Message:", error);
     }
 }
 
@@ -6403,7 +6389,6 @@ document.getElementById("messages").addEventListener("scroll", function () {
         divElement.scrollHeight - divElement.scrollTop ===
         divElement.clientHeight
     ) {
-        // console.log('Scrolled to the bottom');
     }
 });
 document
