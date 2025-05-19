@@ -5075,24 +5075,67 @@ document.getElementById("captureid").addEventListener("click", function () {
     document.getElementById("hidden-file-input").click();
 });
 
+// document
+//     .getElementById("hidden-file-input")
+//     .addEventListener("change", function () {
+//         const imageInput = this;
+//         if (imageInput.files.length > 0) {
+//             const image = imageInput.files[0];
+//             const ref = firebase.storage().ref("images/" + DOM.unique_id);
+//             const mediaName = image.name;
+//             const metadata = {
+//                 contentType: image.type,
+//             };
+//             const task = ref.child(mediaName).put(image, metadata);
+//             task.then((snapshot) => snapshot.ref.getDownloadURL())
+//                 .then((url) => {
+//                     DOM.messageInput.value = url;
+//                     sendMessage("Image", mediaName);
+//                 })
+//                 .catch((error) => console.error(error));
+//         }
+//     });
+
+
+
 document
     .getElementById("hidden-file-input")
     .addEventListener("change", function () {
         const imageInput = this;
+        console.log("image input",imageInput);
         if (imageInput.files.length > 0) {
             const image = imageInput.files[0];
-            const ref = firebase.storage().ref("images/" + DOM.unique_id);
+            console.log("image",image);
             const mediaName = image.name;
-            const metadata = {
-                contentType: image.type,
-            };
-            const task = ref.child(mediaName).put(image, metadata);
-            task.then((snapshot) => snapshot.ref.getDownloadURL())
-                .then((url) => {
-                    DOM.messageInput.value = url;
-                    sendMessage("Image", mediaName);
+            console.log("mediaName",mediaName);
+
+            const formData = new FormData();
+            formData.append("image", image);
+
+            fetch("/upload-image", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Image upload failed");
+                    return response.json();
                 })
-                .catch((error) => console.error(error));
+                .then(data => {
+                    if (data.url) {
+                        const imagePath = data.url;
+                        DOM.messageInput.value = imagePath;
+                        sendMessage("Image", mediaName);
+                    } else {
+                        console.error("Upload failed:", data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error("Upload error:", error);
+                    $("#wentWrong").modal("show");
+                });
         }
     });
 

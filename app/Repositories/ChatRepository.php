@@ -18,4 +18,5 @@ interface ChatRepository
     public function openChatGroup($request,$groupId);
     public function messageDeleteStatusCheck($id);
     public function deleteMessage($request);
+    public function uploadMedia($request);
 }
