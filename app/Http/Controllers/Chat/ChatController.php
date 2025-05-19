@@ -240,8 +240,13 @@ class ChatController extends Controller
     {
         return $this->chatRepository->messageDeleteStatusCheck($id);
     }
-    public function mediaUpload(Request $request)
+    public function uploadImage(Request $request)
     {
-        return $this->chatRepository->uploadMedia($request);
+        return $this->chatRepository->uploadImage($request);
+    }
+
+        public function uploadFile(Request $request)
+    {
+        return $this->chatRepository->uploadFile($request);
     }
 }

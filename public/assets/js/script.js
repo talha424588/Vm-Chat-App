@@ -5102,12 +5102,12 @@ document
     .getElementById("hidden-file-input")
     .addEventListener("change", function () {
         const imageInput = this;
-        console.log("image input",imageInput);
+        console.log("image input", imageInput);
         if (imageInput.files.length > 0) {
             const image = imageInput.files[0];
-            console.log("image",image);
+            console.log("image", image);
             const mediaName = image.name;
-            console.log("mediaName",mediaName);
+            console.log("mediaName", mediaName);
 
             const formData = new FormData();
             formData.append("image", image);
@@ -5143,23 +5143,91 @@ fileIcon.addEventListener("click", () => {
     fileInput.click();
 });
 
-fileInput.addEventListener("change", (event) => {
-    if (event.target.files[0]) {
-        const file = event.target.files[0];
+// fileInput.addEventListener("change", (event) => {
+//     if (event.target.files[0]) {
+//         const file = event.target.files[0];
 
-        const ref = firebase.storage().ref("files/" + DOM.unique_id);
-        const mediaName = file.name;
-        const metadata = {
-            contentType: file.type,
-        };
-        const task = ref.child(mediaName).put(file, metadata);
-        task.then((snapshot) => snapshot.ref.getDownloadURL())
-            .then((url) => {
-                DOM.messageInput.value = url;
-                sendMessage("File", mediaName);
-            })
-            .catch((error) => console.error(error));
+//         const ref = firebase.storage().ref("files/" + DOM.unique_id);
+//         const mediaName = file.name;
+//         const metadata = {
+//             contentType: file.type,
+//         };
+//         const task = ref.child(mediaName).put(file, metadata);
+//         task.then((snapshot) => snapshot.ref.getDownloadURL())
+//             .then((url) => {
+//                 DOM.messageInput.value = url;
+//                 sendMessage("File", mediaName);
+//             })
+//             .catch((error) => console.error(error));
+//     }
+// });
+
+fileInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    console.log("file input", file);
+
+    if (!file) {
+        alert("No file selected.");
+        return;
     }
+
+    const mediaName = file.name;
+    console.log("media name", mediaName);
+    const extension = mediaName.split('.').pop().toLowerCase();
+    console.log("extension", extension);
+    const mimeType = file.type;
+
+    if (extension !== 'pdf' || mimeType !== 'application/pdf') {
+        console.error('Invalid file type:', { extension, mimeType });
+        alert('Please upload a PDF file.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("mediaType", "file");
+    // Log FormData contents for debugging
+    for (const [key, value] of formData.entries()) {
+        console.log(`formData entry: ${key}=${value.name || value}`);
+    }
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (!csrfToken) {
+        console.error("CSRF token not found");
+        alert("CSRF token missing. Please refresh the page.");
+        return;
+    }
+
+    fetch("/upload-file", {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": csrfToken,
+        },
+        body: formData
+    })
+        .then(response => {
+            console.log("Response status:", response.status, response.statusText);
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`PDF upload failed: ${response.status} ${response.statusText} - ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Response data:", data);
+            if (data.url) {
+                DOM.messageInput.value = data.url;
+                sendMessage("File", mediaName);
+            } else {
+                console.error("Upload failed:", data);
+                alert("Failed to upload PDF: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Upload error:", error.message);
+            $("#wentWrong").modal("show");
+        });
 });
 
 const textarea = document.getElementById("input");

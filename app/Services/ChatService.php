@@ -515,7 +515,7 @@ class ChatService implements ChatRepository
         return view('chat', compact('message_id', 'groupId'));
     }
 
-    public function uploadMedia($request)
+    public function uploadImage($request)
     {
         Log::info('Upload request:', $request->file());
 
@@ -533,5 +533,23 @@ class ChatService implements ChatRepository
 
         Log::warning('No valid image file uploaded');
         return response()->json(['error' => 'No valid image file uploaded'], 400);
+    }
+    public function uploadFile($request)
+    {
+        if ($request->hasFile('file') && $request->file('file')->isValid()) {
+
+            $file = $request->file('file');
+            $mediaName = $file->getClientOriginalName();
+            $filename = pathinfo($mediaName, PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $uniqueMediaName = $filename . '_' . time() . '.' . $extension;
+            $file->move(public_path('uploads/docs'), $uniqueMediaName);
+            $url = '/uploads/docs/' . $uniqueMediaName;
+            Log::info('Image uploaded:', ['url' => $url]);
+            return response()->json(['url' => $url], 200);
+        }
+
+        Log::warning('No valid file uploaded');
+        return response()->json(['error' => 'No valid file uploaded'], 400);
     }
 }
