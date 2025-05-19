@@ -5164,7 +5164,6 @@ fileIcon.addEventListener("click", () => {
 
 fileInput.addEventListener("change", (event) => {
     const file = event.target.files[0];
-    console.log("file input", file);
 
     if (!file) {
         alert("No file selected.");
@@ -5172,9 +5171,7 @@ fileInput.addEventListener("change", (event) => {
     }
 
     const mediaName = file.name;
-    console.log("media name", mediaName);
     const extension = mediaName.split('.').pop().toLowerCase();
-    console.log("extension", extension);
     const mimeType = file.type;
 
     if (extension !== 'pdf' || mimeType !== 'application/pdf') {
@@ -5186,10 +5183,6 @@ fileInput.addEventListener("change", (event) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("mediaType", "file");
-    // Log FormData contents for debugging
-    for (const [key, value] of formData.entries()) {
-        console.log(`formData entry: ${key}=${value.name || value}`);
-    }
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
     if (!csrfToken) {
@@ -5215,7 +5208,6 @@ fileInput.addEventListener("change", (event) => {
             return response.json();
         })
         .then(data => {
-            console.log("Response data:", data);
             if (data.url) {
                 DOM.messageInput.value = data.url;
                 sendMessage("File", mediaName);
