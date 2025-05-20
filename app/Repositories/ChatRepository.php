@@ -20,4 +20,5 @@ interface ChatRepository
     public function deleteMessage($request);
     public function uploadImage($request);
     public function uploadFile($request);
+    public function uploadAudio($request);
 }

@@ -66,7 +66,7 @@ Route::group(['middleware' => ['auth:web']], function () {
 
 Route::post("/upload-image" , [ChatController::class, 'uploadImage']);
 Route::post("/upload-file" , [ChatController::class, 'uploadFile']);
-// Route::post("/upload-image" , [ChatController::class, 'mediaUpload']);
+Route::post("/upload-audio" , [ChatController::class, 'uploadVoiceNote']);
 Route::post('/messages/move', [ChatController::class, 'moveMessages']);
 Route::post('/messages', [ChatController::class, 'store']);
 Route::get("/accessToken", [FirebaseService::class, 'sendMessageNotification']);
