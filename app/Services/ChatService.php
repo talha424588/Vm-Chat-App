@@ -555,7 +555,7 @@ class ChatService implements ChatRepository
         Log::info('Uploaded files:', $request->file());
 
         $request->validate([
-            'file' => 'required|file|mimes:mp3|max:10240', // Max 10MB, MP3 only
+            'file' => 'required|file|mimes:mp3|max:10240',
         ]);
 
         if ($request->hasFile('file') && $request->file('file')->isValid()) {
@@ -565,7 +565,6 @@ class ChatService implements ChatRepository
             $extension = $file->getClientOriginalExtension();
             $uniqueMediaName = $filename . '_' . time() . '.' . $extension;
 
-            // Save to public/uploads/audio
             $destinationPath = public_path('uploads/audio');
             $file->move($destinationPath, $uniqueMediaName);
             $url = "/Uploads/audio/{$uniqueMediaName}";

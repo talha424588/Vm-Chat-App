@@ -5169,7 +5169,6 @@ const startRecording = () => {
                             });
                             const mediaName = `recording_${Date.now()}.mp3`;
 
-                            // Upload to Laravel backend
                             const formData = new FormData();
                             formData.append("file", mp3Blob, mediaName);
                             formData.append("mediaType", "Audio");
