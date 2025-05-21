@@ -164,7 +164,6 @@ let populateGroupList = async () => {
             }
         });
     } catch (error) {
-        // console.log("Error fetching chat groups:", error);
     }
 };
 
@@ -1209,7 +1208,6 @@ async function rerenderChatList(preGroupId) {
                 }
             }
         } else {
-            // console.log("Message already exists in the group_messages array.");
         }
     }
     chatList.sort((a, b) => {
@@ -1879,7 +1877,6 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             }
             // else {
-            //     console.log("on reoky ");
             //     var add_file_view = `
             //     <div class="file-message" onclick="scrollToMessage('${message.reply.id
             //         }','${message.id}')">
@@ -3338,7 +3335,6 @@ function checkPrivacyAndAlert(messageContent, messageId) {
             }),
         })
             .then((response) => {
-                // console.log(response);
             })
             .catch((error) => {
                 console.error(error);
@@ -3673,36 +3669,48 @@ function showReply(message_id, senderName, type) {
     const voiceIcon = document.getElementById("voice-icon");
     const fileicon = document.getElementById("file-icon");
     const captureid = document.getElementById("captureid");
+    if (getComputedStyle(chat_action).display == "block" || getComputedStyle(chat_action).display == "flex"
+    && getComputedStyle(Editreplyarea).display == "none"
+) {
 
+    document.getElementById('chat_action').style.display = "none";
+    Editreplyarea.style.display = 'block';
+}
     change_icon_height(replyDiv);
     document.querySelector("#input").value = "";
     document.querySelector("#input").focus();
 }
 
 function removeQuotedMessage() {
-    var replyDiv = document.getElementById("reply-div");
-    var iconContainer = document.querySelector(".icon-container");
-    replyDiv.style.display = "none";
-    iconContainer.style.bottom = "90px";
+    var replyDiv = document.getElementById('reply-div');
+    var iconContainer = document.querySelector('.icon-container');
+    replyDiv.style.display = 'none';
+    iconContainer.style.bottom = '90px';
     DOM.replyId = null;
-    document
-        .querySelector(".auto-resize-textarea")
-        .style.setProperty("height", "44px");
-    document
-        .querySelector(".auto-resize-textarea")
-        .style.setProperty("overflow", "hidden");
+    document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
+    document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
     document.querySelector("#input").value = "";
-
-    const correctionarea = document.getElementById("correction-div");
+    const correctionarea = document.getElementById('correction-div');
     if (getComputedStyle(correctionarea).display == "block") {
-        correctionarea.style.display = "none";
+        correctionarea.style.display = 'none';
         document.querySelector("#input").focus();
     }
 
+
+    const chat_action = document.getElementById('chat_action');
+    const Editreplyarea = document.getElementById('message-reply-area');
+    if (getComputedStyle(chat_action).display == "none" || getComputedStyle(chat_action).display == "flex"
+        && getComputedStyle(Editreplyarea).display == "block") {
+
+        Editreplyarea.style.display = 'none';
+        chat_action.style.display = "flex";
+        document.querySelector("#input").focus();
+    }
     document.getElementById("messages").style.marginBottom = "74px";
 }
 const sendMessageReply = () => {
     sendMessage();
+    removeEditMessage();
     removeQuotedMessage();
 };
 
@@ -3790,9 +3798,6 @@ function highlightSelectedMessage(id) {
                 parentDiv.classList.add("selected-message");
             }
         }
-        // if (parentDiv) {
-        //     parentDiv.classList.toggle("selected-message");
-        // }
         else {
             // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
         }
@@ -3974,7 +3979,6 @@ DOM.messages.addEventListener("scroll", async () => {
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
-        //console.log('User is not at the top yet');
     }
 });
 
@@ -3992,41 +3996,6 @@ const fetchPaginatedMessages = async (
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
-        // let url = "";
-        // if (DOM.searchMessageClick && DOM.lastMessageId) {
-        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
-        //         DOM.groupId
-        //     )}&page=${DOM.currentPage}${
-        //         DOM.searchMessageClick && DOM.lastMessageId
-        //             ? `&lastMessageId=${encodeURIComponent(DOM.lastMessageId)}`
-        //             : ""
-        //     }`;
-        // } else if (message_id || DOM.lastMessageId) {
-        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
-        //         DOM.groupId
-        //     )}&page=${DOM.currentPage}&messageId=${encodeURIComponent(
-        //         message_id
-        //     )}`;
-        // } else if (unreadCounter) {
-        //     DOM.currentPage = Math.ceil(unreadCounter / 50);
-        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
-        //         DOM.groupId
-        //     )}&page=${DOM.currentPage}&unreadCount=${unreadCounter}`;
-        // } else {
-        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
-        //         DOM.groupId
-        //     )}&page=${DOM.currentPage}`;
-        // }
-        // const response = await fetch(url, {
-        //     method: "GET",
-        //     headers: {
-        //         "content-type": "application/json",
-        //     },
-        // });
-        // nextPageMessages = await response.json();
-        // if (DOM.groupSearch) {
-        //     nextPageMessages.data.forEach((item) => searchMessageSet.add(item));
-        // }
         let url = 'get-groups-messages-by-group-id';
 
         const requestBody = {
@@ -4064,7 +4033,7 @@ const fetchPaginatedMessages = async (
             pagnicateChatList = nextPageMessages;
             hasMoreMessages = true;
         }
-        // here
+
         if (message_id) {
             DOM.lastMessageId = nextPageMessages.data.at(-1).id;
         }
@@ -4079,33 +4048,12 @@ const fetchPaginatedMessages = async (
         }
 
         const u_id = user.unique_id;
-        // const ids = nextPageMessages.data.map(item => item.id);
-        // const ids = nextPageMessages.data
-        //     .filter(
-        //         (item) =>
-        //             item.sender !== user.unique_id &&
-        //             !item.seen_by.split(", ").includes(user.unique_id)
-        //     )
-        //     .map((item) => item.id);
-
-
         const ids = nextPageMessages.data
             .filter((item) => {
-                const seenByIds = item.seen_by.split(/,\s*/); // This will split by comma and optional space
+                const seenByIds = item.seen_by.split(/,\s*/);
                 return item.sender !== user.unique_id && !seenByIds.includes(user.unique_id);
             })
             .map((item) => item.id);
-
-        // const Notseenby = nextPageMessages.data
-        //     .filter((item) => {
-        //         const seenBy = item.seen_by
-        //             ? item.seen_by.split(",").map((id) => id.trim())
-        //             : [];
-        //         return !seenBy.includes(u_id);
-        //     })
-        //     .map((item) => item.id);
-
-
         const Notseenby = nextPageMessages.data
             .filter((item) => {
                 const seenBy = item.seen_by
@@ -4132,7 +4080,6 @@ const fetchPaginatedMessages = async (
                 }
             })();
         } else {
-            // console.log("ids length less then 1");
         }
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
@@ -4183,7 +4130,6 @@ const fetchPaginatedMessages = async (
                 );
             }
             // if (DOM.groupReferenceMessageClick) {
-            //     console.log("refrence clicked");
             //     scrollToMessage(message.id);
             // }
             // else if (!DOM.groupReferenceMessageClick) {
@@ -4358,10 +4304,8 @@ const fetchPaginatedMessages = async (
             //                     nullTypemessageTextElement.innerHTML = highlightedText;
             //                 }
             //             } else {
-            //                 // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
             //             }
             //             break;
-            //         // console.log("Unknown message type:", message.type);
             //     }
             //     setTimeout(() => {
             //         messageElement.scrollIntoView();
@@ -4643,13 +4587,10 @@ let sendMessage = (type = "Message", mediaName = null) => {
                     }),
                 })
                     .then((response) => {
-                        // console.log(response);
                     })
                     .catch((error) => {
-                        // console.error(error);
                     });
 
-                // Send "Alert!!!" to the backend to save in DB
                 let msg = {
                     user: user,
                     message: alertMessage,
@@ -4665,7 +4606,7 @@ let sendMessage = (type = "Message", mediaName = null) => {
                 removeQuotedMessage();
 
             } else {
-                // Send original message to the backend to save in DB
+
                 let msg = {
                     user: user,
                     message: value,
@@ -4724,14 +4665,12 @@ window.addEventListener("resize", (e) => {
 
 let init = () => {
     if (DOM.isDeleteParam == 1) {
-        //
+
         console.log("msg id", DOM.delMsgID);
         console.log("group id", DOM.delMsgGrpId);
 
         socket.emit("updateChatAreaMessages", DOM.delMsgID, DOM.delMsgGrpId);
 
-        // return;
-        // window.close();
     }
     // function removeQueryParams() {
     //     console.log("remove param");
@@ -6295,10 +6234,8 @@ function handleMessageResponse_old(
                         nullTypemessageTextElement.innerHTML = highlightedText;
                     }
                 } else {
-                    // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                 }
                 break;
-            // console.log("Unknown message type:", message.type);
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
         setTimeout(function () {
@@ -6468,7 +6405,6 @@ async function restoreMessage(id) {
                 }
             });
     } catch (error) {
-        // console.log("Error Restoring Message:", error);
     }
 }
 
@@ -6705,7 +6641,6 @@ document.getElementById("messages").addEventListener("scroll", function () {
         divElement.scrollHeight - divElement.scrollTop ===
         divElement.clientHeight
     ) {
-        // console.log('Scrolled to the bottom');
     }
 });
 document
