@@ -514,4 +514,66 @@ class ChatService implements ChatRepository
         $message_id = $request->message_id;
         return view('chat', compact('message_id', 'groupId'));
     }
+
+    public function uploadImage($request)
+    {
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $file = $request->file('image');
+            $mediaName = $file->getClientOriginalName();
+            $filename = pathinfo($mediaName, PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $uniqueMediaName = $filename . '_' . time() . '.' . $extension;
+            $file->move(public_path('uploads/image'), $uniqueMediaName);
+            $url = '/uploads/image/' . $uniqueMediaName;
+            Log::info('Image uploaded:', ['url' => $url]);
+            return response()->json(['url' => $url], 200);
+        }
+        return response()->json(['error' => 'No valid image file uploaded'], 400);
+    }
+    public function uploadFile($request)
+    {
+        if ($request->hasFile('file') && $request->file('file')->isValid()) {
+
+            $file = $request->file('file');
+            $mediaName = $file->getClientOriginalName();
+            $filename = pathinfo($mediaName, PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $uniqueMediaName = $filename . '_' . time() . '.' . $extension;
+            $file->move(public_path('uploads/docs'), $uniqueMediaName);
+            $url = '/uploads/docs/' . $uniqueMediaName;
+            Log::info('Image uploaded:', ['url' => $url]);
+            return response()->json(['url' => $url], 200);
+        }
+
+        Log::warning('No valid file uploaded');
+        return response()->json(['error' => 'No valid file uploaded'], 400);
+    }
+
+    public function uploadAudio($request)
+    {
+        Log::info('Audio upload request:', $request->all());
+        Log::info('Uploaded files:', $request->file());
+
+        $request->validate([
+            'file' => 'required|file|mimes:mp3|max:10240',
+        ]);
+
+        if ($request->hasFile('file') && $request->file('file')->isValid()) {
+            $file = $request->file('file');
+            $mediaName = $file->getClientOriginalName();
+            $filename = pathinfo($mediaName, PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $uniqueMediaName = $filename . '_' . time() . '.' . $extension;
+
+            $destinationPath = public_path('uploads/audio');
+            $file->move($destinationPath, $uniqueMediaName);
+            $url = "/Uploads/audio/{$uniqueMediaName}";
+
+            Log::info('Audio uploaded:', ['url' => $url]);
+            return response()->json(['url' => $url], 200);
+        }
+
+        Log::warning('No valid audio file uploaded');
+        return response()->json(['error' => 'No valid audio file uploaded'], 400);
+    }
 }

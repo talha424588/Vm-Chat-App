@@ -14,13 +14,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
 
-    public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService)
-    {
-    }
+    public function __construct(protected ChatRepository $chatRepository, protected FirebaseService $firebaseService) {}
 
     public function index(Request $request)
     {
@@ -119,8 +119,7 @@ class ChatController extends Controller
             if ($message->reply_id) {
                 $message->reply ? GroupMessage::where("id", $message->reply_id)->first() : "null";
                 $message->reply->user ? User::where("unique_id", $message->sender)->first() : "null";
-            }
-            else{
+            } else {
                 $message->reply = null;
             }
             $this->firebaseService->sendNotification($message);
@@ -239,5 +238,18 @@ class ChatController extends Controller
     public function messageisDeleteStatusCheck($id)
     {
         return $this->chatRepository->messageDeleteStatusCheck($id);
+    }
+    public function uploadImage(Request $request)
+    {
+        return $this->chatRepository->uploadImage($request);
+    }
+
+    public function uploadFile(Request $request)
+    {
+        return $this->chatRepository->uploadFile($request);
+    }
+        public function uploadVoiceNote(Request $request)
+    {
+        return $this->chatRepository->uploadAudio($request);
     }
 }

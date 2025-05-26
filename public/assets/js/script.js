@@ -4885,6 +4885,160 @@ const fileInput = document.getElementById("file-input");
 let mediaRecorder;
 let chunks = [];
 
+// const startRecording = () => {
+//     chunks = [];
+
+//     navigator.mediaDevices
+//         .getUserMedia({ audio: true })
+//         .then((stream) => {
+//             mediaRecorder = new MediaRecorder(stream);
+//             mediaRecorder.start();
+//             chatInputContainer.classList.add("recording-active");
+//             voiceIcon.classList.add("recording");
+
+//             voiceSvg.innerHTML = `
+//                 <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+//                 <path d="M11.6667 9C11.2246 9 10.8007 9.18061 10.4882 9.5021C10.1756 9.82359 10 10.2596 10 10.7143V19.2857C10 19.7404 10.1756 20.1764 10.4882 20.4979C10.8007 20.8194 11.2246 21 11.6667 21C12.1087 21 12.5326 20.8194 12.8452 20.4979C13.1577 20.1764 13.3333 19.7404 13.3333 19.2857V10.7143C13.3333 10.2596 13.1577 9.82359 12.8452 9.5021C12.5326 9.18061 12.1087 9 11.6667 9ZM18.3333 9C17.8913 9 17.4674 9.18061 17.1548 9.5021C16.8423 9.82359 16.6667 10.2596 16.6667 10.7143V19.2857C16.6667 19.7404 16.8423 20.1764 17.1548 20.4979C17.4674 20.8194 17.8913 21 18.3333 21C18.7754 21 19.1993 20.8194 19.5118 20.4979C19.8244 20.1764 20 19.7404 20 19.2857V10.7143C20 10.2596 19.8244 9.82359 19.5118 9.5021C19.1993 9.18061 18.7754 9 18.3333 9Z" fill="white"/>
+//             `;
+
+//             mediaRecorder.ondataavailable = (event) => {
+//                 chunks.push(event.data);
+//             };
+//             mediaRecorder.onstop = () => {
+//                 const blob = new Blob(chunks, { type: "audio/wav" });
+//                 const reader = new FileReader();
+//                 reader.onload = function () {
+//                     const arrayBuffer = this.result;
+//                     const audioContext = new (window.AudioContext ||
+//                         window.webkitAudioContext)();
+
+//                     audioContext.decodeAudioData(
+//                         arrayBuffer,
+//                         (buffer) => {
+//                             const samples = buffer.getChannelData(0);
+//                             const mp3 = new lamejs.Mp3Encoder(
+//                                 1,
+//                                 audioContext.sampleRate,
+//                                 128
+//                             );
+//                             const mp3Data = [];
+//                             const chunkSize = 1152;
+//                             for (
+//                                 let i = 0;
+//                                 i < samples.length;
+//                                 i += chunkSize
+//                             ) {
+//                                 const chunk = samples.subarray(
+//                                     i,
+//                                     i + chunkSize
+//                                 );
+//                                 const intSamples = new Int16Array(chunk.length);
+//                                 for (let j = 0; j < chunk.length; j++) {
+//                                     intSamples[j] = Math.max(
+//                                         -32768,
+//                                         Math.min(32767, chunk[j] * 32767)
+//                                     ); // Clamp values
+//                                 }
+//                                 const encodedChunk =
+//                                     mp3.encodeBuffer(intSamples);
+//                                 if (encodedChunk.length > 0) {
+//                                     mp3Data.push(encodedChunk);
+//                                 }
+//                             }
+//                             const endChunk = mp3.flush();
+//                             if (endChunk.length > 0) {
+//                                 mp3Data.push(endChunk);
+//                             }
+//                             const mp3Blob = new Blob(mp3Data, {
+//                                 type: "audio/mp3",
+//                             });
+//                             const audioUrl = URL.createObjectURL(mp3Blob);
+//                             const audio = new Audio(audioUrl);
+//                             const ref = firebase
+//                                 .storage()
+//                                 .ref("audio/" + DOM.unique_id);
+//                             const mediaName = `recording_${Date.now()}.mp3`;
+//                             const metadata = {
+//                                 contentType: "audio/mp3",
+//                             };
+//                             const task = ref
+//                                 .child(mediaName)
+//                                 .put(mp3Blob, metadata);
+//                             task.then((snapshot) =>
+//                                 snapshot.ref.getDownloadURL()
+//                             )
+//                                 .then((url) => {
+//                                     DOM.messageInput.value = url;
+//                                     sendMessage("Audio", mediaName);
+//                                 })
+//                                 .catch((error) => console.error(error));
+//                             chatInputContainer.classList.remove(
+//                                 "recording-active"
+//                             );
+//                             voiceIcon.classList.remove("recording");
+
+//                             voiceSvg.innerHTML = `
+//                             <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+//                             <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
+//                         `;
+//                         },
+//                         (error) => {
+//                             console.error("Error decoding audio data", error);
+//                         }
+//                     );
+//                 };
+//                 reader.readAsArrayBuffer(blob);
+//             };
+//         })
+//         .catch((error) => {
+//             console.error("Error accessing media devices.", error);
+//             chatInputContainer.classList.remove("recording-active");
+//             voiceIcon.classList.remove("recording");
+//             voiceSvg.innerHTML = `
+//                 <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+//                 <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20. 5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
+//             `;
+//         });
+// };
+// if (voiceIcon) {
+//     voiceIcon.addEventListener("click", () => {
+//         if (!mediaRecorder || mediaRecorder.state !== "recording") {
+//             startRecording();
+//         } else {
+//             mediaRecorder.stop();
+//         }
+//     });
+// }
+
+document.getElementById("captureid").addEventListener("click", function () {
+    document.getElementById("hidden-file-input").click();
+});
+
+// document
+//     .getElementById("hidden-file-input")
+//     .addEventListener("change", function () {
+//         const imageInput = this;
+//         if (imageInput.files.length > 0) {
+//             const image = imageInput.files[0];
+//             const ref = firebase.storage().ref("images/" + DOM.unique_id);
+//             const mediaName = image.name;
+//             const metadata = {
+//                 contentType: image.type,
+//             };
+//             const task = ref.child(mediaName).put(image, metadata);
+//             task.then((snapshot) => snapshot.ref.getDownloadURL())
+//                 .then((url) => {
+//                     DOM.messageInput.value = url;
+//                     sendMessage("Image", mediaName);
+//                 })
+//                 .catch((error) => console.error(error));
+//         }
+//     });
+
+
+
+
+
 const startRecording = () => {
     chunks = [];
 
@@ -4937,7 +5091,7 @@ const startRecording = () => {
                                     intSamples[j] = Math.max(
                                         -32768,
                                         Math.min(32767, chunk[j] * 32767)
-                                    ); // Clamp values
+                                    );
                                 }
                                 const encodedChunk =
                                     mp3.encodeBuffer(intSamples);
@@ -4952,38 +5106,52 @@ const startRecording = () => {
                             const mp3Blob = new Blob(mp3Data, {
                                 type: "audio/mp3",
                             });
-                            const audioUrl = URL.createObjectURL(mp3Blob);
-                            const audio = new Audio(audioUrl);
-                            const ref = firebase
-                                .storage()
-                                .ref("audio/" + DOM.unique_id);
                             const mediaName = `recording_${Date.now()}.mp3`;
-                            const metadata = {
-                                contentType: "audio/mp3",
-                            };
-                            const task = ref
-                                .child(mediaName)
-                                .put(mp3Blob, metadata);
-                            task.then((snapshot) =>
-                                snapshot.ref.getDownloadURL()
-                            )
-                                .then((url) => {
-                                    DOM.messageInput.value = url;
-                                    sendMessage("Audio", mediaName);
-                                })
-                                .catch((error) => console.error(error));
-                            chatInputContainer.classList.remove(
-                                "recording-active"
-                            );
-                            voiceIcon.classList.remove("recording");
 
+                            const formData = new FormData();
+                            formData.append("file", mp3Blob, mediaName);
+                            formData.append("mediaType", "Audio");
+
+                            fetch("/upload-audio", {
+                                method: "POST",
+                                headers: {
+                                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                                },
+                                body: formData
+                            })
+                                .then(response => {
+                                    if (!response.ok) throw new Error(`Audio upload failed: ${response.statusText}`);
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.url) {
+                                        DOM.messageInput.value = data.url;
+                                        sendMessage("Audio", mediaName);
+                                    } else {
+                                        console.error("Upload failed:", data.error);
+                                        alert("Failed to upload audio: " + (data.error || "Unknown error"));
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("Upload error:", error);
+                                    $("#wentWrong").modal("show");
+                                });
+
+                            chatInputContainer.classList.remove("recording-active");
+                            voiceIcon.classList.remove("recording");
                             voiceSvg.innerHTML = `
-                            <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-                            <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
-                        `;
+                                <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+                                <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
+                            `;
                         },
                         (error) => {
                             console.error("Error decoding audio data", error);
+                            chatInputContainer.classList.remove("recording-active");
+                            voiceIcon.classList.remove("recording");
+                            voiceSvg.innerHTML = `
+                                <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
+                                <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
+                            `;
                         }
                     );
                 };
@@ -4996,10 +5164,11 @@ const startRecording = () => {
             voiceIcon.classList.remove("recording");
             voiceSvg.innerHTML = `
                 <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-                <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20. 5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
+                <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
             `;
         });
 };
+
 if (voiceIcon) {
     voiceIcon.addEventListener("click", () => {
         if (!mediaRecorder || mediaRecorder.state !== "recording") {
@@ -5010,28 +5179,51 @@ if (voiceIcon) {
     });
 }
 
-document.getElementById("captureid").addEventListener("click", function () {
-    document.getElementById("hidden-file-input").click();
-});
-
 document
     .getElementById("hidden-file-input")
     .addEventListener("change", function () {
         const imageInput = this;
+        console.log("image input", imageInput);
         if (imageInput.files.length > 0) {
             const image = imageInput.files[0];
-            const ref = firebase.storage().ref("images/" + DOM.unique_id);
             const mediaName = image.name;
-            const metadata = {
-                contentType: image.type,
-            };
-            const task = ref.child(mediaName).put(image, metadata);
-            task.then((snapshot) => snapshot.ref.getDownloadURL())
-                .then((url) => {
-                    DOM.messageInput.value = url;
-                    sendMessage("Image", mediaName);
+
+            const extension = mediaName.split('.').pop().toLowerCase();
+            const mimeType = image.type;
+
+            if (!['jpg', 'jpeg', 'png', 'gif'].includes(extension) || !['image/jpeg', 'image/png', 'image/gif'].includes(mimeType)) {
+                console.error('Invalid file type:', { extension, mimeType });
+                alert('Please upload an image (JPG, JPEG, PNG, GIF).');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("image", image);
+
+            fetch("/upload-image", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Image upload failed");
+                    return response.json();
                 })
-                .catch((error) => console.error(error));
+                .then(data => {
+                    if (data.url) {
+                        const imagePath = data.url;
+                        DOM.messageInput.value = imagePath;
+                        sendMessage("Image", mediaName);
+                    } else {
+                        console.error("Upload failed:", data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error("Upload error:", error);
+                    $("#wentWrong").modal("show");
+                });
         }
     });
 
@@ -5039,23 +5231,83 @@ fileIcon.addEventListener("click", () => {
     fileInput.click();
 });
 
-fileInput.addEventListener("change", (event) => {
-    if (event.target.files[0]) {
-        const file = event.target.files[0];
+// fileInput.addEventListener("change", (event) => {
+//     if (event.target.files[0]) {
+//         const file = event.target.files[0];
 
-        const ref = firebase.storage().ref("files/" + DOM.unique_id);
-        const mediaName = file.name;
-        const metadata = {
-            contentType: file.type,
-        };
-        const task = ref.child(mediaName).put(file, metadata);
-        task.then((snapshot) => snapshot.ref.getDownloadURL())
-            .then((url) => {
-                DOM.messageInput.value = url;
-                sendMessage("File", mediaName);
-            })
-            .catch((error) => console.error(error));
+//         const ref = firebase.storage().ref("files/" + DOM.unique_id);
+//         const mediaName = file.name;
+//         const metadata = {
+//             contentType: file.type,
+//         };
+//         const task = ref.child(mediaName).put(file, metadata);
+//         task.then((snapshot) => snapshot.ref.getDownloadURL())
+//             .then((url) => {
+//                 DOM.messageInput.value = url;
+//                 sendMessage("File", mediaName);
+//             })
+//             .catch((error) => console.error(error));
+//     }
+// });
+
+fileInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+
+    if (!file) {
+        alert("No file selected.");
+        return;
     }
+
+    const mediaName = file.name;
+    const extension = mediaName.split('.').pop().toLowerCase();
+    const mimeType = file.type;
+
+    if (extension !== 'pdf' || mimeType !== 'application/pdf') {
+        console.error('Invalid file type:', { extension, mimeType });
+        alert('Please upload a PDF file.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("mediaType", "file");
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    if (!csrfToken) {
+        console.error("CSRF token not found");
+        alert("CSRF token missing. Please refresh the page.");
+        return;
+    }
+
+    fetch("/upload-file", {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": csrfToken,
+        },
+        body: formData
+    })
+        .then(response => {
+            console.log("Response status:", response.status, response.statusText);
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`PDF upload failed: ${response.status} ${response.statusText} - ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.url) {
+                DOM.messageInput.value = data.url;
+                sendMessage("File", mediaName);
+            } else {
+                console.error("Upload failed:", data);
+                alert("Failed to upload PDF: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Upload error:", error.message);
+            $("#wentWrong").modal("show");
+        });
 });
 
 const textarea = document.getElementById("input");
