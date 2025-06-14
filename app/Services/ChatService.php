@@ -523,11 +523,19 @@ class ChatService implements ChatRepository
             $filename = pathinfo($mediaName, PATHINFO_FILENAME);
             $extension = $file->getClientOriginalExtension();
             $uniqueMediaName = $filename . '_' . time() . '.' . $extension;
-            $file->move(public_path('uploads/image'), $uniqueMediaName);
+
+            $destination = $_SERVER['DOCUMENT_ROOT'] . '/uploads/image';
+
+            if (!file_exists($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            $file->move($destination, $uniqueMediaName);
             $url = '/uploads/image/' . $uniqueMediaName;
             Log::info('Image uploaded:', ['url' => $url]);
             return response()->json(['url' => $url], 200);
         }
+
         return response()->json(['error' => 'No valid image file uploaded'], 400);
     }
     public function uploadFile($request)
@@ -545,15 +553,11 @@ class ChatService implements ChatRepository
             return response()->json(['url' => $url], 200);
         }
 
-        Log::warning('No valid file uploaded');
         return response()->json(['error' => 'No valid file uploaded'], 400);
     }
 
     public function uploadAudio($request)
     {
-        Log::info('Audio upload request:', $request->all());
-        Log::info('Uploaded files:', $request->file());
-
         $request->validate([
             'file' => 'required|file|mimes:mp3|max:10240',
         ]);
@@ -573,7 +577,6 @@ class ChatService implements ChatRepository
             return response()->json(['url' => $url], 200);
         }
 
-        Log::warning('No valid audio file uploaded');
         return response()->json(['error' => 'No valid audio file uploaded'], 400);
     }
 }

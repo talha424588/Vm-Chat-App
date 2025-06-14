@@ -235,10 +235,12 @@ class ChatController extends Controller
     {
         return $this->chatRepository->openChatGroup($request, $group_id);
     }
+
     public function messageisDeleteStatusCheck($id)
     {
         return $this->chatRepository->messageDeleteStatusCheck($id);
     }
+
     public function uploadImage(Request $request)
     {
         return $this->chatRepository->uploadImage($request);
@@ -248,7 +250,8 @@ class ChatController extends Controller
     {
         return $this->chatRepository->uploadFile($request);
     }
-        public function uploadVoiceNote(Request $request)
+
+    public function uploadVoiceNote(Request $request)
     {
         return $this->chatRepository->uploadAudio($request);
     }
