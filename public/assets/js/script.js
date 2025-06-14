@@ -4,8 +4,7 @@ let getByClass = (className, parent) =>
     parent
         ? parent.getElementsByClassName(className)
         : getByClass(className, document);
-
-const socket = io("http://localhost:3000");
+var socket = io.connect('/');
 
 const DOM = {
     chatListArea: getById("chat-list-area"),
@@ -164,6 +163,7 @@ let populateGroupList = async () => {
             }
         });
     } catch (error) {
+        // console.log("Error fetching chat groups:", error);
     }
 };
 
@@ -1208,6 +1208,7 @@ async function rerenderChatList(preGroupId) {
                 }
             }
         } else {
+            // console.log("Message already exists in the group_messages array.");
         }
     }
     chatList.sort((a, b) => {
@@ -1505,10 +1506,10 @@ socket.on("updateEditedMessage", (editedMessage) => {
             }
             get_voice_list();
         } else {
-            console.error(
-                "Message element not found for ID:",
-                editedMessage.id
-            );
+            // console.error(
+            //     "Message element not found for ID:",
+            //     editedMessage.id
+            // );
         }
     } else {
         updateViewChatList(editedMessage);
@@ -1877,6 +1878,7 @@ let addMessageToMessageArea = (message, flag = false) => {
 
             }
             // else {
+            //     console.log("on reoky ");
             //     var add_file_view = `
             //     <div class="file-message" onclick="scrollToMessage('${message.reply.id
             //         }','${message.id}')">
@@ -2141,13 +2143,54 @@ let addMessageToMessageArea = (message, flag = false) => {
             `;
             }
             if (message.reply.type == "Audio") {
-                let audioTag = message.reply.msg.startsWith("https://")
-                    ? message.reply.msg
-                    : message.reply.msg.match(/<audio[^>]+>/g)[0];
+                // let audioTag = message.reply.msg.startsWith("https://")
+                //     ? message.reply.msg
+                //     : message.reply.msg.match(/<audio[^>]+>/g)[0];
 
-                audioSrc = message.reply.msg.startsWith("https://")
-                    ? message.reply.msg
-                    : audioTag.match(/src="([^"]+)"/)[1];
+                // audioSrc = message.reply.msg.startsWith("https://")
+                //     ? message.reply.msg
+                //     : audioTag.match(/src="([^"]+)"/)[1];
+
+                let audioTag;
+
+                // Check if the message starts with "https://"
+                if (message.reply.msg.startsWith("https://")) {
+                    audioTag = message.reply.msg;
+                }
+                // Check if the message contains an <audio> tag
+                else if (message.reply.msg.match(/<audio[^>]+>/g)) {
+                    audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
+                }
+                // Handle the case where the message is a relative file path
+                else if (message.reply.msg.startsWith("/uploads/audio/")) {
+                    audioTag = message.reply.msg;
+                }
+                // If none of the above, set audioTag to null or handle accordingly
+                else {
+                    audioTag = null;
+                }
+
+                let audioSrc;
+
+                // Check if the message starts with "https://"
+                if (message.reply.msg.startsWith("https://")) {
+                    audioSrc = message.reply.msg;
+                }
+                // Check if audioTag is defined and contains an <audio> tag
+                else if (audioTag && audioTag.match(/<audio[^>]+src="([^"]+)"/)) {
+                    audioSrc = audioTag.match(/<audio[^>]+src="([^"]+)"/)[1];
+                }
+                // Handle the case where the message is a relative file path
+                else if (message.reply.msg.startsWith("/uploads/audio/")) {
+                    audioSrc = message.reply.msg;
+                }
+                // If none of the above, set audioSrc to null or handle accordingly
+                else {
+                    audioSrc = null;
+                }
+
+
+
                 var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
                     };" data-audio-src="${audioSrc}">
                         <div class="avatar">
@@ -2191,6 +2234,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             `;
             }
             if (message.reply.type == "File") {
+
                 var message_body = `
                 <div class="file-message" onclick="scrollToMessage('${message.reply.id
                     }','${message.reply.id}')">
@@ -2222,6 +2266,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             `;
             }
             if (message.reply.type == "Image") {
+
                 var message_new = `<img src="${message.message ?? message.msg
                     }" class="view-image" style="height:222px; width:100%;">`;
                 messageContent = `
@@ -2241,6 +2286,7 @@ let addMessageToMessageArea = (message, flag = false) => {
             `;
             }
         } else {
+
             messageContent = `
             <img src="${message.message ?? message.msg}" data-original="${message.message ?? message.msg
                 }" class="view-image"" style="height:222px; width:100%;">
@@ -2278,13 +2324,51 @@ let addMessageToMessageArea = (message, flag = false) => {
                 message.reply.type === "Audio" ||
                 /<audio[^>]+>/g.test(message.reply.msg)
             ) {
-                let audioTag = message.reply.msg.startsWith("https://")
-                    ? message.reply.msg
-                    : message.reply.msg.match(/<audio[^>]+>/g)[0];
+                // let audioTag = message.reply.msg.startsWith("https://")
+                //     ? message.reply.msg
+                //     : message.reply.msg.match(/<audio[^>]+>/g)[0];
+                let audioTag;
 
-                audioSrc = message.reply.msg.startsWith("https://")
-                    ? message.reply.msg
-                    : audioTag.match(/src="([^"]+)"/)[1];
+                // Check if the message starts with "https://"
+                if (message.reply.msg.startsWith("https://")) {
+                    audioTag = message.reply.msg;
+                }
+                // Check if the message contains an <audio> tag
+                else if (message.reply.msg.match(/<audio[^>]+>/g)) {
+                    audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
+                }
+                // Handle the case where the message is a relative file path
+                else if (message.reply.msg.startsWith("/uploads/audio/")) {
+                    audioTag = message.reply.msg;
+                }
+                // If none of the above, set audioTag to null or handle accordingly
+                else {
+                    audioTag = null;
+                }
+
+                let audioSrc;
+
+                // Check if the message starts with "https://"
+                if (message.reply.msg.startsWith("https://")) {
+                    audioSrc = message.reply.msg;
+                }
+                // Check if audioTag is defined and contains an <audio> tag
+                else if (audioTag && audioTag.match(/<audio[^>]+src="([^"]+)"/)) {
+                    audioSrc = audioTag.match(/<audio[^>]+src="([^"]+)"/)[1];
+                }
+                // Handle the case where the message is a relative file path
+                else if (message.reply.msg.startsWith("/uploads/audio/")) {
+                    audioSrc = message.reply.msg;
+                }
+                // If none of the above, set audioSrc to null or handle accordingly
+                else {
+                    audioSrc = null;
+                }
+
+
+                // audioSrc = message.reply.msg.startsWith("https://")
+                //     ? message.reply.msg
+                //     : audioTag.match(/src="([^"]+)"/)[1];
                 var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
                     };" data-audio-src="${audioSrc}">
             <div class="avatar">
@@ -2364,7 +2448,6 @@ let addMessageToMessageArea = (message, flag = false) => {
             audioSrc = message.msg;
         }
         if (message.reply) {
-
             if (message.reply.type == "Message") {
                 message_body = `
                 <div class="reply-message-div" onclick="scrollToMessage('${message.reply.id
@@ -2408,13 +2491,43 @@ let addMessageToMessageArea = (message, flag = false) => {
                 `;
             }
             else if (message.reply.type == "Image") {
-                let audioTag = message.msg.startsWith("https://")
-                    ? message.msg
-                    : message.msg.match(/<audio[^>]+>/g)[0];
+                // let audioTag = message.msg.startsWith("https://")
+                //     ? message.msg
+                //     : message.msg.match(/<audio[^>]+>/g)[0];
 
-                audioSrc = message.msg.startsWith("https://")
-                    ? message.msg
-                    : audioTag.match(/src="([^"]+)"/)[1];
+                // audioSrc = message.msg.startsWith("https://")
+                //     ? message.msg
+                //     : audioTag.match(/src="([^"]+)"/)[1];
+
+                let audioTag;
+
+                if (message.reply.msg.startsWith("https://")) {
+                    audioTag = message.reply.msg;
+                }
+                else if (message.reply.msg.match(/<audio[^>]+>/g)) {
+                    audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
+                }
+                else if (message.reply.msg.startsWith("/uploads/audio/")) {
+                    audioTag = message.reply.msg;
+                }
+                else {
+                    audioTag = null;
+                }
+
+                let audioSrc;
+
+                if (message.reply.msg.startsWith("https://")) {
+                    audioSrc = message.reply.msg;
+                }
+                else if (audioTag && audioTag.match(/<audio[^>]+src="([^"]+)"/)) {
+                    audioSrc = audioTag.match(/<audio[^>]+src="([^"]+)"/)[1];
+                }
+                else if (message.reply.msg.startsWith("/uploads/audio/")) {
+                    audioSrc = message.reply.msg;
+                }
+                else {
+                    audioSrc = null;
+                }
 
                 var message_new = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
                     };" data-audio-src="${audioSrc}">
@@ -2461,13 +2574,43 @@ let addMessageToMessageArea = (message, flag = false) => {
             }
 
             else if (message.reply.type == "File") {
-                let audioTag = message.msg.startsWith("https://")
-                    ? message.msg
-                    : message.msg.match(/<audio[^>]+>/g)[0];
+                // let audioTag = message.msg.startsWith("https://")
+                //     ? message.msg
+                //     : message.msg.match(/<audio[^>]+>/g)[0];
 
-                audioSrc = message.msg.startsWith("https://")
-                    ? message.msg
-                    : audioTag.match(/src="([^"]+)"/)[1];
+                // audioSrc = message.msg.startsWith("https://")
+                //     ? message.msg
+                //     : audioTag.match(/src="([^"]+)"/)[1];
+
+                let audioTag;
+
+                if (message.reply.msg.startsWith("https://")) {
+                    audioTag = message.reply.msg;
+                }
+                else if (message.reply.msg.match(/<audio[^>]+>/g)) {
+                    audioTag = message.reply.msg.match(/<audio[^>]+>/g)[0];
+                }
+                else if (message.reply.msg.startsWith("/uploads/audio/")) {
+                    audioTag = message.reply.msg;
+                }
+                else {
+                    audioTag = null;
+                }
+
+                let audioSrc;
+
+                if (message.reply.msg.startsWith("https://")) {
+                    audioSrc = message.reply.msg;
+                }
+                else if (audioTag && audioTag.match(/<audio[^>]+src="([^"]+)"/)) {
+                    audioSrc = audioTag.match(/<audio[^>]+src="([^"]+)"/)[1];
+                }
+                else if (message.reply.msg.startsWith("/uploads/audio/")) {
+                    audioSrc = message.reply.msg;
+                }
+                else {
+                    audioSrc = null;
+                }
 
                 var message_body = `
                     <div class="file-message" onclick="scrollToMessage('${message.reply.id
@@ -2522,13 +2665,30 @@ let addMessageToMessageArea = (message, flag = false) => {
             }
 
             else if (message.reply.type == "Audio") {
-                let audioTag = message.msg.startsWith("https://")
-                    ? message.msg
-                    : message.msg.match(/<audio[^>]+>/g)[0];
+                // let audioTag = message.msg.startsWith("https://")
+                //     ? message.msg
+                //     : message.msg.match(/<audio[^>]+>/g)[0];
 
-                audioSrc = message.msg.startsWith("https://")
-                    ? message.msg
-                    : audioTag.match(/src="([^"]+)"/)[1];
+                // audioSrc = message.msg.startsWith("https://")
+                //     ? message.msg
+                //     : audioTag.match(/src="([^"]+)"/)[1];
+
+                let audioSrc;
+
+                if (message.msg.startsWith("https://")) {
+                    audioSrc = message.msg;
+                } else if (message.msg.match(/<audio[^>]+>/g)) {
+                    const audioTag = message.msg.match(/<audio[^>]+>/g)[0];
+                    const srcMatch = audioTag.match(/src="([^"]+)"/);
+                    audioSrc = srcMatch ? srcMatch[1] : "";
+                } else {
+                    audioSrc = message.msg;
+                }
+
+                if (!audioSrc) {
+                    // console.error("Invalid audio source:", message.msg);
+                    audioSrc = "";
+                }
 
                 var message_body = `<div class="audio-message" style="background-color:${message.user.id == user.id ? "#dcf8c6" : "white"
                     };" data-audio-src="${message.reply.msg}">
@@ -3076,7 +3236,7 @@ function scroll_function() {
     const scrollBottomBtn = document.getElementById("scrollBottomBtn");
 
     if (!messageDiv || !scrollBottomBtn) {
-        console.error("Required elements not found in the DOM.");
+        // console.error("Required elements not found in the DOM.");
         return;
     }
 
@@ -3196,7 +3356,7 @@ function correction_call(message_id, messagebody, senderName) {
         editor.selection.select(editor.getBody(), true);
         editor.selection.collapse(false);
     } else {
-        console.error("TinyMCE editor not initialized for #input");
+        // console.error("TinyMCE editor not initialized for #input");
     }
 
     const correction_message_id = document.getElementById(
@@ -3220,7 +3380,7 @@ function correction_call(message_id, messagebody, senderName) {
     if (Editreplyarea) {
         Editreplyarea.style.display = "block";
     } else {
-        console.error("Element 'correctionreply-area' not found");
+        // console.error("Element 'correctionreply-area' not found");
     }
 
     var replyDiv = document.getElementById("correction-div");
@@ -3235,7 +3395,7 @@ function correction_call(message_id, messagebody, senderName) {
     if (quotedTextElement) {
         quotedTextElement.textContent = senderName;
     } else {
-        console.error("Element '#quoted-message .sender-name' not found");
+        // console.error("Element '#quoted-message .sender-name' not found");
     }
 
     if (quotedNameElement) {
@@ -3243,14 +3403,14 @@ function correction_call(message_id, messagebody, senderName) {
 
         // quotedNameElement.textContent = messagebody;
     } else {
-        console.error("Element '#quoted-message .quoted-text' not found");
+        // console.error("Element '#quoted-message .quoted-text' not found");
     }
 
     if (replyDiv) {
         replyDiv.style.display = "block";
         change_icon_height(replyDiv);
     } else {
-        console.error("Element 'correction-div' not found");
+        // console.error("Element 'correction-div' not found");
     }
 }
 
@@ -3335,9 +3495,10 @@ function checkPrivacyAndAlert(messageContent, messageId) {
             }),
         })
             .then((response) => {
+                // console.log(response);
             })
             .catch((error) => {
-                console.error(error);
+                // console.error(error);
             });
 
         // Send "Alert!!!" to the backend to save in DB
@@ -3669,48 +3830,36 @@ function showReply(message_id, senderName, type) {
     const voiceIcon = document.getElementById("voice-icon");
     const fileicon = document.getElementById("file-icon");
     const captureid = document.getElementById("captureid");
-    if (getComputedStyle(chat_action).display == "block" || getComputedStyle(chat_action).display == "flex"
-    && getComputedStyle(Editreplyarea).display == "none"
-) {
 
-    document.getElementById('chat_action').style.display = "none";
-    Editreplyarea.style.display = 'block';
-}
     change_icon_height(replyDiv);
     document.querySelector("#input").value = "";
     document.querySelector("#input").focus();
 }
 
 function removeQuotedMessage() {
-    var replyDiv = document.getElementById('reply-div');
-    var iconContainer = document.querySelector('.icon-container');
-    replyDiv.style.display = 'none';
-    iconContainer.style.bottom = '90px';
+    var replyDiv = document.getElementById("reply-div");
+    var iconContainer = document.querySelector(".icon-container");
+    replyDiv.style.display = "none";
+    iconContainer.style.bottom = "90px";
     DOM.replyId = null;
-    document.querySelector('.auto-resize-textarea').style.setProperty('height', '44px');
-    document.querySelector('.auto-resize-textarea').style.setProperty('overflow', 'hidden');
+    document
+        .querySelector(".auto-resize-textarea")
+        .style.setProperty("height", "44px");
+    document
+        .querySelector(".auto-resize-textarea")
+        .style.setProperty("overflow", "hidden");
     document.querySelector("#input").value = "";
-    const correctionarea = document.getElementById('correction-div');
+
+    const correctionarea = document.getElementById("correction-div");
     if (getComputedStyle(correctionarea).display == "block") {
-        correctionarea.style.display = 'none';
+        correctionarea.style.display = "none";
         document.querySelector("#input").focus();
     }
 
-
-    const chat_action = document.getElementById('chat_action');
-    const Editreplyarea = document.getElementById('message-reply-area');
-    if (getComputedStyle(chat_action).display == "none" || getComputedStyle(chat_action).display == "flex"
-        && getComputedStyle(Editreplyarea).display == "block") {
-
-        Editreplyarea.style.display = 'none';
-        chat_action.style.display = "flex";
-        document.querySelector("#input").focus();
-    }
     document.getElementById("messages").style.marginBottom = "74px";
 }
 const sendMessageReply = () => {
     sendMessage();
-    removeEditMessage();
     removeQuotedMessage();
 };
 
@@ -3762,7 +3911,7 @@ function moveMessage(messageId) {
             } message${allSelectedMessages.length - 1 + selectedMessagesSet.size > 1 ? "s" : ""} selected`;
 
     } else {
-        console.error(`Message with ID: ${messageId} not found.`);
+        // console.error(`Message with ID: ${messageId} not found.`);
     }
 }
 function pickParentChildMessages(selectedMessage) {
@@ -3798,12 +3947,15 @@ function highlightSelectedMessage(id) {
                 parentDiv.classList.add("selected-message");
             }
         }
+        // if (parentDiv) {
+        //     parentDiv.classList.toggle("selected-message");
+        // }
         else {
             // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
         }
     }
     else {
-        console.error(`Message with ID: ${msg.id} not found.`);
+        // console.error(`Message with ID: ${msg.id} not found.`);
     }
 }
 
@@ -3979,6 +4131,7 @@ DOM.messages.addEventListener("scroll", async () => {
         // scroll_to_unread_div(true);
         isLoadingMessages = false;
     } else if (DOM.messages.scrollTop !== 0) {
+        //console.log('User is not at the top yet');
     }
 });
 
@@ -3996,6 +4149,41 @@ const fetchPaginatedMessages = async (
     isLoading = true;
     const currentScrollHeight = DOM.messages.scrollHeight;
     try {
+        // let url = "";
+        // if (DOM.searchMessageClick && DOM.lastMessageId) {
+        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
+        //         DOM.groupId
+        //     )}&page=${DOM.currentPage}${
+        //         DOM.searchMessageClick && DOM.lastMessageId
+        //             ? `&lastMessageId=${encodeURIComponent(DOM.lastMessageId)}`
+        //             : ""
+        //     }`;
+        // } else if (message_id || DOM.lastMessageId) {
+        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
+        //         DOM.groupId
+        //     )}&page=${DOM.currentPage}&messageId=${encodeURIComponent(
+        //         message_id
+        //     )}`;
+        // } else if (unreadCounter) {
+        //     DOM.currentPage = Math.ceil(unreadCounter / 50);
+        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
+        //         DOM.groupId
+        //     )}&page=${DOM.currentPage}&unreadCount=${unreadCounter}`;
+        // } else {
+        //     url = `get-groups-messages-by-group-id?groupId=${encodeURIComponent(
+        //         DOM.groupId
+        //     )}&page=${DOM.currentPage}`;
+        // }
+        // const response = await fetch(url, {
+        //     method: "GET",
+        //     headers: {
+        //         "content-type": "application/json",
+        //     },
+        // });
+        // nextPageMessages = await response.json();
+        // if (DOM.groupSearch) {
+        //     nextPageMessages.data.forEach((item) => searchMessageSet.add(item));
+        // }
         let url = 'get-groups-messages-by-group-id';
 
         const requestBody = {
@@ -4033,7 +4221,7 @@ const fetchPaginatedMessages = async (
             pagnicateChatList = nextPageMessages;
             hasMoreMessages = true;
         }
-
+        // here
         if (message_id) {
             DOM.lastMessageId = nextPageMessages.data.at(-1).id;
         }
@@ -4048,12 +4236,33 @@ const fetchPaginatedMessages = async (
         }
 
         const u_id = user.unique_id;
+        // const ids = nextPageMessages.data.map(item => item.id);
+        // const ids = nextPageMessages.data
+        //     .filter(
+        //         (item) =>
+        //             item.sender !== user.unique_id &&
+        //             !item.seen_by.split(", ").includes(user.unique_id)
+        //     )
+        //     .map((item) => item.id);
+
+
         const ids = nextPageMessages.data
             .filter((item) => {
-                const seenByIds = item.seen_by.split(/,\s*/);
+                const seenByIds = item.seen_by.split(/,\s*/); // This will split by comma and optional space
                 return item.sender !== user.unique_id && !seenByIds.includes(user.unique_id);
             })
             .map((item) => item.id);
+
+        // const Notseenby = nextPageMessages.data
+        //     .filter((item) => {
+        //         const seenBy = item.seen_by
+        //             ? item.seen_by.split(",").map((id) => id.trim())
+        //             : [];
+        //         return !seenBy.includes(u_id);
+        //     })
+        //     .map((item) => item.id);
+
+
         const Notseenby = nextPageMessages.data
             .filter((item) => {
                 const seenBy = item.seen_by
@@ -4080,6 +4289,7 @@ const fetchPaginatedMessages = async (
                 }
             })();
         } else {
+            // console.log("ids length less then 1");
         }
         if (nextPageMessages.data.length === 0) {
             hasMoreMessages = false;
@@ -4130,6 +4340,7 @@ const fetchPaginatedMessages = async (
                 );
             }
             // if (DOM.groupReferenceMessageClick) {
+            //     console.log("refrence clicked");
             //     scrollToMessage(message.id);
             // }
             // else if (!DOM.groupReferenceMessageClick) {
@@ -4304,8 +4515,10 @@ const fetchPaginatedMessages = async (
             //                     nullTypemessageTextElement.innerHTML = highlightedText;
             //                 }
             //             } else {
+            //                 // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
             //             }
             //             break;
+            //         // console.log("Unknown message type:", message.type);
             //     }
             //     setTimeout(() => {
             //         messageElement.scrollIntoView();
@@ -4587,10 +4800,13 @@ let sendMessage = (type = "Message", mediaName = null) => {
                     }),
                 })
                     .then((response) => {
+                        // console.log(response);
                     })
                     .catch((error) => {
+                        // console.error(error);
                     });
 
+                // Send "Alert!!!" to the backend to save in DB
                 let msg = {
                     user: user,
                     message: alertMessage,
@@ -4606,7 +4822,7 @@ let sendMessage = (type = "Message", mediaName = null) => {
                 removeQuotedMessage();
 
             } else {
-
+                // Send original message to the backend to save in DB
                 let msg = {
                     user: user,
                     message: value,
@@ -4665,12 +4881,10 @@ window.addEventListener("resize", (e) => {
 
 let init = () => {
     if (DOM.isDeleteParam == 1) {
-
-        console.log("msg id", DOM.delMsgID);
-        console.log("group id", DOM.delMsgGrpId);
-
+        //
         socket.emit("updateChatAreaMessages", DOM.delMsgID, DOM.delMsgGrpId);
-
+        // return;
+        // window.close();
     }
     // function removeQueryParams() {
     //     console.log("remove param");
@@ -4885,160 +5099,6 @@ const fileInput = document.getElementById("file-input");
 let mediaRecorder;
 let chunks = [];
 
-// const startRecording = () => {
-//     chunks = [];
-
-//     navigator.mediaDevices
-//         .getUserMedia({ audio: true })
-//         .then((stream) => {
-//             mediaRecorder = new MediaRecorder(stream);
-//             mediaRecorder.start();
-//             chatInputContainer.classList.add("recording-active");
-//             voiceIcon.classList.add("recording");
-
-//             voiceSvg.innerHTML = `
-//                 <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-//                 <path d="M11.6667 9C11.2246 9 10.8007 9.18061 10.4882 9.5021C10.1756 9.82359 10 10.2596 10 10.7143V19.2857C10 19.7404 10.1756 20.1764 10.4882 20.4979C10.8007 20.8194 11.2246 21 11.6667 21C12.1087 21 12.5326 20.8194 12.8452 20.4979C13.1577 20.1764 13.3333 19.7404 13.3333 19.2857V10.7143C13.3333 10.2596 13.1577 9.82359 12.8452 9.5021C12.5326 9.18061 12.1087 9 11.6667 9ZM18.3333 9C17.8913 9 17.4674 9.18061 17.1548 9.5021C16.8423 9.82359 16.6667 10.2596 16.6667 10.7143V19.2857C16.6667 19.7404 16.8423 20.1764 17.1548 20.4979C17.4674 20.8194 17.8913 21 18.3333 21C18.7754 21 19.1993 20.8194 19.5118 20.4979C19.8244 20.1764 20 19.7404 20 19.2857V10.7143C20 10.2596 19.8244 9.82359 19.5118 9.5021C19.1993 9.18061 18.7754 9 18.3333 9Z" fill="white"/>
-//             `;
-
-//             mediaRecorder.ondataavailable = (event) => {
-//                 chunks.push(event.data);
-//             };
-//             mediaRecorder.onstop = () => {
-//                 const blob = new Blob(chunks, { type: "audio/wav" });
-//                 const reader = new FileReader();
-//                 reader.onload = function () {
-//                     const arrayBuffer = this.result;
-//                     const audioContext = new (window.AudioContext ||
-//                         window.webkitAudioContext)();
-
-//                     audioContext.decodeAudioData(
-//                         arrayBuffer,
-//                         (buffer) => {
-//                             const samples = buffer.getChannelData(0);
-//                             const mp3 = new lamejs.Mp3Encoder(
-//                                 1,
-//                                 audioContext.sampleRate,
-//                                 128
-//                             );
-//                             const mp3Data = [];
-//                             const chunkSize = 1152;
-//                             for (
-//                                 let i = 0;
-//                                 i < samples.length;
-//                                 i += chunkSize
-//                             ) {
-//                                 const chunk = samples.subarray(
-//                                     i,
-//                                     i + chunkSize
-//                                 );
-//                                 const intSamples = new Int16Array(chunk.length);
-//                                 for (let j = 0; j < chunk.length; j++) {
-//                                     intSamples[j] = Math.max(
-//                                         -32768,
-//                                         Math.min(32767, chunk[j] * 32767)
-//                                     ); // Clamp values
-//                                 }
-//                                 const encodedChunk =
-//                                     mp3.encodeBuffer(intSamples);
-//                                 if (encodedChunk.length > 0) {
-//                                     mp3Data.push(encodedChunk);
-//                                 }
-//                             }
-//                             const endChunk = mp3.flush();
-//                             if (endChunk.length > 0) {
-//                                 mp3Data.push(endChunk);
-//                             }
-//                             const mp3Blob = new Blob(mp3Data, {
-//                                 type: "audio/mp3",
-//                             });
-//                             const audioUrl = URL.createObjectURL(mp3Blob);
-//                             const audio = new Audio(audioUrl);
-//                             const ref = firebase
-//                                 .storage()
-//                                 .ref("audio/" + DOM.unique_id);
-//                             const mediaName = `recording_${Date.now()}.mp3`;
-//                             const metadata = {
-//                                 contentType: "audio/mp3",
-//                             };
-//                             const task = ref
-//                                 .child(mediaName)
-//                                 .put(mp3Blob, metadata);
-//                             task.then((snapshot) =>
-//                                 snapshot.ref.getDownloadURL()
-//                             )
-//                                 .then((url) => {
-//                                     DOM.messageInput.value = url;
-//                                     sendMessage("Audio", mediaName);
-//                                 })
-//                                 .catch((error) => console.error(error));
-//                             chatInputContainer.classList.remove(
-//                                 "recording-active"
-//                             );
-//                             voiceIcon.classList.remove("recording");
-
-//                             voiceSvg.innerHTML = `
-//                             <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-//                             <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
-//                         `;
-//                         },
-//                         (error) => {
-//                             console.error("Error decoding audio data", error);
-//                         }
-//                     );
-//                 };
-//                 reader.readAsArrayBuffer(blob);
-//             };
-//         })
-//         .catch((error) => {
-//             console.error("Error accessing media devices.", error);
-//             chatInputContainer.classList.remove("recording-active");
-//             voiceIcon.classList.remove("recording");
-//             voiceSvg.innerHTML = `
-//                 <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61"/>
-//                 <path d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20. 5121 22.25 17.6418 22.25 14.1607H20.5196Z" fill="white"/>
-//             `;
-//         });
-// };
-// if (voiceIcon) {
-//     voiceIcon.addEventListener("click", () => {
-//         if (!mediaRecorder || mediaRecorder.state !== "recording") {
-//             startRecording();
-//         } else {
-//             mediaRecorder.stop();
-//         }
-//     });
-// }
-
-document.getElementById("captureid").addEventListener("click", function () {
-    document.getElementById("hidden-file-input").click();
-});
-
-// document
-//     .getElementById("hidden-file-input")
-//     .addEventListener("change", function () {
-//         const imageInput = this;
-//         if (imageInput.files.length > 0) {
-//             const image = imageInput.files[0];
-//             const ref = firebase.storage().ref("images/" + DOM.unique_id);
-//             const mediaName = image.name;
-//             const metadata = {
-//                 contentType: image.type,
-//             };
-//             const task = ref.child(mediaName).put(image, metadata);
-//             task.then((snapshot) => snapshot.ref.getDownloadURL())
-//                 .then((url) => {
-//                     DOM.messageInput.value = url;
-//                     sendMessage("Image", mediaName);
-//                 })
-//                 .catch((error) => console.error(error));
-//         }
-//     });
-
-
-
-
-
 const startRecording = () => {
     chunks = [];
 
@@ -5128,12 +5188,10 @@ const startRecording = () => {
                                         DOM.messageInput.value = data.url;
                                         sendMessage("Audio", mediaName);
                                     } else {
-                                        console.error("Upload failed:", data.error);
                                         alert("Failed to upload audio: " + (data.error || "Unknown error"));
                                     }
                                 })
                                 .catch(error => {
-                                    console.error("Upload error:", error);
                                     $("#wentWrong").modal("show");
                                 });
 
@@ -5145,7 +5203,6 @@ const startRecording = () => {
                             `;
                         },
                         (error) => {
-                            console.error("Error decoding audio data", error);
                             chatInputContainer.classList.remove("recording-active");
                             voiceIcon.classList.remove("recording");
                             voiceSvg.innerHTML = `
@@ -5159,7 +5216,6 @@ const startRecording = () => {
             };
         })
         .catch((error) => {
-            console.error("Error accessing media devices.", error);
             chatInputContainer.classList.remove("recording-active");
             voiceIcon.classList.remove("recording");
             voiceSvg.innerHTML = `
@@ -5179,11 +5235,14 @@ if (voiceIcon) {
     });
 }
 
+document.getElementById("captureid").addEventListener("click", function () {
+    document.getElementById("hidden-file-input").click();
+});
+
 document
     .getElementById("hidden-file-input")
     .addEventListener("change", function () {
         const imageInput = this;
-        console.log("image input", imageInput);
         if (imageInput.files.length > 0) {
             const image = imageInput.files[0];
             const mediaName = image.name;
@@ -5192,8 +5251,6 @@ document
             const mimeType = image.type;
 
             if (!['jpg', 'jpeg', 'png', 'gif'].includes(extension) || !['image/jpeg', 'image/png', 'image/gif'].includes(mimeType)) {
-                console.error('Invalid file type:', { extension, mimeType });
-                alert('Please upload an image (JPG, JPEG, PNG, GIF).');
                 return;
             }
 
@@ -5221,7 +5278,7 @@ document
                     }
                 })
                 .catch(error => {
-                    console.error("Upload error:", error);
+                    // console.error("Upload error:", error);
                     $("#wentWrong").modal("show");
                 });
         }
@@ -5230,25 +5287,6 @@ document
 fileIcon.addEventListener("click", () => {
     fileInput.click();
 });
-
-// fileInput.addEventListener("change", (event) => {
-//     if (event.target.files[0]) {
-//         const file = event.target.files[0];
-
-//         const ref = firebase.storage().ref("files/" + DOM.unique_id);
-//         const mediaName = file.name;
-//         const metadata = {
-//             contentType: file.type,
-//         };
-//         const task = ref.child(mediaName).put(file, metadata);
-//         task.then((snapshot) => snapshot.ref.getDownloadURL())
-//             .then((url) => {
-//                 DOM.messageInput.value = url;
-//                 sendMessage("File", mediaName);
-//             })
-//             .catch((error) => console.error(error));
-//     }
-// });
 
 fileInput.addEventListener("change", (event) => {
     const file = event.target.files[0];
@@ -5263,8 +5301,6 @@ fileInput.addEventListener("change", (event) => {
     const mimeType = file.type;
 
     if (extension !== 'pdf' || mimeType !== 'application/pdf') {
-        console.error('Invalid file type:', { extension, mimeType });
-        alert('Please upload a PDF file.');
         return;
     }
 
@@ -5274,8 +5310,6 @@ fileInput.addEventListener("change", (event) => {
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
     if (!csrfToken) {
-        console.error("CSRF token not found");
-        alert("CSRF token missing. Please refresh the page.");
         return;
     }
 
@@ -5287,7 +5321,6 @@ fileInput.addEventListener("change", (event) => {
         body: formData
     })
         .then(response => {
-            console.log("Response status:", response.status, response.statusText);
             if (!response.ok) {
                 return response.text().then(text => {
                     throw new Error(`PDF upload failed: ${response.status} ${response.statusText} - ${text}`);
@@ -5300,12 +5333,9 @@ fileInput.addEventListener("change", (event) => {
                 DOM.messageInput.value = data.url;
                 sendMessage("File", mediaName);
             } else {
-                console.error("Upload failed:", data);
-                alert("Failed to upload PDF: " + (data.error || "Unknown error"));
             }
         })
         .catch(error => {
-            console.error("Upload error:", error.message);
             $("#wentWrong").modal("show");
         });
 });
@@ -5742,7 +5772,7 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                         searchMessageOffset += searchMessageLimit;
                     })
                     .catch((error) => {
-                        console.error("Error:", "Not Found");
+                        // console.error("Error:", "Not Found");
                     });
             } catch (error) {
                 // console.log(error);
@@ -5830,7 +5860,7 @@ messageSidebar.addEventListener("scroll", function () {
                     isFetching = false;
                 })
                 .catch((error) => {
-                    console.error("Error:", "Not Found");
+                    // console.error("Error:", "Not Found");
                     isFetching = false;
                 });
         }
@@ -6234,8 +6264,10 @@ function handleMessageResponse_old(
                         nullTypemessageTextElement.innerHTML = highlightedText;
                     }
                 } else {
+                    // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                 }
                 break;
+            // console.log("Unknown message type:", message.type);
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
         setTimeout(function () {
@@ -6343,10 +6375,10 @@ function get_voice_list() {
                     audioPlayer.duration
                 );
             } else {
-                console.warn(
-                    "Audio duration is not available or invalid:",
-                    audioPlayer.duration
-                );
+                // console.warn(
+                //     "Audio duration is not available or invalid:",
+                //     audioPlayer.duration
+                // );
             }
         });
 
@@ -6405,6 +6437,7 @@ async function restoreMessage(id) {
                 }
             });
     } catch (error) {
+        // console.log("Error Restoring Message:", error);
     }
 }
 
@@ -6497,7 +6530,7 @@ let update_user_profile = async (elem, file) => {
             elem.classList.add("active");
         }
     } catch (error) {
-        console.error("Error updating User Profile:", error);
+        // console.error("Error updating User Profile:", error);
     }
 };
 
@@ -6641,6 +6674,7 @@ document.getElementById("messages").addEventListener("scroll", function () {
         divElement.scrollHeight - divElement.scrollTop ===
         divElement.clientHeight
     ) {
+        // console.log('Scrolled to the bottom');
     }
 });
 document
