@@ -4,7 +4,7 @@ let getByClass = (className, parent) =>
     parent
         ? parent.getElementsByClassName(className)
         : getByClass(className, document);
-var socket = io.connect('/');
+const socket = io("http://localhost:3000");
 
 const DOM = {
     chatListArea: getById("chat-list-area"),
@@ -5300,7 +5300,12 @@ fileInput.addEventListener("change", (event) => {
     const extension = mediaName.split('.').pop().toLowerCase();
     const mimeType = file.type;
 
-    if (extension !== 'pdf' || mimeType !== 'application/pdf') {
+    // if (extension !== 'pdf' || mimeType !== 'application/pdf') {
+    if (
+        !['pdf', 'doc', 'docx'].includes(extension) ||
+        !['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(mimeType)
+    ) {
+
         return;
     }
 
@@ -5332,6 +5337,7 @@ fileInput.addEventListener("change", (event) => {
             if (data.url) {
                 DOM.messageInput.value = data.url;
                 sendMessage("File", mediaName);
+                event.target.value = '';
             } else {
             }
         })
