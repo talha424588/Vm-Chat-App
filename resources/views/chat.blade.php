@@ -1063,6 +1063,28 @@
     <!-- {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}} -->
     <!-- Include Bootstrap JS -->
 
+    <!-- Move Message Reason Modal -->
+    <div class="modal fade" id="moveMessageReasonModal" tabindex="-1" role="dialog" aria-labelledby="moveMessageReasonModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <img src="{{ asset('assets/svg/danger-5732_256.gif') }}" alt="" style="height: 64px; display: block; margin: 0 auto;">
+                    </div>
+                    <h5 class="mb-2 fw-bold">Reason for Moving Message</h5>
+                    <div class="form-group mb-3">
+                        <label for="moveMessageReasonInput" class="mb-1">Reason</label>
+                        <input type="text" class="form-control text-center" id="moveMessageReasonInput" placeholder="Enter reason (e.g., because...)" />
+                    </div>
+                    <div class="d-flex justify-content-center  mt-3" style="gap: 10px;">
+                        <button type="button" class="btn btn-cancel px-4 me-2" id="moveMessageReasonOkBtn">OK</button>
+                        <button type="button" class="btn px-4" style="color: #000; outline:none" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
