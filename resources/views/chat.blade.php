@@ -1077,8 +1077,8 @@
                         <input type="text" class="form-control text-center" id="moveMessageReasonInput" placeholder="Enter reason (e.g., because...)" />
                     </div>
                     <div class="d-flex justify-content-center  mt-3" style="gap: 10px;">
-                        <button type="button" class="btn btn-primary px-4 me-2" id="moveMessageReasonOkBtn">OK</button>
-                        <button type="button" class="btn btn-cancel px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-cancel px-4 me-2" id="moveMessageReasonOkBtn">OK</button>
+                        <button type="button" class="btn px-4" style="color: #000; outline:none" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>

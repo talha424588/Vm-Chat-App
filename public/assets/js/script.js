@@ -3981,6 +3981,14 @@ function selectUsertosend(username, postgroup_id) {
 $(document).ready(function () {
     $("#MoveMessagetoGroup").on("click", function () {
         // Close the chatModal if open
+        var groupToMove = $("#group_to_move_message").val();
+
+        if (DOM.groupId == groupToMove) {
+            $("#chatModal").modal("hide");
+            $("#moveMessageReasonModal").modal("hide");
+            $("#notAllowed").modal("show");
+            return;
+        }
         $("#chatModal").modal("hide");
         // Show the reason modal instead of moving immediately
         $("#moveMessageReasonInput").val("");
