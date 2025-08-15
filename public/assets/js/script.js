@@ -3861,7 +3861,9 @@ function moveSelectedMessagesToGroup(
     moveMessageIds,
     groupToMove,
     messagesToMove,
-    reason
+    reason,
+    moveFrom,
+    moveTo
 ) {
     const allSelectedMessages = moveMessageIds.map((id) => {
         return {
@@ -3884,6 +3886,8 @@ function moveSelectedMessagesToGroup(
             newGroupId: newGroupId,
             messageList: messagesToMove,
             reason: reason,
+            moveFrom,
+            moveTo
         }),
     })
         .then((response) => response.json())
@@ -3982,6 +3986,14 @@ $(document).ready(function () {
     $("#MoveMessagetoGroup").on("click", function () {
         // Close the chatModal if open
         var groupToMove = $("#group_to_move_message").val();
+        console.log("move group", groupToMove);
+        console.log("Current group", DOM.groupId);
+        console.log("chatList", chatList);
+        let moveFromGroup = chatList.find((group) => group.group.group_id == DOM.groupId);
+        let moveToGroup = chatList.find((group) => group.group.group_id == groupToMove);
+        console.log("from", moveFromGroup);
+        console.log("To", moveToGroup);
+        throw new Error("new error");
 
         if (DOM.groupId == groupToMove) {
             $("#chatModal").modal("hide");
@@ -4016,7 +4028,9 @@ $(document).ready(function () {
             messageIdArray,
             groupToMove,
             allSelectedMessages,
-            reason
+            reason,
+            moveFromGroup,
+            moveToGroup
         );
         document.getElementById("messages_ids").value = "";
         document.getElementById("group_to_move_message").value = "";
