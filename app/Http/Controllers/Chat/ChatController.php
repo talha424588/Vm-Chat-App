@@ -201,7 +201,13 @@ class ChatController extends Controller
                 DB::table('group_messages')
                     ->where('id', $message['id'])
                     ->where('group_id', $message['group_id'])
-                    ->update(['is_deleted' => true, 'status' => EnumMessageEnum::MOVE,'reason' => $request->reason]);
+                    ->update([
+                        'is_deleted' => true,
+                        'status' => EnumMessageEnum::MOVE,
+                        'reason' => $request->reason,
+                        'message_move_from' => isset($request->moveFrom) ? $request->moveFrom : null,
+                        'message_move_to' => isset($request->moveTo) ? $request->moveTo : null
+                    ]);
                 $moveMessages[] = $moveMessageClone;
             }
         }

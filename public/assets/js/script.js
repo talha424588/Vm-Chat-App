@@ -3986,14 +3986,6 @@ $(document).ready(function () {
     $("#MoveMessagetoGroup").on("click", function () {
         // Close the chatModal if open
         var groupToMove = $("#group_to_move_message").val();
-        console.log("move group", groupToMove);
-        console.log("Current group", DOM.groupId);
-        console.log("chatList", chatList);
-        let moveFromGroup = chatList.find((group) => group.group.group_id == DOM.groupId);
-        let moveToGroup = chatList.find((group) => group.group.group_id == groupToMove);
-        console.log("from", moveFromGroup);
-        console.log("To", moveToGroup);
-        throw new Error("new error");
 
         if (DOM.groupId == groupToMove) {
             $("#chatModal").modal("hide");
@@ -4023,14 +4015,19 @@ $(document).ready(function () {
             $("#notAllowed").modal("show");
             return;
         }
+
+        let moveFromGroup = chatList.find((group) => group.group.group_id == DOM.groupId);
+        let moveToGroup = chatList.find((group) => group.group.group_id == groupToMove);
+        console.log("from", moveFromGroup.group.name);
+        console.log("To", moveToGroup.group.name);
         // Pass the reason as an extra argument if needed
         moveSelectedMessagesToGroup(
             messageIdArray,
             groupToMove,
             allSelectedMessages,
             reason,
-            moveFromGroup,
-            moveToGroup
+            moveFromGroup.group.name,
+            moveToGroup.group.name
         );
         document.getElementById("messages_ids").value = "";
         document.getElementById("group_to_move_message").value = "";
