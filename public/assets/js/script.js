@@ -3861,7 +3861,9 @@ function moveSelectedMessagesToGroup(
     moveMessageIds,
     groupToMove,
     messagesToMove,
-    reason
+    reason,
+    moveFrom,
+    moveTo
 ) {
     const allSelectedMessages = moveMessageIds.map((id) => {
         return {
@@ -3884,6 +3886,8 @@ function moveSelectedMessagesToGroup(
             newGroupId: newGroupId,
             messageList: messagesToMove,
             reason: reason,
+            moveFrom,
+            moveTo
         }),
     })
         .then((response) => response.json())
@@ -4011,12 +4015,19 @@ $(document).ready(function () {
             $("#notAllowed").modal("show");
             return;
         }
+
+        let moveFromGroup = chatList.find((group) => group.group.group_id == DOM.groupId);
+        let moveToGroup = chatList.find((group) => group.group.group_id == groupToMove);
+        console.log("from", moveFromGroup.group.name);
+        console.log("To", moveToGroup.group.name);
         // Pass the reason as an extra argument if needed
         moveSelectedMessagesToGroup(
             messageIdArray,
             groupToMove,
             allSelectedMessages,
-            reason
+            reason,
+            moveFromGroup.group.name,
+            moveToGroup.group.name
         );
         document.getElementById("messages_ids").value = "";
         document.getElementById("group_to_move_message").value = "";

@@ -243,31 +243,6 @@ class ChatService implements ChatRepository
         return response()->json(["status" => 200, "message" => "is read updated"]);
     }
 
-    // public function searchGroupMessages($searchQuery, $groupId)
-    // {
-    //     $messages = GroupMessage::where(function ($query) use ($searchQuery, $groupId) {
-    //         $query->where("msg", "LIKE", "%$searchQuery%")
-    //             ->orWhere("media_name", "LIKE", "%$searchQuery%");
-    //     })
-    //         ->where("group_id", $groupId)
-    //         ->where(function ($query) {
-    //             $query->whereIn("type", ["File", "Message"])
-    //                 ->orWhereNull("type")
-    //                 ->orWhere("type", "");
-    //         })
-    //         ->where('is_deleted', false)
-    //         // ->whereRaw("msg NOT REGEXP '<[^>]+>'")
-    //         ->whereRaw("NOT (msg REGEXP '<script[^>]*>|<iframe[^>]*>')")
-    //         ->with("user")
-    //         ->with('reply')
-    //         ->get();
-    //     if (count($messages) > 0) {
-    //         return response()->json(["status" => true, "message" => "success", "messages" => $messages]);
-    //     } else {
-    //         return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
-    //     }
-    // }
-
     public function searchGroupMessages($searchQuery, $groupId, $offset = 0, $limit = 40)
     {
         $messages = GroupMessage::where(function ($query) use ($searchQuery, $groupId) {
@@ -375,19 +350,6 @@ class ChatService implements ChatRepository
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
         }
     }
-
-
-    // public function deleteMessage($messageId)
-    // {
-    //     $message = GroupMessage::find($messageId);
-    //     if ($message) {
-    //         $message->delete();
-    //         return response()->json(['true' => 'Message deleted successfully']);
-    //     } else {
-    //         return response()->json(['false' => 'Not found']);
-    //     }
-    // }
-
 
     public function deleteMessage($request)
     {
