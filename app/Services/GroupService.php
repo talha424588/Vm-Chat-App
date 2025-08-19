@@ -152,6 +152,7 @@ class GroupService implements GroupRepository
             ->whereIn('group_id', $userGroups)
             ->whereRaw("NOT (msg REGEXP '<a[^>]*>|<audio[^>]*>')")
             ->with("user", "group")
+            ->orderBy("id","desc")
             ->paginate($perPageMessages, ['*'], 'page', $pageMessages);
 
         if ($groupWithMessagesArray->isEmpty() && $messages->isEmpty()) {
