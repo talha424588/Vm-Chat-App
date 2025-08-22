@@ -121,6 +121,7 @@ let populateGroupList = async () => {
     let present = {};
 
     try {
+        console.log("auto refresh");
         const id = document.getElementById("login_user_id").value;
         const unique_id = document.getElementById("login_user_unique_id").value;
 
@@ -498,6 +499,7 @@ let viewMessageList = () => {
 };
 
 let generateChatList = async () => {
+    console.log("Generating chat list");
     DOM.chatList.innerHTML = "";
     await populateGroupList();
     viewChatList();
@@ -850,8 +852,12 @@ socket.on("sendChatToClient", (message) => {
     }
 
     let unique_id = document.getElementById("login_user_unique_id").value;
+    console.log("login user", unique_id);
 
     const groupId = message.group_id;
+    console.log("groupId", groupId);
+    console.log("sender", message.sender);
+    console.log("user unique_id", user.unique_id);
     if (message.sender !== user.unique_id) {
         DOM.counter += 1;
         if (DOM.groupId == groupId) {
@@ -4928,17 +4934,23 @@ setInterval(async () => {
         let openGroup = chatList.find((group) => group.group.group_id == DOM.groupId);
         if (openGroup) {
             if (lastVmMessageId == 0) {
+
                 if (openGroup.msg) {
                     lastVmMessageId = openGroup.msg.id;
                 }
             }
             if (openGroup.msg && lastVmMessageId !== openGroup.msg.id) {
+                let loginUserUniqueId = document.getElementById("login_user_unique_id").value
+                // if(openGroup.msg.user.unique_id == loginUserUniqueId) {
+                //     openGroup.group.unread = 0;
+                // }
                 lastVmMessageId = openGroup.msg.id;
                 socket.emit("sendChatToServer", openGroup.msg, true);
             }
         }
     }
-}, 2 * 60 * 1000);
+}, 10000);
+// }, 2 * 60 * 1000);
 var OneSignal = window.OneSignal || [];
 
 OneSignal.push(function () {
