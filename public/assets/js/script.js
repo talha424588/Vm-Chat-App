@@ -4943,8 +4943,7 @@ setInterval(async () => {
             }
         }
     }
-}, 10000);
-// }, 2 * 60 * 1000);
+}, 2 * 60 * 1000);
 var OneSignal = window.OneSignal || [];
 
 OneSignal.push(function () {
