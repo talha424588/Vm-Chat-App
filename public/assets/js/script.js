@@ -499,7 +499,6 @@ let viewMessageList = () => {
 };
 
 let generateChatList = async () => {
-    console.log("Generating chat list");
     DOM.chatList.innerHTML = "";
     await populateGroupList();
     viewChatList();
@@ -852,12 +851,8 @@ socket.on("sendChatToClient", (message) => {
     }
 
     let unique_id = document.getElementById("login_user_unique_id").value;
-    console.log("login user", unique_id);
 
     const groupId = message.group_id;
-    console.log("groupId", groupId);
-    console.log("sender", message.sender);
-    console.log("user unique_id", user.unique_id);
     if (message.sender !== user.unique_id) {
         DOM.counter += 1;
         if (DOM.groupId == groupId) {
@@ -4024,8 +4019,7 @@ $(document).ready(function () {
 
         let moveFromGroup = chatList.find((group) => group.group.group_id == DOM.groupId);
         let moveToGroup = chatList.find((group) => group.group.group_id == groupToMove);
-        console.log("from", moveFromGroup.group.name);
-        console.log("To", moveToGroup.group.name);
+
         // Pass the reason as an extra argument if needed
         moveSelectedMessagesToGroup(
             messageIdArray,
@@ -4228,7 +4222,7 @@ const fetchPaginatedMessages = async (
                         body: JSON.stringify({ ids }),
                     });
                 } catch (error) {
-                    console.error("Error updating seen messages:", error);
+                    // console.error("Error updating seen messages:", error);
                 }
             })();
         } else {
@@ -4608,7 +4602,7 @@ let generateMessageArea = async (
             DOM.messageAreaName.innerHTML = data.name;
         })
         .catch((error) => {
-            console.error("Error fetching group data:", error);
+            // console.error("Error fetching group data:", error);
         });
 
     if (DOM.groupSearchMessageFound == false) {
@@ -4685,7 +4679,7 @@ async function updateMessageSeenBy(ids) {
                 body: JSON.stringify({ ids }),
             });
         } catch (error) {
-            console.error("Error updating seen messages:", error);
+            // console.error("Error updating seen messages:", error);
         }
     })();
 }
@@ -4906,7 +4900,7 @@ let init = () => {
                         DOM.notification_message_id
                     );
                 } else {
-                    console.warn("Notification group not found in chatList.");
+                    // console.warn("Notification group not found in chatList.");
                 }
             }
         }
@@ -5007,7 +5001,7 @@ OneSignal.push(function () {
                 if (userId) {
                     oneSignalSubscription(userId);
                 } else {
-                    console.warn("User ID is not available yet.");
+                    // console.warn("User ID is not available yet.");
                 }
             });
         }
@@ -5223,7 +5217,7 @@ document
                         DOM.messageInput.value = imagePath;
                         sendMessage("Image", mediaName);
                     } else {
-                        console.error("Upload failed:", data.error);
+                        // console.error("Upload failed:", data.error);
                     }
                 })
                 .catch(error => {
@@ -5461,7 +5455,7 @@ $("#deleteModal .btn-delete").on("click", function () {
             socket.emit("deleteMessage", message.data, false);
         })
         .catch(function (error) {
-            console.error(error);
+            // console.error(error);
         });
 });
 
