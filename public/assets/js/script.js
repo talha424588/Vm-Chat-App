@@ -264,7 +264,7 @@ let viewChatList = (flag = false) => {
                         ? latestMessage.user.name
                         : "";
                 const timeText = elem.time
-                    ? new Date(elem.time).toLocaleDateString("en-GB")
+                    ? new Date(elem.time * 1000).toLocaleDateString('en-GB', { year: '2-digit', month: '2-digit', day: '2-digit' })
                     : "No messages";
                 DOM.chatList2.innerHTML += `
                 <div class="d-flex p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
@@ -419,10 +419,11 @@ let viewMessageList = () => {
                 .replace(/\r/g, "\\r")
                 .replace(/\t/g, "\\t");
             const senderName = elem.user.name;
-            let time = new Date(elem.time * 1000);
+            // let time = new Date(elem.time * 1000);
             const timeText = elem.time
-                ? new Date(elem.time).toLocaleDateString("en-GB")
-                : "No messages";
+            ? new Date(elem.time * 1000).toLocaleDateString('en-GB', { year: '2-digit', month: '2-digit', day: '2-digit' })
+            : "No messages";
+            console.log("timeText", timeText);
             if (elem.type == "Message" || elem.type == null) {
                 let messageText = elem.msg.includes("<p>")
                     ? elem.msg.replace(/<\/?p>/g, "")
@@ -5482,6 +5483,7 @@ let isFetchingMessages = false;
 
 // group here
 let searchGroups = async (searchQuery, loadMore = false) => {
+    console.log("searchQuery", searchQuery, loadMore);
     const buttons = document.querySelector(".buttons");
     if (loadMore) {
         currentPageGroups++;
@@ -5495,6 +5497,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
     }
 
     if (searchQuery.trim().length > 0) {
+        console.log("searching...");
         buttons.style.display = "none";
         DOM.groupSearch = true;
         DOM.messageSearchQuery = searchQuery;
@@ -5502,9 +5505,11 @@ let searchGroups = async (searchQuery, loadMore = false) => {
         const unique_id = document.getElementById("login_user_unique_id").value;
 
         try {
+            console.log("fetching...", url);
             const groupResponse = await fetch(url);
             const response = await groupResponse.json();
             if (response) {
+                console.log("search response", response);
                 let groups = new Set();
                 groups = response.data.groups.data;
                 const messages = response.data.messages.data;
@@ -5515,6 +5520,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                         DOM.chatList.style.display = "none";
                     }
                 } else {
+                    console.log("groups", groups);
                     DOM.chatList.style.display = "block";
                     DOM.chatList.innerHTML += `<div class="heading"><h2>Groups</h2></div>`;
                     groups.forEach((group) => {
@@ -5555,6 +5561,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                     }
                 } else {
                     messages.forEach((msg) => {
+                        console.log("messages", msg);
                         messageList.push(msg);
                     });
                     viewMessageList();
