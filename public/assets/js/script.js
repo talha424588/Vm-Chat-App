@@ -264,7 +264,7 @@ let viewChatList = (flag = false) => {
                         ? latestMessage.user.name
                         : "";
                 const timeText = elem.time
-                    ? new Date(elem.time * 1000).toLocaleDateString('en-GB', { year: '2-digit', month: '2-digit', day: '2-digit' })
+                    ? mDate(elem.time).chatListFormat()
                     : "No messages";
                 DOM.chatList2.innerHTML += `
                 <div class="d-flex p-2 border-bottom align-items-center tohide${unreadClass}" data-group-id="${elem.group.group_id}" onclick="selectUsertosend('${elem.group.name}','${elem.group.group_id}')">
@@ -421,7 +421,7 @@ let viewMessageList = () => {
             const senderName = elem.user.name;
             // let time = new Date(elem.time * 1000);
             const timeText = elem.time
-            ? new Date(elem.time * 1000).toLocaleDateString('en-GB', { year: '2-digit', month: '2-digit', day: '2-digit' })
+            ? mDate(elem.time).chatListFormat()
             : "No messages";
             console.log("timeText", timeText);
             if (elem.type == "Message" || elem.type == null) {
