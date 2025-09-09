@@ -217,6 +217,144 @@
     color: #000;
 }
 
+        /* Notification Bell Animation */
+        .bell-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .bell-animate {
+            animation: bellRing 0.5s ease-in-out infinite;
+        }
+
+        @keyframes bellRing {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .notification-count-badge {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Notification Panel Styles */
+        .notification-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 350px;
+            max-height: 400px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .notification-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-weight: bold;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .notification-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-user {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .notification-details {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .notification-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-complete-btn {
+            background: #1DAB61;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .notification-complete-btn:hover {
+            background: #158a4a;
+        }
+
+        .notification-time {
+            font-size: 11px;
+            color: #999;
+        }
+
+        /* Notification Main View Styles */
+        .notification-view {
+            padding: 15px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .notification-header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .notification-main-list {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .notification-main-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .notification-main-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
     </style>
 </head>
 
@@ -236,7 +374,27 @@
                         <small class="text-muted">Online</small>
                     </div>
 
-                    <div class="nav-item dropdown ml-auto">
+                    <div class="nav-item dropdown ml-auto d-flex align-items-center">
+                        <!-- Notification Bell Icon -->
+                        <div class="notification-bell-container" id="notification-bell" onclick="toggleNotifications()" style="margin-right: 10px; cursor: pointer; position: relative;">
+                            <div class="bell-icon" id="bell-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C13.1 2 14 2.9 14 4C14 4.1 14 4.2 14 4.3C16.3 5.2 18 7.5 18 10V16L20 18V19H4V18L6 16V10C6 7.5 7.7 5.2 10 4.3C10 4.2 10 4.1 10 4C10 2.9 10.9 2 12 2ZM10 21C10 22.1 10.9 23 12 23C13.1 23 14 22.1 14 21" stroke="#687780" stroke-width="1.5" fill="none"/>
+                                </svg>
+                            </div>
+                            <div class="notification-count-badge" id="notification-count-badge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">0</div>
+                            
+                            <!-- Notification Panel -->
+                            <div class="notification-panel" id="notification-panel">
+                                <div class="notification-header">
+                                    Travel Notifications
+                                </div>
+                                <div id="notification-list">
+                                    <!-- Notifications will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="button" class="btn loginbutton btn-block" id="logout"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             Logout
@@ -254,7 +412,7 @@
                         <input type="text" placeholder="Search" id="search_group">
                     </div>
 
-                    <div class="buttons">
+                    <div class="buttons" id="buttons-container">
                         <button class="button active" onclick="display_chat('all')">All</button>
                         <button class="button" onclick="display_chat('unread')">Unread</button>
 
@@ -263,10 +421,20 @@
                             {{-- <button class="button">Groups</button> --}}--->
                     </div>
 
+                    <!-- Notification View (Hidden by default) -->
+                    <div class="notification-view" id="notification-view" style="display: none;">
+                        <div class="notification-header-main">
+                            <h5>Travel Notifications</h5>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="toggleNotifications()">Back to Chat</button>
+                        </div>
+                        <div id="notification-main-list" class="notification-main-list">
+                            <!-- Sample notifications will be populated here -->
+                        </div>
+                    </div>
 
                 </div>
                 <!-- Chat List -->
-                <div class="row chat-row">
+                <div class="row chat-row" id="chat-row-container">
                     <div class="col-md-12 chat_list_view" id="chat-list" style="overflow:auto;"></div>
                     <div class="col-md-12 chat_list_view" id="chat-list-unread" style="overflow:auto; display:none;">
                         Unread List </div>
@@ -1052,7 +1220,195 @@
         var csrfToken = '{{ csrf_token() }}';
         var broadcastChatRoute = "{{ route('broadcast.chat') }}";
     </script>
-    <script></script>
+    <script>
+        // Notification functionality
+        let notificationCount = 0;
+        let isNotificationViewActive = false;
+        let notificationUpdateInterval = null;
+        
+        // Sample notification data
+        const sampleNotifications = [
+            {
+                id: 1,
+                firstName: "John",
+                lastName: "Doe",
+                travelDetails: "Flight to New York - AA123",
+                timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+                completed: false
+            },
+            {
+                id: 2,
+                firstName: "Jane",
+                lastName: "Smith",
+                travelDetails: "Train to Boston - Amtrak 171",
+                timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+                completed: false
+            },
+            {
+                id: 3,
+                firstName: "Mike",
+                lastName: "Johnson",
+                travelDetails: "Bus to Chicago - Greyhound 456",
+                timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+                completed: true
+            }
+        ];
+
+        function toggleNotifications() {
+            const buttonsContainer = document.getElementById('buttons-container');
+            const chatRowContainer = document.getElementById('chat-row-container');
+            const notificationView = document.getElementById('notification-view');
+            const bellIcon = document.getElementById('bell-icon');
+            
+            if (!isNotificationViewActive) {
+                // Show notifications, hide chat
+                buttonsContainer.style.display = 'none';
+                chatRowContainer.style.display = 'none';
+                notificationView.style.display = 'block';
+                isNotificationViewActive = true;
+                
+                // Stop bell animation
+                bellIcon.classList.remove('bell-animate');
+                
+                // Load notifications
+                loadNotifications();
+                
+                // Start real-time updates
+                startNotificationUpdates();
+            } else {
+                // Show chat, hide notifications
+                buttonsContainer.style.display = 'block';
+                chatRowContainer.style.display = 'block';
+                notificationView.style.display = 'none';
+                isNotificationViewActive = false;
+                
+                // Stop real-time updates
+                stopNotificationUpdates();
+            }
+        }
+
+        function loadNotifications() {
+            const notificationList = document.getElementById('notification-main-list');
+            notificationList.innerHTML = '';
+            
+            sampleNotifications.forEach(notification => {
+                const notificationItem = createNotificationItem(notification);
+                notificationList.appendChild(notificationItem);
+            });
+        }
+
+        function createNotificationItem(notification) {
+            const div = document.createElement('div');
+            div.className = 'notification-main-item';
+            div.setAttribute('data-notification-id', notification.id);
+            
+            const timeAgo = getTimeAgo(notification.timestamp);
+            
+            div.innerHTML = `
+                <div class="notification-user">
+                    ${notification.firstName} ${notification.lastName}
+                </div>
+                <div class="notification-details">
+                    ${notification.travelDetails}
+                </div>
+                <div class="notification-actions">
+                    <button class="notification-complete-btn" onclick="completeNotification(${notification.id})" ${notification.completed ? 'disabled' : ''}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        ${notification.completed ? 'Completed' : 'Complete'}
+                    </button>
+                    <div class="notification-time" data-timestamp="${notification.timestamp.getTime()}">${timeAgo}</div>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        function completeNotification(notificationId) {
+            const notification = sampleNotifications.find(n => n.id === notificationId);
+            if (notification) {
+                notification.completed = true;
+                loadNotifications();
+                updateNotificationCount();
+            }
+        }
+
+        function getTimeAgo(timestamp) {
+            const now = new Date();
+            const diffInMs = now - timestamp;
+            
+            // Calculate elapsed time in hours:minutes:seconds
+            const totalSeconds = Math.floor(diffInMs / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            // Format elapsed time as HH:MM:SS
+            const elapsedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Format the original timestamp as time (07:40 am)
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                hour12: true 
+            };
+            const originalTime = timestamp.toLocaleTimeString('en-US', timeOptions).toLowerCase();
+            
+            return `${originalTime} | ${elapsedTime}`;
+        }
+
+        function updateNotificationCount() {
+            const pendingNotifications = sampleNotifications.filter(n => !n.completed);
+            notificationCount = pendingNotifications.length;
+            
+            const badge = document.getElementById('notification-count-badge');
+            const bellIcon = document.getElementById('bell-icon');
+            
+            if (notificationCount > 0) {
+                badge.textContent = notificationCount;
+                badge.style.display = 'flex';
+                bellIcon.classList.add('bell-animate');
+            } else {
+                badge.style.display = 'none';
+                bellIcon.classList.remove('bell-animate');
+            }
+        }
+
+        function startNotificationUpdates() {
+            // Clear any existing interval
+            if (notificationUpdateInterval) {
+                clearInterval(notificationUpdateInterval);
+            }
+            
+            // Update every second
+            notificationUpdateInterval = setInterval(function() {
+                updateNotificationTimes();
+            }, 1000);
+        }
+
+        function stopNotificationUpdates() {
+            if (notificationUpdateInterval) {
+                clearInterval(notificationUpdateInterval);
+                notificationUpdateInterval = null;
+            }
+        }
+
+        function updateNotificationTimes() {
+            const timeElements = document.querySelectorAll('.notification-time[data-timestamp]');
+            
+            timeElements.forEach(element => {
+                const timestamp = new Date(parseInt(element.getAttribute('data-timestamp')));
+                const updatedTime = getTimeAgo(timestamp);
+                element.textContent = updatedTime;
+            });
+        }
+
+        // Initialize notifications on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNotificationCount();
+        });
+    </script>
 
     {{-- One Signal --}}
     {{-- <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" async=""></script> --}}
