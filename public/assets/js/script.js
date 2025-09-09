@@ -6658,7 +6658,7 @@ function safeSubstring(htmlContent, startIndex, endIndex) {
 
 
 
-// Notification functionality
+
 let notificationCount = 0;
 let isNotificationViewActive = false;
 let notificationUpdateInterval = null;
@@ -6689,7 +6689,7 @@ const sampleNotifications = [
         timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
         completed: true
     }
-];
+];  
 
 function toggleNotifications() {
     const buttonsContainer = document.getElementById('buttons-container');
@@ -6813,12 +6813,10 @@ function updateNotificationCount() {
 }
 
 function startNotificationUpdates() {
-    // Clear any existing interval
     if (notificationUpdateInterval) {
         clearInterval(notificationUpdateInterval);
     }
 
-    // Update every second
     notificationUpdateInterval = setInterval(function () {
         updateNotificationTimes();
     }, 1000);
