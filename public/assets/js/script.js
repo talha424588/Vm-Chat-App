@@ -6655,3 +6655,311 @@ function safeSubstring(htmlContent, startIndex, endIndex) {
     tempDiv.innerHTML = substring;
     return tempDiv.innerHTML;
 }
+
+
+
+
+let notificationCount = 0;
+let isNotificationViewActive = false;
+let notificationUpdateInterval = null;
+
+// Sample notification data
+const sampleNotifications = [
+    {
+        id: 1,
+        firstName: "John",
+        lastName: "Doe",
+        travelDetails: "Flight to New York - AA123",
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        completed: false
+    },
+    {
+        id: 2,
+        firstName: "Jane",
+        lastName: "Smith",
+        travelDetails: "Train to Boston - Amtrak 171",
+        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+        completed: false
+    },
+    {
+        id: 3,
+        firstName: "Mike",
+        lastName: "Johnson",
+        travelDetails: "Bus to Chicago - Greyhound 456",
+        timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+        completed: true
+    }
+];  
+
+function toggleNotifications() {
+    const buttonsContainer = document.getElementById('buttons-container');
+    const chatRowContainer = document.getElementById('chat-row-container');
+    const notificationView = document.getElementById('notification-view');
+    const bellIcon = document.getElementById('bell-icon');
+
+    if (!isNotificationViewActive) {
+        // Show notifications, hide chat
+        buttonsContainer.style.display = 'none';
+        chatRowContainer.style.display = 'none';
+        notificationView.style.display = 'block';
+        isNotificationViewActive = true;
+
+        // Stop bell animation
+        bellIcon.classList.remove('bell-animate');
+
+        // Load notifications
+        loadNotifications();
+
+        // Start real-time updates
+        startNotificationUpdates();
+    } else {
+        // Show chat, hide notifications
+        buttonsContainer.style.display = 'block';
+        chatRowContainer.style.display = 'block';
+        notificationView.style.display = 'none';
+        isNotificationViewActive = false;
+
+        // Stop real-time updates
+        stopNotificationUpdates();
+    }
+}
+
+function loadNotifications() {
+    const notificationList = document.getElementById('notification-main-list');
+    notificationList.innerHTML = '';
+
+    sampleNotifications.forEach(notification => {
+        const notificationItem = createNotificationItem(notification);
+        notificationList.appendChild(notificationItem);
+    });
+}
+
+function createNotificationItem(notification) {
+    const div = document.createElement('div');
+    div.className = 'notification-main-item';
+    div.setAttribute('data-notification-id', notification.id);
+
+    const timeAgo = getTimeAgo(notification.timestamp);
+
+    div.innerHTML = `
+                <div class="notification-user">
+                    ${notification.firstName} ${notification.lastName}
+                </div>
+                <div class="notification-details">
+                    ${notification.travelDetails}
+                </div>
+                <div class="notification-actions">
+                    <button class="notification-complete-btn" onclick="completeNotification(${notification.id})" ${notification.completed ? 'disabled' : ''}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        ${notification.completed ? 'Completed' : 'Complete'}
+                    </button>
+                    <div class="notification-time" data-timestamp="${notification.timestamp.getTime()}">${timeAgo}</div>
+                </div>
+            `;
+
+    return div;
+}
+
+function completeNotification(notificationId) {
+    // Show the modal instead of directly completing
+    showCompleteModal(notificationId);
+}
+
+let currentNotificationId = null;
+let uploadedImage = null;
+
+function showCompleteModal(notificationId) {
+    currentNotificationId = notificationId;
+    const notification = sampleNotifications.find(n => n.id === notificationId);
+    
+    if (notification) {
+        // Populate modal with notification info
+        const modalInfo = document.getElementById('modal-notification-info');
+        modalInfo.innerHTML = `
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                <strong>${notification.firstName} ${notification.lastName}</strong><br>
+                <span style="color: #666;">${notification.travelDetails}</span>
+            </div>
+        `;
+        
+        // Reset modal state
+        resetModalState();
+        
+        // Show modal
+        document.getElementById('complete-notification-modal').style.display = 'block';
+    }
+}
+
+function closeCompleteModal() {
+    document.getElementById('complete-notification-modal').style.display = 'none';
+    resetModalState();
+    currentNotificationId = null;
+}
+
+function resetModalState() {
+    // Reset image upload
+    document.getElementById('image-upload-input').value = '';
+    document.getElementById('image-preview-container').style.display = 'none';
+    document.getElementById('submit-complete-btn').disabled = true;
+    uploadedImage = null;
+    
+    // Reset upload area
+    const uploadArea = document.getElementById('image-upload-area');
+    uploadArea.style.display = 'block';
+}
+
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            uploadedImage = e.target.result;
+            
+            // Show preview
+            document.getElementById('image-preview').src = e.target.result;
+            document.getElementById('image-preview-container').style.display = 'block';
+            document.getElementById('image-upload-area').style.display = 'none';
+            
+            // Enable submit button
+            document.getElementById('submit-complete-btn').disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function removeImage() {
+    resetModalState();
+}
+
+function submitCompletion() {
+    if (currentNotificationId && uploadedImage) {
+        // Complete the notification
+        const notification = sampleNotifications.find(n => n.id === currentNotificationId);
+        if (notification) {
+            notification.completed = true;
+            notification.completionImage = uploadedImage;
+            notification.completedAt = new Date();
+            
+            // Update UI
+            loadNotifications();
+            updateNotificationCount();
+            
+            // Close modal
+            closeCompleteModal();
+            
+            // Show success message (optional)
+            // alert('Notification completed successfully!');
+        }
+    }
+}
+
+// Add drag and drop functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('image-upload-area');
+    
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                const event = { target: { files: files } };
+                handleImageUpload(event);
+            }
+        });
+    }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('complete-notification-modal');
+        if (event.target === modal) {
+            closeCompleteModal();
+        }
+    });
+});
+
+function getTimeAgo(timestamp) {
+    const now = new Date();
+    const diffInMs = now - timestamp;
+
+    // Calculate elapsed time in hours:minutes:seconds
+    const totalSeconds = Math.floor(diffInMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    // Format elapsed time as HH:MM:SS
+    const elapsedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    // Format the original timestamp as time (07:40 am)
+    const timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    };
+    const originalTime = timestamp.toLocaleTimeString('en-US', timeOptions).toLowerCase();
+
+    return `${originalTime} | ${elapsedTime}`;
+}
+
+function updateNotificationCount() {
+    const pendingNotifications = sampleNotifications.filter(n => !n.completed);
+    notificationCount = pendingNotifications.length;
+
+    const badge = document.getElementById('notification-count-badge');
+    const bellIcon = document.getElementById('bell-icon');
+
+    if (notificationCount > 0) {
+        badge.textContent = notificationCount;
+        badge.style.display = 'flex';
+        bellIcon.classList.add('bell-animate');
+    } else {
+        badge.style.display = 'none';
+        bellIcon.classList.remove('bell-animate');
+    }
+}
+
+function startNotificationUpdates() {
+    if (notificationUpdateInterval) {
+        clearInterval(notificationUpdateInterval);
+    }
+
+    notificationUpdateInterval = setInterval(function () {
+        updateNotificationTimes();
+    }, 1000);
+}
+
+function stopNotificationUpdates() {
+    if (notificationUpdateInterval) {
+        clearInterval(notificationUpdateInterval);
+        notificationUpdateInterval = null;
+    }
+}
+
+function updateNotificationTimes() {
+    const timeElements = document.querySelectorAll('.notification-time[data-timestamp]');
+
+    timeElements.forEach(element => {
+        const timestamp = new Date(parseInt(element.getAttribute('data-timestamp')));
+        const updatedTime = getTimeAgo(timestamp);
+        element.textContent = updatedTime;
+    });
+}
+
+// Initialize notifications on page load
+document.addEventListener('DOMContentLoaded', function () {
+    updateNotificationCount();
+});

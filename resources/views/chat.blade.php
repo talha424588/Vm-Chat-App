@@ -184,18 +184,16 @@
             color: #888;
             font-size: 14px;
         }
-        /* Search Container Styling */
 .search-container {
     display: none;
     align-items: center;
     justify-content: space-between;
-    background-color: #f8f9fa; /* Light gray */
+    background-color: #f8f9fa; 
     border-radius: 20px;
     width: 100%;
     padding: 12px;
 }
 
-/* Search Input Styling */
 .search-input-mobile {
     flex: 1;
     border: none;
@@ -205,7 +203,6 @@
     color: #58595D;
 }
 
-/* Search Icons Styling */
 .search-container i {
     font-size: 16px;
     color: #58595D;
@@ -216,6 +213,269 @@
 .search-container i:hover {
     color: #000;
 }
+
+        .bell-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .bell-animate {
+            animation: bellRing 0.5s ease-in-out infinite;
+        }
+
+        @keyframes bellRing {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .notification-count-badge {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .notification-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 350px;
+            max-height: 400px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .notification-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-weight: bold;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .notification-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-user {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .notification-details {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .notification-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-complete-btn {
+            background: #1DAB61;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .notification-complete-btn:hover {
+            background: #158a4a;
+        }
+
+        .notification-time {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .notification-view {
+            padding: 15px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .notification-header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .notification-main-list {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .notification-main-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .notification-main-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Complete Notification Modal Styles */
+        .complete-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .complete-modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .complete-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .complete-modal-close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .complete-modal-close:hover {
+            color: #000;
+        }
+
+        .image-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .image-upload-area:hover {
+            border-color: #1DAB61;
+        }
+
+        .image-upload-area.dragover {
+            border-color: #1DAB61;
+            background-color: #f8fff8;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .image-preview-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .remove-image-icon {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .remove-image-icon:hover {
+            background: #cc0000;
+        }
+
+        .submit-complete-btn {
+            background: #1DAB61;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-complete-btn:hover {
+            background: #158a4a;
+        }
+
+        .submit-complete-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
 
     </style>
 </head>
@@ -236,7 +496,25 @@
                         <small class="text-muted">Online</small>
                     </div>
 
-                    <div class="nav-item dropdown ml-auto">
+                    <div class="nav-item dropdown ml-auto d-flex align-items-center">
+                        <!-- Notification Bell Icon -->
+                        <div class="notification-bell-container" id="notification-bell" onclick="toggleNotifications()" style="margin-right: 10px; cursor: pointer; position: relative;">
+                            <div class="bell-icon" id="bell-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C13.1 2 14 2.9 14 4C14 4.1 14 4.2 14 4.3C16.3 5.2 18 7.5 18 10V16L20 18V19H4V18L6 16V10C6 7.5 7.7 5.2 10 4.3C10 4.2 10 4.1 10 4C10 2.9 10.9 2 12 2ZM10 21C10 22.1 10.9 23 12 23C13.1 23 14 22.1 14 21" stroke="#687780" stroke-width="1.5" fill="none"/>
+                                </svg>
+                            </div>
+                            <div class="notification-count-badge" id="notification-count-badge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">0</div>
+                            
+                            <div class="notification-panel" id="notification-panel">
+                                <div class="notification-header">
+                                    Travel Notifications
+                                </div>
+                                <div id="notification-list">
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="button" class="btn loginbutton btn-block" id="logout"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             Logout
@@ -254,7 +532,7 @@
                         <input type="text" placeholder="Search" id="search_group">
                     </div>
 
-                    <div class="buttons">
+                    <div class="buttons" id="buttons-container">
                         <button class="button active" onclick="display_chat('all')">All</button>
                         <button class="button" onclick="display_chat('unread')">Unread</button>
 
@@ -263,10 +541,20 @@
                             {{-- <button class="button">Groups</button> --}}--->
                     </div>
 
+                    <!-- Notification View (Hidden by default) -->
+                    <div class="notification-view" id="notification-view" style="display: none;">
+                        <div class="notification-header-main">
+                            <h5>Urgent Notifications Queue</h5>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="toggleNotifications()">Back to Chat</button>
+                        </div>
+                        <div id="notification-main-list" class="notification-main-list">
+                            <!-- Sample notifications will be populated here -->
+                        </div>
+                    </div>
 
                 </div>
                 <!-- Chat List -->
-                <div class="row chat-row">
+                <div class="row chat-row" id="chat-row-container">
                     <div class="col-md-12 chat_list_view" id="chat-list" style="overflow:auto;"></div>
                     <div class="col-md-12 chat_list_view" id="chat-list-unread" style="overflow:auto; display:none;">
                         Unread List </div>
@@ -1052,7 +1340,7 @@
         var csrfToken = '{{ csrf_token() }}';
         var broadcastChatRoute = "{{ route('broadcast.chat') }}";
     </script>
-    <script></script>
+    
 
     {{-- One Signal --}}
     {{-- <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" async=""></script> --}}
@@ -1082,6 +1370,39 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Complete Notification Modal -->
+    <div id="complete-notification-modal" class="complete-modal">
+        <div class="complete-modal-content">
+            <div class="complete-modal-header">
+                <h4>Complete Travel Notification</h4>
+                <span class="complete-modal-close" onclick="closeCompleteModal()">&times;</span>
+            </div>
+            
+            <div class="notification-info" id="modal-notification-info">
+                <!-- Notification details will be populated here -->
+            </div>
+            
+            <div class="image-upload-area" id="image-upload-area" onclick="document.getElementById('image-upload-input').click()">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">Click to upload completion image</div>
+                <div class="upload-subtext">or drag and drop an image here</div>
+            </div>
+            
+            <input type="file" id="image-upload-input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+            
+            <div id="image-preview-container" style="display: none; text-align: center;">
+                <div class="image-preview-wrapper">
+                    <img id="image-preview" class="image-preview" alt="Preview" style="display: block; margin: 0 auto;">
+                    <button type="button" class="remove-image-icon" onclick="removeImage()" title="Remove Image">×</button>
+                </div>
+            </div>
+            
+            <button id="submit-complete-btn" class="submit-complete-btn" onclick="submitCompletion()" disabled>
+                Submit Completion
+            </button>
         </div>
     </div>
 
