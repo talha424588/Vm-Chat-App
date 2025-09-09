@@ -184,18 +184,16 @@
             color: #888;
             font-size: 14px;
         }
-        /* Search Container Styling */
 .search-container {
     display: none;
     align-items: center;
     justify-content: space-between;
-    background-color: #f8f9fa; /* Light gray */
+    background-color: #f8f9fa; 
     border-radius: 20px;
     width: 100%;
     padding: 12px;
 }
 
-/* Search Input Styling */
 .search-input-mobile {
     flex: 1;
     border: none;
@@ -205,7 +203,6 @@
     color: #58595D;
 }
 
-/* Search Icons Styling */
 .search-container i {
     font-size: 16px;
     color: #58595D;
@@ -217,7 +214,6 @@
     color: #000;
 }
 
-        /* Notification Bell Animation */
         .bell-icon {
             transition: transform 0.3s ease;
         }
@@ -242,7 +238,6 @@
             100% { transform: scale(1); }
         }
 
-        /* Notification Panel Styles */
         .notification-panel {
             position: absolute;
             top: 100%;
@@ -321,7 +316,6 @@
             color: #999;
         }
 
-        /* Notification Main View Styles */
         .notification-view {
             padding: 15px;
             height: 100%;
@@ -384,13 +378,11 @@
                             </div>
                             <div class="notification-count-badge" id="notification-count-badge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">0</div>
                             
-                            <!-- Notification Panel -->
                             <div class="notification-panel" id="notification-panel">
                                 <div class="notification-header">
                                     Travel Notifications
                                 </div>
                                 <div id="notification-list">
-                                    <!-- Notifications will be populated here -->
                                 </div>
                             </div>
                         </div>
