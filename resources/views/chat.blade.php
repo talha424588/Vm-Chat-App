@@ -349,6 +349,106 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
+        /* Complete Notification Modal Styles */
+        .complete-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .complete-modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .complete-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .complete-modal-close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .complete-modal-close:hover {
+            color: #000;
+        }
+
+        .image-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .image-upload-area:hover {
+            border-color: #1DAB61;
+        }
+
+        .image-upload-area.dragover {
+            border-color: #1DAB61;
+            background-color: #f8fff8;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .submit-complete-btn {
+            background: #1DAB61;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-complete-btn:hover {
+            background: #158a4a;
+        }
+
+        .submit-complete-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
     </style>
 </head>
 
@@ -416,7 +516,7 @@
                     <!-- Notification View (Hidden by default) -->
                     <div class="notification-view" id="notification-view" style="display: none;">
                         <div class="notification-header-main">
-                            <h5>Travel Notifications</h5>
+                            <h5>Urgent Notifications Queue</h5>
                             <button class="btn btn-sm btn-outline-secondary" onclick="toggleNotifications()">Back to Chat</button>
                         </div>
                         <div id="notification-main-list" class="notification-main-list">
@@ -1242,6 +1342,37 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Complete Notification Modal -->
+    <div id="complete-notification-modal" class="complete-modal">
+        <div class="complete-modal-content">
+            <div class="complete-modal-header">
+                <h4>Complete Travel Notification</h4>
+                <span class="complete-modal-close" onclick="closeCompleteModal()">&times;</span>
+            </div>
+            
+            <div class="notification-info" id="modal-notification-info">
+                <!-- Notification details will be populated here -->
+            </div>
+            
+            <div class="image-upload-area" id="image-upload-area" onclick="document.getElementById('image-upload-input').click()">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">Click to upload completion image</div>
+                <div class="upload-subtext">or drag and drop an image here</div>
+            </div>
+            
+            <input type="file" id="image-upload-input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+            
+            <div id="image-preview-container" style="display: none;">
+                <img id="image-preview" class="image-preview" alt="Preview">
+                <button type="button" onclick="removeImage()" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin-top: 10px;">Remove Image</button>
+            </div>
+            
+            <button id="submit-complete-btn" class="submit-complete-btn" onclick="submitCompletion()" disabled>
+                Submit Completion
+            </button>
         </div>
     </div>
 

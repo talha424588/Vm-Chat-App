@@ -6763,13 +6763,133 @@ function createNotificationItem(notification) {
 }
 
 function completeNotification(notificationId) {
+    // Show the modal instead of directly completing
+    showCompleteModal(notificationId);
+}
+
+let currentNotificationId = null;
+let uploadedImage = null;
+
+function showCompleteModal(notificationId) {
+    currentNotificationId = notificationId;
     const notification = sampleNotifications.find(n => n.id === notificationId);
+    
     if (notification) {
-        notification.completed = true;
-        loadNotifications();
-        updateNotificationCount();
+        // Populate modal with notification info
+        const modalInfo = document.getElementById('modal-notification-info');
+        modalInfo.innerHTML = `
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                <strong>${notification.firstName} ${notification.lastName}</strong><br>
+                <span style="color: #666;">${notification.travelDetails}</span>
+            </div>
+        `;
+        
+        // Reset modal state
+        resetModalState();
+        
+        // Show modal
+        document.getElementById('complete-notification-modal').style.display = 'block';
     }
 }
+
+function closeCompleteModal() {
+    document.getElementById('complete-notification-modal').style.display = 'none';
+    resetModalState();
+    currentNotificationId = null;
+}
+
+function resetModalState() {
+    // Reset image upload
+    document.getElementById('image-upload-input').value = '';
+    document.getElementById('image-preview-container').style.display = 'none';
+    document.getElementById('submit-complete-btn').disabled = true;
+    uploadedImage = null;
+    
+    // Reset upload area
+    const uploadArea = document.getElementById('image-upload-area');
+    uploadArea.style.display = 'block';
+}
+
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            uploadedImage = e.target.result;
+            
+            // Show preview
+            document.getElementById('image-preview').src = e.target.result;
+            document.getElementById('image-preview-container').style.display = 'block';
+            document.getElementById('image-upload-area').style.display = 'none';
+            
+            // Enable submit button
+            document.getElementById('submit-complete-btn').disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function removeImage() {
+    resetModalState();
+}
+
+function submitCompletion() {
+    if (currentNotificationId && uploadedImage) {
+        // Complete the notification
+        const notification = sampleNotifications.find(n => n.id === currentNotificationId);
+        if (notification) {
+            notification.completed = true;
+            notification.completionImage = uploadedImage;
+            notification.completedAt = new Date();
+            
+            // Update UI
+            loadNotifications();
+            updateNotificationCount();
+            
+            // Close modal
+            closeCompleteModal();
+            
+            // Show success message (optional)
+            // alert('Notification completed successfully!');
+        }
+    }
+}
+
+// Add drag and drop functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('image-upload-area');
+    
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                const event = { target: { files: files } };
+                handleImageUpload(event);
+            }
+        });
+    }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('complete-notification-modal');
+        if (event.target === modal) {
+            closeCompleteModal();
+        }
+    });
+});
 
 function getTimeAgo(timestamp) {
     const now = new Date();
