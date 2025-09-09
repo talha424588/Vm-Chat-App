@@ -428,6 +428,34 @@
             margin: 10px 0;
         }
 
+        .image-preview-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .remove-image-icon {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .remove-image-icon:hover {
+            background: #cc0000;
+        }
+
         .submit-complete-btn {
             background: #1DAB61;
             color: white;
@@ -1365,9 +1393,11 @@
             
             <input type="file" id="image-upload-input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
             
-            <div id="image-preview-container" style="display: none;">
-                <img id="image-preview" class="image-preview" alt="Preview">
-                <button type="button" onclick="removeImage()" style="background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin-top: 10px;">Remove Image</button>
+            <div id="image-preview-container" style="display: none; text-align: center;">
+                <div class="image-preview-wrapper">
+                    <img id="image-preview" class="image-preview" alt="Preview" style="display: block; margin: 0 auto;">
+                    <button type="button" class="remove-image-icon" onclick="removeImage()" title="Remove Image">×</button>
+                </div>
             </div>
             
             <button id="submit-complete-btn" class="submit-complete-btn" onclick="submitCompletion()" disabled>
