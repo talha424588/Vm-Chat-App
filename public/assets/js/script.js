@@ -5562,6 +5562,7 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 } else {
                     messages.forEach((msg) => {
                         console.log("messages", msg);
+                        msg.time = new Date(msg.time * 1000);
                         messageList.push(msg);
                     });
                     viewMessageList();
@@ -6689,7 +6690,7 @@ const sampleNotifications = [
         timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
         completed: true
     }
-];  
+];
 
 function toggleNotifications() {
     const buttonsContainer = document.getElementById('buttons-container');
@@ -6773,7 +6774,7 @@ let uploadedImage = null;
 function showCompleteModal(notificationId) {
     currentNotificationId = notificationId;
     const notification = sampleNotifications.find(n => n.id === notificationId);
-    
+
     if (notification) {
         // Populate modal with notification info
         const modalInfo = document.getElementById('modal-notification-info');
@@ -6783,10 +6784,10 @@ function showCompleteModal(notificationId) {
                 <span style="color: #666;">${notification.travelDetails}</span>
             </div>
         `;
-        
+
         // Reset modal state
         resetModalState();
-        
+
         // Show modal
         document.getElementById('complete-notification-modal').style.display = 'block';
     }
@@ -6804,7 +6805,7 @@ function resetModalState() {
     document.getElementById('image-preview-container').style.display = 'none';
     document.getElementById('submit-complete-btn').disabled = true;
     uploadedImage = null;
-    
+
     // Reset upload area
     const uploadArea = document.getElementById('image-upload-area');
     uploadArea.style.display = 'block';
@@ -6816,12 +6817,12 @@ function handleImageUpload(event) {
         const reader = new FileReader();
         reader.onload = function(e) {
             uploadedImage = e.target.result;
-            
+
             // Show preview
             document.getElementById('image-preview').src = e.target.result;
             document.getElementById('image-preview-container').style.display = 'block';
             document.getElementById('image-upload-area').style.display = 'none';
-            
+
             // Enable submit button
             document.getElementById('submit-complete-btn').disabled = false;
         };
@@ -6841,14 +6842,14 @@ function submitCompletion() {
             notification.completed = true;
             notification.completionImage = uploadedImage;
             notification.completedAt = new Date();
-            
+
             // Update UI
             loadNotifications();
             updateNotificationCount();
-            
+
             // Close modal
             closeCompleteModal();
-            
+
             // Show success message (optional)
             // alert('Notification completed successfully!');
         }
@@ -6858,22 +6859,22 @@ function submitCompletion() {
 // Add drag and drop functionality
 document.addEventListener('DOMContentLoaded', function() {
     const uploadArea = document.getElementById('image-upload-area');
-    
+
     if (uploadArea) {
         uploadArea.addEventListener('dragover', function(e) {
             e.preventDefault();
             uploadArea.classList.add('dragover');
         });
-        
+
         uploadArea.addEventListener('dragleave', function(e) {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
         });
-        
+
         uploadArea.addEventListener('drop', function(e) {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
-            
+
             const files = e.dataTransfer.files;
             if (files.length > 0 && files[0].type.startsWith('image/')) {
                 const event = { target: { files: files } };
@@ -6881,7 +6882,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Close modal when clicking outside
     window.addEventListener('click', function(event) {
         const modal = document.getElementById('complete-notification-modal');
