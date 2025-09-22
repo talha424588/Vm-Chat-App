@@ -26,4 +26,9 @@ class GroupMessage extends Model
     {
         return $this->belongsto(GroupMessage::class,'reply_id','id');
     }
+
+    public function compose()
+    {
+        return $this->belongsTo(Compose::class, 'compose_id');
+    }
 }
