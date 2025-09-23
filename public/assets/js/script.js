@@ -4169,6 +4169,10 @@ const fetchPaginatedMessages = async (
         const Notseenby = nextPageMessages.data
             .filter((item) => {
                 console.log("Seen by string:", item);
+                // Skip if priority is 2
+                if (item.message_priority == 2) {
+                    return false;
+                }
                 const seenBy = item.seen_by
                     ? item.seen_by.split(/,\s*/).map((id) => id.trim())
                     : [];
