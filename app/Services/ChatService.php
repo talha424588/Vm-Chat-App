@@ -53,9 +53,12 @@ class ChatService implements ChatRepository
             $paginator = GroupMessage::where('group_id', $request->groupId)
                 // ->where('is_deleted', false)
                 ->whereNot('status', EnumMessageEnum::MOVE)
+                ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
+                ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
                 ->with('user', 'reply')
                 ->orderBy('id', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);
+                return $paginator;
 
             if ($paginator != null) {
                 $response = [

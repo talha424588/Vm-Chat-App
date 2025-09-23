@@ -12,6 +12,6 @@ class Compose extends Model
 
     public function groupMessage()
     {
-        return $this->hasOne(GroupMessage::class, 'compose_id');
+        return $this->hasOne(GroupMessage::class, 'compose_id', 'id');
     }
 }

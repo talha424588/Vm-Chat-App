@@ -30,7 +30,7 @@ class MessageResourceCollection extends ResourceCollection
                 'time' => $message->reply->time,
                 'is_compose' => $message->reply->is_compose,
                 'is_privacy_breach' => $message->is_privacy_breach,
-                'is_deleted' => $message->is_deleted,
+                'is_deleted' => $message->is_deleted
             ] : null;
 
             // Check if user is not null
@@ -41,13 +41,12 @@ class MessageResourceCollection extends ResourceCollection
                 'email' => $message->user->email,
                 'role' => $message->user->role,
                 'user_status' => $message->user->user_status,
-                'email_status' => $message->user->email_status,
+                // 'email_status' => $message->user->email_status,
                 'access' => $message->user->access,
                 'chat_status' => $message->user->chat_status,
                 'seen_privacy' => $message->user->seen_privacy,
-                'code' => $message->user->code,
-                'status' => $message->user->status,
-                'fcm_token' => $message->user->fcm_token,
+                // 'code' => $message->user->code,
+                // 'status' => $message->user->status,
                 'pic' => $message->user->profile_img,
             ] : null;
 
@@ -65,6 +64,8 @@ class MessageResourceCollection extends ResourceCollection
                 'is_privacy_breach' => $message->is_privacy_breach,
                 'is_deleted' => $message->is_deleted,
                 'compose_id' => $message->compose_id,
+                'compose_id' => $message->compose_id,
+                'message_priority' => $message->message_priority,
                 'user' => $user,  // Only add user data if it exists
                 'reply' => $reply,
             ];

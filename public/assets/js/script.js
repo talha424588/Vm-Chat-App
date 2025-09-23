@@ -4168,12 +4168,14 @@ const fetchPaginatedMessages = async (
 
         const Notseenby = nextPageMessages.data
             .filter((item) => {
+                console.log("Seen by string:", item);
                 const seenBy = item.seen_by
                     ? item.seen_by.split(/,\s*/).map((id) => id.trim())
                     : [];
                 return !seenBy.includes(u_id);
             })
             .map((item) => item.id);
+            console.log("Notseenby", Notseenby);
         DOM.unreadCounter = Notseenby.length;
         const notSeenById = Notseenby.at(-1);
         if (ids.length > 0) {
