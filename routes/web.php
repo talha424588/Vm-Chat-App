@@ -62,6 +62,7 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::get('/view/doc', [ChatController::class,'viewDocument'])->name('view-doc');
     Route::post("/update_user_profile",[UserController::class,'updateUserProfile']);
     Route::get("/message/delete/check/" , [ChatController::class, 'messageisDeleteStatusCheck']);
+    Route::get("/message/urgent/" , [ChatController::class, 'getUrgentMessages']);
 });
 
 Route::post("/upload-image" , [ChatController::class, 'uploadImage']);

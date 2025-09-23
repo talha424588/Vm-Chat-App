@@ -3847,9 +3847,6 @@ function highlightSelectedMessage(id) {
                 parentDiv.classList.add("selected-message");
             }
         }
-        // if (parentDiv) {
-        //     parentDiv.classList.toggle("selected-message");
-        // }
         else {
             // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
         }
@@ -4139,32 +4136,12 @@ const fetchPaginatedMessages = async (
         }
 
         const u_id = user.unique_id;
-        // const ids = nextPageMessages.data.map(item => item.id);
-        // const ids = nextPageMessages.data
-        //     .filter(
-        //         (item) =>
-        //             item.sender !== user.unique_id &&
-        //             !item.seen_by.split(", ").includes(user.unique_id)
-        //     )
-        //     .map((item) => item.id);
-
-
         const ids = nextPageMessages.data
             .filter((item) => {
-                const seenByIds = item.seen_by.split(/,\s*/); // This will split by comma and optional space
+                const seenByIds = item.seen_by.split(/,\s*/);
                 return item.sender !== user.unique_id && !seenByIds.includes(user.unique_id);
             })
             .map((item) => item.id);
-
-        // const Notseenby = nextPageMessages.data
-        //     .filter((item) => {
-        //         const seenBy = item.seen_by
-        //             ? item.seen_by.split(",").map((id) => id.trim())
-        //             : [];
-        //         return !seenBy.includes(u_id);
-        //     })
-        //     .map((item) => item.id);
-
 
         const Notseenby = nextPageMessages.data
             .filter((item) => {
@@ -6663,6 +6640,40 @@ const sampleNotifications = [
     }
 ];
 
+function getUrgentMessages()
+{
+    console.log("Fetching urgent messages...");
+    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    fetch('/message/urgent/', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === 200)
+        {
+            notificationCount = data.urgent_count || 0;
+            updateNotificationCount();
+            const bellIcon = document.getElementById('bell-icon');
+            if(notificationCount > 0 && !isNotificationViewActive)
+            {
+                bellIcon.classList.add('bell-animate');
+            }
+            else
+            {
+                bellIcon.classList.remove('bell-animate');
+            }
+        }
+    })
+    .catch(error => {
+        // console.error('Error fetching urgent messages:', error);
+
+    });
+}
+
 function toggleNotifications() {
     const buttonsContainer = document.getElementById('buttons-container');
     const chatRowContainer = document.getElementById('chat-row-container');
@@ -6696,7 +6707,7 @@ function toggleNotifications() {
     }
 }
 
-function loadNotifications() {
+async function loadNotifications() {
     const notificationList = document.getElementById('notification-main-list');
     notificationList.innerHTML = '';
 
