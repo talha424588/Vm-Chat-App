@@ -64,7 +64,7 @@ class GroupService implements GroupRepository
                         // ->where('is_deleted', false)
                         ->whereNot('status', EnumMessageEnum::MOVE);
                 }, 'groupMessages.user' => function ($query){
-                    $query->select('id', 'unique_id', 'name', 'email','role','access','seen_privacy','profile_img','is_deleted');
+                    $query->select('id', 'unique_id', 'name', 'email','role','access','seen_privacy','profile_img','is_deleted','chat_status');
                 }])
                 ->get();
         } else {
