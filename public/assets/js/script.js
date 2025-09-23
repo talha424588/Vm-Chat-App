@@ -3847,9 +3847,6 @@ function highlightSelectedMessage(id) {
                 parentDiv.classList.add("selected-message");
             }
         }
-        // if (parentDiv) {
-        //     parentDiv.classList.toggle("selected-message");
-        // }
         else {
             // console.error(`Parent .ml-3 div not found for message ID: ${messageId}.`);
         }
@@ -4139,32 +4136,12 @@ const fetchPaginatedMessages = async (
         }
 
         const u_id = user.unique_id;
-        // const ids = nextPageMessages.data.map(item => item.id);
-        // const ids = nextPageMessages.data
-        //     .filter(
-        //         (item) =>
-        //             item.sender !== user.unique_id &&
-        //             !item.seen_by.split(", ").includes(user.unique_id)
-        //     )
-        //     .map((item) => item.id);
-
-
         const ids = nextPageMessages.data
             .filter((item) => {
-                const seenByIds = item.seen_by.split(/,\s*/); // This will split by comma and optional space
+                const seenByIds = item.seen_by.split(/,\s*/);
                 return item.sender !== user.unique_id && !seenByIds.includes(user.unique_id);
             })
             .map((item) => item.id);
-
-        // const Notseenby = nextPageMessages.data
-        //     .filter((item) => {
-        //         const seenBy = item.seen_by
-        //             ? item.seen_by.split(",").map((id) => id.trim())
-        //             : [];
-        //         return !seenBy.includes(u_id);
-        //     })
-        //     .map((item) => item.id);
-
 
         const Notseenby = nextPageMessages.data
             .filter((item) => {
