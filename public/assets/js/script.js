@@ -421,8 +421,8 @@ let viewMessageList = () => {
             const senderName = elem.user.name;
             // let time = new Date(elem.time * 1000);
             const timeText = elem.time
-            ? mDate(elem.time).chatListFormat()
-            : "No messages";
+                ? mDate(elem.time).chatListFormat()
+                : "No messages";
             console.log("timeText", timeText);
             if (elem.type == "Message" || elem.type == null) {
                 let messageText = elem.msg.includes("<p>")
@@ -6780,7 +6780,7 @@ function handleImageUpload(event) {
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             uploadedImage = e.target.result;
 
             // Show preview
@@ -6822,21 +6822,21 @@ function submitCompletion() {
 }
 
 // Add drag and drop functionality
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const uploadArea = document.getElementById('image-upload-area');
 
     if (uploadArea) {
-        uploadArea.addEventListener('dragover', function(e) {
+        uploadArea.addEventListener('dragover', function (e) {
             e.preventDefault();
             uploadArea.classList.add('dragover');
         });
 
-        uploadArea.addEventListener('dragleave', function(e) {
+        uploadArea.addEventListener('dragleave', function (e) {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
         });
 
-        uploadArea.addEventListener('drop', function(e) {
+        uploadArea.addEventListener('drop', function (e) {
             e.preventDefault();
             uploadArea.classList.remove('dragover');
 
@@ -6849,7 +6849,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Close modal when clicking outside
-    window.addEventListener('click', function(event) {
+    window.addEventListener('click', function (event) {
         const modal = document.getElementById('complete-notification-modal');
         if (event.target === modal) {
             closeCompleteModal();
