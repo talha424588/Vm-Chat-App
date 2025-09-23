@@ -21,4 +21,5 @@ interface ChatRepository
     public function uploadImage($request);
     public function uploadFile($request);
     public function uploadAudio($request);
+    public function fetchUrgentMessages();
 }

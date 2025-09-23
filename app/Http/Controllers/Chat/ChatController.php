@@ -261,4 +261,9 @@ class ChatController extends Controller
     {
         return $this->chatRepository->uploadAudio($request);
     }
+
+    public function getUrgentMessages()
+    {
+        return $this->chatRepository->fetchUrgentMessages();
+    }
 }

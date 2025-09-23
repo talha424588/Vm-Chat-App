@@ -58,7 +58,6 @@ class ChatService implements ChatRepository
                 ->with('user', 'reply')
                 ->orderBy('id', 'desc')
                 ->paginate($perPage, ['*'], 'page', $page);
-                return $paginator;
 
             if ($paginator != null) {
                 $response = [
@@ -295,8 +294,6 @@ class ChatService implements ChatRepository
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
     }
 
-
-
     public function updateMessage($request)
     {
         $messageId = $request->input('id');
@@ -317,7 +314,6 @@ class ChatService implements ChatRepository
         }
     }
 
-
     public function messageCorrection($request)
     {
         $messageId = $request->input('id');
@@ -337,7 +333,6 @@ class ChatService implements ChatRepository
             return response()->json(["status" => false, "message" => "Not Found", "messages" => null]);
         }
     }
-
 
     public function restoreDeletedMessage($messageId)
     {
@@ -543,5 +538,31 @@ class ChatService implements ChatRepository
         }
 
         return response()->json(['error' => 'No valid audio file uploaded'], 400);
+    }
+
+    public function fetchUrgentMessages()
+    {
+         $messages = GroupMessage::where('compose.priority', 2)->where('external_message_status', 1)
+                ->whereNot('status', EnumMessageEnum::MOVE)
+                ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
+                ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
+                ->with('user', 'reply')
+                ->orderBy('id', 'desc')
+                ->get();
+                return $messages;
+
+        if ($messages->isNotEmpty()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Urgent messages found',
+                'data' => new MessageResourceCollection($messages),
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'No urgent messages found',
+                'data' => null,
+            ], 404);
+        }
     }
 }

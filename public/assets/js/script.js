@@ -6640,6 +6640,40 @@ const sampleNotifications = [
     }
 ];
 
+function getUrgentMessages()
+{
+    console.log("Fetching urgent messages...");
+    let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    fetch('/message/urgent/', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === 200)
+        {
+            notificationCount = data.urgent_count || 0;
+            updateNotificationCount();
+            const bellIcon = document.getElementById('bell-icon');
+            if(notificationCount > 0 && !isNotificationViewActive)
+            {
+                bellIcon.classList.add('bell-animate');
+            }
+            else
+            {
+                bellIcon.classList.remove('bell-animate');
+            }
+        }
+    })
+    .catch(error => {
+        // console.error('Error fetching urgent messages:', error);
+
+    });
+}
+
 function toggleNotifications() {
     const buttonsContainer = document.getElementById('buttons-container');
     const chatRowContainer = document.getElementById('chat-row-container');
@@ -6673,7 +6707,7 @@ function toggleNotifications() {
     }
 }
 
-function loadNotifications() {
+async function loadNotifications() {
     const notificationList = document.getElementById('notification-main-list');
     notificationList.innerHTML = '';
 
