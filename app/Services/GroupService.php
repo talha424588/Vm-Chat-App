@@ -14,41 +14,65 @@ use App\Enum\MessageEnum as EnumMessageEnum;
 
 class GroupService implements GroupRepository
 {
+    // public function fetchUserChatGroups(Request $request)
+    // {
+    //     $groupWithMessagesArray = [];
+    //     if (Auth::user()->role == 2 || Auth::user()->role == 0) {
+    //         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
+    //          ->where("status",1)
+    //         ->with(['groupMessages' => function ($query) {
+    //                 $query->latest('time')
+    //                     // ->where('is_deleted', false)
+    //                     ->whereNot('status', EnumMessageEnum::MOVE);
+    //             }, 'groupMessages.user'])
+    //             ->get();
+    //     } else {
+    //         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
+    //             ->with(['groupMessages' => function ($query) {
+    //                 $query->latest('time')
+    //                     ->where('is_privacy_breach', false)
+    //                     ->whereNot('status', EnumMessageEnum::MOVE);
+    //             }, 'groupMessages.user'])
+    //             ->get();
+    //     }
+
+    //     $groupWithMessagesArray =  $this->alterGroupMessageArray($groups);
+    //     $groupUnreadCount = $this->getUserUnreadMessageCount();
+    //     foreach ($groupWithMessagesArray  as &$group) {
+    //         foreach ($groupUnreadCount as $groupCount) {
+    //             if ($group->group_id == $groupCount['group_id']) {
+    //                 $group->unread_count = $groupCount['unread_count'];
+    //             }
+    //         }
+    //     }
+    //     if (count($groupWithMessagesArray) > 0)
+    //         return new GroupResource($groupWithMessagesArray);
+    //     else
+    //         return response()->json(["status" => false, "groups" => "not found", "messages" => null], 404);
+    // }
+
     public function fetchUserChatGroups(Request $request)
     {
-
-        $groupMessages = GroupMessage::join('compose', 'group_messages.compose_id', '=', 'composes.id')
-                            ->select('group_messages.*', 'compose.id, compose.priority')
-                            ->get();
-
-                            $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
-    ->where("status", 1)
-    ->with(['groupMessages' => function ($query) {
-        $query->join('composes', 'group_messages.compose_id', '=', 'composes.id')
-            ->select('group_messages.*', 'composes.id as compose_id_alias', 'composes.priority as compose_priority')
-            ->latest('time')
-            // ->where('is_deleted', false)
-            ->whereNot('status', EnumMessageEnum::MOVE);
-    }, 'groupMessages.user'])
-    ->get();
-
-return response()->json(['data' => $groups]);
-
-
         $groupWithMessagesArray = [];
         if (Auth::user()->role == 2 || Auth::user()->role == 0) {
             $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
-             ->where("status",1)
-            ->with(['groupMessages' => function ($query) {
-                    $query->latest('time')
+                ->where("status", 1)
+                ->with(['groupMessages' => function ($query) {
+                    $query->join('compose', 'group_messages.compose_id', '=', 'compose.id')
+                        ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
+                        ->latest('time')
                         // ->where('is_deleted', false)
                         ->whereNot('status', EnumMessageEnum::MOVE);
-                }, 'groupMessages.user'])
+                }, 'groupMessages.user' => function ($query){
+                    $query->select('id', 'unique_id', 'name', 'email','role','access','seen_privacy','profile_img','is_deleted');
+                }])
                 ->get();
         } else {
             $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
                 ->with(['groupMessages' => function ($query) {
-                    $query->latest('time')
+                    $query->join('compose', 'group_messages.compose_id', '=', 'composes.id')
+                        ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
+                        ->latest('time')
                         ->where('is_privacy_breach', false)
                         ->whereNot('status', EnumMessageEnum::MOVE);
                 }, 'groupMessages.user'])
@@ -171,7 +195,7 @@ return response()->json(['data' => $groups]);
             ->whereIn('group_id', $userGroups)
             ->whereRaw("NOT (msg REGEXP '<a[^>]*>|<audio[^>]*>')")
             ->with("user", "group")
-            ->orderBy("id","desc")
+            ->orderBy("id", "desc")
             ->paginate($perPageMessages, ['*'], 'page', $pageMessages);
 
         if ($groupWithMessagesArray->isEmpty() && $messages->isEmpty()) {
@@ -208,9 +232,9 @@ return response()->json(['data' => $groups]);
     public function fetchGroupLastMessage($groupId)
     {
         if (Auth::user()->role == 0 || Auth::user()->role == 2) {
-            $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->where("status","!=","Move")->orderBy("id", "Desc")->first();
+            $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->where("status", "!=", "Move")->orderBy("id", "Desc")->first();
         } else {
-            $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->where('is_deleted', 0)->where("status","!=","Move")->orderBy("id", "Desc")->first();
+            $lastestNotDeletedMessage = GroupMessage::with("user")->where("group_id", $groupId)->where('is_deleted', 0)->where("status", "!=", "Move")->orderBy("id", "Desc")->first();
         }
         return response()->json($lastestNotDeletedMessage);
     }
