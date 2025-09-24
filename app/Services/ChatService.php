@@ -542,14 +542,13 @@ class ChatService implements ChatRepository
 
     public function fetchUrgentMessages()
     {
-         $messages = GroupMessage::where('compose.priority', 2)->where('external_message_status', 1)
+         $messages = GroupMessage::where('compose.priority', 2)->where('external_message_status', 0)
                 ->whereNot('status', EnumMessageEnum::MOVE)
                 ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
                 ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
                 ->with('user', 'reply')
                 ->orderBy('id', 'desc')
                 ->get();
-                return $messages;
 
         if ($messages->isNotEmpty()) {
             return response()->json([

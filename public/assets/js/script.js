@@ -4156,7 +4156,7 @@ const fetchPaginatedMessages = async (
                 return !seenBy.includes(u_id);
             })
             .map((item) => item.id);
-            console.log("Notseenby", Notseenby);
+        console.log("Notseenby", Notseenby);
         DOM.unreadCounter = Notseenby.length;
         const notSeenById = Notseenby.at(-1);
         if (ids.length > 0) {
@@ -6621,27 +6621,41 @@ const sampleNotifications = [
         travelDetails: "Flight to New York - AA123",
         timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
         completed: false
-    },
-    {
-        id: 2,
-        firstName: "Jane",
-        lastName: "Smith",
-        travelDetails: "Train to Boston - Amtrak 171",
-        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
-        completed: false
-    },
-    {
-        id: 3,
-        firstName: "Mike",
-        lastName: "Johnson",
-        travelDetails: "Bus to Chicago - Greyhound 456",
-        timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-        completed: true
     }
+    // {
+    //     id: 2,
+    //     firstName: "Jane",
+    //     lastName: "Smith",
+    //     travelDetails: "Train to Boston - Amtrak 171",
+    //     timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+    //     completed: false
+    // },
+    // {
+    //     id: 3,
+    //     firstName: "Mike",
+    //     lastName: "Johnson",
+    //     travelDetails: "Bus to Chicago - Greyhound 456",
+    //     timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+    //     completed: true
+    // }
 ];
 
-function getUrgentMessages()
-{
+
+function extractTravelerName(cleanMsg) {
+    const regex = /Traveler\s+\d+:\s*([\w'-]+)\s*\/\s*([\w'-]+)\s*(MR|MS)/i;
+    const match = cleanMsg.match(regex);
+
+    if (match) {
+        return {
+            lastName: match[1],
+            firstName: match[2],
+            title: match[3].toUpperCase() === "MR" ? "Mr" : "Ms"
+        };
+    }
+    return null;
+}
+
+function getUrgentMessages() {
     console.log("Fetching urgent messages...");
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     fetch('/message/urgent/', {
@@ -6651,36 +6665,56 @@ function getUrgentMessages()
             'X-CSRF-Token': csrfToken
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        if(data.status === 200)
-        {
-            notificationCount = data.urgent_count || 0;
-            updateNotificationCount();
-            const bellIcon = document.getElementById('bell-icon');
-            if(notificationCount > 0 && !isNotificationViewActive)
-            {
-                bellIcon.classList.add('bell-animate');
-            }
-            else
-            {
-                bellIcon.classList.remove('bell-animate');
-            }
-        }
-    })
-    .catch(error => {
-        // console.error('Error fetching urgent messages:', error);
+        .then(response => response.json())
+        .then(urgentEntries => {
+            if (urgentEntries.status == true) {
+                notificationCount = urgentEntries.urgent_count || 0;
+                updateNotificationCount(urgentEntries.data);
+                // const bellIcon = document.getElementById('bell-icon');
+                // if (notificationCount > 0 && !isNotificationViewActive) {
+                //     bellIcon.classList.add('bell-animate');
+                // }
+                // else {
+                //     bellIcon.classList.remove('bell-animate');
+                // }
+                updateNotificationCount(urgentEntries.data);
 
-    });
+                urgentEntries.data.forEach(entry => {
+                    let cleanMsg = processValue(entry.msg, false)
+                    let traveler = extractTravelerName(cleanMsg);
+                    console.log(traveler);
+                    console.log("cleanMsg", cleanMsg);
+
+                    let notification = {
+                        id: entry.id,
+                        firstName: traveler ? traveler.firstName : "N/A",
+                        lastName: traveler ? traveler.lastName : "N/A",
+                        travelDetails: cleanMsg,
+                        timestamp: new Date(parseInt(entry.time) * 1000),
+                        status: entry.external_message_status == 1 ? true : false
+                    }
+                    const notificationList = document.getElementById('notification-main-list');
+                    // notificationList.innerHTML = '';
+
+                    const notificationItem = createNotificationItem(notification);
+                    notificationList.appendChild(notificationItem);
+                });
+            }
+        })
+        .catch(error => {
+            // console.error('Error fetching urgent messages:', error);
+
+        });
 }
 
-function toggleNotifications() {
+async function toggleNotifications() {
     const buttonsContainer = document.getElementById('buttons-container');
     const chatRowContainer = document.getElementById('chat-row-container');
     const notificationView = document.getElementById('notification-view');
     const bellIcon = document.getElementById('bell-icon');
 
     if (!isNotificationViewActive) {
+        console.log("not active")
         // Show notifications, hide chat
         buttonsContainer.style.display = 'none';
         chatRowContainer.style.display = 'none';
@@ -6695,7 +6729,11 @@ function toggleNotifications() {
 
         // Start real-time updates
         startNotificationUpdates();
+
+        await getUrgentMessages();
     } else {
+        console.log("active")
+
         // Show chat, hide notifications
         buttonsContainer.style.display = 'block';
         chatRowContainer.style.display = 'block';
@@ -6718,6 +6756,7 @@ async function loadNotifications() {
 }
 
 function createNotificationItem(notification) {
+    console.log("Creating notification item:", notification);
     const div = document.createElement('div');
     div.className = 'notification-main-item';
     div.setAttribute('data-notification-id', notification.id);
@@ -6736,7 +6775,7 @@ function createNotificationItem(notification) {
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        ${notification.completed ? 'Completed' : 'Complete'}
+                        ${notification.status ? 'Completed' : 'Complete'}
                     </button>
                     <div class="notification-time" data-timestamp="${notification.timestamp.getTime()}">${timeAgo}</div>
                 </div>
@@ -6826,7 +6865,7 @@ function submitCompletion() {
             notification.completedAt = new Date();
 
             // Update UI
-            loadNotifications();
+            // loadNotifications();
             updateNotificationCount();
 
             // Close modal
@@ -6898,8 +6937,9 @@ function getTimeAgo(timestamp) {
     return `${originalTime} | ${elapsedTime}`;
 }
 
-function updateNotificationCount() {
-    const pendingNotifications = sampleNotifications.filter(n => !n.completed);
+function updateNotificationCount(UrgentMessages = []) {
+    console.log("Updating notification count...",UrgentMessages);
+    const pendingNotifications = UrgentMessages.filter(n => n.external_message_status ==0);
     notificationCount = pendingNotifications.length;
 
     const badge = document.getElementById('notification-count-badge');
