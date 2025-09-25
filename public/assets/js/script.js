@@ -6683,7 +6683,13 @@ function getUrgentMessages() {
                     let cleanMsg = processValue(entry.msg, false)
                     let traveler = extractTravelerName(cleanMsg);
                     console.log(traveler);
-                    console.log("cleanMsg", cleanMsg);
+                    console.log("clean Msg before", cleanMsg);
+                    cleanMsg = cleanMsg
+                    .replace(/Flight Details:\s*<br>\s*/i, "Flight Details: ")
+                    .split(/<br>|Note|Traveler/i)[0]
+                    .trim()
+                    .slice(0, 50);
+                    console.log("clean Msg after", cleanMsg);
 
                     let notification = {
                         id: entry.id,
