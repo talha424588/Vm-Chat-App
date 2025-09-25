@@ -6619,25 +6619,9 @@ const sampleNotifications = [
         firstName: "John",
         lastName: "Doe",
         travelDetails: "Flight to New York - AA123",
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
         completed: false
     }
-    // {
-    //     id: 2,
-    //     firstName: "Jane",
-    //     lastName: "Smith",
-    //     travelDetails: "Train to Boston - Amtrak 171",
-    //     timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
-    //     completed: false
-    // },
-    // {
-    //     id: 3,
-    //     firstName: "Mike",
-    //     lastName: "Johnson",
-    //     travelDetails: "Bus to Chicago - Greyhound 456",
-    //     timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    //     completed: true
-    // }
 ];
 
 
@@ -6670,26 +6654,14 @@ function getUrgentMessages() {
             if (urgentEntries.status == true) {
                 notificationCount = urgentEntries.urgent_count || 0;
                 updateNotificationCount(urgentEntries.data);
-                // const bellIcon = document.getElementById('bell-icon');
-                // if (notificationCount > 0 && !isNotificationViewActive) {
-                //     bellIcon.classList.add('bell-animate');
-                // }
-                // else {
-                //     bellIcon.classList.remove('bell-animate');
-                // }
-                updateNotificationCount(urgentEntries.data);
-
                 urgentEntries.data.forEach(entry => {
                     let cleanMsg = processValue(entry.msg, false)
                     let traveler = extractTravelerName(cleanMsg);
-                    console.log(traveler);
-                    console.log("clean Msg before", cleanMsg);
                     cleanMsg = cleanMsg
                     .replace(/Flight Details:\s*<br>\s*/i, "Flight Details: ")
                     .split(/<br>|Note|Traveler/i)[0]
                     .trim()
                     .slice(0, 50);
-                    console.log("clean Msg after", cleanMsg);
 
                     let notification = {
                         id: entry.id,
@@ -6700,8 +6672,6 @@ function getUrgentMessages() {
                         status: entry.external_message_status == 1 ? true : false
                     }
                     const notificationList = document.getElementById('notification-main-list');
-                    // notificationList.innerHTML = '';
-
                     const notificationItem = createNotificationItem(notification);
                     notificationList.appendChild(notificationItem);
                 });
@@ -6709,7 +6679,6 @@ function getUrgentMessages() {
         })
         .catch(error => {
             // console.error('Error fetching urgent messages:', error);
-
         });
 }
 
