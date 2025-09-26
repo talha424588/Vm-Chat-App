@@ -6615,16 +6615,16 @@ let isNotificationViewActive = false;
 let notificationUpdateInterval = null;
 
 // Sample notification data
-const sampleNotifications = [
-    {
-        id: 1,
-        firstName: "John",
-        lastName: "Doe",
-        travelDetails: "Flight to New York - AA123",
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        completed: false
-    }
-];
+// const sampleNotifications = [
+//     {
+//         id: 1,
+//         firstName: "John",
+//         lastName: "Doe",
+//         travelDetails: "Flight to New York - AA123",
+//         timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+//         completed: false
+//     }
+// ];
 
 
 function extractTravelerName(cleanMsg) {
@@ -6702,12 +6702,11 @@ async function toggleNotifications() {
         bellIcon.classList.remove('bell-animate');
 
         // Load notifications
-        loadNotifications();
+        // loadNotifications();
 
         // Start real-time updates
         startNotificationUpdates();
 
-        await getUrgentMessages();
     } else {
         console.log("active")
 
@@ -6722,15 +6721,15 @@ async function toggleNotifications() {
     }
 }
 
-async function loadNotifications() {
-    const notificationList = document.getElementById('notification-main-list');
-    notificationList.innerHTML = '';
+// async function loadNotifications() {
+//     const notificationList = document.getElementById('notification-main-list');
+//     notificationList.innerHTML = '';
 
-    sampleNotifications.forEach(notification => {
-        const notificationItem = createNotificationItem(notification);
-        notificationList.appendChild(notificationItem);
-    });
-}
+//     sampleNotifications.forEach(notification => {
+//         const notificationItem = createNotificationItem(notification);
+//         notificationList.appendChild(notificationItem);
+//     });
+// }
 
 function createNotificationItem(notification) {
     console.log("Creating notification item:", notification);
