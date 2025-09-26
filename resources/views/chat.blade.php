@@ -188,7 +188,7 @@
     display: none;
     align-items: center;
     justify-content: space-between;
-    background-color: #f8f9fa; 
+    background-color: #f8f9fa;
     border-radius: 20px;
     width: 100%;
     padding: 12px;
@@ -505,7 +505,7 @@
                                 </svg>
                             </div>
                             <div class="notification-count-badge" id="notification-count-badge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">0</div>
-                            
+
                             <div class="notification-panel" id="notification-panel">
                                 <div class="notification-header">
                                     Travel Notifications
@@ -1340,7 +1340,7 @@
         var csrfToken = '{{ csrf_token() }}';
         var broadcastChatRoute = "{{ route('broadcast.chat') }}";
     </script>
-    
+
 
     {{-- One Signal --}}
     {{-- <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" async=""></script> --}}
@@ -1380,26 +1380,37 @@
                 <h4>Complete Travel Notification</h4>
                 <span class="complete-modal-close" onclick="closeCompleteModal()">&times;</span>
             </div>
-            
+
             <div class="notification-info" id="modal-notification-info">
                 <!-- Notification details will be populated here -->
             </div>
-            
+
+            <!-- Closer Information Section (only shown when status == 1) -->
+            <div id="closer-info-section" style="display: none; background: #e8f5e8; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #28a745;">
+                <h5 style="margin: 0 0 10px 0; color: #28a745; font-weight: 600;">Ticket Closed By</h5>
+                <div id="closer-details">
+                    <!-- Closer information will be populated here -->
+                </div>
+                <div id="closer-media" style="margin-top: 10px;">
+                    <!-- Uploaded media will be shown here -->
+                </div>
+            </div>
+
             <div class="image-upload-area" id="image-upload-area" onclick="document.getElementById('image-upload-input').click()">
                 <div class="upload-icon">📷</div>
                 <div class="upload-text">Click to upload completion image</div>
                 <div class="upload-subtext">or drag and drop an image here</div>
             </div>
-            
+
             <input type="file" id="image-upload-input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-            
+
             <div id="image-preview-container" style="display: none; text-align: center;">
                 <div class="image-preview-wrapper">
                     <img id="image-preview" class="image-preview" alt="Preview" style="display: block; margin: 0 auto;">
                     <button type="button" class="remove-image-icon" onclick="removeImage()" title="Remove Image">×</button>
                 </div>
             </div>
-            
+
             <button id="submit-complete-btn" class="submit-complete-btn" onclick="submitCompletion()" disabled>
                 Submit Completion
             </button>

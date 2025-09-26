@@ -4867,6 +4867,8 @@ let init = () => {
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
+
+    getUrgentMessages();
 };
 
 init();
@@ -6613,32 +6615,18 @@ let isNotificationViewActive = false;
 let notificationUpdateInterval = null;
 
 // Sample notification data
-const sampleNotifications = [
-    {
-        id: 1,
-        firstName: "John",
-        lastName: "Doe",
-        travelDetails: "Flight to New York - AA123",
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-        completed: false
-    }
-    // {
-    //     id: 2,
-    //     firstName: "Jane",
-    //     lastName: "Smith",
-    //     travelDetails: "Train to Boston - Amtrak 171",
-    //     timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
-    //     completed: false
-    // },
-    // {
-    //     id: 3,
-    //     firstName: "Mike",
-    //     lastName: "Johnson",
-    //     travelDetails: "Bus to Chicago - Greyhound 456",
-    //     timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    //     completed: true
-    // }
-];
+// const sampleNotifications = [
+//     {
+//         id: 1,
+//         firstName: "John",
+//         lastName: "Doe",
+//         travelDetails: "Flight to New York - AA123",
+//         timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+//         completed: false
+//     }
+// ];
+
+let urgentEntriesMessages = [];
 
 
 function extractTravelerName(cleanMsg) {
@@ -6656,7 +6644,6 @@ function extractTravelerName(cleanMsg) {
 }
 
 function getUrgentMessages() {
-    console.log("Fetching urgent messages...");
     let csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     fetch('/message/urgent/', {
         method: 'GET',
@@ -6667,23 +6654,19 @@ function getUrgentMessages() {
     })
         .then(response => response.json())
         .then(urgentEntries => {
+            // urgentEntriesMessages = urgentEntries.data || [];
+
             if (urgentEntries.status == true) {
                 notificationCount = urgentEntries.urgent_count || 0;
                 updateNotificationCount(urgentEntries.data);
-                // const bellIcon = document.getElementById('bell-icon');
-                // if (notificationCount > 0 && !isNotificationViewActive) {
-                //     bellIcon.classList.add('bell-animate');
-                // }
-                // else {
-                //     bellIcon.classList.remove('bell-animate');
-                // }
-                updateNotificationCount(urgentEntries.data);
-
                 urgentEntries.data.forEach(entry => {
                     let cleanMsg = processValue(entry.msg, false)
                     let traveler = extractTravelerName(cleanMsg);
-                    console.log(traveler);
-                    console.log("cleanMsg", cleanMsg);
+                    cleanMsg = cleanMsg
+                    .replace(/Flight Details:\s*<br>\s*/i, "Flight Details: ")
+                    .split(/<br>|Note|Traveler/i)[0]
+                    .trim()
+                    .slice(0, 50);
 
                     let notification = {
                         id: entry.id,
@@ -6691,19 +6674,21 @@ function getUrgentMessages() {
                         lastName: traveler ? traveler.lastName : "N/A",
                         travelDetails: cleanMsg,
                         timestamp: new Date(parseInt(entry.time) * 1000),
-                        status: entry.external_message_status == 1 ? true : false
+                        status: entry.external_message_status == 1 ? true : false,
+                        closedByName: entry.closed_by_name || null,
+                        closedById: entry.closed_by_id || null,
+                        closedByMedia: entry.closed_by_media || null
                     }
                     const notificationList = document.getElementById('notification-main-list');
-                    // notificationList.innerHTML = '';
-
                     const notificationItem = createNotificationItem(notification);
                     notificationList.appendChild(notificationItem);
+                    urgentEntriesMessages.push(notification);
+
                 });
             }
         })
         .catch(error => {
             // console.error('Error fetching urgent messages:', error);
-
         });
 }
 
@@ -6714,7 +6699,6 @@ async function toggleNotifications() {
     const bellIcon = document.getElementById('bell-icon');
 
     if (!isNotificationViewActive) {
-        console.log("not active")
         // Show notifications, hide chat
         buttonsContainer.style.display = 'none';
         chatRowContainer.style.display = 'none';
@@ -6725,12 +6709,11 @@ async function toggleNotifications() {
         bellIcon.classList.remove('bell-animate');
 
         // Load notifications
-        loadNotifications();
+        // loadNotifications();
 
         // Start real-time updates
         startNotificationUpdates();
 
-        await getUrgentMessages();
     } else {
         console.log("active")
 
@@ -6745,24 +6728,22 @@ async function toggleNotifications() {
     }
 }
 
-async function loadNotifications() {
-    const notificationList = document.getElementById('notification-main-list');
-    notificationList.innerHTML = '';
+// async function loadNotifications() {
+//     const notificationList = document.getElementById('notification-main-list');
+//     notificationList.innerHTML = '';
 
-    sampleNotifications.forEach(notification => {
-        const notificationItem = createNotificationItem(notification);
-        notificationList.appendChild(notificationItem);
-    });
-}
+//     sampleNotifications.forEach(notification => {
+//         const notificationItem = createNotificationItem(notification);
+//         notificationList.appendChild(notificationItem);
+//     });
+// }
 
 function createNotificationItem(notification) {
-    console.log("Creating notification item:", notification);
     const div = document.createElement('div');
     div.className = 'notification-main-item';
     div.setAttribute('data-notification-id', notification.id);
 
     const timeAgo = getTimeAgo(notification.timestamp);
-
     div.innerHTML = `
                 <div class="notification-user">
                     ${notification.firstName} ${notification.lastName}
@@ -6771,7 +6752,7 @@ function createNotificationItem(notification) {
                     ${notification.travelDetails}
                 </div>
                 <div class="notification-actions">
-                    <button class="notification-complete-btn" onclick="completeNotification(${notification.id})" ${notification.completed ? 'disabled' : ''}>
+                    <button class="notification-complete-btn" onclick="completeNotification(${notification.id})" ${notification.status ? 'disabled' : ''}>
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -6785,7 +6766,6 @@ function createNotificationItem(notification) {
 }
 
 function completeNotification(notificationId) {
-    // Show the modal instead of directly completing
     showCompleteModal(notificationId);
 }
 
@@ -6793,11 +6773,13 @@ let currentNotificationId = null;
 let uploadedImage = null;
 
 function showCompleteModal(notificationId) {
+
+    console.log("notification messages:", urgentEntriesMessages);
     currentNotificationId = notificationId;
-    const notification = sampleNotifications.find(n => n.id === notificationId);
+    const notification = urgentEntriesMessages.find(n => n.id === notificationId);
+    console.log("Showing modal for notification:", notification);
 
     if (notification) {
-        // Populate modal with notification info
         const modalInfo = document.getElementById('modal-notification-info');
         modalInfo.innerHTML = `
             <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
@@ -6805,6 +6787,51 @@ function showCompleteModal(notificationId) {
                 <span style="color: #666;">${notification.travelDetails}</span>
             </div>
         `;
+
+        // Show closer information only if notification.status == 1
+        const closerInfoSection = document.getElementById('closer-info-section');
+        const imageUploadArea = document.getElementById('image-upload-area');
+
+        if (notification.status == 1) {
+            // Show closer information section
+            closerInfoSection.style.display = 'block';
+
+            // Populate closer details
+            const closerDetails = document.getElementById('closer-details');
+            const closerMedia = document.getElementById('closer-media');
+
+            closerDetails.innerHTML = `
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <strong style="color: #333; margin-right: 10px;">Name:</strong>
+                    <span style="color: #666;">${notification.closedByName || 'Unknown'}</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <strong style="color: #333; margin-right: 10px;">ID:</strong>
+                    <span style="color: #666;">${notification.closedById || 'Unknown'}</span>
+                </div>
+            `;
+
+            // Show uploaded media if available
+            if (notification.closedByMedia) {
+                closerMedia.innerHTML = `
+                    <div style="margin-top: 10px;">
+                        <strong style="color: #333; display: block; margin-bottom: 8px;">Uploaded Media:</strong>
+                        <img src="${notification.closedByMedia}" alt="Completion Media" style="max-width: 100%; max-height: 200px; border-radius: 4px; border: 1px solid #ddd;">
+                    </div>
+                `;
+            } else {
+                closerMedia.innerHTML = '';
+            }
+
+            // Hide image upload area since ticket is already closed
+            imageUploadArea.style.display = 'none';
+        } else {
+            // Hide closer information section for open tickets
+            closerInfoSection.style.display = 'none';
+
+            // Show image upload area for open tickets
+            imageUploadArea.style.display = 'block';
+        }
 
         // Reset modal state
         resetModalState();
@@ -6830,6 +6857,12 @@ function resetModalState() {
     // Reset upload area
     const uploadArea = document.getElementById('image-upload-area');
     uploadArea.style.display = 'block';
+
+    // Reset closer information section
+    const closerInfoSection = document.getElementById('closer-info-section');
+    closerInfoSection.style.display = 'none';
+    document.getElementById('closer-details').innerHTML = '';
+    document.getElementById('closer-media').innerHTML = '';
 }
 
 function handleImageUpload(event) {
@@ -6917,14 +6950,23 @@ function getTimeAgo(timestamp) {
     const now = new Date();
     const diffInMs = now - timestamp;
 
-    // Calculate elapsed time in hours:minutes:seconds
+    // Calculate elapsed time in seconds
     const totalSeconds = Math.floor(diffInMs / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
+    const days = Math.floor(totalSeconds / 86400)
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
 
-    // Format elapsed time as HH:MM:SS
-    const elapsedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    let elapsedTime = '';
+    if (days > 0) {
+        elapsedTime += `${days} day${days > 1 ? 's' : ''}`;
+    }
+    if (hours > 0 || days > 0) {
+        elapsedTime += ` ${hours} hour${hours !== 1 ? 's' : ''}`;
+    }
+    if (minutes > 0 || hours > 0 || days > 0) {
+        elapsedTime += ` ${minutes} min${minutes !== 1 ? 's' : ''}`;
+    }
 
     // Format the original timestamp as time (07:40 am)
     const timeOptions = {
@@ -6934,8 +6976,9 @@ function getTimeAgo(timestamp) {
     };
     const originalTime = timestamp.toLocaleTimeString('en-US', timeOptions).toLowerCase();
 
-    return `${originalTime} | ${elapsedTime}`;
+    return `${originalTime} |${elapsedTime.trim()}`;
 }
+
 
 function updateNotificationCount(UrgentMessages = []) {
     console.log("Updating notification count...",UrgentMessages);
