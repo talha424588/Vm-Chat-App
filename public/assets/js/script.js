@@ -6761,7 +6761,6 @@ function createNotificationItem(notification) {
 }
 
 function completeNotification(notificationId) {
-    // Show the modal instead of directly completing
     showCompleteModal(notificationId);
 }
 
@@ -6893,14 +6892,23 @@ function getTimeAgo(timestamp) {
     const now = new Date();
     const diffInMs = now - timestamp;
 
-    // Calculate elapsed time in hours:minutes:seconds
+    // Calculate elapsed time in seconds
     const totalSeconds = Math.floor(diffInMs / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
+    const days = Math.floor(totalSeconds / 86400)
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
 
-    // Format elapsed time as HH:MM:SS
-    const elapsedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    let elapsedTime = '';
+    if (days > 0) {
+        elapsedTime += `${days} day${days > 1 ? 's' : ''}`;
+    }
+    if (hours > 0 || days > 0) {
+        elapsedTime += ` ${hours} hour${hours !== 1 ? 's' : ''}`;
+    }
+    if (minutes > 0 || hours > 0 || days > 0) {
+        elapsedTime += ` ${minutes} min${minutes !== 1 ? 's' : ''}`;
+    }
 
     // Format the original timestamp as time (07:40 am)
     const timeOptions = {
@@ -6910,8 +6918,9 @@ function getTimeAgo(timestamp) {
     };
     const originalTime = timestamp.toLocaleTimeString('en-US', timeOptions).toLowerCase();
 
-    return `${originalTime} | ${elapsedTime}`;
+    return `${originalTime} |${elapsedTime.trim()}`;
 }
+
 
 function updateNotificationCount(UrgentMessages = []) {
     console.log("Updating notification count...",UrgentMessages);
