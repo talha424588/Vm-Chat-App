@@ -6663,10 +6663,10 @@ function getUrgentMessages() {
                     let cleanMsg = processValue(entry.msg, false)
                     let traveler = extractTravelerName(cleanMsg);
                     cleanMsg = cleanMsg
-                    .replace(/Flight Details:\s*<br>\s*/i, "Flight Details: ")
-                    .split(/<br>|Note|Traveler/i)[0]
-                    .trim()
-                    .slice(0, 50);
+                        .replace(/Flight Details:\s*<br>\s*/i, "Flight Details: ")
+                        .split(/<br>|Note|Traveler/i)[0]
+                        .trim()
+                        .slice(0, 50);
 
                     let notification = {
                         id: entry.id,
@@ -6699,44 +6699,25 @@ async function toggleNotifications() {
     const bellIcon = document.getElementById('bell-icon');
 
     if (!isNotificationViewActive) {
-        // Show notifications, hide chat
         buttonsContainer.style.display = 'none';
         chatRowContainer.style.display = 'none';
         notificationView.style.display = 'block';
         isNotificationViewActive = true;
 
-        // Stop bell animation
         bellIcon.classList.remove('bell-animate');
 
-        // Load notifications
-        // loadNotifications();
-
-        // Start real-time updates
         startNotificationUpdates();
 
     } else {
-        console.log("active")
-
-        // Show chat, hide notifications
         buttonsContainer.style.display = 'block';
         chatRowContainer.style.display = 'block';
         notificationView.style.display = 'none';
         isNotificationViewActive = false;
 
-        // Stop real-time updates
         stopNotificationUpdates();
     }
 }
 
-// async function loadNotifications() {
-//     const notificationList = document.getElementById('notification-main-list');
-//     notificationList.innerHTML = '';
-
-//     sampleNotifications.forEach(notification => {
-//         const notificationItem = createNotificationItem(notification);
-//         notificationList.appendChild(notificationItem);
-//     });
-// }
 
 function createNotificationItem(notification) {
     const div = document.createElement('div');
@@ -6788,15 +6769,12 @@ function showCompleteModal(notificationId) {
             </div>
         `;
 
-        // Show closer information only if notification.status == 1
         const closerInfoSection = document.getElementById('closer-info-section');
         const imageUploadArea = document.getElementById('image-upload-area');
 
         if (notification.status == 1) {
-            // Show closer information section
             closerInfoSection.style.display = 'block';
 
-            // Populate closer details
             const closerDetails = document.getElementById('closer-details');
             const closerMedia = document.getElementById('closer-media');
 
@@ -6811,7 +6789,6 @@ function showCompleteModal(notificationId) {
                 </div>
             `;
 
-            // Show uploaded media if available
             if (notification.closedByMedia) {
                 closerMedia.innerHTML = `
                     <div style="margin-top: 10px;">
@@ -6823,20 +6800,13 @@ function showCompleteModal(notificationId) {
                 closerMedia.innerHTML = '';
             }
 
-            // Hide image upload area since ticket is already closed
             imageUploadArea.style.display = 'none';
         } else {
-            // Hide closer information section for open tickets
             closerInfoSection.style.display = 'none';
-
-            // Show image upload area for open tickets
             imageUploadArea.style.display = 'block';
         }
 
-        // Reset modal state
         resetModalState();
-
-        // Show modal
         document.getElementById('complete-notification-modal').style.display = 'block';
     }
 }
@@ -6848,17 +6818,14 @@ function closeCompleteModal() {
 }
 
 function resetModalState() {
-    // Reset image upload
     document.getElementById('image-upload-input').value = '';
     document.getElementById('image-preview-container').style.display = 'none';
     document.getElementById('submit-complete-btn').disabled = true;
     uploadedImage = null;
 
-    // Reset upload area
     const uploadArea = document.getElementById('image-upload-area');
     uploadArea.style.display = 'block';
 
-    // Reset closer information section
     const closerInfoSection = document.getElementById('closer-info-section');
     closerInfoSection.style.display = 'none';
     document.getElementById('closer-details').innerHTML = '';
@@ -6981,8 +6948,8 @@ function getTimeAgo(timestamp) {
 
 
 function updateNotificationCount(UrgentMessages = []) {
-    console.log("Updating notification count...",UrgentMessages);
-    const pendingNotifications = UrgentMessages.filter(n => n.external_message_status ==0);
+    console.log("Updating notification count...", UrgentMessages);
+    const pendingNotifications = UrgentMessages.filter(n => n.external_message_status == 0);
     notificationCount = pendingNotifications.length;
 
     const badge = document.getElementById('notification-count-badge');
