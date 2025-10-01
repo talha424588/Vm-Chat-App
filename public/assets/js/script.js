@@ -6683,7 +6683,7 @@ async function toggleNotifications() {
 
 function createNotificationItem(notification) {
     const div = document.createElement('div');
-    div.className = 'notification-main-item';
+    div.className = 'notification-main-item ' + (notification.status ? 'completed' : 'pending');
     div.setAttribute('data-notification-id', notification.id);
 
     const timeAgo = getTimeAgo(notification.timestamp);
@@ -6695,7 +6695,7 @@ function createNotificationItem(notification) {
                     ${notification.travelDetails}
                 </div>
                 <div class="notification-actions">
-                    <button class="notification-complete-btn" onclick="completeNotification(${notification.id})">
+                    <button class="notification-complete-btn ${notification.status ? 'is-completed' : ''}" onclick="completeNotification(${notification.id})">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>

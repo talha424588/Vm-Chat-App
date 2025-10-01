@@ -363,6 +363,23 @@
             overflow-wrap: anywhere;
         }
 
+        /* Status-based styles for urgent queue */
+        .notification-main-item.pending {
+            border-left: 4px solid #FFC107; /* amber */
+        }
+
+        .notification-main-item.completed {
+            border-left: 4px solid #1DAB61;
+            background: #f6fffa; /* subtle green */
+            border-color: #cfe9d6;
+        }
+
+        .notification-complete-btn.is-completed {
+            background: #E6F4EA; /* light green */
+            color: #1DAB61;
+            border: 1px solid #cfe9d6;
+        }
+
         .notification-main-item:hover {
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
