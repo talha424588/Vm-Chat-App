@@ -543,13 +543,29 @@ class ChatService implements ChatRepository
 
     public function fetchUrgentMessages()
     {
-         $messages = GroupMessage::where('compose.priority', 2)->where('external_message_status', 0)
-                ->whereNot('status', EnumMessageEnum::MOVE)
-                ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
-                ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
-                ->with('user', 'reply')
-                ->orderBy('id', 'desc')
-                ->get();
+        //  $messages = GroupMessage::where('compose.priority', 2)->where('external_message_status', 0)
+        //         ->whereNot('status', EnumMessageEnum::MOVE)
+        //         ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
+        //         ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
+        //         ->with('user', 'reply')
+        //         ->orderBy('id', 'desc')
+        //         ->get();
+
+        $messages = GroupMessage::join('compose', 'group_messages.compose_id', '=', 'compose.id')
+            ->where('compose.priority', 2)
+            ->where(function ($query) {
+                $query->where('group_messages.external_message_status', 0)
+                    ->orWhere(function ($q) {
+                        $q->where('group_messages.external_message_status', 1)
+                            ->where('group_messages.time', '>=', now()->subDay()->timestamp);
+                    });
+            })
+            ->whereNot('group_messages.status', EnumMessageEnum::MOVE)
+            ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
+            ->with('user', 'reply')
+            ->orderBy('group_messages.id', 'desc')
+            ->get();
+
 
         if ($messages->isNotEmpty()) {
             return response()->json([
@@ -573,7 +589,7 @@ class ChatService implements ChatRepository
             $closedById = $request->input('closed_by_id');
             $closedByName = $request->input('closed_by_name');
             $travelersName = $request->input('travelers_name');
-            
+
             // Handle image upload
             $closedByMedia = null;
             if ($request->hasFile('image')) {
@@ -584,7 +600,7 @@ class ChatService implements ChatRepository
                 $uniqueMediaName = $filename . '_' . time() . '.' . $extension;
 
                 $destination = public_path('uploads/close_external_entries');
-                
+
                 if (!file_exists($destination)) {
                     mkdir($destination, 0755, true);
                 }
@@ -612,7 +628,6 @@ class ChatService implements ChatRepository
                 'message' => 'Close external entry info saved successfully',
                 'data' => $closeEntryInfo
             ], 200);
-
         } catch (\Exception $e) {
             Log::error('Error saving close external entry info: ' . $e->getMessage());
             return response()->json([
@@ -627,7 +642,7 @@ class ChatService implements ChatRepository
     {
         try {
             $closeEntryInfo = CloseExternalEntryInfo::where('entry_id', $entryId)->first();
-            
+
             if ($closeEntryInfo) {
                 return response()->json([
                     'status' => true,
