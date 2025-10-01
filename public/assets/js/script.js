@@ -121,7 +121,6 @@ let populateGroupList = async () => {
     let present = {};
 
     try {
-        console.log("auto refresh");
         const id = document.getElementById("login_user_id").value;
         const unique_id = document.getElementById("login_user_unique_id").value;
 
@@ -6696,7 +6695,7 @@ function createNotificationItem(notification) {
                     ${notification.travelDetails}
                 </div>
                 <div class="notification-actions">
-                    <button class="notification-complete-btn" onclick="completeNotification(${notification.id})" ${notification.status ? 'disabled' : ''}>
+                    <button class="notification-complete-btn" onclick="completeNotification(${notification.id})">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -6710,13 +6709,12 @@ function createNotificationItem(notification) {
 }
 
 function completeNotification(notificationId) {
+    console.log("notification Details", notificationId);
     const notification = urgentEntriesMessages.find(n => n.id === notificationId);
 
     if (notification && notification.status) {
-        // If already completed, show completion details
         showCompletionDetails(notificationId);
     } else {
-        // If not completed, show the completion modal
         showCompleteModal(notificationId);
     }
 }
@@ -6725,11 +6723,8 @@ let currentNotificationId = null;
 let uploadedImage = null;
 
 function showCompleteModal(notificationId) {
-
-    console.log("notification messages:", urgentEntriesMessages);
     currentNotificationId = notificationId;
     const notification = urgentEntriesMessages.find(n => n.id === notificationId);
-    console.log("Showing modal for notification:", notification);
 
     if (notification) {
         const modalInfo = document.getElementById('modal-notification-info');
@@ -6789,6 +6784,7 @@ function closeCompleteModal() {
 }
 
 function showCompletionDetails(notificationId) {
+    console.log("Fetching completion details for notification:", notificationId);
     fetch(`/get-close-external-entry-info/${notificationId}`)
         .then(response => response.json())
         .then(data => {
@@ -7013,7 +7009,6 @@ function getTimeAgo(timestamp) {
 
 
 function updateNotificationCount(UrgentMessages = []) {
-    console.log("Updating notification count...", UrgentMessages);
     const pendingNotifications = UrgentMessages.filter(n => n.external_message_status == 0);
     notificationCount = pendingNotifications.length;
 
