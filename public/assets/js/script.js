@@ -5167,11 +5167,9 @@ document
                         DOM.messageInput.value = imagePath;
                         sendMessage("Image", mediaName);
                     } else {
-                        // console.error("Upload failed:", data.error);
                     }
                 })
                 .catch(error => {
-                    // console.error("Upload error:", error);
                     $("#wentWrong").modal("show");
                 });
         }
@@ -5193,7 +5191,6 @@ fileInput.addEventListener("change", (event) => {
     const extension = mediaName.split('.').pop().toLowerCase();
     const mimeType = file.type;
 
-    // if (extension !== 'pdf' || mimeType !== 'application/pdf') {
     if (
         !['pdf', 'doc', 'docx'].includes(extension) ||
         !['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(mimeType)
@@ -5519,7 +5516,6 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 }
             }
         } catch (error) {
-            // console.log(error);
         }
     } else {
         DOM.groupSearch = false;
@@ -5568,7 +5564,6 @@ async function unreadGrouChat() {
         const unreadConversationGroupResponse = await fetch(url);
         const response = await unreadConversationGroupResponse.json();
     } catch (error) {
-        // console.log(error);
     }
 }
 
@@ -5678,10 +5673,8 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                         searchMessageOffset += searchMessageLimit;
                     })
                     .catch((error) => {
-                        // console.error("Error:", "Not Found");
                     });
             } catch (error) {
-                // console.log(error);
             }
         }, 500);
     } else {
@@ -5766,7 +5759,6 @@ messageSidebar.addEventListener("scroll", function () {
                     isFetching = false;
                 })
                 .catch((error) => {
-                    // console.error("Error:", "Not Found");
                     isFetching = false;
                 });
         }
@@ -6170,10 +6162,8 @@ function handleMessageResponse_old(
                         nullTypemessageTextElement.innerHTML = highlightedText;
                     }
                 } else {
-                    // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                 }
                 break;
-            // console.log("Unknown message type:", message.type);
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
         setTimeout(function () {
@@ -6281,10 +6271,6 @@ function get_voice_list() {
                     audioPlayer.duration
                 );
             } else {
-                // console.warn(
-                //     "Audio duration is not available or invalid:",
-                //     audioPlayer.duration
-                // );
             }
         });
 
@@ -6343,7 +6329,6 @@ async function restoreMessage(id) {
                 }
             });
     } catch (error) {
-        // console.log("Error Restoring Message:", error);
     }
 }
 
@@ -6436,7 +6421,6 @@ let update_user_profile = async (elem, file) => {
             elem.classList.add("active");
         }
     } catch (error) {
-        // console.error("Error updating User Profile:", error);
     }
 };
 
@@ -6491,32 +6475,29 @@ let dragableIcon = () => {
     draggableIcon.setAttribute("draggable", "true");
 
     draggableIcon.addEventListener("dragstart", (event) => {
-        event.dataTransfer.setData("text/plain", null); // For Firefox compatibility
+        event.dataTransfer.setData("text/plain", null);
         event.dataTransfer.effectAllowed = "move";
     });
 
     document.addEventListener("dragover", (event) => {
-        event.preventDefault(); // Prevent default to allow drop
+        event.preventDefault();
     });
 
     document.addEventListener("drop", (event) => {
         event.preventDefault();
 
-        const iconSize = 50; // Adjust this based on the actual icon size
+        const iconSize = 50;
         const x = event.clientX;
         const y = event.clientY;
 
-        // Calculate the boundaries for the icon
         const minX = 0;
         const maxX = window.innerWidth - iconSize;
         const minY = 0;
         const maxY = window.innerHeight - iconSize;
 
-        // Ensure the new position is within the boundaries
         const newX = Math.max(minX, Math.min(x - iconSize / 2, maxX));
         const newY = Math.max(minY, Math.min(y - iconSize / 2, maxY));
 
-        // Set the position of the icon based on the adjusted drop location
         draggableIcon.style.position = "absolute";
         draggableIcon.style.left = `${newX}px`;
         draggableIcon.style.top = `${newY}px`;
@@ -6580,7 +6561,6 @@ document.getElementById("messages").addEventListener("scroll", function () {
         divElement.scrollHeight - divElement.scrollTop ===
         divElement.clientHeight
     ) {
-        // console.log('Scrolled to the bottom');
     }
 });
 document
@@ -6613,21 +6593,7 @@ function safeSubstring(htmlContent, startIndex, endIndex) {
 let notificationCount = 0;
 let isNotificationViewActive = false;
 let notificationUpdateInterval = null;
-
-// Sample notification data
-// const sampleNotifications = [
-//     {
-//         id: 1,
-//         firstName: "John",
-//         lastName: "Doe",
-//         travelDetails: "Flight to New York - AA123",
-//         timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-//         completed: false
-//     }
-// ];
-
 let urgentEntriesMessages = [];
-
 
 function extractTravelerName(cleanMsg) {
     const regex = /Traveler\s+\d+:\s*([\w'-]+)\s*\/\s*([\w'-]+)\s*(MR|MS)/i;
@@ -6686,7 +6652,6 @@ function getUrgentMessages() {
             }
         })
         .catch(error => {
-            // console.error('Error fetching urgent messages:', error);
         });
 }
 
@@ -6824,7 +6789,6 @@ function closeCompleteModal() {
 }
 
 function showCompletionDetails(notificationId) {
-    // Fetch completion details from the server
     fetch(`/get-close-external-entry-info/${notificationId}`)
         .then(response => response.json())
         .then(data => {
@@ -6832,7 +6796,6 @@ function showCompletionDetails(notificationId) {
                 const completionDetails = data.data;
                 const notification = urgentEntriesMessages.find(n => n.id === notificationId);
 
-                // Update modal content with completion details
                 const modalInfo = document.getElementById('modal-notification-info');
                 modalInfo.innerHTML = `
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
@@ -6841,7 +6804,6 @@ function showCompletionDetails(notificationId) {
                     </div>
                 `;
 
-                // Show completion details section
                 const closerInfoSection = document.getElementById('closer-info-section');
                 const closerDetails = document.getElementById('closer-details');
                 const closerMedia = document.getElementById('closer-media');
@@ -6876,7 +6838,6 @@ function showCompletionDetails(notificationId) {
                     closerMedia.innerHTML = '';
                 }
 
-                // Show the modal
                 document.getElementById('complete-notification-modal').style.display = 'block';
             } else {
                 alert('Failed to load completion details: ' + data.message);
@@ -6948,16 +6909,13 @@ function submitCompletion() {
                 formData.append('image', fileInput.files[0]);
             }
 
-            // Add required fields for close external entry info
             formData.append('entry_id', currentNotificationId);
             formData.append('closed_by_id', user.id);
             formData.append('closed_by_name', user.name);
 
-            // Get travelers name from the notification if available
             const travelersName = notification.travelers_name || notification.firstName + ' ' + notification.lastName || '';
             formData.append('travelers_name', travelersName);
 
-            // Send request to save close external entry info
             fetch('/save-close-external-entry-info', {
                 method: 'POST',
                 headers: {
@@ -6969,11 +6927,8 @@ function submitCompletion() {
                 .then(data => {
                     console.log('Close external entry info saved:', data);
                     if (data.status) {
-                        // Update UI
                         updateNotificationCount();
-                        // Close modal
                         closeCompleteModal();
-                        // Show success message
                         alert('Notification completed successfully!');
                     } else {
                         alert('Failed to save completion details: ' + data.message);
