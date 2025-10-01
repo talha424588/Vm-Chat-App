@@ -266,4 +266,25 @@ class ChatController extends Controller
     {
         return $this->chatRepository->fetchUrgentMessages();
     }
+
+    public function saveCloseExternalEntryInfo(Request $request)
+    {
+        $validatorResponse = $this->validateInputDetails($request, [
+            'entry_id' => 'required|integer',
+            'closed_by_id' => 'required|integer',
+            'closed_by_name' => 'required|string|max:255',
+            'travelers_name' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        if (isset($validatorResponse) && $validatorResponse->getStatusCode() == 400)
+            return $validatorResponse;
+
+        return $this->chatRepository->saveCloseExternalEntryInfo($request);
+    }
+
+    public function getCloseExternalEntryInfo($entryId)
+    {
+        return $this->chatRepository->getCloseExternalEntryInfo($entryId);
+    }
 }

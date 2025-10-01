@@ -63,6 +63,8 @@ Route::group(['middleware' => ['auth:web']], function () {
     Route::post("/update_user_profile",[UserController::class,'updateUserProfile']);
     Route::get("/message/delete/check/" , [ChatController::class, 'messageisDeleteStatusCheck']);
     Route::get("/message/urgent/" , [ChatController::class, 'getUrgentMessages']);
+    Route::post("/save-close-external-entry-info" , [ChatController::class, 'saveCloseExternalEntryInfo']);
+    Route::get("/get-close-external-entry-info/{entryId}" , [ChatController::class, 'getCloseExternalEntryInfo']);
 });
 
 Route::post("/upload-image" , [ChatController::class, 'uploadImage']);

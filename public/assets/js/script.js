@@ -121,7 +121,6 @@ let populateGroupList = async () => {
     let present = {};
 
     try {
-        console.log("auto refresh");
         const id = document.getElementById("login_user_id").value;
         const unique_id = document.getElementById("login_user_unique_id").value;
 
@@ -5167,11 +5166,9 @@ document
                         DOM.messageInput.value = imagePath;
                         sendMessage("Image", mediaName);
                     } else {
-                        // console.error("Upload failed:", data.error);
                     }
                 })
                 .catch(error => {
-                    // console.error("Upload error:", error);
                     $("#wentWrong").modal("show");
                 });
         }
@@ -5193,7 +5190,6 @@ fileInput.addEventListener("change", (event) => {
     const extension = mediaName.split('.').pop().toLowerCase();
     const mimeType = file.type;
 
-    // if (extension !== 'pdf' || mimeType !== 'application/pdf') {
     if (
         !['pdf', 'doc', 'docx'].includes(extension) ||
         !['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(mimeType)
@@ -5519,7 +5515,6 @@ let searchGroups = async (searchQuery, loadMore = false) => {
                 }
             }
         } catch (error) {
-            // console.log(error);
         }
     } else {
         DOM.groupSearch = false;
@@ -5568,7 +5563,6 @@ async function unreadGrouChat() {
         const unreadConversationGroupResponse = await fetch(url);
         const response = await unreadConversationGroupResponse.json();
     } catch (error) {
-        // console.log(error);
     }
 }
 
@@ -5678,10 +5672,8 @@ searchMessageInputFeild.addEventListener("input", function (e) {
                         searchMessageOffset += searchMessageLimit;
                     })
                     .catch((error) => {
-                        // console.error("Error:", "Not Found");
                     });
             } catch (error) {
-                // console.log(error);
             }
         }, 500);
     } else {
@@ -5766,7 +5758,6 @@ messageSidebar.addEventListener("scroll", function () {
                     isFetching = false;
                 })
                 .catch((error) => {
-                    // console.error("Error:", "Not Found");
                     isFetching = false;
                 });
         }
@@ -6170,10 +6161,8 @@ function handleMessageResponse_old(
                         nullTypemessageTextElement.innerHTML = highlightedText;
                     }
                 } else {
-                    // console.log("No element with class 'shadow-sm' found for unknown message type:", message.type);
                 }
                 break;
-            // console.log("Unknown message type:", message.type);
         }
         messageElement.scrollIntoView({ behavior: "smooth" });
         setTimeout(function () {
@@ -6281,10 +6270,6 @@ function get_voice_list() {
                     audioPlayer.duration
                 );
             } else {
-                // console.warn(
-                //     "Audio duration is not available or invalid:",
-                //     audioPlayer.duration
-                // );
             }
         });
 
@@ -6343,7 +6328,6 @@ async function restoreMessage(id) {
                 }
             });
     } catch (error) {
-        // console.log("Error Restoring Message:", error);
     }
 }
 
@@ -6436,7 +6420,6 @@ let update_user_profile = async (elem, file) => {
             elem.classList.add("active");
         }
     } catch (error) {
-        // console.error("Error updating User Profile:", error);
     }
 };
 
@@ -6491,32 +6474,29 @@ let dragableIcon = () => {
     draggableIcon.setAttribute("draggable", "true");
 
     draggableIcon.addEventListener("dragstart", (event) => {
-        event.dataTransfer.setData("text/plain", null); // For Firefox compatibility
+        event.dataTransfer.setData("text/plain", null);
         event.dataTransfer.effectAllowed = "move";
     });
 
     document.addEventListener("dragover", (event) => {
-        event.preventDefault(); // Prevent default to allow drop
+        event.preventDefault();
     });
 
     document.addEventListener("drop", (event) => {
         event.preventDefault();
 
-        const iconSize = 50; // Adjust this based on the actual icon size
+        const iconSize = 50;
         const x = event.clientX;
         const y = event.clientY;
 
-        // Calculate the boundaries for the icon
         const minX = 0;
         const maxX = window.innerWidth - iconSize;
         const minY = 0;
         const maxY = window.innerHeight - iconSize;
 
-        // Ensure the new position is within the boundaries
         const newX = Math.max(minX, Math.min(x - iconSize / 2, maxX));
         const newY = Math.max(minY, Math.min(y - iconSize / 2, maxY));
 
-        // Set the position of the icon based on the adjusted drop location
         draggableIcon.style.position = "absolute";
         draggableIcon.style.left = `${newX}px`;
         draggableIcon.style.top = `${newY}px`;
@@ -6580,7 +6560,6 @@ document.getElementById("messages").addEventListener("scroll", function () {
         divElement.scrollHeight - divElement.scrollTop ===
         divElement.clientHeight
     ) {
-        // console.log('Scrolled to the bottom');
     }
 });
 document
@@ -6613,21 +6592,7 @@ function safeSubstring(htmlContent, startIndex, endIndex) {
 let notificationCount = 0;
 let isNotificationViewActive = false;
 let notificationUpdateInterval = null;
-
-// Sample notification data
-// const sampleNotifications = [
-//     {
-//         id: 1,
-//         firstName: "John",
-//         lastName: "Doe",
-//         travelDetails: "Flight to New York - AA123",
-//         timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-//         completed: false
-//     }
-// ];
-
 let urgentEntriesMessages = [];
-
 
 function extractTravelerName(cleanMsg) {
     const regex = /Traveler\s+\d+:\s*([\w'-]+)\s*\/\s*([\w'-]+)\s*(MR|MS)/i;
@@ -6654,8 +6619,6 @@ function getUrgentMessages() {
     })
         .then(response => response.json())
         .then(urgentEntries => {
-            // urgentEntriesMessages = urgentEntries.data || [];
-
             if (urgentEntries.status == true) {
                 notificationCount = urgentEntries.urgent_count || 0;
                 updateNotificationCount(urgentEntries.data);
@@ -6688,7 +6651,6 @@ function getUrgentMessages() {
             }
         })
         .catch(error => {
-            // console.error('Error fetching urgent messages:', error);
         });
 }
 
@@ -6733,7 +6695,7 @@ function createNotificationItem(notification) {
                     ${notification.travelDetails}
                 </div>
                 <div class="notification-actions">
-                    <button class="notification-complete-btn" onclick="completeNotification(${notification.id})" ${notification.status ? 'disabled' : ''}>
+                    <button class="notification-complete-btn" onclick="completeNotification(${notification.id})">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -6747,18 +6709,22 @@ function createNotificationItem(notification) {
 }
 
 function completeNotification(notificationId) {
-    showCompleteModal(notificationId);
+    console.log("notification Details", notificationId);
+    const notification = urgentEntriesMessages.find(n => n.id === notificationId);
+
+    if (notification && notification.status) {
+        showCompletionDetails(notificationId);
+    } else {
+        showCompleteModal(notificationId);
+    }
 }
 
 let currentNotificationId = null;
 let uploadedImage = null;
 
 function showCompleteModal(notificationId) {
-
-    console.log("notification messages:", urgentEntriesMessages);
     currentNotificationId = notificationId;
     const notification = urgentEntriesMessages.find(n => n.id === notificationId);
-    console.log("Showing modal for notification:", notification);
 
     if (notification) {
         const modalInfo = document.getElementById('modal-notification-info');
@@ -6817,6 +6783,68 @@ function closeCompleteModal() {
     currentNotificationId = null;
 }
 
+function showCompletionDetails(notificationId) {
+    console.log("Fetching completion details for notification:", notificationId);
+    fetch(`/get-close-external-entry-info/${notificationId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status) {
+                const completionDetails = data.data;
+                const notification = urgentEntriesMessages.find(n => n.id === notificationId);
+
+                const modalInfo = document.getElementById('modal-notification-info');
+                modalInfo.innerHTML = `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>${notification.firstName} ${notification.lastName}</strong><br>
+                        <span style="color: #666;">${notification.travelDetails}</span>
+                    </div>
+                `;
+
+                const closerInfoSection = document.getElementById('closer-info-section');
+                const closerDetails = document.getElementById('closer-details');
+                const closerMedia = document.getElementById('closer-media');
+                const imageUploadArea = document.getElementById('image-upload-area');
+                const submitBtn = document.getElementById('submit-complete-btn');
+
+                closerInfoSection.style.display = 'block';
+                imageUploadArea.style.display = 'none';
+                submitBtn.style.display = 'none';
+
+                closerDetails.innerHTML = `
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #333; margin-right: 10px;">Closed By:</strong>
+                        <span style="color: #666;">${completionDetails.closed_by_name}</span>
+                    </div>
+                    ${completionDetails.traverlers_name ? `
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #333; margin-right: 10px;">Traveler:</strong>
+                        <span style="color: #666;">${completionDetails.traverlers_name}</span>
+                    </div>
+                    ` : ''}
+                `;
+
+                if (completionDetails.closed_by_media) {
+                    closerMedia.innerHTML = `
+                        <div style="margin-top: 10px;">
+                            <strong style="color: #333; display: block; margin-bottom: 8px;">Completion Image:</strong>
+                            <img src="${completionDetails.closed_by_media}" alt="Completion Image" style="max-width: 100%; max-height: 200px; border-radius: 4px; border: 1px solid #ddd;">
+                        </div>
+                    `;
+                } else {
+                    closerMedia.innerHTML = '';
+                }
+
+                document.getElementById('complete-notification-modal').style.display = 'block';
+            } else {
+                alert('Failed to load completion details: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching completion details:', error);
+            alert('Error loading completion details. Please try again.');
+        });
+}
+
 function resetModalState() {
     document.getElementById('image-upload-input').value = '';
     document.getElementById('image-preview-container').style.display = 'none';
@@ -6858,21 +6886,54 @@ function removeImage() {
 function submitCompletion() {
     if (currentNotificationId && uploadedImage) {
         // Complete the notification
-        const notification = sampleNotifications.find(n => n.id === currentNotificationId);
+        const notification = urgentEntriesMessages.find(n => n.id === currentNotificationId);
+        console.log("Submitting completion for notification:", notification);
+        console.log("currentNotificationId:", currentNotificationId);
+        console.log("uploadedImage:", uploadedImage);
+        console.log("image from html:", document.getElementById('image-upload-input'));
         if (notification) {
             notification.completed = true;
             notification.completionImage = uploadedImage;
             notification.completedAt = new Date();
 
-            // Update UI
-            // loadNotifications();
-            updateNotificationCount();
+            const formData = new FormData();
+            const fileInput = document.getElementById('image-upload-input');
+            console.log("formData:", formData);
+            console.log("fileInput:", fileInput);
 
-            // Close modal
-            closeCompleteModal();
+            if (fileInput.files.length > 0) {
+                formData.append('image', fileInput.files[0]);
+            }
 
-            // Show success message (optional)
-            // alert('Notification completed successfully!');
+            formData.append('entry_id', currentNotificationId);
+            formData.append('closed_by_id', user.id);
+            formData.append('closed_by_name', user.name);
+
+            const travelersName = notification.travelers_name || notification.firstName + ' ' + notification.lastName || '';
+            formData.append('travelers_name', travelersName);
+
+            fetch('/save-close-external-entry-info', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Close external entry info saved:', data);
+                    if (data.status) {
+                        updateNotificationCount();
+                        closeCompleteModal();
+                        alert('Notification completed successfully!');
+                    } else {
+                        alert('Failed to save completion details: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving close external entry info:', error);
+                    alert('Error saving completion details. Please try again.');
+                });
         }
     }
 }
@@ -6948,7 +7009,6 @@ function getTimeAgo(timestamp) {
 
 
 function updateNotificationCount(UrgentMessages = []) {
-    console.log("Updating notification count...", UrgentMessages);
     const pendingNotifications = UrgentMessages.filter(n => n.external_message_status == 0);
     notificationCount = pendingNotifications.length;
 

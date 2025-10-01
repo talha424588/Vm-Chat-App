@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('closed_by_id')->nullable();
             $table->string('closed_by_name')->nullable();
             $table->string('closed_by_media')->nullable();
+            $table->string('traverlers_name')->nullable();
             $table->timestamps();
         });
     }
