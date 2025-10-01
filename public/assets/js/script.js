@@ -6746,7 +6746,7 @@ function createNotificationItem(notification) {
 
 function completeNotification(notificationId) {
     const notification = urgentEntriesMessages.find(n => n.id === notificationId);
-    
+
     if (notification && notification.status) {
         // If already completed, show completion details
         showCompletionDetails(notificationId);
@@ -6831,7 +6831,7 @@ function showCompletionDetails(notificationId) {
             if (data.status) {
                 const completionDetails = data.data;
                 const notification = urgentEntriesMessages.find(n => n.id === notificationId);
-                
+
                 // Update modal content with completion details
                 const modalInfo = document.getElementById('modal-notification-info');
                 modalInfo.innerHTML = `
@@ -6952,7 +6952,7 @@ function submitCompletion() {
             formData.append('entry_id', currentNotificationId);
             formData.append('closed_by_id', user.id);
             formData.append('closed_by_name', user.name);
-            
+
             // Get travelers name from the notification if available
             const travelersName = notification.travelers_name || notification.firstName + ' ' + notification.lastName || '';
             formData.append('travelers_name', travelersName);
@@ -6965,24 +6965,24 @@ function submitCompletion() {
                 },
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Close external entry info saved:', data);
-                if (data.status) {
-                    // Update UI
-                    updateNotificationCount();
-                    // Close modal
-                    closeCompleteModal();
-                    // Show success message
-                    alert('Notification completed successfully!');
-                } else {
-                    alert('Failed to save completion details: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error saving close external entry info:', error);
-                alert('Error saving completion details. Please try again.');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Close external entry info saved:', data);
+                    if (data.status) {
+                        // Update UI
+                        updateNotificationCount();
+                        // Close modal
+                        closeCompleteModal();
+                        // Show success message
+                        alert('Notification completed successfully!');
+                    } else {
+                        alert('Failed to save completion details: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving close external entry info:', error);
+                    alert('Error saving completion details. Please try again.');
+                });
         }
     }
 }
