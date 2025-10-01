@@ -238,6 +238,17 @@
             100% { transform: scale(1); }
         }
 
+        html, body {
+            overflow-x: hidden;
+            overflow-y: hidden; /* prevent page vertical scrollbar */
+            height: 100%;
+        }
+
+        #main-container {
+            height: 100vh;
+            overflow: hidden; /* confine scrolling to inner panes */
+        }
+
         .notification-panel {
             position: absolute;
             top: 100%;
@@ -320,6 +331,7 @@
             padding: 15px;
             height: 100%;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .notification-header-main {
@@ -334,6 +346,9 @@
         .notification-main-list {
             max-height: calc(100vh - 200px);
             overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-right: 6px; /* avoid content under scrollbar */
         }
 
         .notification-main-item {
@@ -343,6 +358,9 @@
             padding: 15px;
             margin-bottom: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 100%;
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
         }
 
         .notification-main-item:hover {
