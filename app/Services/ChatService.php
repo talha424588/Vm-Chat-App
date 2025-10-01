@@ -12,6 +12,7 @@ use App\Http\Resources\userResource;
 use App\Models\Group;
 use App\Models\GroupMessage;
 use App\Models\User;
+use App\Models\CloseExternalEntryInfo;
 use App\Repositories\ChatRepository;
 use App\Repositories\GroupRepository;
 use Illuminate\Http\Request;
@@ -562,6 +563,91 @@ class ChatService implements ChatRepository
                 'message' => 'No urgent messages found',
                 'data' => null,
             ], 404);
+        }
+    }
+
+    public function saveCloseExternalEntryInfo($request)
+    {
+        try {
+            $entryId = $request->input('entry_id');
+            $closedById = $request->input('closed_by_id');
+            $closedByName = $request->input('closed_by_name');
+            $travelersName = $request->input('travelers_name');
+            
+            // Handle image upload
+            $closedByMedia = null;
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $mediaName = $file->getClientOriginalName();
+                $filename = pathinfo($mediaName, PATHINFO_FILENAME);
+                $extension = $file->getClientOriginalExtension();
+                $uniqueMediaName = $filename . '_' . time() . '.' . $extension;
+
+                $destination = public_path('uploads/close_external_entries');
+                
+                if (!file_exists($destination)) {
+                    mkdir($destination, 0755, true);
+                }
+
+                $file->move($destination, $uniqueMediaName);
+                $closedByMedia = '/uploads/close_external_entries/' . $uniqueMediaName;
+            }
+
+            // Create or update the close external entry info
+            $closeEntryInfo = CloseExternalEntryInfo::updateOrCreate(
+                ['entry_id' => $entryId],
+                [
+                    'closed_by_id' => $closedById,
+                    'closed_by_name' => $closedByName,
+                    'closed_by_media' => $closedByMedia,
+                    'traverlers_name' => $travelersName
+                ]
+            );
+
+            // Update the external_message_status in group_messages table
+            GroupMessage::where('id', $entryId)->update(['external_message_status' => 1]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Close external entry info saved successfully',
+                'data' => $closeEntryInfo
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error saving close external entry info: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to save close external entry info',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getCloseExternalEntryInfo($entryId)
+    {
+        try {
+            $closeEntryInfo = CloseExternalEntryInfo::where('entry_id', $entryId)->first();
+            
+            if ($closeEntryInfo) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Close external entry info found',
+                    'data' => $closeEntryInfo
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Close external entry info not found',
+                    'data' => null
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error fetching close external entry info: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch close external entry info',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

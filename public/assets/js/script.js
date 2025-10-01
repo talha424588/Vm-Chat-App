@@ -6654,8 +6654,6 @@ function getUrgentMessages() {
     })
         .then(response => response.json())
         .then(urgentEntries => {
-            // urgentEntriesMessages = urgentEntries.data || [];
-
             if (urgentEntries.status == true) {
                 notificationCount = urgentEntries.urgent_count || 0;
                 updateNotificationCount(urgentEntries.data);
@@ -6747,7 +6745,15 @@ function createNotificationItem(notification) {
 }
 
 function completeNotification(notificationId) {
-    showCompleteModal(notificationId);
+    const notification = urgentEntriesMessages.find(n => n.id === notificationId);
+    
+    if (notification && notification.status) {
+        // If already completed, show completion details
+        showCompletionDetails(notificationId);
+    } else {
+        // If not completed, show the completion modal
+        showCompleteModal(notificationId);
+    }
 }
 
 let currentNotificationId = null;
@@ -6817,6 +6823,71 @@ function closeCompleteModal() {
     currentNotificationId = null;
 }
 
+function showCompletionDetails(notificationId) {
+    // Fetch completion details from the server
+    fetch(`/get-close-external-entry-info/${notificationId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status) {
+                const completionDetails = data.data;
+                const notification = urgentEntriesMessages.find(n => n.id === notificationId);
+                
+                // Update modal content with completion details
+                const modalInfo = document.getElementById('modal-notification-info');
+                modalInfo.innerHTML = `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>${notification.firstName} ${notification.lastName}</strong><br>
+                        <span style="color: #666;">${notification.travelDetails}</span>
+                    </div>
+                `;
+
+                // Show completion details section
+                const closerInfoSection = document.getElementById('closer-info-section');
+                const closerDetails = document.getElementById('closer-details');
+                const closerMedia = document.getElementById('closer-media');
+                const imageUploadArea = document.getElementById('image-upload-area');
+                const submitBtn = document.getElementById('submit-complete-btn');
+
+                closerInfoSection.style.display = 'block';
+                imageUploadArea.style.display = 'none';
+                submitBtn.style.display = 'none';
+
+                closerDetails.innerHTML = `
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #333; margin-right: 10px;">Closed By:</strong>
+                        <span style="color: #666;">${completionDetails.closed_by_name}</span>
+                    </div>
+                    ${completionDetails.traverlers_name ? `
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #333; margin-right: 10px;">Traveler:</strong>
+                        <span style="color: #666;">${completionDetails.traverlers_name}</span>
+                    </div>
+                    ` : ''}
+                `;
+
+                if (completionDetails.closed_by_media) {
+                    closerMedia.innerHTML = `
+                        <div style="margin-top: 10px;">
+                            <strong style="color: #333; display: block; margin-bottom: 8px;">Completion Image:</strong>
+                            <img src="${completionDetails.closed_by_media}" alt="Completion Image" style="max-width: 100%; max-height: 200px; border-radius: 4px; border: 1px solid #ddd;">
+                        </div>
+                    `;
+                } else {
+                    closerMedia.innerHTML = '';
+                }
+
+                // Show the modal
+                document.getElementById('complete-notification-modal').style.display = 'block';
+            } else {
+                alert('Failed to load completion details: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching completion details:', error);
+            alert('Error loading completion details. Please try again.');
+        });
+}
+
 function resetModalState() {
     document.getElementById('image-upload-input').value = '';
     document.getElementById('image-preview-container').style.display = 'none';
@@ -6858,21 +6929,60 @@ function removeImage() {
 function submitCompletion() {
     if (currentNotificationId && uploadedImage) {
         // Complete the notification
-        const notification = sampleNotifications.find(n => n.id === currentNotificationId);
+        const notification = urgentEntriesMessages.find(n => n.id === currentNotificationId);
+        console.log("Submitting completion for notification:", notification);
+        console.log("currentNotificationId:", currentNotificationId);
+        console.log("uploadedImage:", uploadedImage);
+        console.log("image from html:", document.getElementById('image-upload-input'));
         if (notification) {
             notification.completed = true;
             notification.completionImage = uploadedImage;
             notification.completedAt = new Date();
 
-            // Update UI
-            // loadNotifications();
-            updateNotificationCount();
+            const formData = new FormData();
+            const fileInput = document.getElementById('image-upload-input');
+            console.log("formData:", formData);
+            console.log("fileInput:", fileInput);
 
-            // Close modal
-            closeCompleteModal();
+            if (fileInput.files.length > 0) {
+                formData.append('image', fileInput.files[0]);
+            }
 
-            // Show success message (optional)
-            // alert('Notification completed successfully!');
+            // Add required fields for close external entry info
+            formData.append('entry_id', currentNotificationId);
+            formData.append('closed_by_id', user.id);
+            formData.append('closed_by_name', user.name);
+            
+            // Get travelers name from the notification if available
+            const travelersName = notification.travelers_name || notification.firstName + ' ' + notification.lastName || '';
+            formData.append('travelers_name', travelersName);
+
+            // Send request to save close external entry info
+            fetch('/save-close-external-entry-info', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Close external entry info saved:', data);
+                if (data.status) {
+                    // Update UI
+                    updateNotificationCount();
+                    // Close modal
+                    closeCompleteModal();
+                    // Show success message
+                    alert('Notification completed successfully!');
+                } else {
+                    alert('Failed to save completion details: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving close external entry info:', error);
+                alert('Error saving completion details. Please try again.');
+            });
         }
     }
 }
