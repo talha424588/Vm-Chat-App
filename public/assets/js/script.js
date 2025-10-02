@@ -6683,7 +6683,7 @@ async function toggleNotifications() {
 
 function createNotificationItem(notification) {
     const div = document.createElement('div');
-    div.className = 'notification-main-item';
+    div.className = 'notification-main-item ' + (notification.status ? 'completed' : 'pending');
     div.setAttribute('data-notification-id', notification.id);
 
     const timeAgo = getTimeAgo(notification.timestamp);
@@ -6695,7 +6695,7 @@ function createNotificationItem(notification) {
                     ${notification.travelDetails}
                 </div>
                 <div class="notification-actions">
-                    <button class="notification-complete-btn" onclick="completeNotification(${notification.id})">
+                    <button class="notification-complete-btn ${notification.status ? 'is-completed' : ''}" onclick="completeNotification(${notification.id})">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
@@ -6773,7 +6773,8 @@ function showCompleteModal(notificationId) {
         }
 
         resetModalState();
-        document.getElementById('complete-notification-modal').style.display = 'block';
+        const modalEl = document.getElementById('complete-notification-modal');
+        modalEl.style.display = 'flex';
     }
 }
 
@@ -6794,8 +6795,10 @@ function showCompletionDetails(notificationId) {
 
                 const modalInfo = document.getElementById('modal-notification-info');
                 modalInfo.innerHTML = `
+                
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                        <strong>${notification.firstName} ${notification.lastName}</strong><br>
+                        <h5 style="font-weight: 600;">Ticket Traveller</h5>
+                        <strong style="color: #666;">${notification.firstName} ${notification.lastName}</strong><br>
                         <span style="color: #666;">${notification.travelDetails}</span>
                     </div>
                 `;
@@ -6834,7 +6837,7 @@ function showCompletionDetails(notificationId) {
                     closerMedia.innerHTML = '';
                 }
 
-                document.getElementById('complete-notification-modal').style.display = 'block';
+                document.getElementById('complete-notification-modal').style.display = 'flex';
             } else {
                 alert('Failed to load completion details: ' + data.message);
             }
