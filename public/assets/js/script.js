@@ -6773,7 +6773,8 @@ function showCompleteModal(notificationId) {
         }
 
         resetModalState();
-        document.getElementById('complete-notification-modal').style.display = 'block';
+        const modalEl = document.getElementById('complete-notification-modal');
+        modalEl.style.display = 'flex';
     }
 }
 
@@ -6834,7 +6835,7 @@ function showCompletionDetails(notificationId) {
                     closerMedia.innerHTML = '';
                 }
 
-                document.getElementById('complete-notification-modal').style.display = 'block';
+                document.getElementById('complete-notification-modal').style.display = 'flex';
             } else {
                 alert('Failed to load completion details: ' + data.message);
             }
