@@ -6795,8 +6795,10 @@ function showCompletionDetails(notificationId) {
 
                 const modalInfo = document.getElementById('modal-notification-info');
                 modalInfo.innerHTML = `
+                
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                        <strong>${notification.firstName} ${notification.lastName}</strong><br>
+                        <h5 style="font-weight: 600;">Ticket Traveller</h5>
+                        <strong style="color: #666;">${notification.firstName} ${notification.lastName}</strong><br>
                         <span style="color: #666;">${notification.travelDetails}</span>
                     </div>
                 `;
