@@ -6879,12 +6879,10 @@ function handleImageUpload(event) {
         reader.onload = function (e) {
             uploadedImage = e.target.result;
 
-            // Show preview
             document.getElementById('image-preview').src = e.target.result;
             document.getElementById('image-preview-container').style.display = 'block';
             document.getElementById('image-upload-area').style.display = 'none';
 
-            // Enable submit button
             document.getElementById('submit-complete-btn').disabled = false;
         };
         reader.readAsDataURL(file);
@@ -6897,7 +6895,6 @@ function removeImage() {
 
 function submitCompletion() {
     if (currentNotificationId && uploadedImage) {
-        // Complete the notification
         const notification = urgentEntriesMessages.find(n => n.id === currentNotificationId);
         console.log("Submitting completion for notification:", notification);
         console.log("currentNotificationId:", currentNotificationId);
@@ -6937,11 +6934,8 @@ function submitCompletion() {
                     if (data.status) {
                         updateNotificationCount();
                         alert('Notification completed successfully!');
-                        // Auto-close modal after alert
                         closeCompleteModal();
-                        // Update message seen status for current user
                         updateMessageSeenBy([currentNotificationId]);
-                        // Auto-refresh urgent notifications queue
                         refreshUrgentNotifications();
                     } else {
                         alert('Failed to save completion details: ' + data.message);
@@ -6955,7 +6949,6 @@ function submitCompletion() {
     }
 }
 
-// Add drag and drop functionality
 document.addEventListener('DOMContentLoaded', function () {
     const uploadArea = document.getElementById('image-upload-area');
 
@@ -6982,7 +6975,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Close modal when clicking outside
     window.addEventListener('click', function (event) {
         const modal = document.getElementById('complete-notification-modal');
         if (event.target === modal) {
@@ -6995,7 +6987,6 @@ function getTimeAgo(timestamp) {
     const now = new Date();
     const diffInMs = now - timestamp;
 
-    // Calculate elapsed time in seconds
     const totalSeconds = Math.floor(diffInMs / 1000);
     const days = Math.floor(totalSeconds / 86400)
     const hours = Math.floor((totalSeconds % 86400) / 3600);
@@ -7013,7 +7004,6 @@ function getTimeAgo(timestamp) {
         elapsedTime += ` ${minutes} min${minutes !== 1 ? 's' : ''}`;
     }
 
-    // Format the original timestamp as time (07:40 am)
     const timeOptions = {
         hour: '2-digit',
         minute: '2-digit',
@@ -7069,7 +7059,6 @@ function updateNotificationTimes() {
     });
 }
 
-// Initialize notifications on page load
 document.addEventListener('DOMContentLoaded', function () {
     updateNotificationCount();
 });
