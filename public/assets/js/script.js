@@ -6654,6 +6654,16 @@ function getUrgentMessages() {
         });
 }
 
+function refreshUrgentNotifications() {
+    // Clear existing notifications
+    const notificationList = document.getElementById('notification-main-list');
+    notificationList.innerHTML = '';
+    urgentEntriesMessages = [];
+    
+    // Fetch updated urgent notifications
+    getUrgentMessages();
+}
+
 async function toggleNotifications() {
     const buttonsContainer = document.getElementById('buttons-container');
     const chatRowContainer = document.getElementById('chat-row-container');
@@ -6797,8 +6807,7 @@ function showCompletionDetails(notificationId) {
                 modalInfo.innerHTML = `
                 
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                        <h5 style="font-weight: 600;">Ticket Traveller</h5>
-                        <strong style="color: #666;">${notification.firstName} ${notification.lastName}</strong><br>
+                        <h5 style="font-weight: 600;">Ticket Details</h5>
                         <span style="color: #666;">${notification.travelDetails}</span>
                     </div>
                 `;
@@ -6927,8 +6936,13 @@ function submitCompletion() {
                     console.log('Close external entry info saved:', data);
                     if (data.status) {
                         updateNotificationCount();
-                        closeCompleteModal();
                         alert('Notification completed successfully!');
+                        // Auto-close modal after alert
+                        closeCompleteModal();
+                        // Update message seen status for current user
+                        updateMessageSeenBy([currentNotificationId]);
+                        // Auto-refresh urgent notifications queue
+                        refreshUrgentNotifications();
                     } else {
                         alert('Failed to save completion details: ' + data.message);
                     }

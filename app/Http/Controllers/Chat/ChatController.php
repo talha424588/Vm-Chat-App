@@ -274,7 +274,7 @@ class ChatController extends Controller
             'closed_by_id' => 'required|integer',
             'closed_by_name' => 'required|string|max:255',
             'travelers_name' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120'
         ]);
 
         if (isset($validatorResponse) && $validatorResponse->getStatusCode() == 400)
