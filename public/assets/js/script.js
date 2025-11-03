@@ -6654,6 +6654,16 @@ function getUrgentMessages() {
         });
 }
 
+function refreshUrgentNotifications() {
+    // Clear existing notifications
+    const notificationList = document.getElementById('notification-main-list');
+    notificationList.innerHTML = '';
+    urgentEntriesMessages = [];
+    
+    // Fetch updated urgent notifications
+    getUrgentMessages();
+}
+
 async function toggleNotifications() {
     const buttonsContainer = document.getElementById('buttons-container');
     const chatRowContainer = document.getElementById('chat-row-container');
@@ -6797,8 +6807,7 @@ function showCompletionDetails(notificationId) {
                 modalInfo.innerHTML = `
                 
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                        <h5 style="font-weight: 600;">Ticket Traveller</h5>
-                        <strong style="color: #666;">${notification.firstName} ${notification.lastName}</strong><br>
+                        <h5 style="font-weight: 600;">Ticket Details</h5>
                         <span style="color: #666;">${notification.travelDetails}</span>
                     </div>
                 `;
@@ -6870,12 +6879,10 @@ function handleImageUpload(event) {
         reader.onload = function (e) {
             uploadedImage = e.target.result;
 
-            // Show preview
             document.getElementById('image-preview').src = e.target.result;
             document.getElementById('image-preview-container').style.display = 'block';
             document.getElementById('image-upload-area').style.display = 'none';
 
-            // Enable submit button
             document.getElementById('submit-complete-btn').disabled = false;
         };
         reader.readAsDataURL(file);
@@ -6888,7 +6895,6 @@ function removeImage() {
 
 function submitCompletion() {
     if (currentNotificationId && uploadedImage) {
-        // Complete the notification
         const notification = urgentEntriesMessages.find(n => n.id === currentNotificationId);
         console.log("Submitting completion for notification:", notification);
         console.log("currentNotificationId:", currentNotificationId);
@@ -6927,8 +6933,10 @@ function submitCompletion() {
                     console.log('Close external entry info saved:', data);
                     if (data.status) {
                         updateNotificationCount();
-                        closeCompleteModal();
                         alert('Notification completed successfully!');
+                        closeCompleteModal();
+                        updateMessageSeenBy([currentNotificationId]);
+                        refreshUrgentNotifications();
                     } else {
                         alert('Failed to save completion details: ' + data.message);
                     }
@@ -6941,7 +6949,6 @@ function submitCompletion() {
     }
 }
 
-// Add drag and drop functionality
 document.addEventListener('DOMContentLoaded', function () {
     const uploadArea = document.getElementById('image-upload-area');
 
@@ -6968,7 +6975,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Close modal when clicking outside
     window.addEventListener('click', function (event) {
         const modal = document.getElementById('complete-notification-modal');
         if (event.target === modal) {
@@ -6981,7 +6987,6 @@ function getTimeAgo(timestamp) {
     const now = new Date();
     const diffInMs = now - timestamp;
 
-    // Calculate elapsed time in seconds
     const totalSeconds = Math.floor(diffInMs / 1000);
     const days = Math.floor(totalSeconds / 86400)
     const hours = Math.floor((totalSeconds % 86400) / 3600);
@@ -6999,7 +7004,6 @@ function getTimeAgo(timestamp) {
         elapsedTime += ` ${minutes} min${minutes !== 1 ? 's' : ''}`;
     }
 
-    // Format the original timestamp as time (07:40 am)
     const timeOptions = {
         hour: '2-digit',
         minute: '2-digit',
@@ -7055,7 +7059,6 @@ function updateNotificationTimes() {
     });
 }
 
-// Initialize notifications on page load
 document.addEventListener('DOMContentLoaded', function () {
     updateNotificationCount();
 });
