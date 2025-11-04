@@ -23,4 +23,5 @@ interface ChatRepository
     public function uploadAudio($request);
     public function fetchUrgentMessages();
     public function getCloseExternalEntryInfo($entryId);
+    public function saveCloseExternalEntryInfo($request);
 }
