@@ -51,26 +51,26 @@ class GroupService implements GroupRepository
     //         return response()->json(["status" => false, "groups" => "not found", "messages" => null], 404);
     // }
 
-    public function fetchUserChatGroups(Request $request)
+    public function fetchUserChatGroups($request)
     {
         $groupWithMessagesArray = [];
         if (Auth::user()->role == 2 || Auth::user()->role == 0) {
             $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
                 ->where("status", 1)
                 ->with(['groupMessages' => function ($query) {
-                    $query->join('compose', 'group_messages.compose_id', '=', 'compose.id')
+                    $query->leftJoin('compose', 'group_messages.compose_id', '=', 'compose.id')
                         ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
                         ->latest('time')
                         // ->where('is_deleted', false)
                         ->whereNot('status', EnumMessageEnum::MOVE);
-                }, 'groupMessages.user' => function ($query){
-                    $query->select('id', 'unique_id', 'name', 'email','role','access','seen_privacy','profile_img','is_deleted','chat_status');
+                }, 'groupMessages.user' => function ($query) {
+                    $query->select('id', 'unique_id', 'name', 'email', 'role', 'access', 'seen_privacy', 'profile_img', 'is_deleted', 'chat_status');
                 }])
                 ->get();
         } else {
             $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
                 ->with(['groupMessages' => function ($query) {
-                    $query->join('compose', 'group_messages.compose_id', '=', 'composes.id')
+                    $query->leftJoin('compose', 'group_messages.compose_id', '=', 'compose.id')
                         ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
                         ->latest('time')
                         ->where('is_privacy_breach', false)

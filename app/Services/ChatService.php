@@ -54,7 +54,7 @@ class ChatService implements ChatRepository
             $paginator = GroupMessage::where('group_id', $request->groupId)
                 // ->where('is_deleted', false)
                 ->whereNot('status', EnumMessageEnum::MOVE)
-                ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
+                ->leftJoin('compose', 'group_messages.compose_id', '=', 'compose.id')
                 ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
                 ->with('user', 'reply')
                 ->orderBy('id', 'desc')
@@ -599,13 +599,20 @@ class ChatService implements ChatRepository
                 $extension = $file->getClientOriginalExtension();
                 $uniqueMediaName = $filename . '_' . time() . '.' . $extension;
 
-                $destination = public_path('uploads/close_external_entries');
+                $destination = $_SERVER['DOCUMENT_ROOT'] . '/uploads/close_external_entries';
 
                 if (!file_exists($destination)) {
                     mkdir($destination, 0755, true);
                 }
 
                 $file->move($destination, $uniqueMediaName);
+                $url = '/uploads/image/' . $uniqueMediaName;
+                Log::info('Image uploaded:', ['url' => $url]);
+
+                if (!file_exists($destination)) {
+                    mkdir($destination, 0755, true);
+                }
+
                 $closedByMedia = '/uploads/close_external_entries/' . $uniqueMediaName;
             }
 

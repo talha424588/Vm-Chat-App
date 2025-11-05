@@ -2687,6 +2687,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     }
 
     if (!message.is_privacy_breach && !message.is_deleted) {
+        console.log("message details",message);
         let messageElement = document.createElement("div");
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -4144,7 +4145,7 @@ const fetchPaginatedMessages = async (
 
         const Notseenby = nextPageMessages.data
             .filter((item) => {
-                console.log("Seen by string:", item);
+
                 // Skip if priority is 2
                 if (item.message_priority == 2) {
                     return false;
@@ -4155,7 +4156,7 @@ const fetchPaginatedMessages = async (
                 return !seenBy.includes(u_id);
             })
             .map((item) => item.id);
-        console.log("Notseenby", Notseenby);
+
         DOM.unreadCounter = Notseenby.length;
         const notSeenById = Notseenby.at(-1);
         if (ids.length > 0) {
@@ -6659,7 +6660,7 @@ function refreshUrgentNotifications() {
     const notificationList = document.getElementById('notification-main-list');
     notificationList.innerHTML = '';
     urgentEntriesMessages = [];
-    
+
     // Fetch updated urgent notifications
     getUrgentMessages();
 }
@@ -6805,7 +6806,7 @@ function showCompletionDetails(notificationId) {
 
                 const modalInfo = document.getElementById('modal-notification-info');
                 modalInfo.innerHTML = `
-                
+
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
                         <h5 style="font-weight: 600;">Ticket Details</h5>
                         <span style="color: #666;">${notification.travelDetails}</span>
