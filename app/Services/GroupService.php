@@ -63,14 +63,14 @@ class GroupService implements GroupRepository
                         ->latest('time')
                         // ->where('is_deleted', false)
                         ->whereNot('status', EnumMessageEnum::MOVE);
-                }, 'groupMessages.user' => function ($query){
-                    $query->select('id', 'unique_id', 'name', 'email','role','access','seen_privacy','profile_img','is_deleted','chat_status');
+                }, 'groupMessages.user' => function ($query) {
+                    $query->select('id', 'unique_id', 'name', 'email', 'role', 'access', 'seen_privacy', 'profile_img', 'is_deleted', 'chat_status');
                 }])
                 ->get();
         } else {
             $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
                 ->with(['groupMessages' => function ($query) {
-                    $query->join('compose', 'group_messages.compose_id', '=', 'composes.id')
+                    $query->join('compose', 'group_messages.compose_id', '=', 'compose.id')
                         ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
                         ->latest('time')
                         ->where('is_privacy_breach', false)
