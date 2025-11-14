@@ -827,6 +827,15 @@ socket.on("updateGroupMessages", (message) => {
         }
     }
 });
+    function isEditTrue(time) {
+        let unixTime = Number(time);
+        let oneHourLater = unixTime + 3600;
+        let currentUnixTime = Math.floor(new Date() / 1000);
+        if (oneHourLater >= currentUnixTime)
+            return true;
+        else
+            return false;
+    }
 
 socket.on("sendChatToClient", (message) => {
     if (
@@ -1467,12 +1476,16 @@ socket.on("updateEditedMessage", (editedMessage) => {
                             <i class="fas fa-angle-down text-muted px-2"></i>
                         </a>
                         <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                            ${user.role === "0" || user.role === "2"
+                        ${(user.role === "0" || user.role === "2")
                         ? `
-                                <a class="dropdown-item" href="#" onclick="editMessage('${editedMessage.id}')">Edit</a>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
-                            `
-                        : ""
+                            ${isEditTrue(editedMessage.time)
+                                                ? `<a class="dropdown-item" href="#" onclick="editMessage('${editedMessage.id}')">Edit</a>`
+                                                : ""
+                                            }
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
+                        `
+                                            : ""
+                        }
                     }
                             ${user.role === "3" &&
                         editedMessage.sender === user.unique_id
@@ -1571,14 +1584,14 @@ socket.on("restoreMessage", (incomingMessage, uniqueId) => {
                 <i class="fas fa-angle-down text-muted px-2"></i>
             </a>
             <div class="dropdown-menu custom-shadow" aria-labelledby="dropdownMenuButton">
-                ${user.role !== "0" && user.role !== "2"
+                ${user.role !== "0" && user.role !== "2" && isEditTrue(incomingMessage.message.time)
                 ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     `
                 : ""
             }
                 ${(user.role === "0" || user.role === "2") &&
-                incomingMessage.message.type === "Message"
+                incomingMessage.message.type === "Message" && isEditTrue(incomingMessage.message.time)
                 ? `
                         <a class="dropdown-item" href="#" onclick="editMessage('${incomingMessage.message.id}')">Edit</a>
                     `
@@ -2760,7 +2773,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     ${!(
                     user.role === "0" ||
                     user.role === "2"
-                ) && message.type === "Message"
+                ) && message.type === "Message" && isEditTrue(message.time)
                     ? `
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                     `
@@ -2768,7 +2781,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 }
                                     ${user.role === "0" || user.role === "2"
                     ? `
-                                        ${message.type === "Message"
+                                        ${message.type === "Message" && isEditTrue(message.time)
                         ? `
                                                 <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
                                         `
@@ -2855,7 +2868,7 @@ let addMessageToMessageArea = (message, flag = false) => {
                 ) &&
                     message.sender != user.unique_id &&
                     !/<a[^>]+>/g.test(message.msg) &&
-                    !/<audio[^>]+>/g.test(message.msg)
+                    !/<audio[^>]+>/g.test(message.msg) && isEditTrue(message.time)
                     ? `
 
                                     <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
@@ -2863,20 +2876,22 @@ let addMessageToMessageArea = (message, flag = false) => {
                     : ""
                 }
                                     ${user.role === "0" || user.role === "2"
+
                     ? `
-                                        ${message.type === "Message" ||
-                        (message.type === null &&
-                            !/<a[^>]+>/g.test(
-                                message.msg
-                            ) &&
-                            !/<audio[^>]+>/g.test(
-                                message.msg
-                            ))
-                        ? `
-                                        <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit</a>
-                                        `
-                        : ""
-                    }
+                                          ${
+                                            (
+                                                (message.type === "Message" ||
+                                                (message.type === null &&
+                                                    !/<a[^>]+>/g.test(message.msg) &&
+                                                    !/<audio[^>]+>/g.test(message.msg))
+                                                )
+                                                && isEditTrue(message.time)
+                                            )
+                                            ? `
+                                                <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit qwerty</a>
+                                                `
+                                            : ""
+                                            }
                                     ${(message.type === "Message" ||
                         (message.type === null &&
                             !/<a[^>]+>/g.test(
@@ -4867,8 +4882,13 @@ let init = () => {
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
+    console.log("user details",user);
 
-    getUrgentMessages();
+    if (user && (user.role == 0 || user.role == 2)) {
+        getUrgentMessages();
+    } else {
+        document.getElementById("notification-bell").style.display = 'none';
+    }
 };
 
 init();
@@ -6587,7 +6607,7 @@ function safeSubstring(htmlContent, startIndex, endIndex) {
     return tempDiv.innerHTML;
 }
 
-
+// Start Here
 
 
 let notificationCount = 0;
@@ -7063,3 +7083,6 @@ function updateNotificationTimes() {
 document.addEventListener('DOMContentLoaded', function () {
     updateNotificationCount();
 });
+
+
+// End Here

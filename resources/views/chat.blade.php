@@ -17,7 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-storage.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-messaging.js"></script>
     <script src="https://cdn.tiny.cloud/1/xobw36ehtay62tuqr0vszjeg5hetxn82r315vx17eo9dzk4b/tinymce/6/tinymce.min.js"
-    referrerpolicy="origin"></script>
+        referrerpolicy="origin"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
         crossorigin="anonymous">
@@ -115,12 +115,14 @@
 
         #action-bar {
             display: flex;
-            justify-content: space-between; align-items: center;height: 62px;
+            justify-content: space-between;
+            align-items: center;
+            height: 62px;
         }
 
         #selected-count {
             margin-right: auto;
-             font-size: 16px;
+            font-size: 16px;
         }
 
 
@@ -131,11 +133,14 @@
 
         #action-bar {
             display: flex;
-            justify-content: space-between; align-items: center;height: 62px;
+            justify-content: space-between;
+            align-items: center;
+            height: 62px;
         }
 
         #selected-count {
-            margin-right: auto;font-size: 16px;
+            margin-right: auto;
+            font-size: 16px;
         }
 
         .selected-user {
@@ -164,7 +169,7 @@
             cursor: pointer;
             display: flex;
             align-items: center;
-            transition:background-color 0.3s ease;
+            transition: background-color 0.3s ease;
         }
 
         .chat-list-item:hover {
@@ -172,7 +177,9 @@
         }
 
         .chat-radio {
-            margin-right: 10px; width: 18px;height: 18px;
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
         }
 
         .name {
@@ -184,35 +191,38 @@
             color: #888;
             font-size: 14px;
         }
-.search-container {
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f8f9fa;
-    border-radius: 20px;
-    width: 100%;
-    padding: 12px;
-}
 
-.search-input-mobile {
-    flex: 1;
-    border: none;
-    background: transparent;
-    outline: none;
-    font-size: 16px;
-    color: #58595D;
-}
+        .search-container {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8f9fa;
+            border-radius: 20px;
+            width: 100%;
+            padding: 12px;
+        }
 
-.search-container i {
-    font-size: 16px;
-    color: #58595D;
-    cursor: pointer;
-    margin-right:10px
-}
+        .search-input-mobile {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 16px;
+            color: #58595D;
+        }
 
-.search-container i:hover {
-    color: #000;
-}
+        .search-container i {
+            font-size: 16px;
+            color: #58595D;
+            cursor: pointer;
+            margin-right: 10px
+        }
+
+        .search-container i:hover {
+            color: #000;
+        }
+
+        /* Start Here */
 
         .bell-icon {
             transition: transform 0.3s ease;
@@ -223,9 +233,19 @@
         }
 
         @keyframes bellRing {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-10deg); }
-            75% { transform: rotate(10deg); }
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(-10deg);
+            }
+
+            75% {
+                transform: rotate(10deg);
+            }
         }
 
         .notification-count-badge {
@@ -233,20 +253,31 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
-        html, body {
+        html,
+        body {
             overflow-x: hidden;
-            overflow-y: hidden; /* prevent page vertical scrollbar */
+            overflow-y: hidden;
+            /* prevent page vertical scrollbar */
             height: 100%;
         }
 
         #main-container {
             height: 100vh;
-            overflow: hidden; /* confine scrolling to inner panes */
+            overflow: hidden;
+            /* confine scrolling to inner panes */
         }
 
         .notification-panel {
@@ -258,7 +289,7 @@
             background: white;
             border: 1px solid #ddd;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             z-index: 1000;
             overflow-y: auto;
             display: none;
@@ -348,7 +379,8 @@
             overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            padding-right: 6px; /* avoid content under scrollbar */
+            padding-right: 6px;
+            /* avoid content under scrollbar */
         }
 
         .notification-main-item {
@@ -357,7 +389,7 @@
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             max-width: 100%;
             word-wrap: break-word;
             overflow-wrap: anywhere;
@@ -365,23 +397,26 @@
 
         /* Status-based styles for urgent queue */
         .notification-main-item.pending {
-            border-left: 4px solid #FFC107; /* amber */
+            border-left: 4px solid #FFC107;
+            /* amber */
         }
 
         .notification-main-item.completed {
             border-left: 4px solid #1DAB61;
-            background: #f6fffa; /* subtle green */
+            background: #f6fffa;
+            /* subtle green */
             border-color: #cfe9d6;
         }
 
         .notification-complete-btn.is-completed {
-            background: #E6F4EA; /* light green */
+            background: #E6F4EA;
+            /* light green */
             color: #1DAB61;
             border: 1px solid #cfe9d6;
         }
 
         .notification-main-item:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         /* Complete Notification Modal Styles */
@@ -393,7 +428,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             align-items: center;
             justify-content: center;
             padding: 16px;
@@ -407,7 +442,7 @@
             max-height: 88vh;
             overflow-y: auto;
             position: relative;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
         }
 
         .complete-modal-header {
@@ -498,7 +533,7 @@
             justify-content: center;
             font-size: 18px;
             font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .remove-image-icon:hover {
@@ -526,6 +561,7 @@
             cursor: not-allowed;
         }
 
+        /* End Here */
     </style>
 </head>
 
@@ -544,16 +580,22 @@
                         <div class="text-dark font-weight-bold" id="username"></div>
                         <small class="text-muted">Online</small>
                     </div>
-
+                    {{-- Start Here --}}
                     <div class="nav-item dropdown ml-auto d-flex align-items-center">
                         <!-- Notification Bell Icon -->
-                        <div class="notification-bell-container" id="notification-bell" onclick="toggleNotifications()" style="margin-right: 10px; cursor: pointer; position: relative;">
+                        <div class="notification-bell-container" id="notification-bell" onclick="toggleNotifications()"
+                            style="margin-right: 10px; cursor: pointer; position: relative;">
                             <div class="bell-icon" id="bell-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2C13.1 2 14 2.9 14 4C14 4.1 14 4.2 14 4.3C16.3 5.2 18 7.5 18 10V16L20 18V19H4V18L6 16V10C6 7.5 7.7 5.2 10 4.3C10 4.2 10 4.1 10 4C10 2.9 10.9 2 12 2ZM10 21C10 22.1 10.9 23 12 23C13.1 23 14 22.1 14 21" stroke="#687780" stroke-width="1.5" fill="none"/>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M12 2C13.1 2 14 2.9 14 4C14 4.1 14 4.2 14 4.3C16.3 5.2 18 7.5 18 10V16L20 18V19H4V18L6 16V10C6 7.5 7.7 5.2 10 4.3C10 4.2 10 4.1 10 4C10 2.9 10.9 2 12 2ZM10 21C10 22.1 10.9 23 12 23C13.1 23 14 22.1 14 21"
+                                        stroke="#687780" stroke-width="1.5" fill="none" />
                                 </svg>
                             </div>
-                            <div class="notification-count-badge" id="notification-count-badge" style="display: none; position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">0</div>
+                            <div class="notification-count-badge" id="notification-count-badge"
+                                style="display: none; position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">
+                                0</div>
 
                             <div class="notification-panel" id="notification-panel">
                                 <div class="notification-header">
@@ -573,7 +615,9 @@
                             @csrf
                         </form>
                     </div>
+                    {{-- End Here --}}
                 </div>
+                {{-- Start Here --}}
                 <div>
 
                     <div class="search-bar">
@@ -590,16 +634,21 @@
                             {{-- <button class="button">Groups</button> --}}--->
                     </div>
 
+
+
                     <!-- Notification View (Hidden by default) -->
                     <div class="notification-view" id="notification-view" style="display: none;">
                         <div class="notification-header-main">
                             <h5>Urgent Notifications Queue</h5>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="toggleNotifications()">Back to Chat</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="toggleNotifications()">Back to
+                                Chat</button>
                         </div>
                         <div id="notification-main-list" class="notification-main-list">
                             <!-- Sample notifications will be populated here -->
                         </div>
                     </div>
+
+
 
                 </div>
                 <!-- Chat List -->
@@ -609,6 +658,8 @@
                         Unread List </div>
                     <div class="col-md-12 chat_list_view" id="messagesList" style="overflow:auto;"></div>
                 </div>
+
+                {{-- End Here --}}
 
 
                 <!-- Profile Settings -->
@@ -710,14 +761,14 @@
                     </div>
 
 
-                   <span class='profile-pic' id="pic">
-                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z"
-                                    fill="#58595D" />
-                            </svg>
-                        </span>
+                    <span class='profile-pic' id="pic">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M11.469 31.103C11.009 31.037 10.52 31 10 31C6.17 31 4.031 33.021 3.211 34.028C3.078 34.201 3.007 34.413 3.007 34.632C3.007 34.638 3.007 34.644 3.006 34.649C3 35.019 3 35.509 3 36C3 36.552 3.448 37 4 37H11.172C11.059 36.682 11 36.344 11 36C11 34.862 11 33.506 11.004 32.705C11.004 32.135 11.167 31.58 11.469 31.103ZM34 37H14C13.735 37 13.48 36.895 13.293 36.707C13.105 36.52 13 36.265 13 36C13 34.865 13 33.515 13.004 32.711C13.004 32.709 13.004 32.707 13.004 32.705C13.004 32.475 13.084 32.253 13.229 32.075C14.47 30.658 18.22 27 24 27C30.542 27 33.827 30.651 34.832 32.028C34.943 32.197 35 32.388 35 32.583V36C35 36.265 34.895 36.52 34.707 36.707C34.52 36.895 34.265 37 34 37ZM36.828 37H44C44.552 37 45 36.552 45 36V34.631C45 34.41 44.927 34.196 44.793 34.021C43.969 33.021 41.829 31 38 31C37.507 31 37.042 31.033 36.604 31.093C36.863 31.546 37 32.06 37 32.585V36C37 36.344 36.941 36.682 36.828 37ZM10 19C7.24 19 5 21.24 5 24C5 26.76 7.24 29 10 29C12.76 29 15 26.76 15 24C15 21.24 12.76 19 10 19ZM38 19C35.24 19 33 21.24 33 24C33 26.76 35.24 29 38 29C40.76 29 43 26.76 43 24C43 21.24 40.76 19 38 19ZM24 11C20.137 11 17 14.137 17 18C17 21.863 20.137 25 24 25C27.863 25 31 21.863 31 18C31 14.137 27.863 11 24 11Z"
+                                fill="#58595D" />
+                        </svg>
+                    </span>
 
                     <div class="profile-details">
                         <div class="name" id="name">User Name</div>
@@ -732,21 +783,16 @@
                         <i class="fas fa-search"></i>
                     </div>
 
-<!-- Search Input -->
-    <div class="search-container">
-    <div class="back-arrow" onclick="showMobileNavbar()">
-       <i class="fas fa-arrow-left"></i>
-    </div>
-    <input
-        type="text"
-        class="search-input-mobile"
-        id="search-input"
-        placeholder="Search here..."
-        oninput="handleSearch(this.value)"
-    />
-    <i class="fas fa-chevron-up" id="search-toggle-up"></i>
-    <i class="fas fa-chevron-down" id="search-toggle-down"></i>
-    </div>
+                    <!-- Search Input -->
+                    <div class="search-container">
+                        <div class="back-arrow" onclick="showMobileNavbar()">
+                            <i class="fas fa-arrow-left"></i>
+                        </div>
+                        <input type="text" class="search-input-mobile" id="search-input"
+                            placeholder="Search here..." oninput="handleSearch(this.value)" />
+                        <i class="fas fa-chevron-up" id="search-toggle-up"></i>
+                        <i class="fas fa-chevron-down" id="search-toggle-down"></i>
+                    </div>
 
                 </div>
 
@@ -941,13 +987,13 @@
                             <i id="voice-icon" class="chat-icon chat_action_voice">
 
                                 {{-- @if (Auth::user()->seen_privacy) --}}
-                                    <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
-                                        viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
-                                        <path
-                                            d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z"
-                                            fill="white" />
-                                    </svg>
+                                <svg id="voice-svg" width="31" height="30" style="margin-top:8px"
+                                    viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="15.5" cy="15.5" r="15.5" fill="#1DAB61" />
+                                    <path
+                                        d="M15.125 17.2143C16.8146 17.2143 18.1684 15.8504 18.1684 14.1607L18.1786 8.05357C18.1786 6.36393 16.8146 5 15.125 5C13.4354 5 12.0714 6.36393 12.0714 8.05357V14.1607C12.0714 15.8504 13.4354 17.2143 15.125 17.2143ZM20.5196 14.1607C20.5196 17.2143 17.9343 19.3518 15.125 19.3518C12.3157 19.3518 9.73036 17.2143 9.73036 14.1607H8C8 17.6316 10.7686 20.502 14.1071 21.0007V24.3393H16.1429V21.0007C19.4814 20.5121 22.25 17.6418 22.25 14.1607H20.5196Z"
+                                        fill="white" />
+                                </svg>
                                 {{-- @endif --}}
                             </i>
                         </div>
@@ -1166,11 +1212,11 @@
     <input type="hidden" value="{{ Auth::user()->seen_privacy }}" id="login_user_seen_privacy">
     <input type="hidden" value="{{ Auth::user()->role }}" id="login_user_role">
     <input type="hidden" value="{{ Auth::user()->seen_privacy }}" id="login_user_seen_privacy">
-    <input type="hidden" value="{{ $group_id ?? null}}" id="notification_group_id">
-    <input type="hidden" value="{{ $message_id ?? null}}" id="notification_message_id">
+    <input type="hidden" value="{{ $group_id ?? null }}" id="notification_group_id">
+    <input type="hidden" value="{{ $message_id ?? null }}" id="notification_message_id">
     <input type="hidden" value="{{ $is_delete }}" id="is_delete">
     <input type="hidden" value="{{ $del_msg_group_id ?? null }}" id="del_msg_group_id">
-    <input type="hidden" value="{{ $de_message_id ?? null}}" id="del_message_id">
+    <input type="hidden" value="{{ $de_message_id ?? null }}" id="del_message_id">
 
     <style>
         .hidden {
@@ -1185,23 +1231,23 @@
 
     </style>
     <script>
-    // Handle the search input dynamically
-    function handleSearch(query) {
-        console.log("Searching for:", query);
-        // Add your search logic here, e.g., filter items dynamically
-    }
+        // Handle the search input dynamically
+        function handleSearch(query) {
+            console.log("Searching for:", query);
+            // Add your search logic here, e.g., filter items dynamically
+        }
 
-    // Add toggle functionality for chevron icons
-    document.getElementById("search-toggle-up").addEventListener("click", function () {
-        console.log("Chevron Up Clicked");
-        // Add behavior for up action
-    });
+        // Add toggle functionality for chevron icons
+        document.getElementById("search-toggle-up").addEventListener("click", function() {
+            console.log("Chevron Up Clicked");
+            // Add behavior for up action
+        });
 
-    document.getElementById("search-toggle-down").addEventListener("click", function () {
-        console.log("Chevron Down Clicked");
-        // Add behavior for down action
-    });
-</script>
+        document.getElementById("search-toggle-down").addEventListener("click", function() {
+            console.log("Chevron Down Clicked");
+            // Add behavior for down action
+        });
+    </script>
 
     <script>
         function display_chat(type) {
@@ -1401,27 +1447,33 @@
     <!-- Include Bootstrap JS -->
 
     <!-- Move Message Reason Modal -->
-    <div class="modal fade" id="moveMessageReasonModal" tabindex="-1" role="dialog" aria-labelledby="moveMessageReasonModalLabel" aria-hidden="true">
+    <div class="modal fade" id="moveMessageReasonModal" tabindex="-1" role="dialog"
+        aria-labelledby="moveMessageReasonModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body text-center p-4">
                     <div class="mb-3">
-                        <img src="{{ asset('assets/svg/danger-5732_256.gif') }}" alt="" style="height: 64px; display: block; margin: 0 auto;">
+                        <img src="{{ asset('assets/svg/danger-5732_256.gif') }}" alt=""
+                            style="height: 64px; display: block; margin: 0 auto;">
                     </div>
                     <h5 class="mb-2 fw-bold">Reason for Moving Message</h5>
                     <div class="form-group mb-3">
                         <label for="moveMessageReasonInput" class="mb-1">Reason</label>
-                        <input type="text" class="form-control text-center" id="moveMessageReasonInput" placeholder="Enter reason (e.g., because...)" />
+                        <input type="text" class="form-control text-center" id="moveMessageReasonInput"
+                            placeholder="Enter reason (e.g., because...)" />
                     </div>
                     <div class="d-flex justify-content-center  mt-3" style="gap: 10px;">
-                        <button type="button" class="btn btn-cancel px-4 me-2" id="moveMessageReasonOkBtn">OK</button>
-                        <button type="button" class="btn px-4" style="color: #000; outline:none" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-cancel px-4 me-2"
+                            id="moveMessageReasonOkBtn">OK</button>
+                        <button type="button" class="btn px-4" style="color: #000; outline:none"
+                            data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    {{-- Start Here --}}
     <!-- Complete Notification Modal -->
     <div id="complete-notification-modal" class="complete-modal">
         <div class="complete-modal-content">
@@ -1435,7 +1487,8 @@
             </div>
 
             <!-- Closer Information Section (only shown when status == 1) -->
-            <div id="closer-info-section" style="display: none; background: #e8f5e8; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #28a745;">
+            <div id="closer-info-section"
+                style="display: none; background: #e8f5e8; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #28a745;">
                 <h5 style="margin: 0 0 10px 0; color: #28a745; font-weight: 600;">Ticket Closed By</h5>
                 <div id="closer-details">
                     <!-- Closer information will be populated here -->
@@ -1445,18 +1498,22 @@
                 </div>
             </div>
 
-            <div class="image-upload-area" id="image-upload-area" onclick="document.getElementById('image-upload-input').click()">
+            <div class="image-upload-area" id="image-upload-area"
+                onclick="document.getElementById('image-upload-input').click()">
                 <div class="upload-icon">📷</div>
                 <div class="upload-text">Click to upload completion image</div>
                 <div class="upload-subtext">or drag and drop an image here</div>
             </div>
 
-            <input type="file" id="image-upload-input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+            <input type="file" id="image-upload-input" accept="image/*" style="display: none;"
+                onchange="handleImageUpload(event)">
 
             <div id="image-preview-container" style="display: none; text-align: center;">
                 <div class="image-preview-wrapper">
-                    <img id="image-preview" class="image-preview" alt="Preview" style="display: block; margin: 0 auto;">
-                    <button type="button" class="remove-image-icon" onclick="removeImage()" title="Remove Image">×</button>
+                    <img id="image-preview" class="image-preview" alt="Preview"
+                        style="display: block; margin: 0 auto;">
+                    <button type="button" class="remove-image-icon" onclick="removeImage()"
+                        title="Remove Image">×</button>
                 </div>
             </div>
 
@@ -1465,6 +1522,8 @@
             </button>
         </div>
     </div>
+    {{-- End Here --}}
+
 
 </body>
 

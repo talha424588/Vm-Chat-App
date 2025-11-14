@@ -551,20 +551,42 @@ class ChatService implements ChatRepository
         //         ->orderBy('id', 'desc')
         //         ->get();
 
-        $messages = GroupMessage::join('compose', 'group_messages.compose_id', '=', 'compose.id')
-            ->where('compose.priority', 2)
-            ->where(function ($query) {
-                $query->where('group_messages.external_message_status', 0)
-                    ->orWhere(function ($q) {
-                        $q->where('group_messages.external_message_status', 1)
-                            ->where('group_messages.time', '>=', now()->subDay()->timestamp);
-                    });
-            })
-            ->whereNot('group_messages.status', EnumMessageEnum::MOVE)
-            ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
-            ->with('user', 'reply')
-            ->orderBy('group_messages.id', 'desc')
-            ->get();
+        // $messages = GroupMessage::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
+        // ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
+        //     ->where('compose.priority', 2)
+        //     ->where(function ($query) {
+        //         $query->where('group_messages.external_message_status', 0)
+        //             ->orWhere(function ($q) {
+        //                 $q->where('group_messages.external_message_status', 1)
+        //                     ->where('group_messages.time', '>=', now()->subDay()->timestamp);
+        //             });
+        //     })
+        //     ->whereNot('group_messages.status', EnumMessageEnum::MOVE)
+        //     ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
+        //     ->with('user', 'reply')
+        //     ->orderBy('group_messages.id', 'desc')
+        //     ->get();
+
+        $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
+        ->where("status", 1)
+        ->pluck('group_id');
+
+
+        $messages = GroupMessage::whereIn('group_messages.group_id', $groups)
+        ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
+        ->where('compose.priority', 2)
+        ->where(function ($query) {
+            $query->where('group_messages.external_message_status', 0)
+                ->orWhere(function ($q) {
+                    $q->where('group_messages.external_message_status', 1)
+                        ->where('group_messages.time', '>=', now()->subDay()->timestamp);
+                });
+        })
+        ->whereNot('group_messages.status', EnumMessageEnum::MOVE)
+        ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
+        ->with(['user', 'reply'])
+        ->orderByDesc('group_messages.id')
+        ->get();
 
 
         if ($messages->isNotEmpty()) {
@@ -578,7 +600,7 @@ class ChatService implements ChatRepository
                 'status' => false,
                 'message' => 'No urgent messages found',
                 'data' => null,
-            ], 404);
+            ]);
         }
     }
 
