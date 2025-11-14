@@ -827,15 +827,15 @@ socket.on("updateGroupMessages", (message) => {
         }
     }
 });
-    function isEditTrue(time) {
-        let unixTime = Number(time);
-        let oneHourLater = unixTime + 3600;
-        let currentUnixTime = Math.floor(new Date() / 1000);
-        if (oneHourLater >= currentUnixTime)
-            return true;
-        else
-            return false;
-    }
+function isEditTrue(time) {
+    let unixTime = Number(time);
+    let oneHourLater = unixTime + 3600;
+    let currentUnixTime = Math.floor(new Date() / 1000);
+    if (oneHourLater >= currentUnixTime)
+        return true;
+    else
+        return false;
+}
 
 socket.on("sendChatToClient", (message) => {
     if (
@@ -1479,13 +1479,13 @@ socket.on("updateEditedMessage", (editedMessage) => {
                         ${(user.role === "0" || user.role === "2")
                         ? `
                             ${isEditTrue(editedMessage.time)
-                                                ? `<a class="dropdown-item" href="#" onclick="editMessage('${editedMessage.id}')">Edit</a>`
-                                                : ""
-                                            }
+                            ? `<a class="dropdown-item" href="#" onclick="editMessage('${editedMessage.id}')">Edit</a>`
+                            : ""
+                        }
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
                         `
-                                            : ""
-                        }
+                        : ""
+                    }
                     }
                             ${user.role === "3" &&
                         editedMessage.sender === user.unique_id
@@ -2700,7 +2700,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     }
 
     if (!message.is_privacy_breach && !message.is_deleted) {
-        console.log("message details",message);
+        console.log("message details", message);
         let messageElement = document.createElement("div");
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -2878,20 +2878,19 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     ${user.role === "0" || user.role === "2"
 
                     ? `
-                                          ${
-                                            (
-                                                (message.type === "Message" ||
-                                                (message.type === null &&
-                                                    !/<a[^>]+>/g.test(message.msg) &&
-                                                    !/<audio[^>]+>/g.test(message.msg))
-                                                )
-                                                && isEditTrue(message.time)
-                                            )
-                                            ? `
+                                          ${(
+                        (message.type === "Message" ||
+                            (message.type === null &&
+                                !/<a[^>]+>/g.test(message.msg) &&
+                                !/<audio[^>]+>/g.test(message.msg))
+                        )
+                        && isEditTrue(message.time)
+                    )
+                        ? `
                                                 <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit qwerty</a>
                                                 `
-                                            : ""
-                                            }
+                        : ""
+                    }
                                     ${(message.type === "Message" ||
                         (message.type === null &&
                             !/<a[^>]+>/g.test(
@@ -4882,7 +4881,7 @@ let init = () => {
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
-    console.log("user details",user);
+    console.log("user details", user);
 
     if (user && (user.role == 0 || user.role == 2)) {
         getUrgentMessages();
@@ -6854,6 +6853,10 @@ function showCompletionDetails(notificationId) {
                         <span style="color: #666;">${completionDetails.traverlers_name}</span>
                     </div>
                     ` : ''}
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #333; margin-right: 10px;">Closed At:</strong>
+                        <span style="color: #666;">${closeEntryDateFormat(completionDetails.created_at)}</span>
+                    </div>
                 `;
 
                 if (completionDetails.closed_by_media) {
@@ -6876,6 +6879,11 @@ function showCompletionDetails(notificationId) {
             console.error('Error fetching completion details:', error);
             alert('Error loading completion details. Please try again.');
         });
+}
+
+function closeEntryDateFormat(d) {
+    const dt = new Date(d), p = n => n.toString().padStart(2,'0');
+    return `${p(dt.getDate())}-${p(dt.getMonth()+1)}-${dt.getFullYear()} | ${p(dt.getHours())}:${p(dt.getMinutes())}:${p(dt.getSeconds())}`;
 }
 
 function resetModalState() {
