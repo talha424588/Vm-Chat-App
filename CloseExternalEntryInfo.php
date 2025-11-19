@@ -16,8 +16,7 @@ class CloseExternalEntryInfo extends Model
         'closed_by_id',
         'closed_by_name',
         'closed_by_media',
-        'traverlers_name',
-        'group_id'
+        'traverlers_name'
     ];
 
     protected $casts = [

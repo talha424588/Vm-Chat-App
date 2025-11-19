@@ -6615,14 +6615,17 @@ let notificationUpdateInterval = null;
 let urgentEntriesMessages = [];
 
 function extractTravelerName(cleanMsg) {
-    const regex = /Traveler\s+\d+:\s*([\w'-]+)\s*\/\s*([\w'-]+)\s*(MR|MS)/i;
+    const regex = /Traveler\s+\d+:\s*([\w' -]+?)\s*\/\s*([\w' -]+?)\s+(MR|MS|MRS)/i;
     const match = cleanMsg.match(regex);
+
+    console.log("cleanMsg",cleanMsg);
+    console.log("match",match);
 
     if (match) {
         return {
-            lastName: match[1],
-            firstName: match[2],
-            title: match[3].toUpperCase() === "MR" ? "Mr" : "Ms"
+            lastName: match[1].trim(),
+            firstName: match[2].trim(),
+            title: match[3].toUpperCase()
         };
     }
     return null;
@@ -6660,7 +6663,9 @@ function getUrgentMessages() {
                         status: entry.external_message_status == 1 ? true : false,
                         closedByName: entry.closed_by_name || null,
                         closedById: entry.closed_by_id || null,
-                        closedByMedia: entry.closed_by_media || null
+                        closedByMedia: entry.closed_by_media || null,
+                        groupId: entry.group_id,
+                        groupName: entry.group_name
                     }
                     const notificationList = document.getElementById('notification-main-list');
                     const notificationItem = createNotificationItem(notification);
@@ -6708,7 +6713,19 @@ async function toggleNotifications() {
 
         stopNotificationUpdates();
     }
+     debouncedGetUrgentMessages();
 }
+
+function debounce(fn, delay = 500) {
+    let timer = null;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+const debouncedGetUrgentMessages = debounce(refreshUrgentNotifications, 700);
+
 
 
 function createNotificationItem(notification) {
@@ -6719,7 +6736,7 @@ function createNotificationItem(notification) {
     const timeAgo = getTimeAgo(notification.timestamp);
     div.innerHTML = `
                 <div class="notification-user">
-                    ${notification.firstName} ${notification.lastName}
+                    ${notification.firstName} ${notification.lastName} (${notification.groupName})
                 </div>
                 <div class="notification-details">
                     ${notification.travelDetails}
@@ -6882,8 +6899,8 @@ function showCompletionDetails(notificationId) {
 }
 
 function closeEntryDateFormat(d) {
-    const dt = new Date(d), p = n => n.toString().padStart(2,'0');
-    return `${p(dt.getDate())}-${p(dt.getMonth()+1)}-${dt.getFullYear()} | ${p(dt.getHours())}:${p(dt.getMinutes())}:${p(dt.getSeconds())}`;
+    const dt = new Date(d), p = n => n.toString().padStart(2, '0');
+    return `${p(dt.getDate())}-${p(dt.getMonth() + 1)}-${dt.getFullYear()} | ${p(dt.getHours())}:${p(dt.getMinutes())}:${p(dt.getSeconds())}`;
 }
 
 function resetModalState() {
@@ -6925,10 +6942,7 @@ function removeImage() {
 function submitCompletion() {
     if (currentNotificationId && uploadedImage) {
         const notification = urgentEntriesMessages.find(n => n.id === currentNotificationId);
-        console.log("Submitting completion for notification:", notification);
-        console.log("currentNotificationId:", currentNotificationId);
-        console.log("uploadedImage:", uploadedImage);
-        console.log("image from html:", document.getElementById('image-upload-input'));
+
         if (notification) {
             notification.completed = true;
             notification.completionImage = uploadedImage;
@@ -6946,6 +6960,7 @@ function submitCompletion() {
             formData.append('entry_id', currentNotificationId);
             formData.append('closed_by_id', user.id);
             formData.append('closed_by_name', user.name);
+            formData.append('group_id', notification.groupId);
 
             const travelersName = notification.travelers_name || notification.firstName + ' ' + notification.lastName || '';
             formData.append('travelers_name', travelersName);
