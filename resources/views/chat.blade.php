@@ -562,6 +562,108 @@
         }
 
         /* End Here */
+
+        /* Waves container */
+        .bell-waves {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60px;
+            height: 60px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+            /* behind the bell */
+        }
+
+        /* Each wave circle */
+        .bell-waves .wave {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 68, 68, 0.2);
+            /* match badge color */
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        /* Animate waves only when bell-animate is active */
+        .bell-icon.bell-animate+.bell-waves .wave.w1 {
+            animation: waveExpand 1s ease-out infinite;
+            animation-delay: 0s;
+        }
+
+        .bell-icon.bell-animate+.bell-waves .wave.w2 {
+            animation: waveExpand 1s ease-out infinite;
+            animation-delay: 0.33s;
+        }
+
+        .bell-icon.bell-animate+.bell-waves .wave.w3 {
+            animation: waveExpand 1s ease-out infinite;
+            animation-delay: 0.66s;
+        }
+
+        /* Wave keyframes */
+        @keyframes waveExpand {
+            0% {
+                transform: scale(0.3);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.3;
+            }
+
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        /* Keep your existing bell rotation and badge pulse */
+        .bell-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .bell-animate {
+            animation: bellRing 0.5s ease-in-out infinite;
+        }
+
+        @keyframes bellRing {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(-10deg);
+            }
+
+            75% {
+                transform: rotate(10deg);
+            }
+        }
+
+        .notification-count-badge {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 
@@ -583,7 +685,7 @@
                     {{-- Start Here --}}
                     <div class="nav-item dropdown ml-auto d-flex align-items-center">
                         <!-- Notification Bell Icon -->
-                        <div class="notification-bell-container" id="notification-bell" onclick="toggleNotifications()"
+                        {{-- <div class="notification-bell-container" id="notification-bell" onclick="toggleNotifications()"
                             style="margin-right: 10px; cursor: pointer; position: relative;">
                             <div class="bell-icon" id="bell-icon">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -604,7 +706,42 @@
                                 <div id="notification-list">
                                 </div>
                             </div>
+                        </div> --}}
+
+
+
+                        <div class="notification-bell-container" id="notification-bell" onclick="toggleNotifications()"
+                            style="margin-right: 10px; cursor: pointer; position: relative;">
+
+                            <div class="bell-icon" id="bell-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M12 2C13.1 2 14 2.9 14 4C14 4.1 14 4.2 14 4.3C16.3 5.2 18 7.5 18 10V16L20 18V19H4V18L6 16V10C6 7.5 7.7 5.2 10 4.3C10 4.2 10 4.1 10 4C10 2.9 10.9 2 12 2ZM10 21C10 22.1 10.9 23 12 23C13.1 23 14 22.1 14 21"
+                                        stroke="#687780" stroke-width="1.5" fill="none" />
+                                </svg>
+                            </div>
+
+                            <!-- Waves container -->
+                            <div class="bell-waves">
+                                <div class="wave w1"></div>
+                                <div class="wave w2"></div>
+                                <div class="wave w3"></div>
+                            </div>
+
+                            <div class="notification-count-badge" id="notification-count-badge"
+                                style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">
+                                0</div>
+
+                            <div class="notification-panel" id="notification-panel">
+                                <div class="notification-header">
+                                    Travel Notifications
+                                </div>
+                                <div id="notification-list">
+                                </div>
+                            </div>
                         </div>
+
 
                         <button type="button" class="btn loginbutton btn-block" id="logout"
                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

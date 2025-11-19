@@ -67,7 +67,8 @@ class MessageResourceCollection extends ResourceCollection
                 'compose_id' => $message->compose_id,
                 'message_priority' => $message->message_priority,
                 'external_message_status' => $message->external_message_status,
-                'user' => $user,  // Only add user data if it exists
+                'group_name' => $message->group_name,
+                'user' => $user,
                 'reply' => $reply,
             ];
         });

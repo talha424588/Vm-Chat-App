@@ -827,15 +827,15 @@ socket.on("updateGroupMessages", (message) => {
         }
     }
 });
-    function isEditTrue(time) {
-        let unixTime = Number(time);
-        let oneHourLater = unixTime + 3600;
-        let currentUnixTime = Math.floor(new Date() / 1000);
-        if (oneHourLater >= currentUnixTime)
-            return true;
-        else
-            return false;
-    }
+function isEditTrue(time) {
+    let unixTime = Number(time);
+    let oneHourLater = unixTime + 3600;
+    let currentUnixTime = Math.floor(new Date() / 1000);
+    if (oneHourLater >= currentUnixTime)
+        return true;
+    else
+        return false;
+}
 
 socket.on("sendChatToClient", (message) => {
     if (
@@ -1479,13 +1479,13 @@ socket.on("updateEditedMessage", (editedMessage) => {
                         ${(user.role === "0" || user.role === "2")
                         ? `
                             ${isEditTrue(editedMessage.time)
-                                                ? `<a class="dropdown-item" href="#" onclick="editMessage('${editedMessage.id}')">Edit</a>`
-                                                : ""
-                                            }
+                            ? `<a class="dropdown-item" href="#" onclick="editMessage('${editedMessage.id}')">Edit</a>`
+                            : ""
+                        }
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#deleteModal" data-message-id="${editedMessage.id}">Delete</a>
                         `
-                                            : ""
-                        }
+                        : ""
+                    }
                     }
                             ${user.role === "3" &&
                         editedMessage.sender === user.unique_id
@@ -2700,7 +2700,7 @@ let addMessageToMessageArea = (message, flag = false) => {
     }
 
     if (!message.is_privacy_breach && !message.is_deleted) {
-        console.log("message details",message);
+        console.log("message details", message);
         let messageElement = document.createElement("div");
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -2878,20 +2878,19 @@ let addMessageToMessageArea = (message, flag = false) => {
                                     ${user.role === "0" || user.role === "2"
 
                     ? `
-                                          ${
-                                            (
-                                                (message.type === "Message" ||
-                                                (message.type === null &&
-                                                    !/<a[^>]+>/g.test(message.msg) &&
-                                                    !/<audio[^>]+>/g.test(message.msg))
-                                                )
-                                                && isEditTrue(message.time)
-                                            )
-                                            ? `
+                                          ${(
+                        (message.type === "Message" ||
+                            (message.type === null &&
+                                !/<a[^>]+>/g.test(message.msg) &&
+                                !/<audio[^>]+>/g.test(message.msg))
+                        )
+                        && isEditTrue(message.time)
+                    )
+                        ? `
                                                 <a class="dropdown-item" href="#" onclick="editMessage('${message.id}')">Edit qwerty</a>
                                                 `
-                                            : ""
-                                            }
+                        : ""
+                    }
                                     ${(message.type === "Message" ||
                         (message.type === null &&
                             !/<a[^>]+>/g.test(
@@ -4882,7 +4881,7 @@ let init = () => {
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
-    console.log("user details",user);
+    console.log("user details", user);
 
     if (user && (user.role == 0 || user.role == 2)) {
         getUrgentMessages();
@@ -6616,14 +6615,17 @@ let notificationUpdateInterval = null;
 let urgentEntriesMessages = [];
 
 function extractTravelerName(cleanMsg) {
-    const regex = /Traveler\s+\d+:\s*([\w'-]+)\s*\/\s*([\w'-]+)\s*(MR|MS)/i;
+    const regex = /Traveler\s+\d+:\s*([\w' -]+?)\s*\/\s*([\w' -]+?)\s+(MR|MS|MRS)/i;
     const match = cleanMsg.match(regex);
+
+    console.log("cleanMsg",cleanMsg);
+    console.log("match",match);
 
     if (match) {
         return {
-            lastName: match[1],
-            firstName: match[2],
-            title: match[3].toUpperCase() === "MR" ? "Mr" : "Ms"
+            lastName: match[1].trim(),
+            firstName: match[2].trim(),
+            title: match[3].toUpperCase()
         };
     }
     return null;
@@ -6661,7 +6663,9 @@ function getUrgentMessages() {
                         status: entry.external_message_status == 1 ? true : false,
                         closedByName: entry.closed_by_name || null,
                         closedById: entry.closed_by_id || null,
-                        closedByMedia: entry.closed_by_media || null
+                        closedByMedia: entry.closed_by_media || null,
+                        groupId: entry.group_id,
+                        groupName: entry.group_name
                     }
                     const notificationList = document.getElementById('notification-main-list');
                     const notificationItem = createNotificationItem(notification);
@@ -6709,7 +6713,19 @@ async function toggleNotifications() {
 
         stopNotificationUpdates();
     }
+     debouncedGetUrgentMessages();
 }
+
+function debounce(fn, delay = 500) {
+    let timer = null;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+const debouncedGetUrgentMessages = debounce(refreshUrgentNotifications, 700);
+
 
 
 function createNotificationItem(notification) {
@@ -6720,7 +6736,7 @@ function createNotificationItem(notification) {
     const timeAgo = getTimeAgo(notification.timestamp);
     div.innerHTML = `
                 <div class="notification-user">
-                    ${notification.firstName} ${notification.lastName}
+                    ${notification.firstName} ${notification.lastName} (${notification.groupName})
                 </div>
                 <div class="notification-details">
                     ${notification.travelDetails}
@@ -6854,6 +6870,10 @@ function showCompletionDetails(notificationId) {
                         <span style="color: #666;">${completionDetails.traverlers_name}</span>
                     </div>
                     ` : ''}
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #333; margin-right: 10px;">Closed At:</strong>
+                        <span style="color: #666;">${closeEntryDateFormat(completionDetails.created_at)}</span>
+                    </div>
                 `;
 
                 if (completionDetails.closed_by_media) {
@@ -6876,6 +6896,11 @@ function showCompletionDetails(notificationId) {
             console.error('Error fetching completion details:', error);
             alert('Error loading completion details. Please try again.');
         });
+}
+
+function closeEntryDateFormat(d) {
+    const dt = new Date(d), p = n => n.toString().padStart(2, '0');
+    return `${p(dt.getDate())}-${p(dt.getMonth() + 1)}-${dt.getFullYear()} | ${p(dt.getHours())}:${p(dt.getMinutes())}:${p(dt.getSeconds())}`;
 }
 
 function resetModalState() {
@@ -6917,10 +6942,7 @@ function removeImage() {
 function submitCompletion() {
     if (currentNotificationId && uploadedImage) {
         const notification = urgentEntriesMessages.find(n => n.id === currentNotificationId);
-        console.log("Submitting completion for notification:", notification);
-        console.log("currentNotificationId:", currentNotificationId);
-        console.log("uploadedImage:", uploadedImage);
-        console.log("image from html:", document.getElementById('image-upload-input'));
+
         if (notification) {
             notification.completed = true;
             notification.completionImage = uploadedImage;
@@ -6938,6 +6960,7 @@ function submitCompletion() {
             formData.append('entry_id', currentNotificationId);
             formData.append('closed_by_id', user.id);
             formData.append('closed_by_name', user.name);
+            formData.append('group_id', notification.groupId);
 
             const travelersName = notification.travelers_name || notification.firstName + ' ' + notification.lastName || '';
             formData.append('travelers_name', travelersName);

@@ -543,30 +543,6 @@ class ChatService implements ChatRepository
 
     public function fetchUrgentMessages()
     {
-        //  $messages = GroupMessage::where('compose.priority', 2)->where('external_message_status', 0)
-        //         ->whereNot('status', EnumMessageEnum::MOVE)
-        //         ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
-        //         ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
-        //         ->with('user', 'reply')
-        //         ->orderBy('id', 'desc')
-        //         ->get();
-
-        // $messages = GroupMessage::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
-        // ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
-        //     ->where('compose.priority', 2)
-        //     ->where(function ($query) {
-        //         $query->where('group_messages.external_message_status', 0)
-        //             ->orWhere(function ($q) {
-        //                 $q->where('group_messages.external_message_status', 1)
-        //                     ->where('group_messages.time', '>=', now()->subDay()->timestamp);
-        //             });
-        //     })
-        //     ->whereNot('group_messages.status', EnumMessageEnum::MOVE)
-        //     ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
-        //     ->with('user', 'reply')
-        //     ->orderBy('group_messages.id', 'desc')
-        //     ->get();
-
         $groups = Group::whereRaw("FIND_IN_SET(?, REPLACE(access, ' ', '')) > 0", [Auth::user()->id])
         ->where("status", 1)
         ->pluck('group_id');
@@ -574,6 +550,7 @@ class ChatService implements ChatRepository
 
         $messages = GroupMessage::whereIn('group_messages.group_id', $groups)
         ->join('compose', 'group_messages.compose_id', '=', 'compose.id')
+        ->join('groups', 'groups.group_id', '=', 'group_messages.group_id')
         ->where('compose.priority', 2)
         ->where(function ($query) {
             $query->where('group_messages.external_message_status', 0)
@@ -583,7 +560,7 @@ class ChatService implements ChatRepository
                 });
         })
         ->whereNot('group_messages.status', EnumMessageEnum::MOVE)
-        ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority')
+        ->select('group_messages.*', 'compose.id as compose_id', 'compose.priority as message_priority','groups.name as group_name')
         ->with(['user', 'reply'])
         ->orderByDesc('group_messages.id')
         ->get();
@@ -611,8 +588,8 @@ class ChatService implements ChatRepository
             $closedById = $request->input('closed_by_id');
             $closedByName = $request->input('closed_by_name');
             $travelersName = $request->input('travelers_name');
+            $groupId = $request->group_id;
 
-            // Handle image upload
             $closedByMedia = null;
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
@@ -638,18 +615,17 @@ class ChatService implements ChatRepository
                 $closedByMedia = '/uploads/close_external_entries/' . $uniqueMediaName;
             }
 
-            // Create or update the close external entry info
             $closeEntryInfo = CloseExternalEntryInfo::updateOrCreate(
                 ['entry_id' => $entryId],
                 [
                     'closed_by_id' => $closedById,
                     'closed_by_name' => $closedByName,
                     'closed_by_media' => $closedByMedia,
-                    'traverlers_name' => $travelersName
+                    'traverlers_name' => $travelersName,
+                    'group_id' => $groupId
                 ]
             );
 
-            // Update the external_message_status in group_messages table
             GroupMessage::where('id', $entryId)->update(['external_message_status' => 1]);
 
             return response()->json([
