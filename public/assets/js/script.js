@@ -6748,7 +6748,7 @@ function createNotificationItem(notification) {
                         </svg>
                         ${notification.status ? 'Completed' : 'Complete'}
                     </button>
-                    <div class="notification-time" data-timestamp="${notification.timestamp.getTime()}">${timeAgo}</div>
+                    <div class="notification-time" data-timestamp="${notification.timestamp.getTime()}" data-completed="${notification.status ? 'true' : 'false'}">${timeAgo}</div>
                 </div>
             `;
 
@@ -7097,6 +7097,14 @@ function updateNotificationTimes() {
     const timeElements = document.querySelectorAll('.notification-time[data-timestamp]');
 
     timeElements.forEach(element => {
+        const isCompleted = element.getAttribute('data-completed') === 'true'
+            || element.closest('.notification-main-item')?.classList.contains('completed')
+            || element.previousElementSibling?.classList.contains('is-completed');
+
+        if (isCompleted) {
+            return;
+        }
+
         const timestamp = new Date(parseInt(element.getAttribute('data-timestamp')));
         const updatedTime = getTimeAgo(timestamp);
         element.textContent = updatedTime;
