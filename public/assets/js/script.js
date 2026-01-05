@@ -2701,6 +2701,23 @@ let addMessageToMessageArea = (message, flag = false) => {
 
     if (!message.is_privacy_breach && !message.is_deleted) {
         console.log("message details", message);
+
+        // Calculate urgent tag details if needed
+        let urgentTagHTML = "";
+        if (message.message_priority == 2 && user.role == 2) {
+            const messageTime = message.time ? message.time * 1000 : 0;
+            const currentTime = Date.now();
+            const threeHoursInMs = 3 * 60 * 60 * 1000;
+            const timeDifference = currentTime - messageTime;
+            const hoursPassed = timeDifference >= threeHoursInMs ? Math.floor(timeDifference / (60 * 60 * 1000)) : 0;
+            const isOverdue = hoursPassed > 0;
+            const tagBgColor = isOverdue ? '#ff0000' : '#ff4444';
+            const tagText = isOverdue ? `URGENT (${hoursPassed}h)` : 'URGENT';
+            const tagAnimation = isOverdue ? 'animation: pulse-urgent 2s infinite;' : '';
+
+            urgentTagHTML = `<span class="urgent-tag" style="position: absolute; top: 3px; right: 20px; background-color: ${tagBgColor}; color: white; padding: 3px 5px; border-radius: 12px; font-size: 10px; font-weight: bold; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.3); ${tagAnimation}">${tagText}</span>`;
+        }
+
         let messageElement = document.createElement("div");
         messageElement.className = "ml-3";
         messageElement.innerHTML = `
@@ -2709,7 +2726,8 @@ let addMessageToMessageArea = (message, flag = false) => {
             ${message.user.id == user.id ? "" : profileImage}
             <div class="align-self-${message.user.id == user.id ? "end self" : "start"
             } d-flex flex-row align-items-center p-1 my-1 mx-3 rounded message-item ${message.user.id == user.id ? "right-nidle" : "left-nidle"
-            }" data-message-id="${message.id}" id="message-${message.id}">
+            }" data-message-id="${message.id}" id="message-${message.id}" style="position: relative;">
+                    ${urgentTagHTML}
                     <div style="margin-top:-4px">
                         <div class="shadow-sm additional_style" style="background:${message.user.id == user.id ? "#dcf8c6" : "white"
             };">
@@ -2959,6 +2977,263 @@ let addMessageToMessageArea = (message, flag = false) => {
             DOM.messages.appendChild(messageElement);
         } else {
             DOM.messages.insertBefore(messageElement, DOM.messages.firstChild);
+        }
+
+        // Check for urgent message alert (3 hours passed)
+        if (message.message_priority == 2 && user.role == 2 && message.time) {
+            const messageTime = message.time * 1000;
+            const currentTime = Date.now();
+            const threeHoursInMs = 3 * 60 * 60 * 1000;
+            const timeDifference = currentTime - messageTime;
+
+            if (timeDifference >= threeHoursInMs) {
+                const hoursPassed = Math.floor(timeDifference / (60 * 60 * 1000));
+                const messageElement = document.getElementById(`message-${message.id}`);
+
+                if (messageElement) {
+                    // Highlight the message with pulsing red border
+                    messageElement.style.border = '3px solid #ff4444';
+                    messageElement.style.borderRadius = '8px';
+                    messageElement.style.boxShadow = '0 0 15px rgba(255, 68, 68, 0.5)';
+                    messageElement.style.animation = 'pulse-urgent 2s infinite';
+
+                    // Add CSS animations if not already added
+                    if (!document.getElementById('urgent-pulse-style')) {
+                        const style = document.createElement('style');
+                        style.id = 'urgent-pulse-style';
+                        style.textContent = `
+                            @keyframes pulse-urgent {
+                                0%, 100% { box-shadow: 0 0 15px rgba(255, 68, 68, 0.5); }
+                                50% { box-shadow: 0 0 25px rgba(255, 68, 68, 0.8); }
+                            }
+                            .urgent-notification-popup {
+                                position: fixed;
+                                z-index: 10000;
+                                background: linear-gradient(135deg, #ff4444 0%, #ff0000 100%);
+                                color: white;
+                                padding: 16px 20px;
+                                border-radius: 12px;
+                                box-shadow: 0 8px 24px rgba(255, 68, 68, 0.4);
+                                min-width: 320px;
+                                max-width: 400px;
+                                cursor: pointer;
+                                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                                user-select: none;
+                            }
+                            .urgent-notification-popup:hover {
+                                transform: scale(1.03);
+                                box-shadow: 0 12px 32px rgba(255, 68, 68, 0.6);
+                            }
+                            .urgent-notification-popup:active {
+                                transform: scale(0.98);
+                            }
+                            .urgent-notification-header {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                margin-bottom: 12px;
+                                font-weight: bold;
+                                font-size: 16px;
+                            }
+                            .urgent-notification-close {
+                                background: rgba(255, 255, 255, 0.2);
+                                border: none;
+                                color: white;
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 50%;
+                                cursor: pointer;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 18px;
+                                line-height: 1;
+                                transition: background 0.2s;
+                            }
+                            .urgent-notification-close:hover {
+                                background: rgba(255, 255, 255, 0.3);
+                            }
+                            .urgent-notification-content {
+                                font-size: 13px;
+                                line-height: 1.5;
+                            }
+                            .urgent-notification-detail {
+                                margin: 8px 0;
+                                display: flex;
+                                align-items: flex-start;
+                            }
+                            .urgent-notification-label {
+                                font-weight: 600;
+                                margin-right: 8px;
+                                min-width: 80px;
+                            }
+                            .urgent-notification-value {
+                                flex: 1;
+                                word-break: break-word;
+                            }
+                            .urgent-notification-time {
+                                margin-top: 12px;
+                                padding-top: 12px;
+                                border-top: 1px solid rgba(255, 255, 255, 0.3);
+                                font-size: 12px;
+                                opacity: 0.9;
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+
+                    // Update urgent tag to show time passed
+                    const urgentTag = messageElement.querySelector('.urgent-tag');
+                    if (urgentTag) {
+                        urgentTag.style.backgroundColor = '#ff0000';
+                        urgentTag.innerHTML = `URGENT (${hoursPassed}h)`;
+                        urgentTag.style.animation = 'pulse-urgent 2s infinite';
+                    }
+
+                    // Get message position for animation start
+                    const messageRect = messageElement.getBoundingClientRect();
+                    const startX = messageRect.left + messageRect.width / 2;
+                    const startY = messageRect.top + messageRect.height / 2;
+
+                    // Target position (top-right corner)
+                    const popupWidth = 380;
+                    const targetX = window.innerWidth - popupWidth - 20;
+                    const targetY = 20;
+
+                    // Prepare message details
+                    const messagePreview = message.msg ?
+                        (message.msg.length > 80 ? message.msg.substring(0, 80).replace(/<[^>]*>/g, '') + '...' : message.msg.replace(/<[^>]*>/g, '')) :
+                        'No message content';
+                    const senderName = message.user?.name || 'Unknown';
+                    const messageDate = new Date(message.time * 1000).toLocaleString();
+
+                    // Create notification popup
+                    const notificationPopup = document.createElement('div');
+                    notificationPopup.className = 'urgent-notification-popup';
+                    notificationPopup.style.left = startX + 'px';
+                    notificationPopup.style.top = startY + 'px';
+                    notificationPopup.style.transform = 'translate(-50%, -50%) scale(0.3)';
+                    notificationPopup.style.opacity = '0';
+                    notificationPopup.innerHTML = `
+                        <div class="urgent-notification-header">
+                            <span>🚨 URGENT MESSAGE</span>
+                            <button class="urgent-notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                        </div>
+                        <div class="urgent-notification-content">
+                            <div class="urgent-notification-detail">
+                                <span class="urgent-notification-label">From:</span>
+                                <span class="urgent-notification-value">${senderName}</span>
+                            </div>
+                            <div class="urgent-notification-detail">
+                                <span class="urgent-notification-label">Time Passed:</span>
+                                <span class="urgent-notification-value">${hoursPassed} hour(s) ago</span>
+                            </div>
+                            <div class="urgent-notification-detail">
+                                <span class="urgent-notification-label">Preview:</span>
+                                <span class="urgent-notification-value">${messagePreview}</span>
+                            </div>
+                            <div class="urgent-notification-time">
+                                Created: ${messageDate}
+                            </div>
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.3); font-size: 11px; opacity: 0.8; text-align: center;">
+                                👆 Click to view message
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(notificationPopup);
+
+                    // Animate from message to top-right with smooth transition
+                    setTimeout(() => {
+                        // Initial scale and fade in
+                        notificationPopup.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        notificationPopup.style.opacity = '1';
+                        notificationPopup.style.transform = 'translate(-50%, -50%) scale(1)';
+
+                        // Then animate to final position
+                        setTimeout(() => {
+                            notificationPopup.style.transition = 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                            notificationPopup.style.left = targetX + 'px';
+                            notificationPopup.style.top = targetY + 'px';
+                            notificationPopup.style.transform = 'translate(0, 0) scale(1)';
+                        }, 300);
+                    }, 100);
+
+                    // Click to scroll to message - make it more robust
+                    notificationPopup.addEventListener('click', function(e) {
+                        // Don't scroll if clicking the close button
+                        if (e.target.classList.contains('urgent-notification-close')) {
+                            return;
+                        }
+                        
+                        // Find the message element again (in case DOM changed)
+                        const targetMessage = document.getElementById(`message-${message.id}`);
+                        
+                        if (targetMessage) {
+                            // Scroll to message
+                            targetMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            
+                            // Highlight the message briefly
+                            targetMessage.style.border = '3px solid #ff4444';
+                            targetMessage.style.borderRadius = '8px';
+                            targetMessage.style.boxShadow = '0 0 20px rgba(255, 68, 68, 0.7)';
+                            targetMessage.style.transition = 'all 0.3s ease';
+                            
+                            // Add a pulse effect
+                            setTimeout(() => {
+                                targetMessage.style.boxShadow = '0 0 30px rgba(255, 68, 68, 1)';
+                            }, 100);
+                            
+                            // Remove highlight after 3 seconds
+                            setTimeout(() => {
+                                targetMessage.style.border = '';
+                                targetMessage.style.boxShadow = '';
+                                targetMessage.style.transition = '';
+                            }, 3000);
+                            
+                            // Close the notification popup after scrolling
+                            setTimeout(() => {
+                                if (notificationPopup.parentElement) {
+                                    notificationPopup.style.opacity = '0';
+                                    notificationPopup.style.transform = 'translate(0, -20px) scale(0.9)';
+                                    notificationPopup.style.transition = 'all 0.3s ease';
+                                    setTimeout(() => {
+                                        if (notificationPopup.parentElement) {
+                                            notificationPopup.remove();
+                                        }
+                                    }, 300);
+                                }
+                            }, 500);
+                        }
+                    });
+
+                    // Auto-remove after 10 seconds
+                    setTimeout(() => {
+                        if (notificationPopup.parentElement) {
+                            notificationPopup.style.opacity = '0';
+                            notificationPopup.style.transform = 'translate(0, -20px) scale(0.9)';
+                            notificationPopup.style.transition = 'all 0.3s ease';
+                            setTimeout(() => {
+                                if (notificationPopup.parentElement) {
+                                    notificationPopup.remove();
+                                }
+                            }, 300);
+                        }
+                    }, 10000);
+
+                    // Scroll to message after a short delay
+                    setTimeout(() => {
+                        messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 200);
+
+                    // Remove highlight after 10 seconds
+                    setTimeout(() => {
+                        messageElement.style.border = '';
+                        messageElement.style.boxShadow = '';
+                        messageElement.style.animation = '';
+                    }, 10000);
+                }
+            }
         }
     } else if (
         (message.is_privacy_breach == 1 && user.role == 0) ||
@@ -6618,8 +6893,8 @@ function extractTravelerName(cleanMsg) {
     const regex = /Traveler\s+\d+:\s*([\w' -]+?)\s*\/\s*([\w' -]+?)\s+(MR|MS|MRS)/i;
     const match = cleanMsg.match(regex);
 
-    console.log("cleanMsg",cleanMsg);
-    console.log("match",match);
+    console.log("cleanMsg", cleanMsg);
+    console.log("match", match);
 
     if (match) {
         return {
@@ -6713,7 +6988,7 @@ async function toggleNotifications() {
 
         stopNotificationUpdates();
     }
-     debouncedGetUrgentMessages();
+    debouncedGetUrgentMessages();
 }
 
 function debounce(fn, delay = 500) {

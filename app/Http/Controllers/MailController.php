@@ -21,6 +21,6 @@ class MailController extends Controller
 
     public function RequestMessageDelete($user, $request)
     {
-        Mail::to("tal424588@gmail.com")->send(new MessageDeleteRequest($user,$request));
+        Mail::to("Myknowledgeidea@gmail.com")->send(new MessageDeleteRequest($user,$request));
     }
 }
